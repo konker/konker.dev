@@ -22,8 +22,6 @@ jobs:
         with:
           version: '8'
       - name: Install Dependencies
-        run: |
-          pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Run Checks
-        run: |
-          pnpm run ci
+        run: pnpm run ci
