@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/effect-ts-prelude",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Prelude for Effect-ts",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
