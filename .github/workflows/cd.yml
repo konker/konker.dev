@@ -29,6 +29,9 @@ jobs:
       - name: Install Dependencies
         run: |
           pnpm install
+      - name: Run Checks
+        run: |
+          pnpm run ci
       - name: Deploy to Registry
         run: |
           printf "@konker.dev:registry=https://registry.npmjs.org/\n//registry.npmjs.org/:_authToken=NpmToken.${PRIVATE_NPM_TOKEN}" > ~/.npmrc
