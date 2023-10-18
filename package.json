@@ -3,7 +3,11 @@
   "version": "0.0.3",
   "description": "Prelude for Effect-ts",
   "author": "Konrad Markus <mail@konker.dev>",
-  "packageManager": "pnpm@8",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/konkerdotdev/effect-ts-prelude"
@@ -17,7 +21,7 @@
     "typescript",
     "ts"
   ],
-  "license": "ISC",
+  "packageManager": "pnpm@8",
   "peerDependencies": {
     "@effect/data": "^0.18.5",
     "@effect/io": "^0.40.3",
@@ -58,14 +62,15 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc && gulp copy-static",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",
-    "lint-check": "pnpm run eslint-check && pnpm run prettier-check",
+    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run test && pnpm run build",
-    "cd": "pnpm publish --access public"
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run test",
+    "cd": "pnpm run build && pnpm publish --access public"
   }
 }
