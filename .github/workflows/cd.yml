@@ -1,0 +1,35 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'lib/package.json'
+
+env:
+  PRIVATE_NPM_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: CD
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+      - name: Install Dependencies
+        run: |
+          pnpm install
+      - name: Deploy to Registry
+        run: |
+          printf "@konker.dev:registry=https://registry.npmjs.org/\n//registry.npmjs.org/:_authToken=NpmToken.${PRIVATE_NPM_TOKEN}" > ~/.npmrc
+          pnpm run cd
