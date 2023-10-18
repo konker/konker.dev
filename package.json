@@ -61,6 +61,7 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run test && pnpm run build"
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run test && pnpm run build",
+    "cd": "pnpm run ci && pnpm publish --access public"
   }
 }
