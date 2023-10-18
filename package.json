@@ -6,7 +6,8 @@
   "license": "ISC",
   "main": "dist/index.js",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "!dist/**/*.test.*"
   ],
   "repository": {
     "type": "git",
