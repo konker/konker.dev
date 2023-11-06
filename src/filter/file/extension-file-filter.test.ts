@@ -1,5 +1,5 @@
 // TODO: tests
-describe('index', () => {
+describe('extension-file-filter', () => {
   it('should have some tests', () => {
     expect(true).toBe(true);
   });

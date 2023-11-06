@@ -1,5 +1,5 @@
 // TODO: tests
-describe('index', () => {
+describe('noop-file-handler', () => {
   it('should have some tests', () => {
     expect(true).toBe(true);
   });
