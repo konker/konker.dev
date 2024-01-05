@@ -1,6 +1,7 @@
 export * as Effect from '@effect/io/Effect';
 export * as Context from '@effect/data/Context';
 export * as Layer from '@effect/io/Layer';
+export * as Cause from '@effect/io/Cause';
 export * as Console from '@effect/io/Console';
 export { assert } from '@effect/io/Console';
 export * as Deferred from '@effect/io/Deferred';
@@ -24,6 +25,7 @@ export * as ParseResult from '@effect/schema/ParseResult';
 
 import type { LazyArg } from '@effect/data/Function';
 export { LazyArg } from '@effect/data/Function';
+export { Predicate } from '@effect/data/Predicate';
 
 // IIFE
 export type II = <R>(fe: LazyArg<R>) => R;
@@ -33,3 +35,20 @@ export const ii: II = (fe) => fe();
 export function toError(x: unknown): Error {
   return x instanceof Error ? x : new Error(String(x));
 }
+
+// Convenience functions
+import { pipe } from '@effect/data/Function';
+import * as Effect from '@effect/io/Effect';
+export const fromPredicate =
+  <R, E, A>(a: A) =>
+  (predicate: (a: A) => boolean, onFalse: LazyArg<E>): Effect.Effect<R, E, A> => {
+    return pipe(a, predicate, Effect.if({ onTrue: Effect.succeed(a), onFalse: Effect.fail(onFalse()) }));
+  };
+
+// Array functions
+export const Array = {
+  map:
+    <A, B>(f: (a: A) => B) =>
+    (as: Array<A>): Array<B> =>
+      as.map(f),
+};
