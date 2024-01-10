@@ -29,6 +29,7 @@
     "@effect/schema": "^0.36.5",
     "@konker.dev/effect-ts-prelude": "0.0.5",
     "@konker.dev/tiny-event-fp": "^0.0.2",
+    "@konker.dev/tiny-filesystem-fp": "^0.0.1",
     "dist-types": "@smithy/smithy-client/dist-types",
     "effect": "^2.0.2"
   },

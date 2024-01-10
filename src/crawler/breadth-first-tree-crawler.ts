@@ -1,5 +1,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
+import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
+import { FileType } from '@konker.dev/tiny-filesystem-fp';
 
 import type {
   DirectoryData,
@@ -13,8 +15,6 @@ import type {
 import { DIR, FILE, TreeCrawlerEvent } from '../index';
 import type { TinyFileSystemError } from '../lib/error';
 import { toTinyFileSystemError } from '../lib/error';
-import type { TinyFileSystem } from '../lib/TinyFileSystem';
-import { FileType } from '../lib/TinyFileSystem';
 import { FILES_FIRST, sortListingByFileType } from '../lib/utils';
 
 export function notifyDirectoryEvent(

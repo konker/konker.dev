@@ -1,10 +1,10 @@
 import type * as P from '@konker.dev/effect-ts-prelude';
 import type * as E from '@konker.dev/tiny-event-fp';
+import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
 import type { TreeCrawlerDirectoryFilter, TreeCrawlerFileFilter } from './filter';
 import type { TreeCrawlerDirectoryHandler, TreeCrawlerFileHandler } from './handler';
 import type { TinyFileSystemError } from './lib/error';
-import type { TinyFileSystem } from './lib/TinyFileSystem';
 
 export type Err = TinyFileSystemError;
 

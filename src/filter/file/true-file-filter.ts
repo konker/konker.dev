@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
+import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
-import type { TinyFileSystem } from '../../lib/TinyFileSystem';
 import type { TreeCrawlerFileFilter } from '../index';
 
 export const TrueFileFilter: TreeCrawlerFileFilter = (

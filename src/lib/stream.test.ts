@@ -2,7 +2,7 @@ import { PassThrough, Readable } from 'node:stream';
 
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
+import { PromiseDependentWritableStream } from '../../dist/lib/PromiseDependentWritableStream';
 import * as streamUtils from './stream';
 
 describe('stream utils', () => {

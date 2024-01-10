@@ -1,7 +1,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
+import type { FileType, Ref, TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
 import type { TinyFileSystemError } from './error';
-import type { FileType, Ref, TinyFileSystem } from './TinyFileSystem';
 
 // Array functions
 export const Array = {

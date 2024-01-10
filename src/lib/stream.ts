@@ -5,9 +5,9 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import { toError } from '@konker.dev/effect-ts-prelude';
 import readline from 'readline';
 
-import type { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
-import type { S3Error } from './s3-client-fp';
-import { toS3Error } from './s3-client-fp';
+import type { PromiseDependentWritableStream } from '../../dist/lib/PromiseDependentWritableStream';
+import type { S3Error } from '../../dist/lib/s3-client-fp';
+import { toS3Error } from '../../dist/lib/s3-client-fp';
 
 /**
  * Consume a readStream
