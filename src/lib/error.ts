@@ -1,15 +1,15 @@
-export const TAG = 'TinyFileSystemError';
+export const TAG = 'TinyTreeCrawlerError';
 
-export type TinyFileSystemError = {
+export type TinyTreeCrawlerError = {
   readonly _tag: typeof TAG;
   readonly message: string;
   readonly cause: unknown;
 };
 
-export function toTinyFileSystemError(x: unknown): TinyFileSystemError {
+export function toTinyTreeCrawlerError(x: unknown): TinyTreeCrawlerError {
   return {
     _tag: TAG,
-    message: typeof x === 'object' && x && 'message' in x ? (x as any).message : String(x),
+    message: typeof x === 'object' && x && 'message' in x && typeof x.message === 'string' ? x.message : String(x),
     cause: x,
   };
 }

@@ -17,7 +17,7 @@ export default {
   modulePathIgnorePatterns: ['<rootDir>/dist', '<rootDir>/.build', '<rootDir>/.sst', '<rootDir>/node_modules'],
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
   collectCoverage: true,
-  collectCoverageFrom: ['YOUR_SRC_DIR_COULD_BE_DOT/**/*.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/examples/**'],
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   coveragePathIgnorePatterns: [
     // Non logic directories

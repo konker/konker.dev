@@ -1,15 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 import type { FileType, Ref, TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
-
-import type { TinyFileSystemError } from './error';
-
-// Array functions
-export const Array = {
-  map:
-    <A, B>(f: (a: A) => B) =>
-    (as: Array<A>): Array<B> =>
-      as.map(f),
-};
+import type { TinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/dist/lib/error';
 
 export const DIRECTORIES_FIRST = true;
 export const FILES_FIRST = false;

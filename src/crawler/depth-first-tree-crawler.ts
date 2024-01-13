@@ -3,58 +3,12 @@ import * as E from '@konker.dev/tiny-event-fp';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 import { FileType } from '@konker.dev/tiny-filesystem-fp';
 
-import type {
-  DirectoryData,
-  Err,
-  FileData,
-  TreeCrawler,
-  TreeCrawlerData,
-  TreeCrawlerFilters,
-  TreeCrawlerHandlers,
-} from '../index';
+import type { TreeCrawler, TreeCrawlerData, TreeCrawlerFilters, TreeCrawlerHandlers } from '../index';
 import { DIR, FILE, TreeCrawlerEvent } from '../index';
-import type { TinyFileSystemError } from '../lib/error';
-import { toTinyFileSystemError } from '../lib/error';
+import type { TinyTreeCrawlerError } from '../lib/error';
+import { toTinyTreeCrawlerError } from '../lib/error';
 import { DIRECTORIES_FIRST, sortListingByFileType } from '../lib/utils';
-
-export function notifyDirectoryEvent(
-  events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
-  directoryData: P.Option.Option<DirectoryData>
-): P.Effect.Effect<never, TinyFileSystemError, void> {
-  return P.pipe(
-    directoryData,
-    P.Option.match({
-      onSome: (directoryData) =>
-        P.pipe(
-          events,
-          E.notify(TreeCrawlerEvent.Directory, directoryData),
-          (x) => x,
-          P.Effect.mapError(toTinyFileSystemError),
-          P.Effect.flatMap(() => P.Effect.unit)
-        ),
-      onNone: () => P.Effect.unit,
-    })
-  );
-}
-
-export function notifyFileEvent(
-  events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
-  fileData: P.Option.Option<FileData>
-): P.Effect.Effect<never, TinyFileSystemError, void> {
-  return P.pipe(
-    fileData,
-    P.Option.match({
-      onSome: (fileData) =>
-        P.pipe(
-          events,
-          E.notify(TreeCrawlerEvent.File, fileData),
-          P.Effect.mapError(toTinyFileSystemError),
-          P.Effect.flatMap(() => P.Effect.unit)
-        ),
-      onNone: () => P.Effect.unit,
-    })
-  );
-}
+import { notifyDirectoryEvent, notifyFileEvent } from './index';
 
 export const DepthFirstTreeCrawler: TreeCrawler = (
   tfs: TinyFileSystem,
@@ -62,11 +16,14 @@ export const DepthFirstTreeCrawler: TreeCrawler = (
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
 ) => {
-  const crawlTree = (dirPath: string, rootPath: string = dirPath, level = 0): P.Effect.Effect<never, Err, void> => {
+  const crawlTree = (
+    dirPath: string,
+    rootPath: string,
+    level: number
+  ): P.Effect.Effect<never, TinyTreeCrawlerError, void> => {
     return P.pipe(
       // Apply directory handler
       handlers[DIR](tfs, dirPath, level),
-      (x) => x,
 
       // Notify directory event if there is some data from the handler
       P.Effect.tap((directoryData) => notifyDirectoryEvent(events, directoryData)),
@@ -111,11 +68,28 @@ export const DepthFirstTreeCrawler: TreeCrawler = (
             )
           );
         })
-      )
+      ),
+
+      // Narrow errors
+      P.Effect.mapError(toTinyTreeCrawlerError)
     );
   };
 
-  return crawlTree;
+  return (dirPath: string, rootPath: string = dirPath, level = 0) =>
+    P.pipe(
+      P.Effect.unit,
+
+      // Notify `Started` event
+      P.Effect.tap(() => P.pipe(events, E.notify(TreeCrawlerEvent.Started))),
+
+      P.Effect.flatMap(() => crawlTree(dirPath, rootPath, level)),
+
+      // Notify Finished event
+      P.Effect.tap(() => P.pipe(events, E.notify(TreeCrawlerEvent.Finished))),
+
+      // Narrow errors
+      P.Effect.mapError(toTinyTreeCrawlerError)
+    );
 };
 
 // --------------------------------------------------------------------------

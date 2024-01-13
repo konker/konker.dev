@@ -4,9 +4,7 @@ import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
 import type { TreeCrawlerDirectoryFilter, TreeCrawlerFileFilter } from './filter';
 import type { TreeCrawlerDirectoryHandler, TreeCrawlerFileHandler } from './handler';
-import type { TinyFileSystemError } from './lib/error';
-
-export type Err = TinyFileSystemError;
+import type { TinyTreeCrawlerError } from './lib/error';
 
 // --------------------------------------------------------------------------
 /**
@@ -53,6 +51,4 @@ export type TreeCrawler = (
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
-) => (dirPath: string, rootPath?: string, level?: number) => P.Effect.Effect<never, Err, void>;
-
-// --------------------------------------------------------------------------
+) => (dirPath: string, rootPath?: string, level?: number) => P.Effect.Effect<never, TinyTreeCrawlerError, void>;
