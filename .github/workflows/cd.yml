@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'PATH_TO_PACKAGE_JSON'
+      - 'package.json'
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
