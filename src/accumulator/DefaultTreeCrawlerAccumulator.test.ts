@@ -2,7 +2,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
 import { TreeCrawlerEvent } from '../index';
-import * as unit from './index';
+import * as unit from './DefaultTreeCrawlerAccumultor';
 
 describe('accumulator', () => {
   describe('DefaultTreeCrawlerAccumulator', () => {

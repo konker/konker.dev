@@ -3,7 +3,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
 
-import { DefaultTreeCrawlerAccumulator } from '../accumulator';
+import { DefaultTreeCrawlerAccumulator } from '../accumulator/DefaultTreeCrawlerAccumultor';
 import { BreadthFirstTreeCrawler } from '../crawler/breadth-first-tree-crawler';
 import { sequenceFileFilters } from '../filter';
 import { TrueDirectoryFilter } from '../filter/directory/true-directory-filter';
