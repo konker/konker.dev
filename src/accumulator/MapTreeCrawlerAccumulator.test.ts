@@ -7,7 +7,7 @@ import * as unit from './MapTreeCrawlerAccumultor';
 describe('accumulator', () => {
   describe('MapTreeCrawlerAccumulator', () => {
     it('should work as expected', () => {
-      const accumulator = unit.MapTreeCrawlerAccumulator((event, _data) => `FOO_${event}`)();
+      const accumulator = unit.MapTreeCrawlerAccumulator((event, _data) => `FOO_${event}`);
       accumulator.push(TreeCrawlerEvent.Directory, { _tag: 'Directory', level: 1, path: '/tmp/foo' });
       accumulator.push(TreeCrawlerEvent.File, { _tag: 'File', level: 1, path: '/tmp/foo/a.txt', data: ['A'] });
 

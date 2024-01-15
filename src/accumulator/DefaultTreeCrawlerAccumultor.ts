@@ -5,11 +5,9 @@ import type { TreeCrawlerAccumulator } from './index';
 
 export type DefaultAccumulatorItem = [TreeCrawlerEvent, TreeCrawlerData];
 
-export const DefaultTreeCrawlerAccumulator = (
-  accInit: Array<DefaultAccumulatorItem> = []
-): TreeCrawlerAccumulator<Array<DefaultAccumulatorItem>> => {
+export const DefaultTreeCrawlerAccumulator = (): TreeCrawlerAccumulator<Array<DefaultAccumulatorItem>> => {
   // eslint-disable-next-line fp/no-let
-  let acc: Array<DefaultAccumulatorItem> = [...accInit];
+  let acc: Array<DefaultAccumulatorItem> = [];
 
   const rep = {
     push: (eventType: TreeCrawlerEvent, eventData?: TreeCrawlerData) => {

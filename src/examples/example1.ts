@@ -17,7 +17,7 @@ import * as memFs1Fixture from '../test/fixtures/memfs-1.json';
 (async function main() {
   const prg = P.pipe(
     P.Effect.Do,
-    P.Effect.bind('accumulator', () => P.Effect.succeed(DefaultTreeCrawlerAccumulator([]))),
+    P.Effect.bind('accumulator', () => P.Effect.succeed(DefaultTreeCrawlerAccumulator())),
     P.Effect.bind('events', ({ accumulator }) =>
       P.pipe(
         E.createTinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>(),
