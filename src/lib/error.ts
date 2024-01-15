@@ -1,15 +1,7 @@
-export const TAG = 'TinyTreeCrawlerError';
+import { toTinyError } from '@konker.dev/tiny-error-fp';
 
-export type TinyTreeCrawlerError = {
-  readonly _tag: typeof TAG;
-  readonly message: string;
-  readonly cause: unknown;
-};
+export const ERROR_TAG = 'TinyTreeCrawlerError';
+export type ERROR_TAG = typeof ERROR_TAG;
 
-export function toTinyTreeCrawlerError(x: unknown): TinyTreeCrawlerError {
-  return {
-    _tag: TAG,
-    message: typeof x === 'object' && x && 'message' in x && typeof x.message === 'string' ? x.message : String(x),
-    cause: x,
-  };
-}
+export const toTinyTreeCrawlerError = toTinyError<ERROR_TAG>(ERROR_TAG);
+export type TinyTreeCrawlerError = ReturnType<typeof toTinyTreeCrawlerError>;

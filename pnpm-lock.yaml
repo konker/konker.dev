@@ -29,6 +29,9 @@ dependencies:
   '@konker.dev/effect-ts-prelude':
     specifier: 0.0.5
     version: 0.0.5(@effect/data@0.18.7)(@effect/io@0.41.2)(@effect/schema@0.36.5)(effect@2.0.2)
+  '@konker.dev/tiny-error-fp':
+    specifier: ^0.0.1
+    version: 0.0.1
   '@konker.dev/tiny-event-fp':
     specifier: ^0.0.4
     version: 0.0.4
@@ -1586,6 +1589,10 @@ packages:
       '@effect/io': 0.41.2(@effect/data@0.18.7)
       '@effect/schema': 0.36.5(@effect/data@0.18.7)(@effect/io@0.41.2)
       effect: 2.0.2
+    dev: false
+
+  /@konker.dev/tiny-error-fp@0.0.1:
+    resolution: {integrity: sha512-6byqMIkw+5UY0S49XE0vrxE8hdajMSynhhmmXUp//CbN/rvPo035cH2W23qVFvzlJzYNbW6EA7aUNzMWIsKZcw==}
     dev: false
 
   /@konker.dev/tiny-event-fp@0.0.4:
