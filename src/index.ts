@@ -36,19 +36,31 @@ export function toError(x: unknown): Error {
   return x instanceof Error ? x : new Error(String(x));
 }
 
-// Convenience functions
-import { pipe } from '@effect/data/Function';
-import * as Effect from '@effect/io/Effect';
-export const fromPredicate =
-  <R, E, A>(a: A) =>
-  (predicate: (a: A) => boolean, onFalse: LazyArg<E>): Effect.Effect<R, E, A> => {
-    return pipe(a, predicate, Effect.if({ onTrue: Effect.succeed(a), onFalse: Effect.fail(onFalse()) }));
-  };
-
 // Array functions
 export const Array = {
   map:
     <A, B>(f: (a: A) => B) =>
     (as: Array<A>): Array<B> =>
       as.map(f),
+
+  foldl:
+    <A, B>(f: (acc: B, val: A) => B, b: B) =>
+    (as: Array<A>): B =>
+      as.reduce(f, b),
+
+  foldr:
+    <A, B>(f: (acc: B, val: A) => B, b: B) =>
+    (as: Array<A>): B =>
+      as.reduceRight(f, b),
+
+  join:
+    <A>(sep = '') =>
+    (as: Array<A>): string =>
+      as.join(sep),
+
+  // eslint-disable-next-line fp/no-mutating-methods
+  toSorted: <A>(as: Array<A>): Array<A> => [...as].sort(),
+
+  // eslint-disable-next-line fp/no-mutating-methods
+  toReversed: <A>(as: Array<A>): Array<A> => [...as].reverse(),
 };

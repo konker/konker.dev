@@ -40,6 +40,58 @@ describe('effect-prelude', () => {
     });
   });
 
+  describe('Array.map', () => {
+    it('should function as expected', () => {
+      expect(
+        P.pipe(
+          [1, 2, 3],
+          P.Array.map((n) => n * 2)
+        )
+      ).toEqual([2, 4, 6]);
+    });
+  });
+
+  describe('Array.foldl', () => {
+    it('should function as expected', () => {
+      expect(
+        P.pipe(
+          [1, 2, 3],
+          P.Array.foldl((acc, val) => acc + String(val), '')
+        )
+      ).toEqual('123');
+    });
+  });
+
+  describe('Array.foldr', () => {
+    it('should function as expected', () => {
+      expect(
+        P.pipe(
+          [1, 2, 3],
+          P.Array.foldr((acc, val) => acc + String(val), '')
+        )
+      ).toEqual('321');
+    });
+  });
+
+  describe('Array.toSorted', () => {
+    it('should function as expected', () => {
+      expect(P.pipe([3, 1, 2], P.Array.toSorted)).toEqual([1, 2, 3]);
+    });
+  });
+
+  describe('Array.toReversed', () => {
+    it('should function as expected', () => {
+      expect(P.pipe([1, 2, 3], P.Array.toReversed)).toEqual([3, 2, 1]);
+    });
+  });
+
+  describe('Array.join', () => {
+    it('should function as expected', () => {
+      expect(P.pipe([1, 2, 3], P.Array.join())).toEqual('123');
+      expect(P.pipe([1, 2, 3], P.Array.join('-'))).toEqual('1-2-3');
+    });
+  });
+
   describe('example usage', () => {
     function strToNum(s: string): P.Effect.Effect<never, Error, number> {
       return P.pipe(s, P.Schema.decode(P.Schema.NumberFromString), P.Effect.mapError(P.toError));
