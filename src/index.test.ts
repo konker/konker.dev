@@ -97,6 +97,100 @@ describe('effect-prelude', () => {
       return P.pipe(s, P.Schema.decode(P.Schema.NumberFromString), P.Effect.mapError(P.toError));
     }
 
-    P.assert(P.Effect.runSync(strToNum('1')) === 1);
+    P.Console.assert(P.Effect.runSync(strToNum('1')) === 1);
+  });
+
+  describe('type test', () => {
+    it('should not have any type errors', () => {
+      // --------------------------------------------------------------------------
+      // From: https://www.effect.website/docs/context-management/layers
+
+      // Define the interface for the MeasuringCup service
+      type MeasuringCup = {
+        readonly measure: (amount: number, unit: string) => P.Effect.Effect<never, never, string>;
+      };
+
+      // Create a tag for the MeasuringCup service
+      const MeasuringCup = P.Context.Tag<MeasuringCup>();
+
+      const MeasuringCupLive: P.Layer.Layer<never, never, MeasuringCup> = P.Layer.succeed(
+        MeasuringCup,
+        MeasuringCup.of({
+          measure: (amount, unit) => P.Effect.succeed(`Measured ${amount} ${unit}(s)`),
+        })
+      );
+
+      // Sugar
+      type Sugar = {
+        readonly grams: (amount: number) => P.Effect.Effect<never, never, string>;
+      };
+
+      const Sugar = P.Context.Tag<Sugar>();
+
+      const SugarLive: P.Layer.Layer<MeasuringCup, never, Sugar> = P.Layer.effect(
+        Sugar,
+        P.Effect.map(MeasuringCup, (measuringCup) =>
+          Sugar.of({
+            grams: (amount) => measuringCup.measure(amount, 'gram'),
+          })
+        )
+      );
+
+      // Flour
+      type Flour = {
+        readonly cups: (amount: number) => P.Effect.Effect<never, never, string>;
+      };
+
+      const Flour = P.Context.Tag<Flour>();
+
+      const FlourLive: P.Layer.Layer<MeasuringCup, never, Flour> = P.Layer.effect(
+        Flour,
+        P.Effect.map(MeasuringCup, (measuringCup) =>
+          Flour.of({
+            cups: (amount) => measuringCup.measure(amount, 'cup'),
+          })
+        )
+      );
+
+      type Recipe = {
+        readonly steps: P.Effect.Effect<never, never, ReadonlyArray<string>>;
+      };
+
+      const Recipe = P.Context.Tag<Recipe>();
+
+      const RecipeLive: P.Layer.Layer<Sugar | Flour, never, Recipe> = P.Layer.effect(
+        Recipe,
+        P.Effect.all([Sugar, Flour]).pipe(
+          P.Effect.map(([sugar, flour]) =>
+            Recipe.of({
+              steps: P.Effect.all([sugar.grams(200), flour.cups(1)]),
+            })
+          )
+        )
+      );
+
+      const IngredientsLive: P.Layer.Layer<MeasuringCup, never, Sugar | Flour> = P.Layer.merge(FlourLive, SugarLive);
+
+      const MainLive1: P.Layer.Layer<never, never, Recipe> = RecipeLive.pipe(
+        P.Layer.provide(IngredientsLive), // provides the ingredients to the recipe
+        P.Layer.provide(MeasuringCupLive) // provides the MeasuringCup to the ingredients
+      );
+
+      const RecipeDraft: P.Layer.Layer<MeasuringCup, never, Recipe> = RecipeLive.pipe(P.Layer.provide(IngredientsLive)); // provides the ingredients to the recipe
+
+      const MainLive2: P.Layer.Layer<never, never, MeasuringCup | Recipe> = RecipeDraft.pipe(
+        P.Layer.provideMerge(MeasuringCupLive)
+      ); // provides the MeasuringCup to the recipe
+
+      const MainLive3: P.Layer.Layer<never, never, Recipe> = RecipeLive.pipe(
+        P.Layer.provide(IngredientsLive),
+        P.Layer.provide(MeasuringCupLive)
+      );
+
+      // Just to use the variables, the actual test is the absence of type errors
+      expect(MainLive1).toBeDefined();
+      expect(MainLive2).toBeDefined();
+      expect(MainLive3).toBeDefined();
+    });
   });
 });
