@@ -4,8 +4,8 @@ export * as Schema from '@effect/schema/Schema';
 export * as TreeFormatter from '@effect/schema/TreeFormatter';
 export * as ParseResult from '@effect/schema/ParseResult';
 
-import type { LazyArg } from '@effect/data/Function';
-export { LazyArg } from '@effect/data/Function';
+import type { LazyArg } from 'effect/Function';
+export { LazyArg } from 'effect/Function';
 
 // IIFE
 export type II = <R>(fe: LazyArg<R>) => R;
