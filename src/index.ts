@@ -46,8 +46,8 @@ export type TreeCrawlerFilters = [TreeCrawlerFileFilter, TreeCrawlerDirectoryFil
 export type TreeCrawlerHandlers = [TreeCrawlerFileHandler, TreeCrawlerDirectoryHandler];
 
 // --------------------------------------------------------------------------
-export type TreeCrawler = (
-  tfs: TinyFileSystem,
+export type TreeCrawler<T extends TinyFileSystem = TinyFileSystem> = (
+  tfs: T,
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
