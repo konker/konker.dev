@@ -51,6 +51,17 @@ describe('effect-prelude', () => {
     });
   });
 
+  describe('Array.filter', () => {
+    it('should function as expected', () => {
+      expect(
+        P.pipe(
+          [1, 2, 3, 4],
+          P.Array.filter((n) => n % 2 === 0)
+        )
+      ).toEqual([2, 4]);
+    });
+  });
+
   describe('Array.foldl', () => {
     it('should function as expected', () => {
       expect(

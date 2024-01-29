@@ -23,6 +23,11 @@ export const Array = {
     (as: Array<A>): Array<B> =>
       as.map(f),
 
+  filter:
+    <A>(f: (a: A) => boolean) =>
+    (as: Array<A>): Array<A> =>
+      as.filter(f),
+
   foldl:
     <A, B>(f: (acc: B, val: A) => B, b: B) =>
     (as: Array<A>): B =>
