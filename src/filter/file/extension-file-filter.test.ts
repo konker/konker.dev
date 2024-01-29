@@ -5,7 +5,7 @@ import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
 import * as memFs1Fixture from '../../test/fixtures/memfs-1.json';
 import * as unit from './extension-file-filter';
 
-describe('false-directory-filter', () => {
+describe('extension-file-filter', () => {
   let memFsTinyFileSystem: MemFsTinyFileSystem;
 
   beforeAll(() => {

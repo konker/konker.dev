@@ -3,16 +3,16 @@ import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
 import type { TinyTreeCrawlerError } from '../lib/error';
 
-export type TreeCrawlerDirectoryFilter = (
-  tfs: TinyFileSystem,
+export type TreeCrawlerDirectoryFilter<T extends TinyFileSystem = TinyFileSystem> = (
+  tfs: T,
   rootPath: string,
   dirPath: string,
   dirName: string,
   level: number
 ) => P.Effect.Effect<never, TinyTreeCrawlerError, boolean>;
 
-export type TreeCrawlerFileFilter = (
-  tfs: TinyFileSystem,
+export type TreeCrawlerFileFilter<T extends TinyFileSystem = TinyFileSystem> = (
+  tfs: T,
   rootPath: string,
   dirPath: string,
   fileName: string,
