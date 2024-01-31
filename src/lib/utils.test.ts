@@ -3,6 +3,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import type { Ref } from '@konker.dev/tiny-filesystem-fp';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
 
+import { TreeCrawlerDataType } from '../index';
 import * as memFs1Fixture from '../test/fixtures/memfs-1.json';
 import * as unit from './utils';
 
@@ -11,6 +12,28 @@ describe('utils', () => {
 
   beforeAll(() => {
     memFsTinyFileSystem = MemFsTinyFileSystem(memFs1Fixture, '/tmp');
+  });
+
+  describe('isFileData', () => {
+    it('should work as expected', () => {
+      expect(unit.isFileData({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo', data: [] })).toStrictEqual(
+        true
+      );
+      expect(
+        unit.isFileData({ _tag: TreeCrawlerDataType.Directory, level: 0, path: '/tmp/foo', data: [] })
+      ).toStrictEqual(false);
+    });
+  });
+
+  describe('isDirectoryData', () => {
+    it('should work as expected', () => {
+      expect(
+        unit.isDirectoryData({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo', data: [] })
+      ).toStrictEqual(false);
+      expect(
+        unit.isDirectoryData({ _tag: TreeCrawlerDataType.Directory, level: 0, path: '/tmp/foo', data: [] })
+      ).toStrictEqual(true);
+    });
   });
 
   describe('sortListingByFileType', () => {

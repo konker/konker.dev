@@ -44,14 +44,6 @@ export type DirectoryData = {
 
 export type TreeCrawlerData = FileData | DirectoryData;
 
-export function isFileData(data: TreeCrawlerData): data is FileData {
-  return data._tag === TreeCrawlerDataType.File;
-}
-
-export function isDirectoryData(data: TreeCrawlerData): data is DirectoryData {
-  return data._tag === TreeCrawlerDataType.Directory;
-}
-
 // --------------------------------------------------------------------------
 export const FILE = 0;
 export const DIR = 1;

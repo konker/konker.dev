@@ -17,6 +17,14 @@ export default {
   modulePathIgnorePatterns: ['<rootDir>/dist', '<rootDir>/.build', '<rootDir>/.sst', '<rootDir>/node_modules'],
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
   collectCoverage: true,
+  coverageThreshold: {
+    global: {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+  },
   collectCoverageFrom: ['src/**/*.ts', '!src/examples/**'],
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   coveragePathIgnorePatterns: [
