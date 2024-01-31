@@ -2,6 +2,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
 import type { FileData } from '../../index';
+import { TreeCrawlerDataType } from '../../index';
 import type { TinyTreeCrawlerError } from '../../lib/error';
 import { toTinyTreeCrawlerError } from '../../lib/error';
 
@@ -18,7 +19,7 @@ export const DefaultTreeCrawlerFileHandler = (
     P.Effect.mapError(toTinyTreeCrawlerError),
     P.Effect.map(({ data, path }) =>
       P.Option.some({
-        _tag: 'File',
+        _tag: TreeCrawlerDataType.File,
         level,
         path,
         data: [data.toString()],

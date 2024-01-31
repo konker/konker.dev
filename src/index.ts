@@ -17,11 +17,16 @@ export enum TreeCrawlerEvent {
   Finished = 'Finished',
 }
 
+export enum TreeCrawlerDataType {
+  File = 'File',
+  Directory = 'Directory',
+}
+
 /**
  * Event data type produced when a file is encountered.
  */
 export type FileData = {
-  _tag: 'File';
+  _tag: TreeCrawlerDataType.File;
   path: string;
   level: number;
   data: Array<unknown>;
@@ -31,13 +36,21 @@ export type FileData = {
  * Event data type produced when a directory is encountered.
  */
 export type DirectoryData = {
-  _tag: 'Directory';
+  _tag: TreeCrawlerDataType.Directory;
   path: string;
   level: number;
   data?: Array<string>;
 };
 
 export type TreeCrawlerData = FileData | DirectoryData;
+
+export function isFileData(data: TreeCrawlerData): data is FileData {
+  return data._tag === TreeCrawlerDataType.File;
+}
+
+export function isDirectoryData(data: TreeCrawlerData): data is DirectoryData {
+  return data._tag === TreeCrawlerDataType.Directory;
+}
 
 // --------------------------------------------------------------------------
 export const FILE = 0;
