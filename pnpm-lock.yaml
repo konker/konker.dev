@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.0.5
     version: 0.0.5(fast-check@3.15.0)
   '@konker.dev/tiny-filesystem-fp':
-    specifier: ^0.0.8
-    version: 0.0.8(@aws-sdk/client-s3@3.501.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.0)(fast-glob@3.3.2)(memfs@4.6.0)
+    specifier: ^0.0.9
+    version: 0.0.9(@aws-sdk/client-s3@3.501.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.0)(fast-glob@3.3.2)(memfs@4.6.0)
   '@smithy/smithy-client':
     specifier: ^2.1.12
     version: 2.3.1
@@ -1497,8 +1497,8 @@ packages:
       - fast-check
     dev: false
 
-  /@konker.dev/tiny-filesystem-fp@0.0.8(@aws-sdk/client-s3@3.501.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.0)(fast-glob@3.3.2)(memfs@4.6.0):
-    resolution: {integrity: sha512-gcBnLfcU6My/Dr4s6fGRegb3heutKAQU0xXn2jGx6YApr+Lx7WV5RY0BaokM/hy2MJYQdh4VnFf0yTzGmRkeCA==}
+  /@konker.dev/tiny-filesystem-fp@0.0.9(@aws-sdk/client-s3@3.501.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.0)(fast-glob@3.3.2)(memfs@4.6.0):
+    resolution: {integrity: sha512-cJLRllykDZL1t5gqN/MydlzfwAw2aRqsM2SWfgN5I6Nf/bYc090KwxpruibFwDx4ZDLmNW8kZVKiNg++4LfJlw==}
     peerDependencies:
       '@aws-sdk/client-s3': ^3.450.0
       '@konker.dev/aws-client-effect-s3': ^0.0.5
