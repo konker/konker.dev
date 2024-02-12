@@ -19,22 +19,22 @@ export function toError(x: unknown): Error {
 // Array functions
 export const Array = {
   map:
-    <A, B>(f: (a: A) => B) =>
+    <A, B>(f: (a: A, i?: number) => B) =>
     (as: Array<A>): Array<B> =>
       as.map(f),
 
   filter:
-    <A>(f: (a: A) => boolean) =>
+    <A>(f: (a: A, i?: number) => boolean) =>
     (as: Array<A>): Array<A> =>
       as.filter(f),
 
   foldl:
-    <A, B>(f: (acc: B, val: A) => B, b: B) =>
+    <A, B>(f: (acc: B, val: A, i?: number) => B, b: B) =>
     (as: Array<A>): B =>
       as.reduce(f, b),
 
   foldr:
-    <A, B>(f: (acc: B, val: A) => B, b: B) =>
+    <A, B>(f: (acc: B, val: A, i?: number) => B, b: B) =>
     (as: Array<A>): B =>
       as.reduceRight(f, b),
 
