@@ -26,18 +26,18 @@
   "dependencies": {
     "@effect/schema": "^0.61.3",
     "@konker.dev/effect-ts-prelude": "latest",
-    "@konker.dev/tiny-error-fp": "^0.0.1",
     "@konker.dev/tiny-event-fp": "^0.0.5",
-    "@konker.dev/tiny-filesystem-fp": "^0.0.11",
+    "@konker.dev/tiny-error-fp": "^0.0.1",
+    "@konker.dev/tiny-filesystem-fp": "^0.0.13",
     "dist-types": "link:@smithy/smithy-client/dist-types",
-    "effect": "^2.2.2"
+    "effect": "2.2.2"
   },
   "peerDependencies": {
-    "@aws-sdk/client-s3": "^3.441.0",
-    "@aws-sdk/lib-storage": "^3.441.0",
-    "@aws-sdk/s3-request-presigner": "^3.441.0",
-    "@aws-sdk/types": "^3.433.0",
-    "@smithy/smithy-client": "^2.1.12",
+    "@aws-sdk/client-s3": "^3.513.0",
+    "@aws-sdk/lib-storage": "^3.513.0",
+    "@aws-sdk/s3-request-presigner": "^3.513.0",
+    "@aws-sdk/types": "^3.511.0",
+    "@smithy/smithy-client": "^2.3.1",
     "micromatch": "^4.0.5"
   },
   "devDependencies": {

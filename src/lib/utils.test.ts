@@ -16,9 +16,9 @@ describe('utils', () => {
 
   describe('isFileData', () => {
     it('should work as expected', () => {
-      expect(unit.isFileData({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo', data: [] })).toStrictEqual(
-        true
-      );
+      expect(
+        unit.isFileData({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo', data: new Uint8Array() })
+      ).toStrictEqual(true);
       expect(
         unit.isFileData({ _tag: TreeCrawlerDataType.Directory, level: 0, path: '/tmp/foo', data: [] })
       ).toStrictEqual(false);
@@ -28,7 +28,7 @@ describe('utils', () => {
   describe('isDirectoryData', () => {
     it('should work as expected', () => {
       expect(
-        unit.isDirectoryData({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo', data: [] })
+        unit.isDirectoryData({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo', data: new Uint8Array() })
       ).toStrictEqual(false);
       expect(
         unit.isDirectoryData({ _tag: TreeCrawlerDataType.Directory, level: 0, path: '/tmp/foo', data: [] })

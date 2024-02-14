@@ -22,7 +22,7 @@ export const DefaultTreeCrawlerFileHandler = (
         _tag: TreeCrawlerDataType.File,
         level,
         path,
-        data: [data.toString()],
+        data,
       })
     )
   );

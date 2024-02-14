@@ -1,5 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
+import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
 
 import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
 import { TreeCrawlerDataType } from '../index';
@@ -70,7 +71,12 @@ describe('crawler', () => {
             P.pipe(
               unit.notifyFileEvent(
                 events,
-                P.Option.some({ _tag: TreeCrawlerDataType.File, level: 0, path: '/tmp/foo/a.txt', data: ['A'] })
+                P.Option.some({
+                  _tag: TreeCrawlerDataType.File,
+                  level: 0,
+                  path: '/tmp/foo/a.txt',
+                  data: stringToUint8Array('A'),
+                })
               )
             )
           )
@@ -79,7 +85,7 @@ describe('crawler', () => {
 
       expect(mockFileListener).toHaveBeenCalledTimes(1);
       expect(mockFileListener.mock.calls).toStrictEqual([
-        ['File', { _tag: TreeCrawlerDataType.File, data: ['A'], level: 0, path: '/tmp/foo/a.txt' }],
+        ['File', { _tag: TreeCrawlerDataType.File, data: stringToUint8Array('A'), level: 0, path: '/tmp/foo/a.txt' }],
       ]);
     });
 
