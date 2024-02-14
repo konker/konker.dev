@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-treecrawler-fp",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "A library for crawling a filesystem tree, based on Effect-ts",
   "license": "ISC",
