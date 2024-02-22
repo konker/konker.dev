@@ -7,10 +7,10 @@ settings:
 dependencies:
   '@effect/schema':
     specifier: ^0.61.3
-    version: 0.61.3(effect@2.2.2)(fast-check@3.15.0)
+    version: 0.61.3(effect@2.2.5)(fast-check@3.15.0)
   effect:
-    specifier: ^2.2.2
-    version: 2.2.2
+    specifier: 2.2.5
+    version: 2.2.5
 
 devDependencies:
   '@effect/language-service':
@@ -452,13 +452,13 @@ packages:
     resolution: {integrity: sha512-BnlM8LlaqCAYgdRfxlbR7gXGh/FD1scL1fPgNVJEPoOM08od1jtJz+iKhwfaud8TPnnhZR+TED2h5ynjanLeCQ==}
     dev: true
 
-  /@effect/schema@0.61.3(effect@2.2.2)(fast-check@3.15.0):
+  /@effect/schema@0.61.3(effect@2.2.5)(fast-check@3.15.0):
     resolution: {integrity: sha512-2e6aC6e5qniRJtKXY+hBAm8azP+pJv2hmQ+AwjA4abhTMILam27lMuXUxpNLmpNghr4HdjcZAs+R6PcKPBF12A==}
     peerDependencies:
       effect: ^2.2.2
       fast-check: ^3.13.2
     dependencies:
-      effect: 2.2.2
+      effect: 2.2.5
       fast-check: 3.15.0
     dev: false
 
@@ -2342,8 +2342,8 @@ packages:
       object.defaults: 1.1.0
     dev: true
 
-  /effect@2.2.2:
-    resolution: {integrity: sha512-hY/37Ssd2Zfn0r09vDe9tSYPVS5HZBbmW4DMBO7OIIvRADgp5cnWfLhY6pVy+Bm5DXV9luFycjDcB1731WGyTA==}
+  /effect@2.2.5:
+    resolution: {integrity: sha512-F1bfJXeecK6WpZDSU1UK8C8tUr3n7AqGVL1b8HWeVlHD4192x+6yN0Eb7Qa0CASike5dsbloTfidxBZFr0IpVg==}
     dev: false
 
   /electron-to-chromium@1.4.648:
