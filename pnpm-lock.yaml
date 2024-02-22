@@ -22,16 +22,16 @@ dependencies:
     version: 0.61.7(effect@2.2.5)(fast-check@3.15.1)
   '@konker.dev/effect-ts-prelude':
     specifier: latest
-    version: 0.0.11(@effect/schema@0.61.7)(effect@2.2.5)
+    version: 0.0.12(@effect/schema@0.61.7)(effect@2.2.5)
   '@konker.dev/tiny-error-fp':
     specifier: ^0.0.1
     version: 0.0.1
   '@konker.dev/tiny-event-fp':
-    specifier: ^0.0.5
-    version: 0.0.5(fast-check@3.15.1)
+    specifier: ^0.0.6
+    version: 0.0.6(fast-check@3.15.1)
   '@konker.dev/tiny-filesystem-fp':
-    specifier: ^0.0.14
-    version: 0.0.14(@aws-sdk/client-s3@3.513.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.1)(fast-glob@3.3.2)(memfs@4.7.0)
+    specifier: ^0.0.15
+    version: 0.0.15(@aws-sdk/client-s3@3.513.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.1)(fast-glob@3.3.2)(memfs@4.7.0)
   '@smithy/smithy-client':
     specifier: ^2.3.1
     version: 2.3.1
@@ -1512,18 +1512,18 @@ packages:
       '@aws-sdk/lib-storage': 3.513.0(@aws-sdk/client-s3@3.513.0)
       '@aws-sdk/s3-request-presigner': 3.513.0
       '@effect/schema': 0.61.7(effect@2.2.5)(fast-check@3.15.1)
-      '@konker.dev/effect-ts-prelude': 0.0.11(@effect/schema@0.61.7)(effect@2.2.5)
+      '@konker.dev/effect-ts-prelude': 0.0.12(@effect/schema@0.61.7)(effect@2.2.5)
       effect: 2.2.5
     transitivePeerDependencies:
       - aws-crt
       - fast-check
     dev: false
 
-  /@konker.dev/effect-ts-prelude@0.0.11(@effect/schema@0.61.7)(effect@2.2.5):
-    resolution: {integrity: sha512-oBPHaBwButVO6VpfNFSKfDUpKoKkbnTRBYzHdu4EdJj1WKR1kGUmqHBAVdymkQbnnXx9TOJCVAoOOHg6XkABsA==}
+  /@konker.dev/effect-ts-prelude@0.0.12(@effect/schema@0.61.7)(effect@2.2.5):
+    resolution: {integrity: sha512-CeZUmNSsG8DNpMbsk3dq0ceMsTSDqVUZv/mdLOIXfeDFPU050vm/gdDYcvlYG0IsS5aBzcsWae6ksiR60utO5Q==}
     peerDependencies:
       '@effect/schema': ^0.61.3
-      effect: ^2.2.2
+      effect: 2.2.5
     dependencies:
       '@effect/schema': 0.61.7(effect@2.2.5)(fast-check@3.15.1)
       effect: 2.2.5
@@ -1533,18 +1533,18 @@ packages:
     resolution: {integrity: sha512-6byqMIkw+5UY0S49XE0vrxE8hdajMSynhhmmXUp//CbN/rvPo035cH2W23qVFvzlJzYNbW6EA7aUNzMWIsKZcw==}
     dev: false
 
-  /@konker.dev/tiny-event-fp@0.0.5(fast-check@3.15.1):
-    resolution: {integrity: sha512-FqDVQ9H9XHB8KOoN2xPg1vw2c3OsmtlmtE1qk8Efq2CrV3RTjKkybgxupmI4nisYQaXv/E44jmIChlzDKjB60Q==}
+  /@konker.dev/tiny-event-fp@0.0.6(fast-check@3.15.1):
+    resolution: {integrity: sha512-kpbhC5X1eStIgbj8q3ENqodfFgvuxr74KAa9R3sCfyyibtKSM8Nw61mC/L7K18ipseWotWtBRoaSkZRi2d58NQ==}
     dependencies:
       '@effect/schema': 0.61.7(effect@2.2.5)(fast-check@3.15.1)
-      '@konker.dev/effect-ts-prelude': 0.0.11(@effect/schema@0.61.7)(effect@2.2.5)
+      '@konker.dev/effect-ts-prelude': 0.0.12(@effect/schema@0.61.7)(effect@2.2.5)
       effect: 2.2.5
     transitivePeerDependencies:
       - fast-check
     dev: false
 
-  /@konker.dev/tiny-filesystem-fp@0.0.14(@aws-sdk/client-s3@3.513.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.1)(fast-glob@3.3.2)(memfs@4.7.0):
-    resolution: {integrity: sha512-uyTJZeW5U17MEuoB4tkXlIBDFwyZGDRJfrCNTRc1CiQ5RyqmJYGSIigIGtcWvefoZC7P6ex67Fgiex4zWXMTJA==}
+  /@konker.dev/tiny-filesystem-fp@0.0.15(@aws-sdk/client-s3@3.513.0)(@konker.dev/aws-client-effect-s3@0.0.5)(fast-check@3.15.1)(fast-glob@3.3.2)(memfs@4.7.0):
+    resolution: {integrity: sha512-3Lt1q7yMoYPQGpiWPNeQtMZAJg/1Cisgfdgk4iW7txyCCHnJggwlId7zcjKO4qDu402RnfbPrW+ybz7hFwzP1g==}
     peerDependencies:
       '@aws-sdk/client-s3': ^3.450.0
       '@konker.dev/aws-client-effect-s3': ^0.0.5
@@ -1554,7 +1554,7 @@ packages:
       '@aws-sdk/client-s3': 3.513.0
       '@effect/schema': 0.61.7(effect@2.2.5)(fast-check@3.15.1)
       '@konker.dev/aws-client-effect-s3': 0.0.5(fast-check@3.15.1)
-      '@konker.dev/effect-ts-prelude': 0.0.11(@effect/schema@0.61.7)(effect@2.2.5)
+      '@konker.dev/effect-ts-prelude': 0.0.12(@effect/schema@0.61.7)(effect@2.2.5)
       effect: 2.2.5
       fast-glob: 3.3.2
       memfs: 4.7.0(quill-delta@5.1.0)(rxjs@7.8.1)(tslib@2.6.2)
