@@ -104,7 +104,7 @@ describe('effect-prelude', () => {
   });
 
   describe('example usage', () => {
-    function strToNum(s: string): P.Effect.Effect<never, Error, number> {
+    function strToNum(s: string): P.Effect.Effect<number, Error> {
       return P.pipe(s, P.Schema.decode(P.Schema.NumberFromString), P.Effect.mapError(P.toError));
     }
 
@@ -118,13 +118,13 @@ describe('effect-prelude', () => {
 
       // Define the interface for the MeasuringCup service
       type MeasuringCup = {
-        readonly measure: (amount: number, unit: string) => P.Effect.Effect<never, never, string>;
+        readonly measure: (amount: number, unit: string) => P.Effect.Effect<string>;
       };
 
       // Create a tag for the MeasuringCup service
-      const MeasuringCup = P.Context.Tag<MeasuringCup>();
+      const MeasuringCup = P.Context.GenericTag<MeasuringCup>('@services/MeasuringCup');
 
-      const MeasuringCupLive: P.Layer.Layer<never, never, MeasuringCup> = P.Layer.succeed(
+      const MeasuringCupLive: P.Layer.Layer<MeasuringCup> = P.Layer.succeed(
         MeasuringCup,
         MeasuringCup.of({
           measure: (amount, unit) => P.Effect.succeed(`Measured ${amount} ${unit}(s)`),
@@ -133,12 +133,12 @@ describe('effect-prelude', () => {
 
       // Sugar
       type Sugar = {
-        readonly grams: (amount: number) => P.Effect.Effect<never, never, string>;
+        readonly grams: (amount: number) => P.Effect.Effect<string>;
       };
 
-      const Sugar = P.Context.Tag<Sugar>();
+      const Sugar = P.Context.GenericTag<Sugar>('@services/Sugar');
 
-      const SugarLive: P.Layer.Layer<MeasuringCup, never, Sugar> = P.Layer.effect(
+      const SugarLive: P.Layer.Layer<Sugar, never, MeasuringCup> = P.Layer.effect(
         Sugar,
         P.Effect.map(MeasuringCup, (measuringCup) =>
           Sugar.of({
@@ -149,12 +149,12 @@ describe('effect-prelude', () => {
 
       // Flour
       type Flour = {
-        readonly cups: (amount: number) => P.Effect.Effect<never, never, string>;
+        readonly cups: (amount: number) => P.Effect.Effect<string>;
       };
 
-      const Flour = P.Context.Tag<Flour>();
+      const Flour = P.Context.GenericTag<Flour>('@services/Flour');
 
-      const FlourLive: P.Layer.Layer<MeasuringCup, never, Flour> = P.Layer.effect(
+      const FlourLive: P.Layer.Layer<Flour, never, MeasuringCup> = P.Layer.effect(
         Flour,
         P.Effect.map(MeasuringCup, (measuringCup) =>
           Flour.of({
@@ -164,12 +164,12 @@ describe('effect-prelude', () => {
       );
 
       type Recipe = {
-        readonly steps: P.Effect.Effect<never, never, ReadonlyArray<string>>;
+        readonly steps: P.Effect.Effect<ReadonlyArray<string>>;
       };
 
-      const Recipe = P.Context.Tag<Recipe>();
+      const Recipe = P.Context.GenericTag<Recipe>('@services/Recipe');
 
-      const RecipeLive: P.Layer.Layer<Sugar | Flour, never, Recipe> = P.Layer.effect(
+      const RecipeLive: P.Layer.Layer<Recipe, never, Sugar | Flour> = P.Layer.effect(
         Recipe,
         P.Effect.all([Sugar, Flour]).pipe(
           P.Effect.map(([sugar, flour]) =>
@@ -180,20 +180,18 @@ describe('effect-prelude', () => {
         )
       );
 
-      const IngredientsLive: P.Layer.Layer<MeasuringCup, never, Sugar | Flour> = P.Layer.merge(FlourLive, SugarLive);
+      const IngredientsLive: P.Layer.Layer<Sugar | Flour, never, MeasuringCup> = P.Layer.merge(FlourLive, SugarLive);
 
-      const MainLive1: P.Layer.Layer<never, never, Recipe> = RecipeLive.pipe(
+      const MainLive1: P.Layer.Layer<Recipe> = RecipeLive.pipe(
         P.Layer.provide(IngredientsLive), // provides the ingredients to the recipe
         P.Layer.provide(MeasuringCupLive) // provides the MeasuringCup to the ingredients
       );
 
-      const RecipeDraft: P.Layer.Layer<MeasuringCup, never, Recipe> = RecipeLive.pipe(P.Layer.provide(IngredientsLive)); // provides the ingredients to the recipe
+      const RecipeDraft: P.Layer.Layer<Recipe, never, MeasuringCup> = RecipeLive.pipe(P.Layer.provide(IngredientsLive)); // provides the ingredients to the recipe
 
-      const MainLive2: P.Layer.Layer<never, never, MeasuringCup | Recipe> = RecipeDraft.pipe(
-        P.Layer.provideMerge(MeasuringCupLive)
-      ); // provides the MeasuringCup to the recipe
+      const MainLive2: P.Layer.Layer<MeasuringCup | Recipe> = RecipeDraft.pipe(P.Layer.provideMerge(MeasuringCupLive)); // provides the MeasuringCup to the recipe
 
-      const MainLive3: P.Layer.Layer<never, never, Recipe> = RecipeLive.pipe(
+      const MainLive3: P.Layer.Layer<Recipe> = RecipeLive.pipe(
         P.Layer.provide(IngredientsLive),
         P.Layer.provide(MeasuringCupLive)
       );
