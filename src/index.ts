@@ -5,7 +5,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 export type Fact = boolean;
 export type Facts = Record<string, Fact>;
 
-export type Rule<R, C, E, F extends Facts> = (context: C, facts: F) => P.Effect.Effect<R, E, F>;
+export type Rule<R, C, E, F extends Facts> = (context: C, facts: F) => P.Effect.Effect<F, E, R>;
 
 export type RuleSet<R, C, E, F extends Facts> = {
   readonly facts: F;
@@ -16,7 +16,7 @@ export type RuleSetTransform<R, C, E, F extends Facts> = (ruleSet: RuleSet<R, C,
 
 export type RuleFunc<C, F extends Facts> = (context: C, facts: F) => boolean;
 
-export type RuleFuncEffect<R, C, E, F extends Facts> = (context: C, facts: F) => P.Effect.Effect<R, E, boolean>;
+export type RuleFuncEffect<R, C, E, F extends Facts> = (context: C, facts: F) => P.Effect.Effect<boolean, E, R>;
 
 //---------------------------------------------------------------------------
 // Fact functions
@@ -80,7 +80,7 @@ export const sequence =
 // Execution function
 export const decide =
   <R, C, E, F extends Facts>(context: C) =>
-  (ruleSet: RuleSet<R, C, E, F>): P.Effect.Effect<R, E, F> =>
+  (ruleSet: RuleSet<R, C, E, F>): P.Effect.Effect<F, E, R> =>
     P.pipe(
       ruleSet.rules,
       P.Effect.reduce(ruleSet.facts, (facts, rule) => rule(context, facts))
