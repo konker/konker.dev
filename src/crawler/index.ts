@@ -8,7 +8,7 @@ import { toTinyTreeCrawlerError } from '../lib/error';
 export function notifyDirectoryEvent(
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
   directoryData: P.Option.Option<DirectoryData>
-): P.Effect.Effect<never, TinyTreeCrawlerError, void> {
+): P.Effect.Effect<void, TinyTreeCrawlerError> {
   return P.pipe(
     directoryData,
     P.Option.match({
@@ -22,7 +22,7 @@ export function notifyDirectoryEvent(
 export function notifyFileEvent(
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
   fileData: P.Option.Option<FileData>
-): P.Effect.Effect<never, TinyTreeCrawlerError, void> {
+): P.Effect.Effect<void, TinyTreeCrawlerError> {
   return P.pipe(
     fileData,
     P.Option.match({

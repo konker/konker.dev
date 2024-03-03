@@ -9,10 +9,10 @@ export type TreeCrawlerFileHandler = (
   dirPath: string,
   fileName: string,
   level: number
-) => P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<FileData>>;
+) => P.Effect.Effect<P.Option.Option<FileData>, TinyTreeCrawlerError>;
 
 export type TreeCrawlerDirectoryHandler = (
   tfs: TinyFileSystem,
   path: string,
   level: number
-) => P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<DirectoryData>>;
+) => P.Effect.Effect<P.Option.Option<DirectoryData>, TinyTreeCrawlerError>;

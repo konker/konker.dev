@@ -9,7 +9,7 @@ export type TreeCrawlerDirectoryFilter<T extends TinyFileSystem = TinyFileSystem
   dirPath: string,
   dirName: string,
   level: number
-) => P.Effect.Effect<never, TinyTreeCrawlerError, boolean>;
+) => P.Effect.Effect<boolean, TinyTreeCrawlerError>;
 
 export type TreeCrawlerFileFilter<T extends TinyFileSystem = TinyFileSystem> = (
   tfs: T,
@@ -17,7 +17,7 @@ export type TreeCrawlerFileFilter<T extends TinyFileSystem = TinyFileSystem> = (
   dirPath: string,
   fileName: string,
   level: number
-) => P.Effect.Effect<never, TinyTreeCrawlerError, boolean>;
+) => P.Effect.Effect<boolean, TinyTreeCrawlerError>;
 
 export const sequenceFileFilters =
   (filters: Array<TreeCrawlerFileFilter>): TreeCrawlerFileFilter =>

@@ -18,7 +18,7 @@ export function isDirectoryData(data: TreeCrawlerData): data is DirectoryData {
 
 export const sortListingByFileType =
   (tfs: TinyFileSystem, directoriesFirst: boolean) =>
-  (listing: Array<Ref>): P.Effect.Effect<never, TinyFileSystemError, Array<{ childPath: Ref; fileType: FileType }>> =>
+  (listing: Array<Ref>): P.Effect.Effect<Array<{ childPath: Ref; fileType: FileType }>, TinyFileSystemError> =>
     P.pipe(
       listing.map((childPath: Ref) =>
         P.pipe(

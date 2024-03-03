@@ -9,4 +9,4 @@ export const NoopTreeCrawlerFileHandler = (
   _dirPath: string,
   _fileName: string,
   _level: number
-): P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<FileData>> => P.Effect.succeed(P.Option.none());
+): P.Effect.Effect<P.Option.Option<FileData>, TinyTreeCrawlerError> => P.Effect.succeed(P.Option.none());

@@ -4,5 +4,5 @@ import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
 
 export type TreeCrawlerAccumulator<T> = {
   readonly push: (eventType: TreeCrawlerEvent, eventData?: TreeCrawlerData) => TreeCrawlerAccumulator<T>;
-  readonly data: () => P.Effect.Effect<never, never, T>;
+  readonly data: () => P.Effect.Effect<T>;
 };

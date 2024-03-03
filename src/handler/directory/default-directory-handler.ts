@@ -9,5 +9,5 @@ export const DefaultTreeCrawlerDirectoryHandler = (
   _tfs: TinyFileSystem,
   path: string,
   level: number
-): P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<DirectoryData>> =>
+): P.Effect.Effect<P.Option.Option<DirectoryData>, TinyTreeCrawlerError> =>
   P.Effect.succeed(P.Option.some({ _tag: TreeCrawlerDataType.Directory, level, path }));

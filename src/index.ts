@@ -56,4 +56,4 @@ export type TreeCrawler<T extends TinyFileSystem = TinyFileSystem> = (
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
-) => (dirPath: string, rootPath?: string, level?: number) => P.Effect.Effect<never, TinyTreeCrawlerError, void>;
+) => (dirPath: string, rootPath?: string, level?: number) => P.Effect.Effect<void, TinyTreeCrawlerError>;

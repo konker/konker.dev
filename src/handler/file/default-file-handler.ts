@@ -11,7 +11,7 @@ export const DefaultTreeCrawlerFileHandler = (
   dirPath: string,
   fileName: string,
   level: number
-): P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<FileData>> =>
+): P.Effect.Effect<P.Option.Option<FileData>, TinyTreeCrawlerError> =>
   P.pipe(
     P.Effect.Do,
     P.Effect.bind('path', () => tfs.joinPath(dirPath, fileName)),

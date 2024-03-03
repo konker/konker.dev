@@ -10,7 +10,7 @@ export const FileListingTreeCrawlerDirectoryHandler = (
   tfs: TinyFileSystem,
   path: string,
   level: number
-): P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<DirectoryData>> =>
+): P.Effect.Effect<P.Option.Option<DirectoryData>, TinyTreeCrawlerError> =>
   P.pipe(
     tfs.listFiles(path),
     P.Effect.mapError(toTinyTreeCrawlerError),

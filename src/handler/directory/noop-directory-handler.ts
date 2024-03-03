@@ -8,4 +8,4 @@ export const NoopTreeCrawlerDirectoryHandler = (
   _tfs: TinyFileSystem,
   _path: string,
   _level: number
-): P.Effect.Effect<never, TinyTreeCrawlerError, P.Option.Option<DirectoryData>> => P.Effect.succeed(P.Option.none());
+): P.Effect.Effect<P.Option.Option<DirectoryData>, TinyTreeCrawlerError> => P.Effect.succeed(P.Option.none());

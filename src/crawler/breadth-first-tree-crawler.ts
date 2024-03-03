@@ -16,11 +16,7 @@ export const BreadthFirstTreeCrawler: TreeCrawler = (
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
 ) => {
-  const crawlTree = (
-    dirPath: string,
-    rootPath: string,
-    level: number
-  ): P.Effect.Effect<never, TinyTreeCrawlerError, void> => {
+  const crawlTree = (dirPath: string, rootPath: string, level: number): P.Effect.Effect<void, TinyTreeCrawlerError> => {
     return P.pipe(
       P.Effect.unit,
 

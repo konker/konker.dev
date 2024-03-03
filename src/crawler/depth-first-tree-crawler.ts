@@ -16,11 +16,7 @@ export const DepthFirstTreeCrawler: TreeCrawler = (
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
 ) => {
-  const crawlTree = (
-    dirPath: string,
-    rootPath: string,
-    level: number
-  ): P.Effect.Effect<never, TinyTreeCrawlerError, void> => {
+  const crawlTree = (dirPath: string, rootPath: string, level: number): P.Effect.Effect<void, TinyTreeCrawlerError> => {
     return P.pipe(
       // Apply directory handler
       handlers[DIR](tfs, dirPath, level),
