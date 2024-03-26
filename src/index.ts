@@ -20,32 +20,32 @@ export function toError(x: unknown): Error {
 export const Array = {
   map:
     <A, B>(f: (a: A, i: number) => B) =>
-    (as: Array<A>): Array<B> =>
+    (as: ReadonlyArray<A>): ReadonlyArray<B> =>
       as.map(f),
 
   filter:
     <A>(f: (a: A, i: number) => boolean) =>
-    (as: Array<A>): Array<A> =>
+    (as: ReadonlyArray<A>): ReadonlyArray<A> =>
       as.filter(f),
 
   foldl:
     <A, B>(f: (acc: B, val: A, i: number) => B, b: B) =>
-    (as: Array<A>): B =>
+    (as: ReadonlyArray<A>): B =>
       as.reduce(f, b),
 
   foldr:
     <A, B>(f: (acc: B, val: A, i: number) => B, b: B) =>
-    (as: Array<A>): B =>
+    (as: ReadonlyArray<A>): B =>
       as.reduceRight(f, b),
 
   join:
     <A>(sep = '') =>
-    (as: Array<A>): string =>
+    (as: ReadonlyArray<A>): string =>
       as.join(sep),
 
   // eslint-disable-next-line fp/no-mutating-methods
-  toSorted: <A>(as: Array<A>): Array<A> => [...as].sort(),
+  toSorted: <A>(as: ReadonlyArray<A>): ReadonlyArray<A> => [...as].sort(),
 
   // eslint-disable-next-line fp/no-mutating-methods
-  toReversed: <A>(as: Array<A>): Array<A> => [...as].reverse(),
+  toReversed: <A>(as: ReadonlyArray<A>): ReadonlyArray<A> => [...as].reverse(),
 };
