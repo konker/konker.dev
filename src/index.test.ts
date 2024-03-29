@@ -62,6 +62,12 @@ describe('effect-prelude', () => {
     });
   });
 
+  describe('Array.filterUndefined', () => {
+    it('should function as expected', () => {
+      expect(P.pipe([1, 0, 2, undefined, 3, null, 4], P.Array.filterUndefined)).toEqual([1, 0, 2, 3, 4]);
+    });
+  });
+
   describe('Array.foldl', () => {
     it('should function as expected', () => {
       expect(

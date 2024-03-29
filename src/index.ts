@@ -16,6 +16,10 @@ export function toError(x: unknown): Error {
   return x instanceof Error ? x : new Error(String(x));
 }
 
+export function isDefined<T>(x: T | undefined): x is T {
+  return x !== undefined && x !== null;
+}
+
 // Array functions
 export const Array = {
   map:
@@ -27,6 +31,8 @@ export const Array = {
     <A>(f: (a: A, i: number) => boolean) =>
     (as: ReadonlyArray<A>): ReadonlyArray<A> =>
       as.filter(f),
+
+  filterUndefined: <A>(as: ReadonlyArray<A | undefined>): ReadonlyArray<A> => as.filter(isDefined),
 
   foldl:
     <A, B>(f: (acc: B, val: A, i: number) => B, b: B) =>
