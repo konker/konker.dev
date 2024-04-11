@@ -25,6 +25,11 @@
   "dependencies": {
     "@astrojs/check": "^0.5.10",
     "@astrojs/tailwind": "^5.1.0",
+    "@fontsource/ibm-plex-mono": "^5.0.12",
+    "@fontsource/ibm-plex-sans": "^5.0.19",
+    "@fontsource/ibm-plex-serif": "^5.0.12",
+    "@fontsource/open-sans": "^5.0.27",
+    "@tailwindcss/typography": "^0.5.12",
     "@types/node": "^20.6.2",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",

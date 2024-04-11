@@ -1,0 +1,615 @@
+@charset "UTF-8";
+/*
+Gutenberg: A Meaningful Web Typography Starter Kit
+Website ....... http://matejlatin.github.io/Gutenberg/
+Version ....... 1.2.3
+Github ........ https://github.com/matejlatin/Gutenberg
+Authors ....... Matej Latin (@matejlatin)
+License ....... Creative Commmons Attribution 3.0
+License URL ... https://raw.githubusercontent.com/matejlatin/Gutenberg/master/license.txt
+*/
+/* Configuration
+   ========================================================================== */
+/* Calculations
+   ========================================================================== */
+/* Font themes
+   ========================================================================== */
+aside {
+  display: block;
+}
+
+/* Defaults
+   ========================================================================== */
+@media screen and (min-width: 4005em) {
+  body,
+  html {
+    margin: 0;
+    width: 100%;
+    max-width: none;
+  }
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+  font-size: 100%;
+  font-family: "IBM Plex Serif", Georgia, serif;
+  color: #222;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+@media screen and (min-width: 4005em) {
+  html {
+    font-size: 18px;
+    font-size: 1.125rem;
+  }
+}
+
+p, cite, figcaption {
+  line-height: 26px;
+  line-height: 1.625rem;
+  margin: 0px 0px 26px;
+  margin: 0rem 0rem 1.625rem;
+}
+@media screen and (min-width: 4005em) {
+  p, cite, figcaption {
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+    margin-bottom: 31px;
+    margin-bottom: 1.7222222222rem;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+}
+
+footer {
+  display: block;
+}
+body > footer {
+  margin: 0 auto;
+  width: 80%;
+}
+
+header {
+  display: block;
+}
+
+main {
+  display: block;
+}
+
+section {
+  display: block;
+}
+
+/* Links
+   ========================================================================== */
+a {
+  background: transparent;
+  color: #00a;
+  transition: all 0.3s;
+}
+a:active, a:hover {
+  outline: 0;
+}
+a:hover {
+  color: #551a8b;
+  text-decoration: none;
+}
+a:visited {
+  color: #551a8b;
+}
+a:visited:hover {
+  color: #551a8b;
+}
+a:active {
+  color: #f00;
+}
+
+article,
+.article {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+}
+@media screen and (min-width: 4005em) {
+  article,
+  .article {
+    max-width: 108000px;
+    max-width: 6000rem;
+  }
+}
+
+audio {
+  display: inline-block;
+  vertical-align: baseline;
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+canvas {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+pre {
+  overflow: auto;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+}
+
+code {
+  padding: 26px;
+  padding: 1.625rem;
+  display: block;
+}
+@media screen and (min-width: 4005em) {
+  code {
+    padding: 31px;
+    padding: 1.7222222222rem;
+  }
+}
+
+details {
+  display: block;
+}
+
+summary {
+  display: block;
+}
+
+figcaption {
+  line-height: 26px;
+  line-height: 1.625rem;
+  color: #222;
+  display: block;
+  font-size: 0.8125rem;
+  font-style: italic;
+  margin-bottom: 0;
+  text-align: center;
+}
+@media screen and (min-width: 4005em) {
+  figcaption {
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+    margin-bottom: 0;
+  }
+}
+
+figure {
+  display: block;
+}
+
+@media screen and (min-width: 4005em) {
+  figure.floatLeft,
+  figure.floatRight {
+    max-width: 36000px;
+    max-width: 2000rem;
+    padding: 0px 31px;
+    padding: 0rem 1.7222222222rem;
+  }
+}
+@media screen and (min-width: 4005em) {
+  figure.floatLeft blockquote,
+  figure.floatRight blockquote {
+    padding: 0px;
+    padding: 0rem;
+    text-align: left;
+  }
+}
+@media screen and (min-width: 4005em) {
+  figure.floatLeft blockquote p,
+  figure.floatRight blockquote p {
+    font-size: 19.2px;
+    font-size: 1.2rem;
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+  }
+}
+
+/* Headings
+   ========================================================================== */
+h1 {
+  font-size: 40px;
+  font-size: 2.5rem;
+  line-height: 52px;
+  line-height: 3.25rem;
+  margin-top: 26px;
+  margin-top: 1.625rem;
+  margin-bottom: 26px;
+  margin-bottom: 1.625rem;
+}
+
+h2 {
+  font-size: 27px;
+  font-size: 1.6875rem;
+  line-height: 39px;
+  line-height: 2.4375rem;
+  margin-top: 65px;
+  margin-top: 4.0625rem;
+  margin-bottom: 13px;
+  margin-bottom: 0.8125rem;
+}
+
+h3 {
+  font-size: 22px;
+  font-size: 1.375rem;
+  line-height: 26px;
+  line-height: 1.625rem;
+  margin-top: 52px;
+  margin-top: 3.25rem;
+  margin-bottom: 13px;
+  margin-bottom: 0.8125rem;
+}
+
+h4 {
+  font-size: 19.2px;
+  font-size: 1.2rem;
+  line-height: 26px;
+  line-height: 1.625rem;
+  margin-top: 39px;
+  margin-top: 2.4375rem;
+  margin-bottom: 13px;
+  margin-bottom: 0.8125rem;
+}
+
+h5 {
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 26px;
+  line-height: 1.625rem;
+  margin-top: 65px;
+  margin-top: 4.0625rem;
+  margin-bottom: 13px;
+  margin-bottom: 0.8125rem;
+}
+
+h6 {
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 26px;
+  line-height: 1.625rem;
+  margin-top: 65px;
+  margin-top: 4.0625rem;
+  margin-bottom: 13px;
+  margin-bottom: 0.8125rem;
+}
+
+@media screen and (min-width: 4005em) {
+  h1 {
+    font-size: 40px;
+    font-size: 2.5rem;
+    line-height: 62px;
+    line-height: 3.4444444444rem;
+    margin-top: 31px;
+    margin-top: 1.7222222222rem;
+    margin-bottom: 31px;
+    margin-bottom: 1.7222222222rem;
+  }
+  h2 {
+    font-size: 27px;
+    font-size: 1.6875rem;
+    line-height: 46.5px;
+    line-height: 2.5833333333rem;
+    margin-top: 77.5px;
+    margin-top: 4.3055555556rem;
+    margin-bottom: 15.5px;
+    margin-bottom: 0.8611111111rem;
+  }
+  h3 {
+    font-size: 22px;
+    font-size: 1.375rem;
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+    margin-top: 62px;
+    margin-top: 3.4444444444rem;
+    margin-bottom: 15.5px;
+    margin-bottom: 0.8611111111rem;
+  }
+  h4 {
+    font-size: 19.2px;
+    font-size: 1.2rem;
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+    margin-top: 46.5px;
+    margin-top: 2.5833333333rem;
+    margin-bottom: 15.5px;
+    margin-bottom: 0.8611111111rem;
+  }
+  h5 {
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+    margin-top: 77.5px;
+    margin-top: 4.3055555556rem;
+    margin-bottom: 15.5px;
+    margin-bottom: 0.8611111111rem;
+  }
+  h6 {
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 31px;
+    line-height: 1.7222222222rem;
+    margin-top: 77.5px;
+    margin-top: 4.3055555556rem;
+    margin-bottom: 15.5px;
+    margin-bottom: 0.8611111111rem;
+  }
+}
+h1 + h2 {
+  margin-top: 26px;
+  margin-top: 1.625rem;
+}
+@media screen and (min-width: 4005em) {
+  h1 + h2 {
+    margin-top: 31px;
+    margin-top: 1.7222222222rem;
+  }
+}
+
+h2 + h3,
+h3 + h4,
+h4 + h5 {
+  margin-top: 13px;
+  margin-top: 0.8125rem;
+}
+@media screen and (min-width: 4005em) {
+  h2 + h3,
+  h3 + h4,
+  h4 + h5 {
+    margin-top: 15.5px;
+    margin-top: 0.8611111111rem;
+  }
+}
+
+h5 + h6 {
+  margin-top: -13px;
+  margin-top: -0.8125rem;
+}
+@media screen and (min-width: 4005em) {
+  h5 + h6 {
+    margin-top: -15.5px;
+    margin-top: -0.8611111111rem;
+  }
+}
+
+h6 {
+  font-style: italic;
+  font-weight: normal;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+hgroup {
+  display: block;
+}
+
+hr {
+  margin-top: 0px;
+  margin-top: 0rem;
+  margin-bottom: 26px;
+  margin-bottom: 1.625rem;
+  box-sizing: content-box;
+  border: 0;
+  color: #222;
+  display: block;
+  height: 26px;
+  height: 1.625rem;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+@media screen and (min-width: 4005em) {
+  hr {
+    margin-top: 0px;
+    margin-top: 0rem;
+    margin-bottom: 31px;
+    margin-bottom: 1.7222222222rem;
+    height: 31px;
+    height: 1.7222222222rem;
+  }
+}
+hr:before {
+  content: "···";
+  letter-spacing: 0.2em;
+}
+
+img {
+  border: 0;
+  max-width: 100%;
+  display: block;
+  margin: inherit auto;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+ul li,
+ol li {
+  margin-bottom: 0;
+}
+
+nav {
+  display: block;
+}
+
+progress {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+blockquote {
+  font-style: italic;
+  padding-left: 1.4375rem;
+}
+@media screen and (min-width: 4005em) {
+  blockquote {
+    padding-left: 2rem;
+  }
+}
+
+cite {
+  display: block;
+  font-style: normal;
+}
+
+figure blockquote {
+  padding: 26px 0px;
+  padding: 1.625rem 0rem;
+}
+@media screen and (min-width: 4005em) {
+  figure blockquote {
+    padding: 62px 0px 31px;
+    padding: 3.4444444444rem 0rem 1.7222222222rem;
+    text-align: center;
+  }
+}
+figure blockquote p {
+  font-size: 27px;
+  font-size: 1.6875rem;
+  line-height: 39px;
+  line-height: 2.4375rem;
+}
+@media screen and (min-width: 4005em) {
+  figure blockquote p {
+    font-size: 27px;
+    font-size: 1.6875rem;
+    line-height: 46.5px;
+    line-height: 2.5833333333rem;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
+}
+
+td,
+th {
+  padding: 0;
+}
+
+[hidden],
+template {
+  display: none;
+}
+
+br {
+  margin-bottom: 0;
+}
+
+abbr {
+  letter-spacing: 0.1em;
+}
+
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+dfn {
+  font-style: italic;
+}
+
+em,
+i {
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+mark {
+  background: #ff0;
+  color: #000;
+}
+
+small {
+  line-height: 13px;
+  line-height: 0.8125rem;
+  font-size: 70%;
+}
+@media screen and (min-width: 4005em) {
+  small {
+    line-height: 15.5px;
+    line-height: 0.8611111111rem;
+  }
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+/* Paragraph
+========================================================================== */
+.attention-grabber {
+  font-size: 19.2px;
+  font-size: 1.2rem;
+}
+
+.alignLeft {
+  text-align: left;
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.uppercase {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+/* TODOs:
+ - some line heights produce margins with .5 results, seemingly breaking the gird (?),
+ - add table and side comments elements,
+ */
+
+/*# sourceMappingURL=gutenberg.css.map */
