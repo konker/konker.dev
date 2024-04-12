@@ -1,0 +1,27 @@
+---
+import '@fontsource/ibm-plex-serif';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  readonly pageTitle: string;
+  readonly title: string;
+  readonly pubDate: string;
+  readonly author: string;
+  readonly abstract: string;
+}
+
+const { pageTitle, title, abstract, pubDate, author } = Astro.props
+---
+<BaseLayout pageTitle={pageTitle}>
+  <section id="content" class="grow w-full lg:mr-auto lg:ml-auto mt-2 mb-4 prose md:prose-lg lg:prose-xl max-w-none md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-lg">
+    <article>
+      <hgroup class="text-center">
+        <h1>{title}</h1>
+        <p><em><span class="pubDate">{pubDate}</span> · By <span class="author">{author}</span></em></p>
+      </hgroup>
+      <hr>
+      <p class="attention-grabber">{abstract}</p>
+      <slot />
+    </article>
+  </section>
+</BaseLayout>

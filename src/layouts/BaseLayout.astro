@@ -4,7 +4,10 @@ import Footer from '../components/Footer.astro';
 import '@fontsource/ibm-plex-serif';
 
 import '../styles/global.css';
-// import '../styles/typography.css';
+
+interface Props {
+  readonly pageTitle: string;
+}
 
 const { pageTitle } = Astro.props
 ---
@@ -14,7 +17,6 @@ const { pageTitle } = Astro.props
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="//unpkg.com/gutenberg-css" media="print">
   <title>{pageTitle}</title>
 </head>
 <body class="h-full w-full text-gray-800 bg-neutral-100">
@@ -22,9 +24,7 @@ const { pageTitle } = Astro.props
   <div id="wrapper" class="flex flex-col flex-1 my-5 mx-5">
     <Header/>
     <main class="flex flex-col grow">
-      <section id="content" class="grow ml-4 mr-2 lg:mr-auto lg:ml-auto mt-2 mb-4 text-lg prose prose-zinc md:prose-lg lg:prose-xl max-w-none md:max-w-screen-md lg:max-w-screen-lg">
-        <slot />
-      </section>
+      <slot />
     </main>
   </div>
   <Footer/>

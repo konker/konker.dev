@@ -1,9 +1,12 @@
 ---
-
+import MainNavigation from '../components/MainNavigation.astro';
 ---
 <header class="pl-0 relative">
-  <a href="/" class="block text-black border-0 no-underline visited:text-black hover:text-black">
-    <img src="/konker-flash-1.png" alt="" class="float-left h-20">
-    <span class="title block my-0 ml-14 pt-1 pb-3 text-4xl font-medium border-b border-gray-400">konker.dev</span>
-  </a>
+  <div id="logo">
+    <a href="/" class="block text-black border-0 no-underline visited:text-black hover:text-black">
+      <img src="/konker-flash-1.png" alt="" class="float-left h-20">
+      <span class="title block my-0 ml-14 pt-1 pb-3 text-4xl font-medium border-b border-gray-400">konker.dev</span>
+    </a>
+  </div>
+  <MainNavigation />
 </header>

@@ -1,0 +1,135 @@
+---
+// How to use tailwind vars for width, colors, fonts?
+---
+<nav class="main-navigation">
+  <button
+    aria-label="toggle menu"
+    type="button"
+    class="hamburger"
+  >
+    <!-- icons by Lucide: https://lucide.dev/ -->
+    <svg
+      class="hamburger-menu-icon-open"
+      role="img"
+      aria-label="close"
+      xmlns="http://www.w3.org/2000/svg"
+      width="2em"
+      height="2em"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M18 6L6 18M6 6l12 12"
+      ></path>
+    </svg>
+    <svg
+      class="hamburger-menu-icon-closed"
+      role="img"
+      aria-label="menu"
+      xmlns="http://www.w3.org/2000/svg"
+      width="2em"
+      height="2em"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M4 12h16M4 6h16M4 18h16"
+      ></path>
+    </svg>
+  </button>
+
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/projects/">Projects</a>
+    <a href="/til/">TIL</a>
+    <a href="/about/">About</a>
+  </div>
+</nav>
+
+<style>
+  .main-navigation .hamburger {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.0rem;
+  }
+
+  .main-navigation.expanded .hamburger-menu-icon-closed,
+  .main-navigation .hamburger-menu-icon-open,
+  .main-navigation .nav-links {
+    display: none;
+  }
+  .main-navigation.expanded .hamburger-menu-icon-open,
+  .main-navigation .hamburger-menu-icon-closed,
+  .main-navigation.expanded .nav-links {
+    display: inline-block;
+  }
+
+  .main-navigation {
+    text-align: right;
+    margin-left: 3.5rem;
+  }
+  .main-navigation .nav-links {
+    position: absolute;
+    right: 0;
+    width: 100%;
+    padding-left: 3.5rem;
+  }
+  .main-navigation .nav-links a {
+    display: block;
+    background-color: #ddd;
+    color: #00a;
+    font-weight: 400;
+    text-decoration: underline;
+    text-align: center;
+    font-family: 'Helvetica Neue', 'Helvetica', 'sans-serif';
+    margin: 0.05rem 0.0rem;
+    padding: 0.15rem 0.85rem;
+  }
+  .main-navigation .nav-links a:hover {
+    background-color: #214478;
+    color: #ddd;
+    text-decoration: none;
+  }
+
+  @media screen and (min-width: 636px) {
+    .main-navigation .hamburger {
+      display: none;
+    }
+    .main-navigation.expanded .nav-links,
+    .main-navigation .nav-links {
+      position: static;
+      display: block;
+      width: inherit;
+      max-width: 100%;
+      margin-left: 3.5rem;
+      text-align: right;
+    }
+    .main-navigation .nav-links a {
+      display: inline-block;
+      min-width: 6rem;
+      margin: 0 0.05rem;
+      padding: 0.0rem 0.15rem;
+      background-color: #fff;
+      color: #00a;
+      font-weight: 400;
+      border: 1px solid #999;
+      border-top-width: 0;
+      text-decoration: underline;
+      text-align: center;
+      font-family: 'Helvetica Neue', 'Helvetica', 'sans-serif';
+    }
+    .main-navigation .nav-links a:hover {
+      background-color: #214478;
+      color: #fff;
+      text-decoration: none;
+    }
+  }
+</style>

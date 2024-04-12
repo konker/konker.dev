@@ -1,0 +1,52 @@
+# konker.dev
+
+- Add navigation:
+  - Home
+  - TIL
+    - tags
+      - (or should these be top-level, for any content, e.g. projects, etc?)
+      - but then projects would also have to be content collections?
+        - Can content collections be metadata only and refer to pages?
+  - Projects
+  - About
+    - Contact
+- Hamburger menu
+- Develop footer further
+  - Links to github?
+  - Other links?
+    - Astro
+    - Tailwind
+    - AWS
+- Add some TIL posts
+  - Have about 3?
+  - As astro content?
+  - Layout for Index page
+  - Layout for detail page [?]
+- Add skeleton project pages?
+  - ???
+  - Would be good to get to a point where I just need to write
+- Print CSS
+  - https://github.com/BafS/Gutenberg/blob/master/docs/index.html
+- Analytics
+  - Page views counter for posts?
+- Documentation pages?
+  - (Or even project pages)
+  - Do they need to be different from current typographical style?
+    - Starlight even?
+      - Does starlight use tailwind?
+- Dark mode?
+  - Search?
+- Contact form?
+- Comments/feedback for TIL posts?
+- Sitemap?
+- RSS feed?
+- SEO?
+- Test favicon
+- Check vitals/performance
+  - https://pagespeed.web.dev/
+  - Lighthouse?
+  - SSL?
+- Codeberg?
+  - Mirror to github?
+  - What about codestar link to github for site-o-matic CD?
+  - 
