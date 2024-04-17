@@ -1,7 +1,7 @@
 ---
-import { Breadcrumb } from '../lib/types';
+import type { BreadcrumbT } from '../lib/types';
 
-type Props = Breadcrumb;
+type Props = BreadcrumbT;
 const { url, title } = Astro.props;
 ---
 <li><a href={url}>{title}</a></li>

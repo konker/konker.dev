@@ -1,0 +1,26 @@
+---
+import { TAG_COLLECTIONS, type TagCollection } from '../../lib/collections';
+import { getCollection } from 'astro:content';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import type { TagEntryT } from '../../lib/types';
+
+const allEntries = await Promise.all(TAG_COLLECTIONS.map(collection => getCollection(collection)));
+const tagEntries = allEntries.reduce((acc, entries, i) => {
+  const collection: TagCollection = TAG_COLLECTIONS[i]!
+  const x = entries.map((entry): TagEntryT<TagCollection> => ({
+    entry,
+    collection
+  }));
+  return [...acc, ...x];
+}, [] as Array<TagEntryT<TagCollection>>);
+
+const uniqueTags = [...new Set(tagEntries.map((tagEntry) => tagEntry.entry.data.tags).flat())];
+
+const pageTitle="Tags Index"
+---
+
+<BaseLayout pageTitle={pageTitle}>
+    <div class="tags">
+      {uniqueTags.map(tag => <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>)}
+    </div>
+</BaseLayout>

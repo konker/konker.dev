@@ -1,7 +1,7 @@
 ---
 title: Absolute path to current script in bash
 author: Konrad Markus
-description: "DESC"
+abstract: "DESC"
 pubDate: 2024-04-11
 tags: ["til", "shell", "bash"]
 ---

@@ -7,12 +7,12 @@ import '@fontsource/merriweather';
 import '@fontsource-variable/open-sans';
 
 import '../styles/global.css';
-import { Breadcrumbs, SectionNavigation } from '../lib/types';
+import type { BreadcrumbT, SectionNavigationT } from '../lib/types';
 
 interface Props {
   readonly pageTitle: string;
-  readonly breadcrumbs: Breadcrumbs;
-  readonly sectionNavigation?: SectionNavigation;
+  readonly breadcrumbs?: ReadonlyArray<BreadcrumbT> | undefined;
+  readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 
 const { pageTitle, breadcrumbs, sectionNavigation } = Astro.props

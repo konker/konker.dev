@@ -1,7 +1,7 @@
 ---
 title: The "Norway Problem" with YAML
 author: Konrad Markus
-description: DESC
+abstract: DESC
 pubDate: 2024-04-12
 tags: ["til", "yaml"]
 ---

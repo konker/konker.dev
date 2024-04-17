@@ -1,7 +1,7 @@
 ---
 title: Madge circular dependency detection for node.js
 author: Konrad Markus
-description: "DESC"
+abstract: "DESC"
 pubDate: 2022-08-08
 tags: ["til", "nodejs", "javascript", "typescript"]
 ---

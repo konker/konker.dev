@@ -1,8 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
-import type { Breadcrumb, Breadcrumbs, Collections } from '../../lib/types';
-import { collectionEntryToSectionNavigation, collectionEntryToUrl, HomeBreadcrumb } from '../../lib';
+import type { BreadcrumbT } from '../../lib/types';
+import { collectionEntryToSectionNavigation, collectionEntryToUrl } from '../../lib/collections/helpers';
+import type { Collections } from '../../content/config';
+import { HomeBreadcrumb } from '../../lib';
 
 export async function getStaticPaths() {
   const entries = await getCollection('til');
@@ -15,10 +17,10 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
-const collection: Collections = 'til';
-const indexBreadcrumb: Breadcrumb = { title: 'TIL', url: `/${collection}/` };
+const collection: Collections = 'til' as const;
+const indexBreadcrumb: BreadcrumbT = { title: 'TIL', url: `/${collection}/` };
 
-const breadcrumbs: Breadcrumbs = [
+const breadcrumbs: ReadonlyArray<BreadcrumbT> = [
   HomeBreadcrumb,
   indexBreadcrumb,
   { title: entry.data.title,  url: collectionEntryToUrl(collection, entry) },
@@ -29,6 +31,6 @@ const entries = await getCollection(collection);
 const filteredEntries = entries.filter(e => !e.data.draft);
 const sectionNavigation = collectionEntryToSectionNavigation(collection, indexBreadcrumb, filteredEntries, entry);
 ---
-<ArticleLayout {...entry.data} breadcrumbs={breadcrumbs} sectionNavigation={sectionNavigation}>
+<ArticleLayout {...entry.data} pageTitle={entry.data.title} breadcrumbs={breadcrumbs} sectionNavigation={sectionNavigation}>
   <Content />
 </ArticleLayout>

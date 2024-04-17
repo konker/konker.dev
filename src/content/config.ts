@@ -6,7 +6,7 @@ const tilCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     pubDate: z.date(),
-    description: z.string(),
+    abstract: z.string(),
     author: z.string(),
     draft: z.boolean().default(false),
     image: z.optional(
@@ -24,7 +24,7 @@ const projectsCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     pubDate: z.date(),
-    description: z.string(),
+    abstract: z.string(),
     author: z.string(),
     draft: z.boolean().default(false),
     image: z.optional(
@@ -41,3 +41,5 @@ export const collections = {
   til: tilCollection,
   projects: projectsCollection,
 };
+
+export type Collections = keyof typeof collections;

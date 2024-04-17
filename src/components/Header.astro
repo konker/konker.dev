@@ -1,14 +1,13 @@
 ---
 import MainNavigation from '../components/MainNavigation.astro';
 import BreadcrumbsNavigation from '../components/BreadcrumbsNavigation.astro';
-import SectionNavigation from '../components/SectionNavigation.astro';
-import type { Breadcrumbs, SectionNavigation } from '../lib/types';
+import type { BreadcrumbT, SectionNavigationT } from '../lib/types';
 
 export type Props = {
-  readonly breadcrumbs: Breadcrumbs | undefined;
-  readonly sectionNavigation?: SectionNavigation;
+  readonly breadcrumbs?: ReadonlyArray<BreadcrumbT> | undefined;
+  readonly sectionNavigation?: SectionNavigationT | undefined;
 }
-const { breadcrumbs, sectionNavigation } = Astro.props
+const { breadcrumbs } = Astro.props
 ---
 <header class="pl-0 relative">
   <div id="logo" class="mr-10 md:mr-0 font-serif">

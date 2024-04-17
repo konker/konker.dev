@@ -1,8 +1,8 @@
 ---
-import type { SectionNavigation } from '../lib/types';
+import type { SectionNavigationT } from '../lib/types';
 
 export type Props = {
-  readonly sectionNavigation: SectionNavigation | undefined;
+  readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 const { sectionNavigation } = Astro.props
 ---

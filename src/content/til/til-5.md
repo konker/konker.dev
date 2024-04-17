@@ -1,7 +1,7 @@
 ---
 title: SWC to speed up typescript
 author: Konrad Markus
-description: "DESC"
+abstract: "DESC"
 pubDate: 2022-08-08
 tags: ["til", "typescript"]
 ---

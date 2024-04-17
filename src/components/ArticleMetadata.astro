@@ -9,18 +9,18 @@ export type Props = {
   readonly tags: Array<string>;
 }
 
-const { title, pubDate, author, tags  } = Astro.props
+const { pubDate, author, tags  } = Astro.props
 const displayPubDate = toDisplayDate(pubDate);
 const readablePubDate = toReadableDate(pubDate);
 ---
 <div class="metadata-wrapper mb-16 text-left">
   <div class="metadata flex flex-col justify-start md:flex-row">
     <span class="pubDate flex min-w-fit font-sans pr-8" title={readablePubDate}>
-      <span class="separator inline-block px-0 mr-2"><Calendar size="24"/><!--&#128197;--></span>
+      <span class="separator inline-block px-0 mr-2"><Calendar size="24"/></span>
       {displayPubDate}
     </span>
     <span class="author flex min-w-fit font-sans">
-      <span class="separator inline-block px-0 mr-2"><User size="24"/><!--&#129299;--></span>
+      <span class="separator inline-block px-0 mr-2"><User size="24"/></span>
       <a href="/about" class="text-blue-800 visited:text-blue-800">{author}</a>
     </span>
   </div>
