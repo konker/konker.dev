@@ -15,9 +15,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Helvetica Neue', 'Helvetica', ...defaultTheme.fontFamily.sans],
-        serif: ['IBM Plex Serif', 'Georgia', 'Times New Roman', ...defaultTheme.fontFamily.serif],
-        mono: ['IBM Plex Mono', ...defaultTheme.fontFamily.mono],
+        sans: ['Open Sans Variable', 'Helvetica', ...defaultTheme.fontFamily.sans],
+        serif: ['Merriweather', 'Georgia', 'Times New Roman', ...defaultTheme.fontFamily.serif],
+        mono: ['JetBrains Mono Variable', ...defaultTheme.fontFamily.mono],
       },
       colors: {
         // This should have been included in Tailwind...

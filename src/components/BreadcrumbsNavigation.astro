@@ -1,4 +1,5 @@
 ---
+import { Home, MoveRight } from 'lucide-astro';
 import type { Breadcrumbs } from '../lib/types';
 
 export type Props = {
@@ -11,11 +12,11 @@ const last = breadcrumbs?.length - 1 ?? 0;
   {
     breadcrumbs.map((breadcrumb, idx: number) => (
       <span class="breadcrumb font-sans">
-        {idx === 0 ? <span class="separator inline-block py-1 px-1">&#127968;</span> : undefined}
+        {idx === 0 ? <span class="separator inline-block py-1 px-1 mb-[-0.55rem]"><Home size="24"/><!--&#127968;--></span> : undefined}
         <a href={breadcrumb.url} class="inline-block py-1 px-1 visited:text-blue-800">
           <span class="title">{ breadcrumb.title }</span>
         </a>
-        {idx < last ? <span class="separator inline-block py-1 px-1">&#10230;</span> : undefined}
+        {idx < last ? <span class="separator inline-block mb-[-0.45rem] py-1 px-1"><MoveRight size="18"/><!--&#10230;--></span> : undefined}
       </span>
     ))}
 </nav> : undefined }

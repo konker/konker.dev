@@ -1,13 +1,15 @@
 ---
+import { Tags } from 'lucide-astro';
+
 export type Props = {
   readonly tags: Array<string>;
 }
 
 const { tags } = Astro.props
 ---
-<p class="tags ml-2 font-sans">
-  <span class="separator inline-block px-0">&#127991;</span>
+<p class="tags mt-3 ml-1 font-sans align-text-bottom">
+  <span class="separator inline-block py-0 px-0 mb-[-0.55rem]"><Tags size="24"/></span>
   {tags.map((tag: string) => (
-    <span class="tag inline-block py-1 px-3 bg-white mx-2 rounded-lg font-sans"><a href={`/tags/${tag}`} class="text-blue-800">#{tag}</a></span>
+    <span class="tag inline-block py-0 px-3 bg-white mb-2 mx-2 rounded-lg font-sans"><a href={`/tags/${tag}`} class="text-blue-800">#{tag}</a></span>
   ))}
 </p>

@@ -5,11 +5,11 @@
     - ~~Format readable date properly~~
     - ~~Use proper name for author?~~
     - ~~Remove email from author?~~
-    - Better icons?: https://lucide-astro.dzeio.com/
-  - Comments/feedback for TIL posts
-    - https://elazizi.com/posts/add-comments-section-to-your-astro-blog/
+    - ~~Better icons?: https://lucide-astro.dzeio.com/~~
   - Tag index pages
   - TIL index page
+  - Comments/feedback for TIL posts
+    - https://elazizi.com/posts/add-comments-section-to-your-astro-blog/
   - Projects index page
     - Project page template
       - More like a documentation style
