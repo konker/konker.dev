@@ -1,0 +1,7 @@
+---
+import { Breadcrumb } from '../lib/types';
+
+type Props = Breadcrumb;
+const { url, title } = Astro.props;
+---
+<li><a href={url}>{title}</a></li>

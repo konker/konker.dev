@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="svg4137"
+   height="1775"
+   viewBox="0 0 2985.0057 1775.026"
+   width="2985"
+   version="1.1"
+   sodipodi:docname="FinlandFlag.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.18750186"
+     inkscape:cx="1674.65"
+     inkscape:cy="1061.3228"
+     inkscape:window-width="2560"
+     inkscape:window-height="1508"
+     inkscape:window-x="0"
+     inkscape:window-y="48"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4137" />
+  <defs
+     id="defs4141">
+    <filter
+       id="filter13619"
+       style="color-interpolation-filters:sRGB"
+       height="1.0311778"
+       width="1.0195087"
+       y="-0.015588846"
+       x="-0.0097543458">
+      <feGaussianBlur
+         id="feGaussianBlur13621"
+         stdDeviation="13.352142" />
+    </filter>
+  </defs>
+  <g
+     id="g4158"
+     transform="translate(-177.59901,-177.66)">
+    <g
+       id="g4153">
+      <rect
+         id="rect4"
+         height="1755.3"
+         width="2984.8999"
+         y="177.66"
+         x="177.58"
+         fill="#ffffff" />
+      <rect
+         id="rect6"
+         height="493.23001"
+         width="2984.8999"
+         y="808.70001"
+         x="177.58"
+         fill="#003580" />
+      <rect
+         id="rect8"
+         height="1755.3"
+         width="497.48001"
+         y="177.66"
+         x="1006.7"
+         fill="#003580" />
+    </g>
+  </g>
+</svg>

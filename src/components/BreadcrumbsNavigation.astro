@@ -1,0 +1,21 @@
+---
+import type { Breadcrumbs } from '../lib/types';
+
+export type Props = {
+  readonly breadcrumbs: Breadcrumbs | undefined;
+}
+const { breadcrumbs } = Astro.props
+const last = breadcrumbs?.length - 1 ?? 0;
+---
+{ breadcrumbs ? <nav class="breadcrumbs float-left hidden md:inline-block max-w-50 ml-6 mt-2 px-2 pb-1 bg-white rounded-lg">
+  {
+    breadcrumbs.map((breadcrumb, idx: number) => (
+      <span class="breadcrumb font-sans">
+        {idx === 0 ? <span class="separator inline-block py-1 px-1">&#127968;</span> : undefined}
+        <a href={breadcrumb.url} class="inline-block py-1 px-1 visited:text-blue-800">
+          <span class="title">{ breadcrumb.title }</span>
+        </a>
+        {idx < last ? <span class="separator inline-block py-1 px-1">&#10230;</span> : undefined}
+      </span>
+    ))}
+</nav> : undefined }

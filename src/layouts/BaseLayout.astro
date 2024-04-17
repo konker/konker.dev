@@ -4,12 +4,15 @@ import Footer from '../components/Footer.astro';
 import '@fontsource/ibm-plex-serif';
 
 import '../styles/global.css';
+import { Breadcrumbs, SectionNavigation } from '../lib/types';
 
 interface Props {
   readonly pageTitle: string;
+  readonly breadcrumbs: Breadcrumbs;
+  readonly sectionNavigation?: SectionNavigation;
 }
 
-const { pageTitle } = Astro.props
+const { pageTitle, breadcrumbs, sectionNavigation } = Astro.props
 ---
 
 <!DOCTYPE html>
@@ -20,9 +23,9 @@ const { pageTitle } = Astro.props
   <title>{pageTitle}</title>
 </head>
 <body class="h-full w-full text-gray-800 bg-neutral-100">
-<div id="container" class="flex flex-col min-h-full font-serif">
+<div id="container" class="flex flex-col w-full min-h-full font-serif">
   <div id="wrapper" class="flex flex-col flex-1 my-5 mx-5">
-    <Header/>
+    <Header breadcrumbs={breadcrumbs} sectionNavigation={sectionNavigation} />
     <main class="flex flex-col grow">
       <slot />
     </main>

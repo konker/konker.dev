@@ -1,12 +1,22 @@
 ---
 import MainNavigation from '../components/MainNavigation.astro';
+import BreadcrumbsNavigation from '../components/BreadcrumbsNavigation.astro';
+import SectionNavigation from '../components/SectionNavigation.astro';
+import type { Breadcrumbs, SectionNavigation } from '../lib/types';
+
+export type Props = {
+  readonly breadcrumbs: Breadcrumbs | undefined;
+  readonly sectionNavigation?: SectionNavigation;
+}
+const { breadcrumbs, sectionNavigation } = Astro.props
 ---
 <header class="pl-0 relative">
-  <div id="logo">
+  <div id="logo" class="mr-10 md:mr-0 font-serif">
     <a href="/" class="block text-black border-0 no-underline visited:text-black hover:text-black">
       <img src="/konker-flash-1.png" alt="" class="float-left h-20">
-      <span class="title block my-0 ml-14 pt-1 pb-3 text-4xl font-medium border-b border-gray-400">konker.dev</span>
+      <span class="title block my-0 ml-14 pt-1 pb-6 text-4xl font-medium border-b border-gray-400">konker.dev</span>
     </a>
   </div>
   <MainNavigation />
+  <BreadcrumbsNavigation breadcrumbs={breadcrumbs} />
 </header>

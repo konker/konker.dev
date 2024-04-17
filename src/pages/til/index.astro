@@ -1,0 +1,17 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogPost from '../../components/BlogPost.astro';
+import '../../styles/global.css';
+
+const allPosts = await getCollection('til');
+const filteredPosts = allPosts.filter(post => !post.data.draft);
+const pageTitle = 'TIL';
+---
+<BaseLayout pageTitle={pageTitle}>
+  <nav>
+    <ul>
+      {filteredPosts.map((post) => <BlogPost url={`/til/${post.slug}/`} title={post.data.title} /> )}
+    </ul>
+  </nav>
+</BaseLayout>

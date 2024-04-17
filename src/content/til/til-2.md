@@ -1,13 +1,13 @@
 ---
-title: My Second Blog Post
-author: Astro Learner
-description: "After learning some Astro, I couldn't stop!"
-image:
-    url: "https://docs.astro.build/assets/arc.webp"
-    alt: "Thumbnail of Astro arcs."
-pubDate: 2022-07-08
-tags: ["astro", "blogging", "learning in public", "successes", "til"]
+title: The "Norway Problem" with YAML
+author: Konrad Markus
+description: DESC
+pubDate: 2024-04-12
+tags: ["til", "yaml"]
 ---
 
-After a successful first week learning Astro, I decided to try some more. I wrote and imported a small component from memory!
+I personally don't like YAML, it's too easy to be confusing, especially as the size of the content increases.
 
+This opinion can be (and is) argued to-and-fro, however, one of the actual flaws with YAML is known as the "Norway problem":
+
+https://www.bram.us/2022/01/11/yaml-the-norway-problem/

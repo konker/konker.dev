@@ -1,23 +1,23 @@
 ---
-title: My Fourth Blog Post
-author: Astro Learner
-description: "This post will show up on its own!"
-image:
-    url: "https://docs.astro.build/default-og-image.png"
-    alt: "The word astro against an illustration of planets and stars."
+title: Madge circular dependency detection for node.js
+author: Konrad Markus
+description: "DESC"
 pubDate: 2022-08-08
-tags: ["astro", "successes", "til"]
+tags: ["til", "nodejs", "javascript", "typescript"]
 ---
-This post should show up with my other blog posts, because `Astro.glob()` is returning a list of all my posts in order to create my list.
+Madge is a tool which detects circular dependencies in your javascript imports. It's a handy additional linting tool that can be added to your nodejs build/CI toolchain.
 
+https://www.npmjs.com/package/madge
 
-```typescript
-import * as P from '@konker.dev/effect-ts-prelude';
+## Example usage
 
-// A pipeh
-export function foo(x: number) {
-  P.pipe(x, (x) => x * 2);
+`package.json`
+```JSON
+{
+  "...": "",
+  "scripts": {
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning --ts-config ./tsconfig.json src",
+    "...": ""
+  }
 }
-
-console.log(foo(2)); // 4
 ```

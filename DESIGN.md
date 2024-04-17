@@ -1,32 +1,66 @@
 # konker.dev
 
+- TODO
+  - Metadata
+    - ~~Format readable date properly~~
+    - ~~Use proper name for author?~~
+    - ~~Remove email from author?~~
+    - Better icons?: https://lucide-astro.dzeio.com/
+  - Comments/feedback for TIL posts
+    - https://elazizi.com/posts/add-comments-section-to-your-astro-blog/
+  - Tag index pages
+  - TIL index page
+  - Projects index page
+    - Project page template
+      - More like a documentation style
+      - Can we somehow use/leverage starlight here?
+  - About page content
+  - Footer content
+    - Share links?
+    - Links to main parts of site?
+    - Link to analytics??
+      - See: https://harrk.dev/why-i-switched-from-plausible-to-fathom-analytics/
+  - Hamburger menu
+    - Animate?
+    - Make wider/longer?
+  - Analytics
+    - https://usefathom.com/pricing [?]
+    - https://plausible.io/#pricing [?]
+    - 
+- RSS feed?
+- Accessibility?
+- PGP signatures
+  - Could make an Astro integration?
+    - Project/TIL material
+- Search?
+- Sitemap?
+
 - Add navigation:
   - Home
+  - Projects
   - TIL
     - tags
       - (or should these be top-level, for any content, e.g. projects, etc?)
       - but then projects would also have to be content collections?
         - Can content collections be metadata only and refer to pages?
-  - Projects
   - About
     - Contact
-- Hamburger menu
+- ~~Hamburger menu~~
+- Add some TIL posts
+- Add skeleton project pages?
+  - ???
+  - Would be good to get to a point where I just need to write
 - Develop footer further
   - Links to github?
   - Other links?
     - Astro
     - Tailwind
     - AWS
-- Add some TIL posts
-  - Have about 3?
-  - As astro content?
-  - Layout for Index page
-  - Layout for detail page [?]
-- Add skeleton project pages?
-  - ???
-  - Would be good to get to a point where I just need to write
 - Print CSS
   - https://github.com/BafS/Gutenberg/blob/master/docs/index.html
+- Fallback for noscript
+- Fallback for very small screen?
+  - Could be quite similar to fallback for noscript?
 - Analytics
   - Page views counter for posts?
 - Documentation pages?
@@ -35,11 +69,8 @@
     - Starlight even?
       - Does starlight use tailwind?
 - Dark mode?
-  - Search?
+- Search?
 - Contact form?
-- Comments/feedback for TIL posts?
-- Sitemap?
-- RSS feed?
 - SEO?
 - Test favicon
 - Check vitals/performance
@@ -49,4 +80,4 @@
 - Codeberg?
   - Mirror to github?
   - What about codestar link to github for site-o-matic CD?
-  - 
+- Pratchett clacks?

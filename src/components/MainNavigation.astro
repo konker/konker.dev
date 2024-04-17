@@ -11,7 +11,7 @@
     <svg
       class="hamburger-menu-icon-open"
       role="img"
-      aria-label="close"
+      aria-label="close menu"
       xmlns="http://www.w3.org/2000/svg"
       width="2em"
       height="2em"
@@ -20,9 +20,9 @@
       <path
         fill="none"
         stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
         d="M18 6L6 18M6 6l12 12"
       ></path>
     </svg>
@@ -38,9 +38,9 @@
       <path
         fill="none"
         stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
         d="M4 12h16M4 6h16M4 18h16"
       ></path>
     </svg>
@@ -57,8 +57,19 @@
 <style>
   .main-navigation .hamburger {
     position: absolute;
-    top: 0.85rem;
+    top: 1.0rem;
     right: 0.0rem;
+    padding-top: 0.25rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+  }
+
+  .main-navigation .nav-links {
+    transform: translateX(-100%);
+  }
+  .main-navigation.expanded .nav-links {
+    transform: translateX(0);
+    transition: transform 1s;
   }
 
   .main-navigation.expanded .hamburger-menu-icon-closed,
@@ -66,31 +77,41 @@
   .main-navigation .nav-links {
     display: none;
   }
+  .main-navigation.expanded .hamburger {
+    background-color: #fff;
+    padding-bottom: 4.0rem;
+    border: 1px solid #ddd;
+  }
+  .main-navigation .hamburger-menu-icon-open {
+    background-color: #fff;
+  }
   .main-navigation.expanded .hamburger-menu-icon-open,
   .main-navigation .hamburger-menu-icon-closed,
   .main-navigation.expanded .nav-links {
-    display: inline-block;
+    display: block;
   }
 
   .main-navigation {
-    text-align: right;
     margin-left: 3.5rem;
   }
   .main-navigation .nav-links {
     position: absolute;
     right: 0;
-    width: 100%;
-    padding-left: 3.5rem;
+    width: 85%;
+    padding: 0.0rem 0.0rem 0.5rem 0.5rem;
   }
   .main-navigation .nav-links a {
     display: block;
-    background-color: #ddd;
+    background-color: #fff;
     color: #00a;
+    border-color: #ddd;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
     font-weight: 400;
     text-decoration: underline;
     text-align: center;
     font-family: 'Helvetica Neue', 'Helvetica', 'sans-serif';
-    margin: 0.05rem 0.0rem;
     padding: 0.15rem 0.85rem;
   }
   .main-navigation .nav-links a:hover {
@@ -99,29 +120,34 @@
     text-decoration: none;
   }
 
-  @media screen and (min-width: 636px) {
+  @media screen and (min-width: 766px) {
     .main-navigation .hamburger {
       display: none;
     }
     .main-navigation.expanded .nav-links,
     .main-navigation .nav-links {
       position: static;
+      float: right;
+      transform: translateX(0);
       display: block;
       width: inherit;
       max-width: 100%;
-      margin-left: 3.5rem;
+      margin-left: 2.5rem;
+      padding: 0;
       text-align: right;
     }
     .main-navigation .nav-links a {
       display: inline-block;
       min-width: 6rem;
       margin: 0 0.05rem;
-      padding: 0.0rem 0.15rem;
+      padding: 0.25rem 0.25rem;
       background-color: #fff;
       color: #00a;
       font-weight: 400;
       border: 1px solid #999;
       border-top-width: 0;
+      border-bottom-left-radius: 0.0rem;
+      border-bottom-right-radius: 0.0rem;
       text-decoration: underline;
       text-align: center;
       font-family: 'Helvetica Neue', 'Helvetica', 'sans-serif';

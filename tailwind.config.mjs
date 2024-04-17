@@ -50,6 +50,9 @@ export default {
       typography: (theme) => ({
         DEFAULT: {
           css: {
+            p: {
+              fontSize: '1.0rem',
+            },
             '.attention-grabber': {
               fontSize: '120%',
             },

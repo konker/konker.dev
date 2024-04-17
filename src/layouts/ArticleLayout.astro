@@ -1,27 +1,38 @@
 ---
 import '@fontsource/ibm-plex-serif';
 import BaseLayout from './BaseLayout.astro';
+import SectionNavigationLong from '../components/SectionNavigationLong.astro';
+import type { Breadcrumbs, SectionNavigation } from '../lib/types';
+import ArticleMetadata from '../components/ArticleMetadata.astro';
+import ArticleMetadataTagBar from '../components/ArticleMetadataTagBar.astro';
 
-interface Props {
+export type Props = {
   readonly pageTitle: string;
   readonly title: string;
-  readonly pubDate: string;
+  readonly pubDate: Date;
   readonly author: string;
   readonly abstract: string;
+  readonly tags: Array<string>;
+  readonly breadcrumbs: Breadcrumbs;
+  readonly sectionNavigation?: SectionNavigation;
 }
 
-const { pageTitle, title, abstract, pubDate, author } = Astro.props
+const { pageTitle, title, abstract, tags, breadcrumbs, sectionNavigation } = Astro.props
 ---
-<BaseLayout pageTitle={pageTitle}>
-  <section id="content" class="grow w-full lg:mr-auto lg:ml-auto mt-2 mb-4 prose md:prose-lg lg:prose-xl max-w-none md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-lg">
-    <article>
-      <hgroup class="text-center">
-        <h1>{title}</h1>
-        <p><em><span class="pubDate">{pubDate}</span> · By <span class="author">{author}</span></em></p>
-      </hgroup>
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} sectionNavigation={sectionNavigation}>
+  <!--  prose-lg md:prose-md lg:prose-lg max-w-none md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl -->
+  <section id="content" class="grow w-full mr-auto ml-auto mt-2 mb-4 prose">
+    <article class="mx-6 md:mx-6 pt-0 md:pt-16">
+      <h1 set:html={title}></h1>
+      <ArticleMetadata {...Astro.props} />
       <hr>
       <p class="attention-grabber">{abstract}</p>
       <slot />
+      <hr class="mt-10">
+      <div class="article-footer border-t-2 mt-16">
+        <SectionNavigationLong sectionNavigation={sectionNavigation} />
+        <ArticleMetadataTagBar tags={tags} />
+      </div>
     </article>
   </section>
 </BaseLayout>

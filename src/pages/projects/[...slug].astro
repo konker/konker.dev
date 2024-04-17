@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import type { Breadcrumb, Breadcrumbs, Collections } from '../../lib/types';
+import { HomeBreadcrumb } from '../../lib';
+import { collectionEntryToUrl } from '../../lib';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('projects');
+  return entries
+    .filter(e => !e.data.draft)
+    .map(entry => ({
+    params: { slug: entry.slug }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const collection: Collections = 'projects';
+const indexBreadcrumb: Breadcrumb = { title: 'Projects', url: `/${collection}/` };
+
+const breadcrumbs: Breadcrumbs = [
+  HomeBreadcrumb,
+  indexBreadcrumb,
+  { title: entry.data.title,  url: collectionEntryToUrl(collection, entry) }
+];
+---
+<ArticleLayout {...entry.data} breadcrumbs={breadcrumbs}>
+  <Content />
+</ArticleLayout>
