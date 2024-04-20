@@ -1,5 +1,5 @@
 ---
-import  { File, FolderUp } from 'lucide-astro';
+import  { FileText, FolderUp } from 'lucide-astro';
 import type { SectionNavigationT } from '../lib/types';
 
 export type Props = {
@@ -10,13 +10,13 @@ const { sectionNavigation } = Astro.props
 <nav class="sectionNavigationLong w-full mb-0 bg-white py-2 px-4 font-sans">
   <p class="prev m-1">
     {sectionNavigation?.prev ? <span class="breadcrumb inline-block">
-      <span class="separator inline-block mb-[-0.20rem] px-2 font-serif"><File size="16"/></span>
+      <span class="separator inline-block mb-[-0.20rem] px-2 font-serif"><FileText size="16"/></span>
       <a href={sectionNavigation.prev.url} class="text-blue-800 visited:text-blue-800">{sectionNavigation.prev.title}</a>
     </span> : undefined}
   </p>
   <p class="next m-1">
     {sectionNavigation?.next ? <span class="breadcrumb inline-block">
-      <span class="separator inline-block mb-[-0.20rem] px-2 font-serif"><File size="16"/></span>
+      <span class="separator inline-block mb-[-0.20rem] px-2 font-serif"><FileText size="16"/></span>
       <a href={sectionNavigation.next.url} class="text-blue-800 visited:text-blue-800">{sectionNavigation.next.title}</a>
     </span> : undefined}
   </p>

@@ -1,8 +1,8 @@
 import * as D from 'date-fns';
 
-import type { BreadcrumbT } from './types.ts';
+import type { LinkT } from './types.ts';
 
-export const HomeBreadcrumb: BreadcrumbT = {
+export const HomeBreadcrumb: LinkT = {
   url: '/',
   title: 'Home',
 };

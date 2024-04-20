@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment,fp/no-nil */
 import type { CollectionEntry } from 'astro:content';
+import { FileText, GitBranch, Lightbulb, Tag, Tags } from 'lucide-astro';
 
-import type { Collections } from '../../content/config.ts';
-import type { BreadcrumbT, SectionNavigationT } from '../types.ts';
+import type { CollectionName } from '../../content/config.ts';
+import type { LinkT, SectionNavigationT } from '../types.ts';
 
-export function collectionEntryToUrl<T extends Collections>(collection: T, entry: CollectionEntry<T>): string {
+export function collectionEntryToUrl<T extends CollectionName>(collection: T, entry: CollectionEntry<T>): string {
   return `/${collection}/${entry.slug}`;
 }
 
-export function collectionEntryToBreadcrumb<T extends Collections>(
+export function collectionEntryToBreadcrumb<T extends CollectionName>(
   collection: T,
   entry: CollectionEntry<T> | undefined
-): BreadcrumbT | undefined {
+): LinkT | undefined {
   return entry
     ? {
         url: collectionEntryToUrl(collection, entry),
@@ -20,9 +21,9 @@ export function collectionEntryToBreadcrumb<T extends Collections>(
     : undefined;
 }
 
-export function collectionEntryToSectionNavigation<T extends Collections>(
+export function collectionEntryToSectionNavigation<T extends CollectionName>(
   collection: T,
-  indexBreadcrumb: BreadcrumbT,
+  indexBreadcrumb: LinkT,
   entries: Array<CollectionEntry<T>>,
   entry: CollectionEntry<T> | undefined
 ): SectionNavigationT | undefined {
@@ -38,4 +39,21 @@ export function collectionEntryToSectionNavigation<T extends Collections>(
     prev: collectionEntryToBreadcrumb(collection, prevEntry),
     next: collectionEntryToBreadcrumb(collection, nextEntry),
   };
+}
+
+export function itemIconLookup(itemIconName: string) {
+  switch (itemIconName) {
+    case 'blog':
+    case 'til':
+      return Lightbulb;
+    case 'project':
+    case 'projects':
+      return GitBranch;
+    case 'tag':
+      return Tag;
+    case 'tags':
+      return Tags;
+    default:
+      return FileText;
+  }
 }

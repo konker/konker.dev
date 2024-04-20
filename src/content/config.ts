@@ -42,4 +42,4 @@ export const collections = {
   projects: projectsCollection,
 };
 
-export type Collections = keyof typeof collections;
+export type CollectionName = keyof typeof collections;

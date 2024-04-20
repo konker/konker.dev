@@ -1,10 +1,10 @@
 ---
 import MainNavigation from '../components/MainNavigation.astro';
 import BreadcrumbsNavigation from '../components/BreadcrumbsNavigation.astro';
-import type { BreadcrumbT, SectionNavigationT } from '../lib/types';
+import type { LinkT, SectionNavigationT } from '../lib/types';
 
 export type Props = {
-  readonly breadcrumbs?: ReadonlyArray<BreadcrumbT> | undefined;
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 const { breadcrumbs } = Astro.props
@@ -16,6 +16,6 @@ const { breadcrumbs } = Astro.props
       <span class="title block my-0 ml-14 pt-1 pb-4 text-3xl font-medium border-b border-gray-400">konker.dev</span>
     </a>
   </div>
-  <MainNavigation />
+  <MainNavigation breadcrumbs={breadcrumbs} />
   <BreadcrumbsNavigation breadcrumbs={breadcrumbs} />
 </header>

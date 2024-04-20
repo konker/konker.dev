@@ -4,14 +4,14 @@ import Footer from '../components/Footer.astro';
 import '@fontsource/ibm-plex-mono';
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/merriweather';
-import '@fontsource-variable/open-sans';
+import '@fontsource-variable/work-sans';
 
 import '../styles/global.css';
-import type { BreadcrumbT, SectionNavigationT } from '../lib/types';
+import type { LinkT, SectionNavigationT } from '../lib/types';
 
 interface Props {
   readonly pageTitle: string;
-  readonly breadcrumbs?: ReadonlyArray<BreadcrumbT> | undefined;
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 

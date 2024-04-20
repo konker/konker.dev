@@ -1,0 +1,17 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { LinkT } from '../lib/types';
+
+export type Props = {
+  readonly pageTitle: string;
+  readonly breadcrumbs?: ReadonlyArray<LinkT>;
+}
+
+const { pageTitle, breadcrumbs } = Astro.props
+---
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
+  <section id="content" class="grow w-full mr-auto ml-auto mt-2 mb-4 pt-6 md:pt-16 prose">
+    <h1 set:html={pageTitle}></h1>
+    <slot />
+  </section>
+</BaseLayout>

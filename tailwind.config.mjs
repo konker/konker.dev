@@ -15,7 +15,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Open Sans Variable', 'Helvetica', ...defaultTheme.fontFamily.sans],
+        sans: ['Work Sans Variable', 'Helvetica', ...defaultTheme.fontFamily.sans],
         serif: ['Merriweather', 'Georgia', 'Times New Roman', ...defaultTheme.fontFamily.serif],
         mono: ['JetBrains Mono Variable', ...defaultTheme.fontFamily.mono],
       },
@@ -70,6 +70,7 @@ export default {
               borderColor: theme('colors.gray.300'),
             },
             h1: {
+              fontFamily: ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
               fontWeight: '400',
               fontSize: '2.5rem',
               lineHeight: '3.25rem',
@@ -77,7 +78,7 @@ export default {
               marginBottom: '1.625rem',
             },
             h2: {
-              fontFamily: ['Helvetica', 'Arial', 'sans-serif'],
+              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
               fontWeight: '400',
               fontSize: '1.6875rem',
               lineHeight: '2.4375rem',
@@ -85,7 +86,7 @@ export default {
               marginBottom: '0.8125rem',
             },
             h3: {
-              fontFamily: ['Helvetica', 'Arial', 'sans-serif'],
+              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
               fontWeight: '400',
               fontSize: '1.375rem',
               lineHeight: '1.625rem',
@@ -93,7 +94,7 @@ export default {
               marginBottom: '0.8125rem',
             },
             h4: {
-              fontFamily: ['Helvetica', 'Arial', 'sans-serif'],
+              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
               fontSize: '1.2rem',
               lineHeight: '1.625rem',
               marginTop: '2.4375rem',
@@ -104,13 +105,14 @@ export default {
         lg: {
           css: {
             h1: {
+              fontFamily: ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
               fontSize: '2.5rem',
               lineHeight: '3.4rem',
               marginTop: '1.72rem',
               marginBottom: '1.72rem',
             },
             h2: {
-              fontFamily: ['Helvetica', 'Arial', 'sans-serif'],
+              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
               fontWeight: '400',
               fontSize: '1.6875rem',
               lineHeight: '2.4375rem',
@@ -118,7 +120,7 @@ export default {
               marginBottom: '0.8125rem',
             },
             h3: {
-              fontFamily: ['Helvetica', 'Arial', 'sans-serif'],
+              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
               fontWeight: '400',
               fontSize: '1.375rem',
               lineHeight: '1.625rem',
@@ -126,7 +128,7 @@ export default {
               marginBottom: '0.8125rem',
             },
             h4: {
-              fontFamily: ['Helvetica', 'Arial', 'sans-serif'],
+              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
               fontSize: '1.2rem',
               lineHeight: '1.625rem',
               marginTop: '2.4375rem',
@@ -137,6 +139,7 @@ export default {
         xl: {
           css: {
             h1: {
+              fontFamily: ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
               fontSize: '3.5rem',
               lineHeight: '4.5rem',
               marginTop: '1.72rem',
@@ -174,6 +177,7 @@ export default {
       addBase({
         a: {
           textDecoration: 'underline',
+          textUnderlineOffset: '0.20rem',
           color: theme('colors.classic-link'),
           '&:hover': {
             textDecoration: 'none',
@@ -183,60 +187,6 @@ export default {
             color: theme('colors.classic-link-visited'),
           },
         },
-        /*
-        '#content p': {
-          lineHeight: '1.625rem',
-          marginBottom: '1.625rem',
-        },
-        h1: {
-          fontFamily: theme('fontFamily.serif'),
-          fontSize: '2.5rem',
-          lineHeight: '3.25rem',
-          // marginTop: '6.5rem',
-          marginBottom: '1.625rem',
-        },
-        h2: {
-          fontSize: '1.6875rem',
-          lineHeight: '2.4375rem',
-          marginTop: '4.0625rem',
-          marginBottom: '0.8125rem',
-          fontFamily: theme('fontFamily.sans'),
-        },
-        h3: {
-          fontFamily: theme('fontFamily.sans'),
-          fontSize: '1.375rem',
-          lineHeight: '1.625rem',
-          marginTop: '3.25rem',
-          marginBottom: '0.8125rem',
-        },
-        h4: {
-          fontFamily: theme('fontFamily.sans'),
-          fontSize: '1.2rem',
-          lineHeight: '1.625rem',
-          marginTop: '2.4375rem',
-          marginBottom: '0.8125rem',
-        },
-        h5: {
-          fontFamily: theme('fontFamily.sans'),
-          fontSize: '1rem',
-          lineHeight: '1.625rem',
-          marginTop: '4.0625rem',
-          marginBottom: '0.8125rem',
-        },
-        h6: {
-          fontFamily: theme('fontFamily.sans'),
-          fontSize: '1rem',
-          lineHeight: '1.625rem',
-          marginTop: '4.0625rem',
-          marginBottom: '0.8125rem',
-        },
-        'h1 + h2': {
-          marginTop: '1.625rem',
-        },
-        'h2 + h3, h3 + h4, h4 + h5': {
-          marginTop: '0.8125rem',
-        },
-        */
       });
     }),
   ],

@@ -1,9 +1,9 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import SectionNavigationLong from '../components/SectionNavigationLong.astro';
-import type { BreadcrumbT, SectionNavigationT } from '../lib/types';
+import type { LinkT, SectionNavigationT } from '../lib/types';
 import ArticleMetadata from '../components/ArticleMetadata.astro';
-import ArticleMetadataTagBar from '../components/ArticleMetadataTagBar.astro';
+import TagBar from '../components/TagBar.astro';
 
 export type Props = {
   readonly pageTitle: string;
@@ -12,7 +12,7 @@ export type Props = {
   readonly author: string;
   readonly abstract: string;
   readonly tags: Array<string>;
-  readonly breadcrumbs?: ReadonlyArray<BreadcrumbT>;
+  readonly breadcrumbs?: ReadonlyArray<LinkT>;
   readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 
@@ -30,7 +30,7 @@ const { pageTitle, title, abstract, tags, breadcrumbs, sectionNavigation } = Ast
       <hr class="mt-10">
       <div class="article-footer border-t-2 mt-16">
         <SectionNavigationLong sectionNavigation={sectionNavigation} />
-        <ArticleMetadataTagBar tags={tags} />
+        <TagBar tags={tags} />
       </div>
     </article>
   </section>

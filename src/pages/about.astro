@@ -1,13 +1,19 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import type { LinkT } from '../lib/types';
+import { HomeBreadcrumb } from '../lib';
+import ContentPageLayout from '../layouts/ContentPageLayout.astro';
 
+// --------------------------------------------------------------------------
 const pageTitle = 'About';
+
+// --------------------------------------------------------------------------
+const thisBreadcrumb: LinkT = { title: pageTitle, url: `/about/` };
+const breadcrumbs: ReadonlyArray<LinkT> = [
+  HomeBreadcrumb,
+  thisBreadcrumb,
+];
 ---
 
-<BaseLayout pageTitle={pageTitle}>
+<ContentPageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
   <p>About content</p>
-  <ul>
-    <li><a href="/article">article</a></li>
-    <li><a href="/article2">article2</a></li>
-  </ul>
-</BaseLayout>
+</ContentPageLayout>

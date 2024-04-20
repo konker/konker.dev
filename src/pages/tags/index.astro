@@ -1,13 +1,17 @@
 ---
+import type { CollectionName } from '../../content/config';
+import type { LinkT } from '../../lib/types';
+import { HomeBreadcrumb } from '../../lib';
 import { TAG_COLLECTIONS, type TagCollection } from '../../lib/collections';
 import { getCollection } from 'astro:content';
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogLinkIndexLayout from "../../layouts/BlogLinkIndexLayout.astro";
 import type { TagEntryT } from '../../lib/types';
 
+// --------------------------------------------------------------------------
 const allEntries = await Promise.all(TAG_COLLECTIONS.map(collection => getCollection(collection)));
 const tagEntries = allEntries.reduce((acc, entries, i) => {
   const collection: TagCollection = TAG_COLLECTIONS[i]!
-  const x = entries.map((entry): TagEntryT<TagCollection> => ({
+  const x = entries.filter(entry => !entry.data.draft).map((entry): TagEntryT<TagCollection> => ({
     entry,
     collection
   }));
@@ -16,11 +20,26 @@ const tagEntries = allEntries.reduce((acc, entries, i) => {
 
 const uniqueTags = [...new Set(tagEntries.map((tagEntry) => tagEntry.entry.data.tags).flat())];
 
-const pageTitle="Tags Index"
----
+// --------------------------------------------------------------------------
+const pageTitle="Tags Index";
+const intro = 'This is a collection of all the tags used in my posts and projects.<br>TODO: add counts and sorting?';
+const links = uniqueTags.map(tag => ({
+  url: `/tags/${tag}`,
+  title: tag,
+}))
 
-<BaseLayout pageTitle={pageTitle}>
-    <div class="tags">
-      {uniqueTags.map(tag => <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>)}
-    </div>
-</BaseLayout>
+// --------------------------------------------------------------------------
+const thisBreadcrumb: LinkT = { title: pageTitle, url: '/tags/' };
+const breadcrumbs: ReadonlyArray<LinkT> = [
+  HomeBreadcrumb,
+  thisBreadcrumb,
+];
+---
+<BlogLinkIndexLayout
+  pageTitle={pageTitle}
+  breadcrumbs={breadcrumbs}
+  intro={intro}
+  links={links}
+  titleIconName="tags"
+  itemIconName="tag">
+</BlogLinkIndexLayout>

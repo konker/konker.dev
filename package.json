@@ -27,6 +27,7 @@
     "@astrojs/tailwind": "^5.1.0",
     "@fontsource-variable/jetbrains-mono": "^5.0.20",
     "@fontsource-variable/open-sans": "^5.0.28",
+    "@fontsource-variable/work-sans": "^5.0.18",
     "@fontsource/ibm-plex-mono": "^5.0.12",
     "@fontsource/merriweather": "^5.0.12",
     "@tailwindcss/typography": "^0.5.12",

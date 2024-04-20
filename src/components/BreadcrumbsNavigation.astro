@@ -1,9 +1,9 @@
 ---
 import { Home, MoveRight } from 'lucide-astro';
-import type { BreadcrumbT } from '../lib/types';
+import type { LinkT } from '../lib/types';
 
 export type Props = {
-  readonly breadcrumbs?: ReadonlyArray<BreadcrumbT> | undefined;
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
 }
 const { breadcrumbs } = Astro.props
 const last = breadcrumbs?.length ? breadcrumbs.length - 1 : 0;
@@ -20,3 +20,9 @@ const last = breadcrumbs?.length ? breadcrumbs.length - 1 : 0;
       </span>
     ))}
 </nav> : undefined }
+
+<style>
+  .breadcrumbs a:visited {
+    color: #00a;
+  }
+</style>

@@ -1,5 +1,21 @@
 ---
+import { LinkT } from '../lib/types';
+
+export type Props = {
+  readonly breadcrumbs: ReadonlyArray<LinkT>;
+}
+
 // How to use tailwind vars for width, colors, fonts?
+const navLinks: ReadonlyArray<LinkT> = [
+  { url: '/', title: 'Home' },
+  { url: '/projects/', title: 'Projects' },
+  { url: '/til/', title: 'TIL' },
+  { url: '/tags/', title: 'Tags' },
+  { url: '/about/', title: 'About' },
+]
+
+const { breadcrumbs } = Astro.props;
+const navLinksSelectedLookup = navLinks.map((link, i) => breadcrumbs.length === 1 && i === 0 || i > 0 && breadcrumbs?.some(i => i.url === link.url));
 ---
 <nav class="main-navigation">
   <button
@@ -47,10 +63,14 @@
   </button>
 
   <div class="nav-links">
-    <a href="/">Home</a>
-    <a href="/projects/">Projects</a>
-    <a href="/til/">TIL</a>
-    <a href="/about/">About</a>
+    {navLinks.map((link, idx) => (
+      <a
+        href={link.url}
+        class={['nav-link', navLinksSelectedLookup[idx] ? 'selected' : '' ].join(' ')}
+      >
+        {link.title}
+      </a>
+    ))}
   </div>
 </nav>
 
@@ -114,6 +134,7 @@
     font-family: 'Helvetica Neue', 'Helvetica', 'sans-serif';
     padding: 0.15rem 0.85rem;
   }
+  .main-navigation .nav-links a.selected,
   .main-navigation .nav-links a:hover {
     background-color: #214478;
     color: #ddd;
@@ -152,6 +173,7 @@
       text-align: center;
       font-family: 'Helvetica Neue', 'Helvetica', 'sans-serif';
     }
+    .main-navigation .nav-links a.selected,
     .main-navigation .nav-links a:hover {
       background-color: #214478;
       color: #fff;

@@ -1,17 +1,33 @@
 ---
+import type { LinkT } from '../../lib/types';
+import { HomeBreadcrumb } from '../../lib';
+import { TagCollection } from '../../lib/collections';
 import { getCollection } from "astro:content";
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import BlogPost from '../../components/BlogPost.astro';
 import '../../styles/global.css';
+import BlogPostIndexLayout from '../../layouts/BlogPostIndexLayout.astro';
 
-const allPosts = await getCollection('projects');
+// --------------------------------------------------------------------------
+const collection: TagCollection = 'projects';
+const allPosts = await getCollection(collection);
 const filteredPosts = allPosts.filter(post => !post.data.draft);
+
+// --------------------------------------------------------------------------
 const pageTitle = 'Projects';
+const intro = 'This is a collection of my projects.';
+
+// --------------------------------------------------------------------------
+const thisBreadcrumb: LinkT = { title: pageTitle, url: `/${collection}/` };
+const breadcrumbs: ReadonlyArray<LinkT> = [
+  HomeBreadcrumb,
+  thisBreadcrumb,
+];
 ---
-<BaseLayout pageTitle={pageTitle}>
-  <nav>
-    <ul>
-      {filteredPosts.map((post) => <BlogPost url={`/projects/${post.slug}/`} title={post.data.title} /> )}
-    </ul>
-  </nav>
-</BaseLayout>
+<BlogPostIndexLayout
+  pageTitle={pageTitle}
+  breadcrumbs={breadcrumbs}
+  intro={intro}
+  collection={collection}
+  posts={filteredPosts}
+  titleIconName="project"
+  itemIconName="project">
+</BlogPostIndexLayout>

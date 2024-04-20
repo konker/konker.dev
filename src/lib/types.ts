@@ -2,16 +2,16 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { TagCollection } from './collections';
 
-export type BreadcrumbT = {
+export type LinkT = {
   readonly url: string;
   readonly title: string;
   readonly icon?: string;
 };
 
 export type SectionNavigationT = {
-  readonly index: BreadcrumbT;
-  readonly prev: BreadcrumbT | undefined;
-  readonly next: BreadcrumbT | undefined;
+  readonly index: LinkT;
+  readonly prev: LinkT | undefined;
+  readonly next: LinkT | undefined;
 };
 
 export type TagEntryT<T extends TagCollection> = {

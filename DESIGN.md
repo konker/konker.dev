@@ -1,13 +1,14 @@
 # konker.dev
 
 - TODO
-  - Metadata
+  - ~~Metadata~~
     - ~~Format readable date properly~~
     - ~~Use proper name for author?~~
     - ~~Remove email from author?~~
     - ~~Better icons?: https://lucide-astro.dzeio.com/~~
-  - Tag index pages
-  - TIL index page
+  - ~~Tag index pages~~
+  - ~~TIL index page~~
+  - ~~Selected items for MainNavigation~~
   - Comments/feedback for TIL posts
     - https://elazizi.com/posts/add-comments-section-to-your-astro-blog/
   - Projects index page
@@ -26,8 +27,10 @@
   - Analytics
     - https://usefathom.com/pricing [?]
     - https://plausible.io/#pricing [?]
-    - 
+
 - RSS feed?
+  - Just for TIL?
+  - Could have separate one for tags?
 - Accessibility?
 - PGP signatures
   - Could make an Astro integration?

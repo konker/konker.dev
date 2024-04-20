@@ -1,9 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
-import type { BreadcrumbT } from '../../lib/types';
+import type { LinkT } from '../../lib/types';
 import { collectionEntryToSectionNavigation, collectionEntryToUrl } from '../../lib/collections/helpers';
-import type { Collections } from '../../content/config';
+import type { CollectionName } from '../../content/config';
 import { HomeBreadcrumb } from '../../lib';
 
 export async function getStaticPaths() {
@@ -17,10 +17,10 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
-const collection: Collections = 'til' as const;
-const indexBreadcrumb: BreadcrumbT = { title: 'TIL', url: `/${collection}/` };
+const collection: CollectionName = 'til' as const;
+const indexBreadcrumb: LinkT = { title: 'TIL', url: `/${collection}/` };
 
-const breadcrumbs: ReadonlyArray<BreadcrumbT> = [
+const breadcrumbs: ReadonlyArray<LinkT> = [
   HomeBreadcrumb,
   indexBreadcrumb,
   { title: entry.data.title,  url: collectionEntryToUrl(collection, entry) },

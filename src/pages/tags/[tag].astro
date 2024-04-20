@@ -1,16 +1,17 @@
 ---
+import { HomeBreadcrumb } from '../../lib';
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import BlogPost from "../../components/BlogPost.astro";
 import { TAG_COLLECTIONS } from '../../lib/collections';
 import type {  TagCollection } from '../../lib/collections';
-import type { TagEntryT } from '../../lib/types';
+import type { LinkT, TagEntryT } from '../../lib/types';
+import TagLinkLayout from '../../layouts/TagLinkLayout.astro';
 
 type Props = {
     readonly tag: string;
     readonly entries: Array<TagEntryT<TagCollection>>;
 }
 
+// --------------------------------------------------------------------------
 export async function getStaticPaths() {
   const allEntries = await Promise.all(TAG_COLLECTIONS.map(collection => getCollection(collection)));
   const tagEntries = allEntries.reduce((acc, entries, i) => {
@@ -22,6 +23,7 @@ export async function getStaticPaths() {
     return [...acc, ...x];
   }, [] as Array<TagEntryT<TagCollection>>);
 
+// --------------------------------------------------------------------------
   const uniqueTags = [...new Set(tagEntries.map((tagEntry) => tagEntry.entry.data.tags).flat())];
 
   return uniqueTags.map((tag) => {
@@ -33,12 +35,25 @@ export async function getStaticPaths() {
   });
 }
 
+// --------------------------------------------------------------------------
 const { tag } = Astro.params;
+const indexBreadcrumb: LinkT = { title: 'Tags', url: '/tags/' };
+const breadcrumbs: ReadonlyArray<LinkT> = [
+  HomeBreadcrumb,
+  indexBreadcrumb,
+  { title: tag, url: `/tags/${tag}/` }
+];
+
+// --------------------------------------------------------------------------
 const { entries } = Astro.props;
+const pageTitle = `Tag: ${tag}`;
+const intro = `This is a collection of all the posts with the tag ${tag}`;
 ---
-<BaseLayout pageTitle={tag}>
-  <p>Posts tagged with {tag}</p>
-  <ul>
-    {entries.map((tagEntry) => <BlogPost url={`/${tagEntry.collection}/${tagEntry.entry.slug}/`} title={tagEntry.entry.data.title} />)}
-  </ul>
-</BaseLayout>
+<TagLinkLayout
+  pageTitle={pageTitle}
+  breadcrumbs={breadcrumbs}
+  intro={intro}
+  tagEntries={entries}
+  titleIconName="tag"
+  itemIconName="tag">
+</TagLinkLayout>
