@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
+import { itemIconLookup } from '../../lib/collections/helpers';
+import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import type { LinkT } from '../../lib/types';
+import BaseLayout from '../site/BaseLayout.astro';
+
+interface Props {
+  readonly pageTitle: string;
+  readonly intro: string;
+  readonly indexEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
+  readonly titleIconName?: string;
+  readonly itemIconName?: string;
+}
+
+const { pageTitle, intro, breadcrumbs, indexEntries, titleIconName, itemIconName } = Astro.props;
+const TitleIcon = itemIconLookup(titleIconName);
+---
+
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
+  <section id="content" class="content grow w-full mx-6 md:mx-auto mt-2 md:mt-16 mb-4">
+    <h1>
+      <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
+      {pageTitle}
+    </h1>
+    <p class="mb-12">{intro}</p>
+    <nav class="my-6 md:my-16 not-prose">
+      {indexEntries.map((entry) => <ProjectIndexItem entry={entry} itemIconName={itemIconName} />)}
+    </nav>
+  </section>
+</BaseLayout>

@@ -1,0 +1,29 @@
+---
+import type { MarkdownInstance } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import { ANCHOR_TOP } from '../../scripts/consts';
+import PrevNextNavigation from '../site/PrevNextNavigation.astro';
+
+interface Props {
+  readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
+  readonly prevEntry: CollectionEntry<MoonlightCollectionName> | undefined;
+  readonly nextEntry: CollectionEntry<MoonlightCollectionName> | undefined;
+}
+
+const { Content, prevEntry, nextEntry } = Astro.props;
+const prev = prevEntry ? { url: prevEntry.slug, title: prevEntry.data.title } : undefined;
+const next = nextEntry ? { url: nextEntry.slug, title: nextEntry.data.title } : undefined;
+---
+
+<div id="page-content-wrapper" class="w-full">
+  <div
+    id="page-content"
+    class="content min-h-screen max-h-screen overflow-scroll pr-6 ml-6 md:ml-auto md:mr-auto mt-16 mb-16"
+  >
+    <a id={ANCHOR_TOP}></a>
+    <Content />
+    <hr />
+    <PrevNextNavigation prev={prev} next={next} />
+  </div>
+</div>

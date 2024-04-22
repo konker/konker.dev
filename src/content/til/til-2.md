@@ -1,7 +1,7 @@
 ---
 title: The "Norway Problem" with YAML
 author: Konrad Markus
-abstract: Flaw in YAML where literal `NO` string may be converted to a boolean false.
+description:  Flaw in YAML where literal `NO` string may be converted to a boolean false.
 pubDate: 2024-04-12
 tags: ["til", "yaml"]
 ---

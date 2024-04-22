@@ -1,45 +1,48 @@
 ---
-import type { CollectionName } from '../../content/config';
-import type { LinkT } from '../../lib/types';
+import { getCollection } from 'astro:content';
+import TagLinkIndexLayout from '../../layouts/tags/TagLinkIndexLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
 import { TAG_COLLECTIONS, type TagCollection } from '../../lib/collections';
-import { getCollection } from 'astro:content';
-import BlogLinkIndexLayout from "../../layouts/BlogLinkIndexLayout.astro";
-import type { TagEntryT } from '../../lib/types';
+import type { LinkT, TagEntryT } from '../../lib/types';
 
 // --------------------------------------------------------------------------
-const allEntries = await Promise.all(TAG_COLLECTIONS.map(collection => getCollection(collection)));
-const tagEntries = allEntries.reduce((acc, entries, i) => {
-  const collection: TagCollection = TAG_COLLECTIONS[i]!
-  const x = entries.filter(entry => !entry.data.draft).map((entry): TagEntryT<TagCollection> => ({
-    entry,
-    collection
-  }));
-  return [...acc, ...x];
-}, [] as Array<TagEntryT<TagCollection>>);
+const allEntries = await Promise.all(TAG_COLLECTIONS.map((collection) => getCollection(collection)));
+const tagEntries = allEntries.reduce(
+  (acc, entries, i) => {
+    const collection: TagCollection = TAG_COLLECTIONS[i]!;
+    const x = entries
+      .filter((entry) => !entry.data.draft)
+      .map(
+        (entry): TagEntryT<TagCollection> => ({
+          entry,
+          collection,
+        })
+      );
+    return [...acc, ...x];
+  },
+  [] as Array<TagEntryT<TagCollection>>
+);
 
 const uniqueTags = [...new Set(tagEntries.map((tagEntry) => tagEntry.entry.data.tags).flat())];
 
 // --------------------------------------------------------------------------
-const pageTitle="Tags Index";
+const pageTitle = 'Tags Index';
 const intro = 'This is a collection of all the tags used in my posts and projects.<br>TODO: add counts and sorting?';
-const links = uniqueTags.map(tag => ({
+const links = uniqueTags.map((tag) => ({
   url: `/tags/${tag}`,
   title: tag,
-}))
+}));
 
 // --------------------------------------------------------------------------
 const thisBreadcrumb: LinkT = { title: pageTitle, url: '/tags/' };
-const breadcrumbs: ReadonlyArray<LinkT> = [
-  HomeBreadcrumb,
-  thisBreadcrumb,
-];
+const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 ---
-<BlogLinkIndexLayout
+
+<TagLinkIndexLayout
   pageTitle={pageTitle}
   breadcrumbs={breadcrumbs}
   intro={intro}
   links={links}
   titleIconName="tags"
-  itemIconName="tag">
-</BlogLinkIndexLayout>
+  itemIconName="tag"
+/>

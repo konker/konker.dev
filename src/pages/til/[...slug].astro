@@ -1,36 +1,43 @@
 ---
 import { getCollection } from 'astro:content';
-import ArticleLayout from '../../layouts/ArticleLayout.astro';
-import type { LinkT } from '../../lib/types';
-import { collectionEntryToSectionNavigation, collectionEntryToUrl } from '../../lib/collections/helpers';
-import type { CollectionName } from '../../content/config';
+
+import BlogPostLayout from '../../layouts/blog/BlogPostLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
+import { collectionEntryToSectionNavigation, collectionEntryToUrl } from '../../lib/collections/helpers';
+import type { LinkT } from '../../lib/types';
 
 export async function getStaticPaths() {
   const entries = await getCollection('til');
   return entries
-    .filter(e => !e.data.draft)
-    .map(entry => ({
-    params: { slug: entry.slug }, props: { entry },
-  }));
+    .filter((e) => !e.data.draft)
+    .map((entry) => ({
+      params: { slug: entry.slug },
+      props: { entry },
+    }));
 }
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
-const collection: CollectionName = 'til' as const;
+const collection = 'til' as const;
 const indexBreadcrumb: LinkT = { title: 'TIL', url: `/${collection}/` };
 
 const breadcrumbs: ReadonlyArray<LinkT> = [
   HomeBreadcrumb,
   indexBreadcrumb,
-  { title: entry.data.title,  url: collectionEntryToUrl(collection, entry) },
+  { title: entry.data.title, url: collectionEntryToUrl(collection, entry) },
 ];
 
 // Derive the section navigation from the collection.
 const entries = await getCollection(collection);
-const filteredEntries = entries.filter(e => !e.data.draft);
+const filteredEntries = entries.filter((e) => !e.data.draft);
 const sectionNavigation = collectionEntryToSectionNavigation(collection, indexBreadcrumb, filteredEntries, entry);
 ---
-<ArticleLayout {...entry.data} pageTitle={entry.data.title} breadcrumbs={breadcrumbs} sectionNavigation={sectionNavigation}>
+
+<BlogPostLayout
+  {...entry.data}
+  pageTitle={entry.data.title}
+  breadcrumbs={breadcrumbs}
+  sectionNavigation={sectionNavigation}
+>
   <Content />
-</ArticleLayout>
+</BlogPostLayout>

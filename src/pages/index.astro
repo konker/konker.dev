@@ -1,18 +1,13 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { LinkT } from '../lib/types';
+import BaseLayout from '../layouts/site/BaseLayout.astro';
 import { HomeBreadcrumb } from '../lib';
+import type { LinkT } from '../lib/types';
 
 // --------------------------------------------------------------------------
 const pageTitle = 'Home';
 
 // --------------------------------------------------------------------------
-const breadcrumbs: ReadonlyArray<LinkT> = [
-  HomeBreadcrumb,
-];
+const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb];
 ---
 
-<BaseLayout
-  pageTitle={pageTitle}
-  breadcrumbs={breadcrumbs}>
-</BaseLayout>
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} />

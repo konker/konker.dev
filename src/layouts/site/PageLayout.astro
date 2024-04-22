@@ -1,0 +1,26 @@
+---
+import { itemIconLookup } from '../../lib/collections/helpers';
+import type { LinkT } from '../../lib/types';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  readonly pageTitle: string;
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
+  readonly titleIconName?: string;
+}
+
+const { pageTitle, breadcrumbs, titleIconName } = Astro.props;
+const TitleIcon = itemIconLookup(titleIconName);
+---
+
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
+  <div id="page-content-wrapper" class="grow w-full ml-16">
+    <section id="page-content" class="content w-full mx-auto mt-2 md:mt-16 mb-4">
+      <h1>
+        <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
+        {pageTitle}
+      </h1>
+      <slot />
+    </section>
+  </div>
+</BaseLayout>

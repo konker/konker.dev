@@ -1,0 +1,28 @@
+---
+interface Props {
+  readonly logoImagePath: string;
+  readonly siteTitle: string;
+}
+
+const { logoImagePath, siteTitle } = Astro.props;
+---
+
+<div id="logo" class="font-serif m-6 mb-0">
+  <a href="/" class="block">
+    <img src={logoImagePath} alt="" class="float-left h-20" />
+    <span class="title block text-3xl my-0 ml-14 pt-0 pb-4 border-b border-gray-400 dark:border-gray-500"
+      >{siteTitle}</span
+    >
+  </a>
+  <slot />
+</div>
+
+<style>
+  #logo a:visited,
+  #logo a:hover,
+  #logo a:link {
+    color: var(--kdd-color-heading);
+    text-decoration: none;
+    border: 0;
+  }
+</style>

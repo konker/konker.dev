@@ -7,10 +7,14 @@ export const HomeBreadcrumb: LinkT = {
   title: 'Home',
 };
 
-export function toDisplayDate(date: Date): string {
-  return D.formatDate(date, 'yyyy-MM-dd');
+export function toDisplayDate(date: Date | undefined): string {
+  return date ? D.formatDate(date, 'yyyy-MM-dd') : '';
 }
 
-export function toReadableDate(date: Date): string {
-  return D.formatDate(date, 'EEEE do MMMM yyyy');
+export function toReadableDate(date: Date | undefined): string {
+  return date ? D.formatDate(date, 'EEEE do MMMM yyyy') : '';
+}
+
+export function getUrlPathParts(url: URL): Array<string> {
+  return url.pathname.split('/').filter((part) => part.length > 0);
 }

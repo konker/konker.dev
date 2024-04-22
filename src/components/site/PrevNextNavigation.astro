@@ -1,0 +1,42 @@
+---
+import { ArrowLeft, ArrowRight } from 'lucide-astro';
+import type { LinkT } from '../../lib/types';
+
+interface Props {
+  readonly prev: LinkT | undefined;
+  readonly next: LinkT | undefined;
+}
+
+const { prev, next } = Astro.props;
+---
+
+<div class="prev-next-navigation flex flex-col md:flex-row mt-12 mb-12 font-sans">
+  {
+    prev ? (
+      <a href={prev.url} class="next-prev prev text-left">
+        <ArrowLeft class="block float-left mr-3 mt-1 mb-2" />
+        <span>{prev.title}</span>
+      </a>
+    ) : undefined
+  }
+  {
+    next ? (
+      <a href={next.url} class="next-prev next text-right">
+        <ArrowRight class="block float-right ml-3 mt-1 mb-2" />
+        {next.title}
+      </a>
+    ) : undefined
+  }
+</div>
+
+<style>
+  .prev-next-navigation a {
+    @apply block flex-1 px-4 py-4 align-middle rounded-lg bg-kdd-nav mb-3;
+  }
+  .prev-next-navigation a:nth-child(2) {
+    @apply md:ml-6;
+  }
+  .prev-next-navigation a:visited {
+    @apply text-kdd-link;
+  }
+</style>

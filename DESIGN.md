@@ -1,5 +1,83 @@
 # konker.dev
 
+- POA
+  - ~~next / prev links on moonlight [1]~~
+  - ~~scrollbars on main content [1]~~
+  - amend lint rules to remove most FP [2]
+  - aria props [3] 
+  - giscus comments / (also reactions?) [3]
+    - Do we want to create a codeberg equivalent?
+  - search [7]
+    - check astro/starlight and just do that for a start
+  - ~~main-navigation is full screen in sm [?][9]~~
+  - ~~animate main-navigation [6]~~
+  - ~~auto-close for intra-page navigation~~
+  - ~~social links [3]~~
+    - ~~top nav [?]~~
+    - ~~footer~~
+    - What are these actually?
+      - ~~github~~
+      - ~~codeberg~~
+      - twitter [?]
+      - ~~linkedin [?]~~
+      - fediverse [? but should set that up]
+      - keybase [?]
+  - ~~dark/light mode toggle [2]~~
+    - light mode code for dark mode?  
+  - easter_eggs?
+    - clacks
+    - ...
+  - Check vitals/performance
+    - https://pagespeed.web.dev/
+    - Lighthouse?
+    - SSL?
+  - Analytics
+    - https://usefathom.com/pricing [?]
+    - https://plausible.io/#pricing [?]
+  - aria
+  - sitemap / rss
+  - nojs navigation not working
+  - footer content
+    - see: social links above as part of it
+
+
+  
+    
+
+- Idea:
+  - Implement an Astro ??? to implement the layout of https://diataxis.fr/reference/
+  - Fundamentals first:
+    - Use tailwind vars everywhere for consistency
+      - Own src/styles/css files
+      - <style></style> sections in components
+    - Streamline the use of tailwind
+      - Make sure repeating combinations are abstracted out
+        - How?
+  - Make sure we have full control over responsiveness
+    - sm: phone
+      - collapse left and right
+    - md: tablet / small screen
+      - collapse right
+    - lg: desktop
+      - collapse none
+
+- Projects
+  - ~~Content collection per project?~~
+  - Content collection for all projects
+  - A project is a top-level folder inside `content/projects`
+  - Need to auto-index all project content
+    - Files in sub-folders [is this needed for first version?]
+    - Heading levels within files
+      - Can we use: https://github.com/vcarl/remark-headings [?]
+  - Need to generate navigation for project content
+    - Similar to starlight: sidebar with files/folders; right-hand bar with in-page navigation [?]
+  - See: https://diataxis.fr/reference/
+    - Left nav slides out, right nav slides out (on small screens)
+    - Right nav is collapsed first on medium screens
+  - Can we re-use some features of starlight?
+    - Code rendering, diffs/etc?
+    - Search?
+
 - TODO
   - ~~Metadata~~
     - ~~Format readable date properly~~
@@ -15,6 +93,11 @@
     - Project page template
       - More like a documentation style
       - Can we somehow use/leverage starlight here?
+        - This is a tradeoff:
+          - PRO: very good documentation features, responsive, light/dark, auto-index doc folder trees
+          - CON: not designed to be per-project, more like for a standalone site
+          - CON: will need a lot of hacking to make it fit with the rest of the site design
+            - QUESTION: is this hacking worth it, or should we go to the effort of creating our own implementation?
   - About page content
   - Footer content
     - Share links?

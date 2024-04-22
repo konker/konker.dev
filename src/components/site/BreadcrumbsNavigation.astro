@@ -1,0 +1,40 @@
+---
+import { Home, MoveRight } from 'lucide-astro';
+import type { LinkT } from '../../lib/types';
+
+export interface Props {
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
+}
+const { breadcrumbs } = Astro.props;
+const last = breadcrumbs?.length ? breadcrumbs.length - 1 : 0;
+---
+
+{
+  breadcrumbs ? (
+    <nav class="breadcrumbs float-left hidden md:inline-block max-w-50 ml-14 mt-2 px-2 pb-1 bg-kdd-nav rounded-lg">
+      {breadcrumbs.map((breadcrumb, idx: number) => (
+        <span class="breadcrumb font-sans">
+          {idx === 0 ? (
+            <span class="separator inline-block pt-2 px-1 mb-[-0.35rem]">
+              <Home size="24" />
+            </span>
+          ) : undefined}
+          <a href={breadcrumb.url} class="inline-block py-1 pl-1 pr-2 visited:text-classic-link-light">
+            <span class="title">{breadcrumb.title}</span>
+          </a>
+          {idx < last ? (
+            <span class="separator inline-block mb-[-0.55rem] py-1 px-1">
+              <MoveRight size="18" />
+            </span>
+          ) : undefined}
+        </span>
+      ))}
+    </nav>
+  ) : undefined
+}
+
+<style>
+  .breadcrumbs a:visited {
+    color: var(--kdd-color-link);
+  }
+</style>

@@ -1,193 +1,107 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import typography from '@tailwindcss/typography';
 import defaultTheme from 'tailwindcss/defaultTheme';
-import plugin from 'tailwindcss/plugin';
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  purge: {
+    safelist: [
+      'block',
+      'xs:block',
+      'sm:block',
+      'md:block',
+      'lg:block',
+      'xl:block',
+      'hidden',
+      'xs:hidden',
+      'sm:hidden',
+      'md:hidden',
+      'lg:hidden',
+      'xl:hidden',
+      'fixed',
+      'xs:fixed',
+      'sm:fixed',
+      'md:fixed',
+      'lg:fixed',
+      'xl:fixed',
+      'static',
+      'xs:static',
+      'sm:static',
+      'md:static',
+      'lg:static',
+      'xl:static',
+      'relative',
+      'xs:relative',
+      'sm:relative',
+      'md:relative',
+      'lg:relative',
+      'xl:relative',
+      'right-0',
+      'left-0',
+      'dark',
+      'not-prose',
+    ],
+  },
+  darkMode: ['selector', '[data-theme-mode="dark"]'],
   theme: {
     screens: {
       sm: '640px',
       md: '768px',
       lg: '1024px',
       xl: '1280px',
+      '2xl': '1536px',
+    },
+    fontFamily: {
+      serif: ['Merriweather', ...defaultTheme.fontFamily.serif],
+      sans: ['Work Sans Variable', ...defaultTheme.fontFamily.sans],
+      mono: ['JetBrains Mono Variable', ...defaultTheme.fontFamily.mono],
     },
     extend: {
-      fontFamily: {
-        sans: ['Work Sans Variable', 'Helvetica', ...defaultTheme.fontFamily.sans],
-        serif: ['Merriweather', 'Georgia', 'Times New Roman', ...defaultTheme.fontFamily.serif],
-        mono: ['JetBrains Mono Variable', ...defaultTheme.fontFamily.mono],
-      },
       colors: {
         // This should have been included in Tailwind...
         inherit: 'inherit',
 
-        // Theme
-        'classic-link': '#0000ee',
-        'classic-link-active': '#ee0000',
-        'classic-link-visited': '#551a8b',
-        'konker-flash-red': '#b70404',
-        'konker-flash-red-dark': '#a00000',
-        'konker-flash-blue': '#2c5aa0',
-        'konker-flash-blue-light': '#5fbcd3',
-        'konker-flash-blue-dark': '#214478',
+        // Dark mode
+        'color-text-dark': 'var(--kdd-color-text-dark)',
+        'color-heading-dark': 'var(--kdd-color-heading-dark)',
+        'color-bg-dark': 'var(--kdd-color-bg-dark)',
+        'classic-link-dark': 'var(--kdd-classic-link-dark)',
+        'classic-link-visited-dark': 'var(--kdd-classic-link-visited-dark)',
+        'classic-link-active-dark': 'var(--kdd-classic-link-active-dark)',
+
+        // Light mode
+        'color-text-light': 'var(--kdd-color-text-light)',
+        'color-heading-light': 'var(--kdd-color-heading-light)',
+        'color-bg-light': 'var(--kdd-color-bg-light)',
+        'classic-link-light': 'var(--kdd-classic-link-light)',
+        'classic-link-visited-light': 'var(--kdd-classic-link-visited-light)',
+        'classic-link-active-light': 'var(--kdd-classic-link-active-light)',
+
+        // Branding
+        'konker-flash-red': 'var(--kdd-konker-flash-red)',
+        'konker-flash-red-dark': 'var(--kdd-konker-flash-red-dark)',
+        'konker-flash-blue': 'var(--kdd-konker-flash-blue)',
+        'konker-flash-blue-light': 'var(--kdd-konker-flash-blue-light)',
+        'konker-flash-blue-dark': 'var(--kdd-konker-flash-blue-dark)',
       },
-      width: {
-        layout: 'min(1280px, 100%)',
-        header: 'min(1040px, 100%)',
-        footer: 'min(980px, 100%)',
-        index: 'min(880px, 100%)',
-        articleList: 'min(920px, 100%)',
-        article: 'min(800px, 100%)',
-        image: 'min(1080px, 100%)',
-        wiki: 'min(1280px, 100%)',
-      },
-      gridTemplateColumns: {
-        layout: 'minmax(0, 0.75fr) minmax(0, 3.25fr);',
-        content: 'minmax(0, 4.25fr) minmax(0, 1.25fr);',
-      },
-      typography: (theme) => ({
-        DEFAULT: {
-          css: {
-            p: {
-              fontSize: '1.0rem',
-            },
-            '.attention-grabber': {
-              fontSize: '120%',
-            },
-            figcaption: {
-              textAlign: 'center',
-            },
-            hr: {
-              width: '2.7rem',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              marginTop: '1.72rem',
-              marginBottom: '1.72rem',
-              borderTopWidth: '0.45rem',
-              borderStyle: 'dotted',
-              borderColor: theme('colors.gray.300'),
-            },
-            h1: {
-              fontFamily: ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
-              fontWeight: '400',
-              fontSize: '2.5rem',
-              lineHeight: '3.25rem',
-              marginTop: '1.625rem',
-              marginBottom: '1.625rem',
-            },
-            h2: {
-              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
-              fontWeight: '400',
-              fontSize: '1.6875rem',
-              lineHeight: '2.4375rem',
-              marginTop: '3.625rem',
-              marginBottom: '0.8125rem',
-            },
-            h3: {
-              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
-              fontWeight: '400',
-              fontSize: '1.375rem',
-              lineHeight: '1.625rem',
-              marginTop: '3.25rem',
-              marginBottom: '0.8125rem',
-            },
-            h4: {
-              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
-              fontSize: '1.2rem',
-              lineHeight: '1.625rem',
-              marginTop: '2.4375rem',
-              marginBottom: '0.8125rem',
-            },
-          },
-        },
-        lg: {
-          css: {
-            h1: {
-              fontFamily: ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
-              fontSize: '2.5rem',
-              lineHeight: '3.4rem',
-              marginTop: '1.72rem',
-              marginBottom: '1.72rem',
-            },
-            h2: {
-              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
-              fontWeight: '400',
-              fontSize: '1.6875rem',
-              lineHeight: '2.4375rem',
-              marginTop: '3.625rem',
-              marginBottom: '0.8125rem',
-            },
-            h3: {
-              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
-              fontWeight: '400',
-              fontSize: '1.375rem',
-              lineHeight: '1.625rem',
-              marginTop: '3.25rem',
-              marginBottom: '0.8125rem',
-            },
-            h4: {
-              fontFamily: ['Work Sans Variable', 'Helvetica', 'Arial', 'sans-serif'],
-              fontSize: '1.2rem',
-              lineHeight: '1.625rem',
-              marginTop: '2.4375rem',
-              marginBottom: '0.8125rem',
-            },
-          },
-        },
-        xl: {
-          css: {
-            h1: {
-              fontFamily: ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
-              fontSize: '3.5rem',
-              lineHeight: '4.5rem',
-              marginTop: '1.72rem',
-              marginBottom: '1.72rem',
-            },
-            h2: {
-              fontSize: '2.0rem',
-              lineHeight: '2.583rem',
-              marginTop: '4.05rem',
-              marginBottom: '1.61rem',
-            },
-            h3: {
-              fontSize: '1.475rem',
-              lineHeight: '1.72rem',
-              marginTop: '3.44rem',
-              marginBottom: '0.86rem',
-            },
-            h4: {
-              fontSize: '1.2rem',
-              lineHeight: '1.72rem',
-              marginTop: '2.58rem',
-              marginBottom: '0.86rem',
-            },
-          },
-        },
+      textColor: ({ theme }) => ({
+        dark: theme('colors.color-text-dark'),
+        light: theme('colors.color-text-light'),
+        kdd: 'var(--kdd-color-text)',
+        'kdd-hr': 'var(--kdd-color-hr)',
+        'kdd-heading': 'var(--kdd-color-heading)',
+        'kdd-link': 'var(--kdd-color-link)',
+      }),
+      backgroundColor: ({ theme }) => ({
+        dark: theme('colors.color-bg-dark'),
+        light: theme('colors.color-bg-light'),
+        kdd: 'var(--kdd-color-bg)',
+        'kdd-blog': 'var(--kdd-color-bg-blog)',
+        'kdd-project': 'var(--kdd-color-bg-project)',
+        'kdd-tag': 'var(--kdd-color-bg-tag)',
+        'kdd-nav': 'var(--kdd-color-bg-nav)',
       }),
     },
   },
-  plugins: [
-    typography,
-
-    // eslint-disable-next-line fp/no-nil
-    plugin(function ({ _addComponents, _addUtilities, addBase, theme }) {
-      // eslint-disable-next-line fp/no-unused-expression
-      addBase({
-        a: {
-          textDecoration: 'underline',
-          textUnderlineOffset: '0.20rem',
-          color: theme('colors.classic-link'),
-          '&:hover': {
-            textDecoration: 'none',
-            color: theme('colors.classic-link-visited'),
-          },
-          '&:visited': {
-            color: theme('colors.classic-link-visited'),
-          },
-        },
-      });
-    }),
-  ],
+  plugins: [typography],
 };

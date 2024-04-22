@@ -1,0 +1,48 @@
+---
+import { Calendar, User } from 'lucide-astro';
+import { toDisplayDate, toReadableDate } from '../../lib';
+import TagBar from '../tags/TagBar.astro';
+
+interface Props {
+  readonly title: string;
+  readonly tags: Array<string>;
+  readonly pubDate?: Date;
+  readonly author?: string;
+}
+
+const { pubDate, author, tags } = Astro.props;
+const displayPubDate = toDisplayDate(pubDate);
+const readablePubDate = toReadableDate(pubDate);
+---
+
+<div class="metadata-wrapper mb-0 text-left">
+  <div class="metadata flex flex-col justify-start md:flex-row">
+    {
+      pubDate ? (
+        <span class="pubDate flex min-w-fit font-sans pr-8 mb-2 md:mb-0" title={readablePubDate}>
+          <span class="separator inline-block px-0 mr-2">
+            <Calendar size="24" />
+          </span>
+          {displayPubDate}
+        </span>
+      ) : undefined
+    }
+    {
+      author ? (
+        <span class="author flex min-w-fit font-sans mb-2 md:mb-0">
+          <span class="separator inline-block px-0 mr-2">
+            <User size="24" />
+          </span>
+          <a href="/about">{author}</a>
+        </span>
+      ) : undefined
+    }
+  </div>
+  <TagBar tags={tags} />
+</div>
+
+<style>
+  .metadata-wrapper a:visited {
+    color: var(--kdd-color-link);
+  }
+</style>

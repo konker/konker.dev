@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment,fp/no-nil */
-import type { CollectionEntry } from 'astro:content';
-import { FileText, GitBranch, Lightbulb, Tag, Tags } from 'lucide-astro';
+import type { CollectionEntry, ContentCollectionKey } from 'astro:content';
+import { Box, FileText, Lightbulb, Tag, Tags } from 'lucide-astro';
 
-import type { CollectionName } from '../../content/config.ts';
 import type { LinkT, SectionNavigationT } from '../types.ts';
 
-export function collectionEntryToUrl<T extends CollectionName>(collection: T, entry: CollectionEntry<T>): string {
+// --------------------------------------------------------------------------
+export function collectionEntryToUrl<T extends ContentCollectionKey>(collection: T, entry: CollectionEntry<T>): string {
   return `/${collection}/${entry.slug}`;
 }
 
-export function collectionEntryToBreadcrumb<T extends CollectionName>(
+export function collectionEntryToBreadcrumb<T extends ContentCollectionKey>(
   collection: T,
   entry: CollectionEntry<T> | undefined
 ): LinkT | undefined {
@@ -21,7 +20,7 @@ export function collectionEntryToBreadcrumb<T extends CollectionName>(
     : undefined;
 }
 
-export function collectionEntryToSectionNavigation<T extends CollectionName>(
+export function collectionEntryToSectionNavigation<T extends ContentCollectionKey>(
   collection: T,
   indexBreadcrumb: LinkT,
   entries: Array<CollectionEntry<T>>,
@@ -41,14 +40,14 @@ export function collectionEntryToSectionNavigation<T extends CollectionName>(
   };
 }
 
-export function itemIconLookup(itemIconName: string) {
+export function itemIconLookup(itemIconName: string | undefined) {
   switch (itemIconName) {
     case 'blog':
     case 'til':
       return Lightbulb;
     case 'project':
     case 'projects':
-      return GitBranch;
+      return Box;
     case 'tag':
       return Tag;
     case 'tags':

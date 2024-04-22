@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import EntryLink from './EntryLink.astro';
+
+interface Props {
+  readonly indexEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+  readonly itemIconName?: string;
+}
+
+const { indexEntries } = Astro.props;
+---
+
+<div id="index-navigation">
+  <nav>
+    {
+      indexEntries.map((x) => (
+        <p>
+          <EntryLink url={x.slug} title={x.data.title} />
+        </p>
+      ))
+    }
+  </nav>
+</div>

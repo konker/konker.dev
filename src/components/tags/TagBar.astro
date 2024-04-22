@@ -1,0 +1,28 @@
+---
+import { Tags } from 'lucide-astro';
+
+interface Props {
+  readonly tags: Array<string>;
+}
+
+const { tags } = Astro.props;
+---
+
+<p class="tags mt-1 ml-1 md:mt-3 font-sans align-text-bottom">
+  <span class="separator inline-block float-left py-0 pr-2 pb-12 pt-1"><Tags size="24" class=""/></span>
+  {
+    tags.map((tag: string) => (
+      <span class="tag inline-block py-1 px-3 bg-kdd-nav mb-2 mr-2 rounded-lg font-sans">
+        <a href={`/tags/${tag}`} class="text-blue-800">
+          #{tag}
+        </a>
+      </span>
+    ))
+  }
+</p>
+
+<style>
+  .tags a:visited {
+    color: var(--kdd-color-link);
+  }
+</style>

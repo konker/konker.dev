@@ -1,0 +1,25 @@
+---
+import type { LinkT, SectionNavigationT } from '../../lib/types';
+import { SITE_TITLE } from '../../scripts/consts';
+import BreadcrumbsNavigation from './BreadcrumbsNavigation.astro';
+import MainNavigation from './MainNavigation.astro';
+import SiteLogo from './SiteLogo.astro';
+import SocialBar from './SocialBar.astro';
+import ThemeModeToggle from './ThemeModeToggle.astro';
+
+interface Props {
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
+  readonly sectionNavigation?: SectionNavigationT | undefined;
+}
+const { breadcrumbs } = Astro.props;
+---
+
+<header class="mb-6 pl-0 relative">
+  <SiteLogo siteTitle={SITE_TITLE} logoImagePath="/konker-flash-1-dark-mode.png">
+    <SocialBar class="hidden md:block absolute top-6 right-8">
+      <ThemeModeToggle navId="theme-mode-toggle-header" initLightMode={true} />
+    </SocialBar>
+  </SiteLogo>
+  <MainNavigation />
+  <BreadcrumbsNavigation breadcrumbs={breadcrumbs} />
+</header>

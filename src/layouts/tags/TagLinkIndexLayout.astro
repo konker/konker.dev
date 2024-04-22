@@ -1,0 +1,49 @@
+---
+import { itemIconLookup } from '../../lib/collections/helpers';
+import type { LinkT } from '../../lib/types';
+import BaseLayout from '../site/BaseLayout.astro';
+
+interface Props {
+  readonly pageTitle: string;
+  readonly intro: string;
+  readonly links: Array<LinkT>;
+  readonly itemIconName?: string;
+  readonly titleIconName?: string;
+  readonly breadcrumbs?: ReadonlyArray<LinkT>;
+}
+
+const { pageTitle, breadcrumbs, intro, links, itemIconName, titleIconName } = Astro.props;
+const ItemIcon = itemIconLookup(itemIconName);
+const TitleIcon = itemIconLookup(titleIconName);
+---
+
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
+  <section id="content" class="content grow w-full mx-6 md:mx-auto mt-2 md:mt-16 mb-4">
+    <h1>
+      <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
+      {pageTitle}
+    </h1>
+    <p class="mb-12" set:html={intro} />
+    <nav class="links my-6 md:my-16 not-prose">
+      {
+        links.map((link) => (
+          <div class="wrapper">
+            <h2 class="mt-0 mb-3 font-sans text-lg bg-kdd-nav py-2 px-3 rounded-lg">
+              <span class="separator inline-block mb-[-0.40rem] pr-1">
+                <ItemIcon size="28" />
+              </span>
+              <a href={link.url}>{link.title}</a>
+            </h2>
+          </div>
+        ))
+      }
+    </nav>
+  </section>
+</BaseLayout>
+
+<style>
+  .links a,
+  .links a:visited {
+    color: var(--kdd-color-link);
+  }
+</style>

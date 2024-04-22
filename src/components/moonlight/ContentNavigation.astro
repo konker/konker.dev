@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-astro';
+import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
+import NavigationPanel from '../site/NavigationPanel.astro';
+import NavigationToggle from '../site/NavigationToggle.astro';
+import EntryLink from './EntryLink.astro';
+
+interface Props {
+  readonly projectRootEntry: CollectionEntry<MoonlightCollectionName>;
+  readonly projectEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+}
+
+const { projectEntries, projectRootEntry } = Astro.props;
+const urlPathSlug = Astro.url.pathname;
+const navLinksSelectedLookup = projectEntries.map(
+  (entry, i) => (urlPathSlug.length === 0 && i == 0) || urlPathSlug === entry.slug
+);
+const isProjectRoot = urlPathSlug === projectRootEntry.slug;
+---
+
+<NavigationToggle
+  navId="content-navigation"
+  breakpoint={NavigationPanelBreakpoint.MD}
+  class="fixed left-6"
+  CloseIcon={PanelLeftClose}
+  OpenIcon={PanelLeftOpen}
+/>
+<NavigationPanel
+  navId="content-navigation"
+  breakpoint={NavigationPanelBreakpoint.MD}
+  panelDir={NavigationPanelDirection.LEFT}
+  class="min-h-screen max-h-screen overflow-scroll mt-12 md:mt-0 pl-16 pr-6 py-8 md:w-2/5 p-6 bg-color-bg-light dark:bg-color-bg-dark opacity-90 md:opacity-100"
+>
+  <nav>
+    <ul>
+      <li class={isProjectRoot ? 'selected' : ''}>
+        <EntryLink url={projectRootEntry.slug} title={projectRootEntry.data.title} />
+      </li>
+      {
+        projectEntries.map((x, i) => (
+          <li class={navLinksSelectedLookup[i] ? 'selected' : ''}>
+            <EntryLink url={x.slug} title={x.data.title} />
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</NavigationPanel>
+
+<style>
+  nav ul li {
+    margin-bottom: 0.5rem;
+  }
+  nav ul li.selected {
+    font-weight: bold;
+  }
+</style>

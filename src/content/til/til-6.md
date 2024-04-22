@@ -1,7 +1,7 @@
 ---
 title: 'TODO: add-comments-section-to-your-astro-blog'
 author: Konrad Markus
-abstract: "DESC"
+description:  "DESC"
 pubDate: 2022-08-08
 tags: ['til', 'astro', 'TODO']
 draft: true

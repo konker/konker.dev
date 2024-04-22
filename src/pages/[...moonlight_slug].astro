@@ -1,0 +1,62 @@
+---
+import ProjectIndexLayout from '../layouts/moonlight/ProjectIndexLayout.astro';
+import ProjectPageLayout from '../layouts/moonlight/ProjectPageLayout.astro';
+import { HomeBreadcrumb } from '../lib';
+import { MOONLIGHT_PAGE_TYPE_INDEX, type MoonlightPageProps } from '../lib/moonlight';
+import { moonlightGetStaticPaths } from '../lib/moonlight/routing';
+import type { LinkT } from '../lib/types';
+
+export async function getStaticPaths() {
+  return moonlightGetStaticPaths({
+    projects: '/projects',
+  });
+}
+
+type Props = MoonlightPageProps;
+
+// --------------------------------------------------------------------------
+const indexBreadcrumb: LinkT = { title: 'Projects', url: '/projects/' };
+const indexBreadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb];
+const breadcrumbs: ReadonlyArray<LinkT> =
+  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX
+    ? indexBreadcrumbs
+    : [
+        ...indexBreadcrumbs,
+        {
+          title: Astro.props.projectRootEntry.data.title,
+          url: Astro.props.projectRootEntry.slug,
+        },
+      ].concat(
+        Astro.props.entry.slug !== Astro.props.projectRootEntry.slug
+          ? [
+              {
+                title: Astro.props.entry.data.title,
+                url: Astro.props.entry.slug,
+              },
+            ]
+          : []
+      );
+---
+
+{
+  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX ? (
+    <ProjectIndexLayout
+      pageTitle="Projects"
+      intro="INDEX INTRO FIXME"
+      indexEntries={Astro.props.indexEntries}
+      breadcrumbs={breadcrumbs}
+      titleIconName="project"
+      itemIconName="project"
+    />
+  ) : (
+    <ProjectPageLayout
+      breadcrumbs={breadcrumbs}
+      projectEntries={Astro.props.projectEntries}
+      projectRootEntry={Astro.props.projectRootEntry}
+      prevEntry={Astro.props.prevEntry}
+      nextEntry={Astro.props.nextEntry}
+      Content={Astro.props.Content}
+      headings={Astro.props.headings}
+    />
+  )
+}

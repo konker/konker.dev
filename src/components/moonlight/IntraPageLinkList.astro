@@ -1,0 +1,25 @@
+---
+import type { HeadingsList } from '../../lib/types';
+import IntraPageLink from './IntraPageLink.astro';
+import IntraPageLinkListMutual from './IntraPageLinkListMutual.astro';
+
+interface Props {
+  readonly list: HeadingsList;
+}
+
+const { list } = Astro.props;
+---
+
+{
+  list.map((x) =>
+    Array.isArray(x) ? (
+      <ul>
+        <IntraPageLinkListMutual list={x} />
+      </ul>
+    ) : (
+      <li>
+        <IntraPageLink url={x.slug} title={x.text} />
+      </li>
+    )
+  )
+}

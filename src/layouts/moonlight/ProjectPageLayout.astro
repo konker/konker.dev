@@ -1,0 +1,28 @@
+---
+import type { MarkdownHeading, MarkdownInstance } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import ContentNavigation from '../../components/moonlight/ContentNavigation.astro';
+import IntraPageNavigation from '../../components/moonlight/IntraPageNavigation.astro';
+import PageContent from '../../components/moonlight/PageContent.astro';
+import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import type { LinkT } from '../../lib/types';
+import BaseLayout from '../site/BaseLayout.astro';
+
+interface Props {
+  readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
+  readonly headings: Array<MarkdownHeading>;
+  readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
+  readonly prevEntry: CollectionEntry<MoonlightCollectionName> | undefined;
+  readonly nextEntry: CollectionEntry<MoonlightCollectionName> | undefined;
+  readonly projectRootEntry: CollectionEntry<MoonlightCollectionName>;
+  readonly projectEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+}
+
+const { breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, projectEntries } = Astro.props;
+---
+
+<BaseLayout pageTitle="FIXME" breadcrumbs={breadcrumbs}>
+  <ContentNavigation projectEntries={projectEntries} projectRootEntry={projectRootEntry} />
+  <PageContent Content={Content} prevEntry={prevEntry} nextEntry={nextEntry} />
+  <IntraPageNavigation headings={headings} />
+</BaseLayout>

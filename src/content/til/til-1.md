@@ -1,7 +1,7 @@
 ---
 title: Notes on registering a domain with AWS Route53
 pubDate: 2024-04-08
-abstract: Some notes related to registering a cheap
+description:  Some notes related to registering a cheap
   domain via AWS. At the time of writing, `.click` domains are
   the cheapest, both to initially register, and also to renew.
 author: 'Konrad Markus'
@@ -29,7 +29,7 @@ I added the following information for the WHOIS record:
   Verify your email to avoid domain suspension
   Choose the link in the email sent to privacy@example.com from noreply@domainnameverification.net or noreply@registrar.amazon.com to verify your email is reachable.
   ```
-- I set it to: webmaster+\<domainName\>@morningwoodsoftware.com
+- I set it to: webmaster+\<domainName\><wbr>@morningwoodsoftware.com
   - NOTE: check spam for these verification emails
   - NOTE: any changes to the domain, e.g. contact info starts an async process. Check the `Route53 > Domains > Requests` page to see progress. Performing another operation when a previous operation is in progress will result in an error (but won't interrupt the in-progress operation)
     If verification is not received within 15 days after you registered the domain or changed the contact email, the domain will be suspended and no longer be accessible on the internet.

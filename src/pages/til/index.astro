@@ -1,15 +1,15 @@
 ---
-import type { LinkT } from '../../lib/types';
+import { getCollection } from 'astro:content';
+import BlogIndexLayout from '../../layouts/blog/BlogIndexLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
-import { getCollection } from "astro:content";
-import BlogPostIndexLayout from '../../layouts/BlogPostIndexLayout.astro';
+import type { TagCollection } from '../../lib/collections';
+import type { LinkT } from '../../lib/types';
 import '../../styles/global.css';
-import { TagCollection } from '../../lib/collections';
 
 // --------------------------------------------------------------------------
 const collection: TagCollection = 'til';
 const allPosts = await getCollection(collection);
-const filteredPosts = allPosts.filter(post => !post.data.draft);
+const filteredPosts = allPosts.filter((post) => !post.data.draft);
 
 // --------------------------------------------------------------------------
 const pageTitle = 'TIL';
@@ -17,17 +17,15 @@ const intro = 'This is a collection of my "Today I Learned" posts.';
 
 // --------------------------------------------------------------------------
 const thisBreadcrumb: LinkT = { title: pageTitle, url: `/${collection}/` };
-const breadcrumbs: ReadonlyArray<LinkT> = [
-  HomeBreadcrumb,
-  thisBreadcrumb,
-];
+const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 ---
-<BlogPostIndexLayout
+
+<BlogIndexLayout
   pageTitle={pageTitle}
   breadcrumbs={breadcrumbs}
   intro={intro}
   collection={collection}
   posts={filteredPosts}
   titleIconName="blog"
-  itemIconName="blog">
-</BlogPostIndexLayout>
+  itemIconName="blog"
+/>

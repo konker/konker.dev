@@ -1,0 +1,25 @@
+---
+import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
+
+interface Props {
+  readonly navId: string;
+  readonly panelDir: NavigationPanelDirection;
+  readonly breakpoint: NavigationPanelBreakpoint;
+  readonly class: string;
+}
+
+const panelDirClassNamesLookup: Record<NavigationPanelDirection, string> = {
+  [NavigationPanelDirection.TOP]: 'navigation-panel-top top-0',
+  [NavigationPanelDirection.LEFT]: 'navigation-panel-left left-0',
+  [NavigationPanelDirection.RIGHT]: 'navigation-panel-right right-0',
+  [NavigationPanelDirection.BOTTOM]: 'navigation-panel-bottom bottom-0',
+};
+
+const { navId, panelDir, breakpoint, class: classNames } = Astro.props;
+const panelFunctionalClassNames = `noscript navigation-panel ${breakpoint} overflow-x-clip overflow-y-scroll w-full h-full hidden ${breakpoint}:block fixed ${breakpoint}:static`;
+const panelClassNames = classNames + ' ' + panelFunctionalClassNames + ' ' + panelDirClassNamesLookup[panelDir];
+---
+
+<div id={navId} class={panelClassNames}>
+  <slot />
+</div>

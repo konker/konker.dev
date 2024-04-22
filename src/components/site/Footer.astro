@@ -1,0 +1,40 @@
+---
+import SocialBar from './SocialBar.astro';
+import ThemeModeToggle from './ThemeModeToggle.astro';
+---
+
+<footer class="relative bg-kdd font-sans text-xs border-t-4 border-solid border-konker-flash-red-dark pb-16">
+  <p class="flex md:block flex-col py-6 px-6 my-0 border-t-8 border-solid border-konker-flash-blue-light leading-6">
+    <!--
+    Design by <a href="https://milkmilklemonadearoundthecornerchocolatesmade.com/"
+                 title="Milk Milk, Lemonade, Around the Corner Chocolate's Made">Milk Milk, Lemonade</a> |
+    -->
+    <span>
+      Brought to you from <a href="https://www.hel.fi/en" title="Helsinki">Helsinki</a>, <a
+        href="https://www.visitfinland.com/en/"
+        title="Finland">Finland</a
+      >
+      <img src="/finland-flag-128.png" alt="Finland" class="inline-block ml-1 h-3" />
+    </span>
+    <span>
+      <span class="separator px-2">|</span>
+      Built with <a href="https://astro.build/" title="Astro">Astro</a>
+    </span>
+    <span>
+      <span class="separator px-2">|</span>
+      Powered by <a href="https://site-o-matic.net/" title="Site-O-Matic">Site-O-Matic</a>
+    </span>
+    <span>
+      <span class="separator px-2">|</span>
+      Hosted on <a href="https://aws.amazon.com/" title="Amazon Web Services">AWS</a>
+    </span>
+    <span>
+      <SocialBar class="ml-8">
+        <ThemeModeToggle navId="theme-mode-toggle-footer" initLightMode={true} />
+      </SocialBar>
+    </span>
+  </p>
+  <!--<p class="geek-code font-mono">-->
+  <!--  GCS/E d s: a? C+++$ UL++ P++ L+++ E-&#45;&#45;() W+++ K? w-&#45;&#45; M PS++ PE- Y++ PGP&gt;++ t+++ !R tv b+ DI+ G e++ h-&#45;&#45; r++ y+++-->
+  <!--</p>-->
+</footer>

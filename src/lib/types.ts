@@ -1,3 +1,4 @@
+import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import type { TagCollection } from './collections';
@@ -18,3 +19,5 @@ export type TagEntryT<T extends TagCollection> = {
   readonly collection: T;
   readonly entry: CollectionEntry<T>;
 };
+
+export type HeadingsList = Array<MarkdownHeading | HeadingsList>;

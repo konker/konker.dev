@@ -1,0 +1,68 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { PilcrowLeft, PilcrowRight } from 'lucide-astro';
+import type { HeadingsList } from '../../lib/types';
+import { ANCHOR_TOP, NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
+import NavigationPanel from '../site/NavigationPanel.astro';
+import NavigationToggle from '../site/NavigationToggle.astro';
+import IntraPageLink from './IntraPageLink.astro';
+import IntraPageLinkList from './IntraPageLinkList.astro';
+
+interface Props {
+  readonly headings: Array<MarkdownHeading>;
+}
+
+const { headings } = Astro.props;
+
+function groupHeadings(headings: Array<MarkdownHeading>, depth: number): HeadingsList {
+  let skipIdx = -1;
+  return headings.reduce((acc, val, i) => {
+    if (skipIdx !== -1 && i < skipIdx) {
+      return acc;
+    }
+    if (val.depth !== depth) {
+      // Find the next heading with the current depth
+      const nextDepthIdx = headings.slice(i).findIndex((x) => x.depth === depth);
+      const j = nextDepthIdx === -1 ? headings.length : i + nextDepthIdx;
+      skipIdx = j;
+
+      // Recurse for sub-list
+      return [...acc, groupHeadings(headings.slice(i, j), val.depth)];
+    }
+    return acc.concat(val);
+  }, [] as HeadingsList);
+}
+---
+
+<NavigationToggle
+  navId="intra-page-navigation"
+  breakpoint={NavigationPanelBreakpoint.LG}
+  class="fixed right-6"
+  CloseIcon={PilcrowRight}
+  OpenIcon={PilcrowLeft}
+/>
+<NavigationPanel
+  navId="intra-page-navigation"
+  breakpoint={NavigationPanelBreakpoint.LG}
+  panelDir={NavigationPanelDirection.RIGHT}
+  class="min-h-screen max-h-screen overflow-scroll mt-12 lg:mt-0 px-6 pb-6 lg:w-2/5 lg:min-w-[14rem] bg-color-bg-light dark:bg-color-bg-dark opacity-90 md:opacity-100"
+>
+  <nav>
+    <ul>
+      <li><IntraPageLink url={ANCHOR_TOP} title="Overview" /></li>
+      {
+        groupHeadings(headings, 2).map((x) =>
+          Array.isArray(x) ? (
+            <ul>
+              <IntraPageLinkList list={x} />
+            </ul>
+          ) : (
+            <li>
+              <IntraPageLink url={x.slug} title={x.text} />
+            </li>
+          )
+        )
+      }
+    </ul>
+  </nav>
+</NavigationPanel>

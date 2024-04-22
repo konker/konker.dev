@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { itemIconLookup } from '../../lib/collections/helpers';
+import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+
+interface Props {
+  readonly entry: CollectionEntry<MoonlightCollectionName>;
+  readonly itemIconName?: string | undefined;
+}
+
+const { entry, itemIconName } = Astro.props;
+const ItemIcon = itemIconLookup(itemIconName);
+---
+
+<article
+  class={[
+    'blog-post',
+    'mb-6',
+    'pt-6',
+    'pb-1',
+    'px-6',
+    'min-h-32',
+    'bg-gray-200',
+    'rounded-t-lg',
+    'rounded-b-xl',
+    'border-b-8',
+    'border-gray-300',
+    itemIconName,
+  ].join(' ')}
+>
+  <div class="wrapper">
+    <h2 class="mt-0 mb-5 font-sans text-lg bg-kdd-nav py-2 pl-1 pr-6 rounded-md">
+      <span class="separator float-left inline-block mb-[-0.40rem] px-1"><ItemIcon size="28" /></span>
+      <a href={entry.slug} class="block pl-[36px]">{entry.data.title}</a>
+    </h2>
+    <p class="abstract mb-8 font-serif">{entry.data.description}</p>
+  </div>
+</article>
+
+<style>
+  article.blog-post.project,
+  article.blog-post.projects {
+    background-color: var(--kdd-color-bg-project);
+  }
+</style>

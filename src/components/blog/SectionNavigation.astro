@@ -1,0 +1,24 @@
+---
+import type { SectionNavigationT } from '../../lib/types';
+
+export interface Props {
+  readonly sectionNavigation?: SectionNavigationT | undefined;
+}
+const { sectionNavigation } = Astro.props
+
+// [TODO: rename this to BlogNavigation or similar?]
+---
+<nav class="sectionNavigation flex flex-row w-full mt-16 font-sans">
+  <span class="prev flex-1">
+  {sectionNavigation?.prev ? <span class="separator inline-block px-2">&#9198;</span> : undefined}
+  {sectionNavigation?.prev ? <span class="breadcrumb inline-block"><a href={sectionNavigation.prev.url} title={sectionNavigation.prev.title}>Previous</a></span> : undefined}
+  </span>
+  <span class="index flex-1 text-center">
+  {sectionNavigation?.index ? <span class="separator inline-block px-2">&#9167;</span> : undefined}
+  {sectionNavigation?.index ?<span class="breadcrumb inline-block"><a href={sectionNavigation.index.url} title={sectionNavigation.index.title}>Up</a></span> : undefined}
+  </span>
+  <span class="next flex-1 text-right">
+  {sectionNavigation?.next ? <span class="breadcrumb inline-block"><a href={sectionNavigation.next.url} title={sectionNavigation.next.title}>Next</a></span> : undefined}
+  {sectionNavigation?.next ? <span class="separator inline-block px-2">&#9197;</span> : undefined}
+  </span>
+</nav>

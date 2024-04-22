@@ -1,0 +1,45 @@
+---
+import ArticleMetadata from '../../components/blog/ArticleMetadata.astro';
+import PrevNextNavigation from '../../components/site/PrevNextNavigation.astro';
+import type { LinkT, SectionNavigationT } from '../../lib/types';
+import BaseLayout from '../site/BaseLayout.astro';
+
+interface Props {
+  readonly pageTitle: string;
+  readonly title: string;
+  readonly pubDate: Date;
+  readonly author: string;
+  readonly description: string;
+  readonly tags: Array<string>;
+  readonly breadcrumbs?: ReadonlyArray<LinkT>;
+  readonly sectionNavigation?: SectionNavigationT | undefined;
+}
+
+const { pageTitle, title, description, breadcrumbs, sectionNavigation } = Astro.props;
+---
+
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
+  <section id="content" class="content grow w-full mx-6 md:mx-auto mt-2 md:mt-16 mb-4">
+    <article>
+      <h1 set:html={title} />
+      <ArticleMetadata {...Astro.props} />
+      <hr />
+      <p class="attention-grabber">{description}</p>
+      <slot />
+      <hr class="mt-10" />
+      <div class="article-footer mt-16">
+        {
+          sectionNavigation ? (
+            <PrevNextNavigation prev={sectionNavigation.prev} next={sectionNavigation.next} />
+          ) : undefined
+        }
+      </div>
+    </article>
+  </section>
+</BaseLayout>
+
+<style>
+  .attention-grabber {
+    font-size: 125%;
+  }
+</style>
