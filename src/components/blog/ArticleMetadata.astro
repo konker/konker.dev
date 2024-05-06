@@ -19,7 +19,7 @@ const readablePubDate = toReadableDate(pubDate);
   <div class="metadata flex flex-col justify-start md:flex-row">
     {
       pubDate ? (
-        <span class="pubDate flex min-w-fit font-sans pr-8 mb-2 md:mb-0" title={readablePubDate}>
+        <span class="pubDate flex min-w-fit font-sans mr-8 mt-1 mb-2 md:mb-0" title={readablePubDate}>
           <span class="separator inline-block px-0 mr-2">
             <Calendar size="24" />
           </span>
@@ -29,7 +29,7 @@ const readablePubDate = toReadableDate(pubDate);
     }
     {
       author ? (
-        <span class="author flex min-w-fit font-sans mb-2 md:mb-0">
+        <span class="author flex min-w-fit font-sans mr-8 mt-1 mb-2 md:mb-0">
           <span class="separator inline-block px-0 mr-2">
             <User size="24" />
           </span>
@@ -37,8 +37,8 @@ const readablePubDate = toReadableDate(pubDate);
         </span>
       ) : undefined
     }
+    <TagBar tags={tags} />
   </div>
-  <TagBar tags={tags} />
 </div>
 
 <style>

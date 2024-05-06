@@ -40,6 +40,7 @@ export default {
       'left-0',
       'dark',
       'not-prose',
+      ...[...Array(100).keys()].map((x) => `text-[${100 + x}%]`),
     ],
   },
   darkMode: ['selector', '[data-theme-mode="dark"]'],

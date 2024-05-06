@@ -1,36 +1,22 @@
 ---
-import { getCollection } from 'astro:content';
 import TagLinkIndexLayout from '../../layouts/tags/TagLinkIndexLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
-import { TAG_COLLECTIONS, type TagCollection } from '../../lib/collections';
-import type { LinkT, TagEntryT } from '../../lib/types';
+import { TAG_COLLECTIONS } from '../../lib/collections';
+import { tagsGetAllCollectionTags } from '../../lib/collections/tags';
+import type { LinkT } from '../../lib/types';
 
 // --------------------------------------------------------------------------
-const allEntries = await Promise.all(TAG_COLLECTIONS.map((collection) => getCollection(collection)));
-const tagEntries = allEntries.reduce(
-  (acc, entries, i) => {
-    const collection: TagCollection = TAG_COLLECTIONS[i]!;
-    const x = entries
-      .filter((entry) => !entry.data.draft)
-      .map(
-        (entry): TagEntryT<TagCollection> => ({
-          entry,
-          collection,
-        })
-      );
-    return [...acc, ...x];
+const { total, tags } = await tagsGetAllCollectionTags(TAG_COLLECTIONS);
+
+// --------------------------------------------------------------------------
+const pageTitle = 'Tags';
+const intro = '';
+const links = tags.map((tag) => ({
+  ...tag,
+  link: {
+    url: `/tags/${tag.tag}`,
+    title: tag.tag,
   },
-  [] as Array<TagEntryT<TagCollection>>
-);
-
-const uniqueTags = [...new Set(tagEntries.map((tagEntry) => tagEntry.entry.data.tags).flat())];
-
-// --------------------------------------------------------------------------
-const pageTitle = 'Tags Index';
-const intro = 'This is a collection of all the tags used in my posts and projects.<br>TODO: add counts and sorting?';
-const links = uniqueTags.map((tag) => ({
-  url: `/tags/${tag}`,
-  title: tag,
 }));
 
 // --------------------------------------------------------------------------
@@ -43,6 +29,7 @@ const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
   breadcrumbs={breadcrumbs}
   intro={intro}
   links={links}
+  total={total}
   titleIconName="tags"
   itemIconName="tag"
 />

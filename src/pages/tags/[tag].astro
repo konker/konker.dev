@@ -1,36 +1,25 @@
 ---
-import { getCollection } from 'astro:content';
+import { TAG_COLLECTIONS } from '../../lib/collections';
+import { tagsGetAllCollectionTagEntries } from '../../lib/collections/tags';
+
 import TagLinkLayout from '../../layouts/tags/TagLinkLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
 import type { TagCollection } from '../../lib/collections';
-import { TAG_COLLECTIONS } from '../../lib/collections';
-import type { LinkT, TagEntryT } from '../../lib/types';
+import type { TagEntry } from '../../lib/collections/tags';
+import { tagsGetAllCollectionTags } from '../../lib/collections/tags';
+import type { LinkT } from '../../lib/types';
 
 interface Props {
   readonly tag: string;
-  readonly entries: Array<TagEntryT<TagCollection>>;
+  readonly entries: Array<TagEntry<TagCollection>>;
 }
 
 // --------------------------------------------------------------------------
 export async function getStaticPaths() {
-  const allEntries = await Promise.all(TAG_COLLECTIONS.map((collection) => getCollection(collection)));
-  const tagEntries = allEntries.reduce(
-    (acc, entries, i) => {
-      const collection: TagCollection = TAG_COLLECTIONS[i]!;
-      const x = entries.map(
-        (entry): TagEntryT<TagCollection> => ({
-          entry,
-          collection,
-        })
-      );
-      return [...acc, ...x];
-    },
-    [] as Array<TagEntryT<TagCollection>>
-  );
+  const tagEntries = await tagsGetAllCollectionTagEntries(TAG_COLLECTIONS);
+  const { tags } = await tagsGetAllCollectionTags(TAG_COLLECTIONS);
 
-  const uniqueTags = [...new Set(tagEntries.map((tagEntry) => tagEntry.entry.data.tags).flat())];
-
-  return uniqueTags.map((tag) => {
+  return tags.map(({ tag }) => {
     const filteredTagEntries = tagEntries.filter((tagEntry) => tagEntry.entry.data.tags.includes(tag));
     return {
       params: { tag },
@@ -46,8 +35,8 @@ const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb, { ti
 
 // --------------------------------------------------------------------------
 const { entries } = Astro.props;
-const pageTitle = `Tag: ${tag}`;
-const intro = `This is a collection of all the posts with the tag ${tag}`;
+const pageTitle = `Tag: <code>#${tag}</code>`;
+const intro = `This is a collection of all the content tagged <code>#${tag}</code>`;
 ---
 
 <TagLinkLayout

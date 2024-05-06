@@ -4,11 +4,21 @@
 
   - ~~next / prev links on moonlight [1]~~
   - ~~scrollbars on main content [1]~~
-  - amend lint rules to remove most FP [2]
-  - aria props [3]
+  - ~~amend lint rules to remove most FP [2]~~
+  - aria props [2]
   - giscus comments / (also reactions?) [3]
     - Do we want to create a codeberg equivalent?
-  - search [7]
+  - RSS feed [2]
+  - Sitemap? [3]
+  - Test favicon [3]
+  - Check vitals/performance [2]
+    - https://pagespeed.web.dev/
+    - Lighthouse?
+    - SSL?
+  - Codeberg?
+    - Mirror to github for deployment? [6]
+ 
+  - search [4]
     - check astro/starlight and just do that for a start
   - ~~main-navigation is full screen in sm [?][9]~~
   - ~~animate main-navigation [6]~~

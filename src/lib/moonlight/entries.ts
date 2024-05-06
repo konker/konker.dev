@@ -1,8 +1,10 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 
+import { notDraftFilterPredicate } from '../collections/helpers.ts';
 import type { MoonlightCollectionName } from './config.ts';
 import { countSlugPathParts, extractProject } from './utils.ts';
 
+// --------------------------------------------------------------------------
 export type MoonlightEntry<T extends CollectionEntry<MoonlightCollectionName>> = {
   readonly collectionRootPagesPath: string;
   readonly project: string;
@@ -20,22 +22,18 @@ export const toMoonlightEntry =
     },
   });
 
-export function getStaticPathsFilterPredicate(entry: CollectionEntry<MoonlightCollectionName>): boolean {
-  return !entry.data?.draft;
-}
-
+// --------------------------------------------------------------------------
 export function indexEntriesFilterPredicate<T extends CollectionEntry<MoonlightCollectionName>>(
   moonlightEntry: MoonlightEntry<T>
 ): boolean {
-  return getStaticPathsFilterPredicate(moonlightEntry.entry) && countSlugPathParts(moonlightEntry.entry.slug) === 2;
+  return notDraftFilterPredicate(moonlightEntry.entry) && countSlugPathParts(moonlightEntry.entry.slug) === 2;
 }
 
+// --------------------------------------------------------------------------
 export async function moonlightGetAllEntries(collectionName: MoonlightCollectionName, collectionRootPagesPath: string) {
   const allEntries = await getCollection(collectionName);
 
-  const moonlightEntries = allEntries
-    .filter(getStaticPathsFilterPredicate)
-    .map(toMoonlightEntry(collectionRootPagesPath));
+  const moonlightEntries = allEntries.filter(notDraftFilterPredicate).map(toMoonlightEntry(collectionRootPagesPath));
 
   // Make sure the index entry is at the top
   return moonlightEntries.sort((a, b) => {

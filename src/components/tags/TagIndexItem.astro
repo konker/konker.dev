@@ -1,0 +1,24 @@
+---
+import { itemIconLookup } from '../../lib/collections/helpers';
+import type { TagLinkT } from '../../lib/collections/tags';
+
+interface Props {
+  readonly tag: TagLinkT;
+  readonly total: number;
+  readonly itemIconName?: string | undefined;
+}
+
+const { tag, itemIconName } = Astro.props;
+const ItemIcon = itemIconLookup(itemIconName);
+// const factor = Math.round((1 + tag.count / total) * 100 * 1.2);
+// const linkClassName = `text-[${factor}%]`;
+---
+
+<div class="wrapper mr-3 text-lg">
+  <h2 class={`mt-0 mb-3 font-sans bg-kdd-nav pt-1 pb-3 pl-3 pr-4 rounded-xl`}>
+    <span class="separator inline-block mb-[-0.40rem] pr-0">
+      <ItemIcon size="22" />
+    </span>
+    <a href={tag.link.url}>{tag.link.title}</a>
+  </h2>
+</div>

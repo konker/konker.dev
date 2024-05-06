@@ -45,7 +45,7 @@ const { pageTitle, breadcrumbs } = Astro.props;
     // --------------------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
       themeInit(['theme-mode-toggle-header', 'theme-mode-toggle-main-nav', 'theme-mode-toggle-footer']);
-      navigationPanelInit('main-navigation', 'top', 'md');
+      navigationPanelInit('main-navigation', 'top', 'md', true);
       navigationPanelInit('content-navigation', 'left', 'md');
       navigationPanelInit('intra-page-navigation', 'right', 'lg', true);
     });

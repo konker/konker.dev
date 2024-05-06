@@ -4,6 +4,11 @@ import { Box, FileText, Lightbulb, Tag, Tags } from 'lucide-astro';
 import type { LinkT, SectionNavigationT } from '../types.ts';
 
 // --------------------------------------------------------------------------
+export function notDraftFilterPredicate<T extends ContentCollectionKey>(entry: CollectionEntry<T>): boolean {
+  return !entry.data?.draft;
+}
+
+// --------------------------------------------------------------------------
 export function collectionEntryToUrl<T extends ContentCollectionKey>(collection: T, entry: CollectionEntry<T>): string {
   return `/${collection}/${entry.slug}`;
 }

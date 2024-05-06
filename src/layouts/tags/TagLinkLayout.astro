@@ -1,14 +1,15 @@
 ---
+import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
 import type { TagCollection } from '../../lib/collections';
 import { itemIconLookup } from '../../lib/collections/helpers';
-import type { LinkT, TagEntryT } from '../../lib/types';
+import type { TagEntry } from '../../lib/collections/tags';
+import type { LinkT } from '../../lib/types';
 import BaseLayout from '../site/BaseLayout.astro';
-import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
 
 interface Props {
   readonly pageTitle: string;
   readonly intro: string;
-  readonly tagEntries: Array<TagEntryT<TagCollection>>;
+  readonly tagEntries: Array<TagEntry<TagCollection>>;
   readonly itemIconName?: string;
   readonly titleIconName?: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT>;
@@ -22,13 +23,17 @@ const TitleIcon = itemIconLookup(titleIconName);
   <section id="content" class="content grow w-full mx-6 md:mr-auto md:ml-auto mt-2 md:mt-16 mb-4">
     <h1>
       <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
-      {pageTitle}
+      <span set:html={pageTitle} />
     </h1>
-    <p class="mb-12">{intro}</p>
+    <p class="mb-12" set:html={intro} />
     <nav class="my-6 md:my-16 not-prose">
       {
         tagEntries.map((tagEntry) => (
-          <BlogPostIndexItem collection={tagEntry.collection} post={tagEntry.entry} itemIconName={tagEntry.collection} />
+          <BlogPostIndexItem
+            collection={tagEntry.collection}
+            post={tagEntry.entry}
+            itemIconName={tagEntry.collection}
+          />
         ))
       }
     </nav>

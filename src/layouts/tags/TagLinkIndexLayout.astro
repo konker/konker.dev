@@ -1,19 +1,21 @@
 ---
+import TagIndexItem from '../../components/tags/TagIndexItem.astro';
 import { itemIconLookup } from '../../lib/collections/helpers';
+import type { TagLinkT } from '../../lib/collections/tags';
 import type { LinkT } from '../../lib/types';
 import BaseLayout from '../site/BaseLayout.astro';
 
 interface Props {
   readonly pageTitle: string;
   readonly intro: string;
-  readonly links: Array<LinkT>;
+  readonly links: Array<TagLinkT>;
+  readonly total: number;
   readonly itemIconName?: string;
   readonly titleIconName?: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT>;
 }
 
-const { pageTitle, breadcrumbs, intro, links, itemIconName, titleIconName } = Astro.props;
-const ItemIcon = itemIconLookup(itemIconName);
+const { pageTitle, breadcrumbs, intro, links, total, itemIconName, titleIconName } = Astro.props;
 const TitleIcon = itemIconLookup(titleIconName);
 ---
 
@@ -21,22 +23,11 @@ const TitleIcon = itemIconLookup(titleIconName);
   <section id="content" class="content grow w-full mx-6 md:mx-auto mt-2 md:mt-16 mb-4">
     <h1>
       <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
-      {pageTitle}
+      <span set:html={pageTitle} />
     </h1>
     <p class="mb-12" set:html={intro} />
     <nav class="links my-6 md:my-16 not-prose">
-      {
-        links.map((link) => (
-          <div class="wrapper">
-            <h2 class="mt-0 mb-3 font-sans text-lg bg-kdd-nav py-2 px-3 rounded-lg">
-              <span class="separator inline-block mb-[-0.40rem] pr-1">
-                <ItemIcon size="28" />
-              </span>
-              <a href={link.url}>{link.title}</a>
-            </h2>
-          </div>
-        ))
-      }
+      {links.map((link) => <TagIndexItem tag={link} total={total} itemIconName={itemIconName} />)}
     </nav>
   </section>
 </BaseLayout>
