@@ -3,14 +3,7 @@
   "parserOptions": {
     "project": ["./tsconfig.json"]
   },
-  "plugins": [
-    "@typescript-eslint",
-    "import",
-    "simple-import-sort",
-    "prettier",
-    "deprecation",
-    "sort-destructure-keys"
-  ],
+  "plugins": ["@typescript-eslint", "import", "simple-import-sort", "prettier", "deprecation", "sort-destructure-keys"],
   "extends": [
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",

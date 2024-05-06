@@ -1,10 +1,11 @@
 # konker.dev
 
 - POA
+
   - ~~next / prev links on moonlight [1]~~
   - ~~scrollbars on main content [1]~~
   - amend lint rules to remove most FP [2]
-  - aria props [3] 
+  - aria props [3]
   - giscus comments / (also reactions?) [3]
     - Do we want to create a codeberg equivalent?
   - search [7]
@@ -23,7 +24,7 @@
       - fediverse [? but should set that up]
       - keybase [?]
   - ~~dark/light mode toggle [2]~~
-    - light mode code for dark mode?  
+    - light mode code for dark mode?
   - easter_eggs?
     - clacks
     - ...
@@ -40,11 +41,8 @@
   - footer content
     - see: social links above as part of it
 
-
-  
-    
-
 - Idea:
+
   - Implement an Astro ??? to implement the layout of https://diataxis.fr/reference/
   - Fundamentals first:
     - Use tailwind vars everywhere for consistency
@@ -62,6 +60,7 @@
       - collapse none
 
 - Projects
+
   - ~~Content collection per project?~~
   - Content collection for all projects
   - A project is a top-level folder inside `content/projects`
@@ -79,6 +78,7 @@
     - Search?
 
 - TODO
+
   - ~~Metadata~~
     - ~~Format readable date properly~~
     - ~~Use proper name for author?~~

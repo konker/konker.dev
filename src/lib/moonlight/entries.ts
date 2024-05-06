@@ -1,7 +1,6 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 
 import type { MoonlightCollectionName } from './config.ts';
-import { getStaticPathsFilterPredicate } from './routing.ts';
 import { countSlugPathParts, extractProject } from './utils.ts';
 
 export type MoonlightEntry<T extends CollectionEntry<MoonlightCollectionName>> = {
@@ -20,6 +19,10 @@ export const toMoonlightEntry =
       slug: `${collectionRootPagesPath}/${entry.slug}`,
     },
   });
+
+export function getStaticPathsFilterPredicate(entry: CollectionEntry<MoonlightCollectionName>): boolean {
+  return !entry.data?.draft;
+}
 
 export function indexEntriesFilterPredicate<T extends CollectionEntry<MoonlightCollectionName>>(
   moonlightEntry: MoonlightEntry<T>

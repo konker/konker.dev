@@ -1,26 +1,27 @@
 ---
 title: Notes on registering a domain with AWS Route53
 pubDate: 2024-04-08
-description:  Some notes related to registering a cheap
+description: Some notes related to registering a cheap
   domain via AWS. At the time of writing, `.click` domains are
   the cheapest, both to initially register, and also to renew.
 author: 'Konrad Markus'
 image:
-    url: 'https://docs.astro.build/assets/full-logo-dark.png'
-    alt: 'The full Astro logo.'
-tags: ["til", "aws", "www"]
+  url: 'https://docs.astro.build/assets/full-logo-dark.png'
+  alt: 'The full Astro logo.'
+tags: ['til', 'aws', 'www']
 ---
 
 These notes are an aid to remembering what dummy WHOIS information can be used.
 DISCLAIMER: the information here is anecdotal, so use at your own risk!
 
-AWS domains are registered via [Route53](https://console.aws.amazon.com/route53/home). 
+AWS domains are registered via [Route53](https://console.aws.amazon.com/route53/home).
 
 The below assumes that you have an account with AWS and are familiar with registering domains and the DNS system.
 
 - `.click` domains are the cheapest, both to initially register, and also to renew. <br>Good if you need something cheap and cheerful
 
 I added the following information for the WHOIS record:
+
 - type: Person
 - First name: REDACTED
 - Last Name: FOR PRIVACY

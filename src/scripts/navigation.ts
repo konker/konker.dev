@@ -49,7 +49,7 @@ export function navigationPanelIsOpen(element: Element): boolean {
 
   return element.classList.contains(NAVIGATION_PANEL_CLASS_OPENED);
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.navigationPanelIsOpen = navigationPanelIsOpen;
 
 // --------------------------------------------------------------------------
@@ -72,7 +72,7 @@ export function navigationPanelOpen(panel: NavigationPanelStackEntry): boolean {
 
   return true;
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.navigationPanelOpen = navigationPanelOpen;
 
 // --------------------------------------------------------------------------
@@ -94,7 +94,7 @@ export function navigationPanelClose(panel: NavigationPanelStackEntry): boolean 
 
   return true;
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.navigationPanelClose = navigationPanelClose;
 
 // --------------------------------------------------------------------------
@@ -109,7 +109,7 @@ export function navigationPanelCloseAll(): boolean {
 
   return marked.length > 0;
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.navigationPanelCloseAll = navigationPanelCloseAll;
 
 // --------------------------------------------------------------------------
@@ -119,7 +119,7 @@ export function navigationPanelToggle(panel: NavigationPanelStackEntry): boolean
   }
   return navigationPanelOpen(panel);
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.navigationPanelToggle = navigationPanelToggle;
 
 // --------------------------------------------------------------------------
@@ -189,5 +189,5 @@ export function navigationPanelInit(
   console.log(`[navigation] panel init: ${panelId}`);
   return true;
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.navigationPanelInit = navigationPanelInit;

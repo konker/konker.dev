@@ -47,7 +47,7 @@ export function themeSave(storage: Storage, theme: Theme, storageKey: string): v
 export function themeGet(): Theme {
   return themeLoad(localStorage, DEFAULT_THEME_STORAGE_KEY) ?? themeDocGet(document) ?? themeGetSystemPreference();
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.themeGet = themeGet;
 
 export function themeSet(s: string): Theme | undefined {
@@ -58,7 +58,7 @@ export function themeSet(s: string): Theme | undefined {
   themeSave(localStorage, newTheme, DEFAULT_THEME_STORAGE_KEY);
   return newTheme;
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.themeSet = themeSet;
 
 export function themeToggle(): Theme | undefined {
@@ -67,7 +67,7 @@ export function themeToggle(): Theme | undefined {
 
   return themeSet(newTheme);
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.themeToggle = themeToggle;
 
 // --------------------------------------------------------------------------
@@ -99,7 +99,7 @@ export function themeInit(themeModeToggleNavIds: Array<string> = []): boolean {
 
   return true;
 }
-// @ts-expect-error
+// @ts-expect-error adding to global window object
 window.themeInit = themeInit;
 
 // --------------------------------------------------------------------------

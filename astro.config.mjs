@@ -1,6 +1,5 @@
 import tailwind from '@astrojs/tailwind';
 import { defineConfig } from 'astro/config';
-// import remarkSectionize from 'remark-sectionize';
 
 // https://astro.build/config
 export default defineConfig({

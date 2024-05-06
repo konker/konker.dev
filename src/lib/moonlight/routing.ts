@@ -13,10 +13,6 @@ import {
 import { MOONLIGHT_PAGE_TYPE_ENTRY, MOONLIGHT_PAGE_TYPE_INDEX } from './index.ts';
 import { RecordKeysOf } from './utils.ts';
 
-export function getStaticPathsFilterPredicate(entry: CollectionEntry<MoonlightCollectionName>): boolean {
-  return !entry.data?.draft;
-}
-
 export const formatRootIndexStaticPath = <T extends CollectionEntry<MoonlightCollectionName>>(
   allEntries: Array<MoonlightEntry<T>>,
   collectionRootPagesPath: string
@@ -36,6 +32,7 @@ export const formatEntryStaticPath =
     const prevEntry = moonlightGetPrevEntry(allEntries, moonlightEntry);
     const nextEntry = moonlightGetNextEntry(allEntries, moonlightEntry);
     return {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       params: { moonlight_slug: moonlightEntry.entry.slug },
       props: {
         type: MOONLIGHT_PAGE_TYPE_ENTRY,

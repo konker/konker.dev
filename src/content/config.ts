@@ -1,4 +1,3 @@
-// Import utilities from `astro:content`
 import { defineCollection, z } from 'astro:content';
 
 import { MoonlightSchema } from '../lib/moonlight/schema.ts';
