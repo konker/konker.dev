@@ -11,40 +11,18 @@ interface Props {
 const { navId, breakpoint, class: classNames, CloseIcon, OpenIcon } = Astro.props;
 
 const functionalClassNamesLabel = `${breakpoint}:hidden`;
-const classNamesLabel = classNames + ' ' + functionalClassNamesLabel;
+const classNamesLabel = classNames + ' navigation-toggle-label ' + functionalClassNamesLabel;
 const toggleId = `${navId}-toggle`;
 const labelId = `${navId}-label`;
 ---
 
-<input id={toggleId} class="navigation-toggle" type="checkbox" />
 <label for={toggleId} id={labelId} class={classNamesLabel}>
-  <CloseIcon class="close-icon" size="32" />
-  <OpenIcon class="open-icon" size="32" />
+  <CloseIcon class="close-icon hidden" size="28" />
+  <OpenIcon class="open-icon" size="28" />
 </label>
 
 <style>
-  input.navigation-toggle {
-    display: none;
-  }
-  input.navigation-toggle + label {
+  .navigation-toggle-label {
     cursor: pointer;
-  }
-  input.navigation-toggle:checked + label + .navigation-panel.noscript {
-    display: block;
-  }
-  input.navigation-toggle + label + .navigation-panel.noscript.md {
-    @apply hidden md:block;
-  }
-  input.navigation-toggle + label + .navigation-panel.noscript.lg {
-    @apply hidden lg:block;
-  }
-
-  .navigation-toggle + label .open-icon,
-  .navigation-toggle:checked + label .close-icon {
-    display: block;
-  }
-  .navigation-toggle:checked + label .open-icon,
-  .navigation-toggle + label .close-icon {
-    display: none;
   }
 </style>

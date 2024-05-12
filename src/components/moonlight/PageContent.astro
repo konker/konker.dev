@@ -16,14 +16,17 @@ const prev = prevEntry ? { url: prevEntry.slug, title: prevEntry.data.title } : 
 const next = nextEntry ? { url: nextEntry.slug, title: nextEntry.data.title } : undefined;
 ---
 
-<div id="page-content-wrapper" class="w-full">
-  <div
-    id="page-content"
-    class="content min-h-screen max-h-screen overflow-scroll pr-6 ml-6 md:ml-auto md:mr-auto mt-16 mb-16"
-  >
+<!-- md:h-[calc(100vh-var(--kdd-footer-height))] -->
+<div
+  id="page-content-wrapper"
+  class="md:max-h-[calc(100vh-var(--kdd-footer-height))] w-full md:w-3/5 flex-1 md:overflow-y-scroll mt-0 mb-6"
+>
+  <div id="page-content" class="content pr-6 ml-6 md:ml-auto md:mr-auto">
     <a id={ANCHOR_TOP}></a>
     <Content />
     <hr />
     <PrevNextNavigation prev={prev} next={next} />
   </div>
 </div>
+
+<style></style>

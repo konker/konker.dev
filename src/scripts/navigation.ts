@@ -161,7 +161,7 @@ export function navigationPanelInit(
   element.classList.remove('navigation-panel-right');
   element.classList.remove('navigation-panel-bottom');
 
-  toggle.addEventListener('click', () => {
+  label.addEventListener('click', () => {
     navigationPanelToggle({ element, toggle, panelDirection, breakpoint });
   });
 

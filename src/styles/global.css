@@ -1,6 +1,7 @@
 /* ----------------------------------------------------------------------- */
 :root,
 ::backdrop {
+  --kdd-footer-height: 15rem;
   --kdd-konker-flash-red: #b70404;
   --kdd-konker-flash-red-dark: #a00000;
   --kdd-konker-flash-blue: #2c5aa0;
@@ -151,6 +152,55 @@ nav ul ul {
 }
 nav ul li {
   margin-bottom: 0.25rem;
+}
+
+/* ----------------------------------------------------------------------- */
+.main-navigation .nav-links a,
+.main-navigation .nav-links a:visited {
+  @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l text-kdd-link bg-kdd-nav;
+}
+.main-navigation .nav-links a.nav-link:first-of-type {
+  @apply border-t md:border-t-0;
+}
+.main-navigation .nav-links a.nav-link:last-of-type {
+  @apply md:border-r;
+}
+.main-navigation .nav-links a.selected,
+.main-navigation .nav-links a:hover {
+  @apply bg-konker-flash-blue-dark dark:bg-konker-flash-blue-dark text-white dark:text-white no-underline;
+}
+
+/* ----------------------------------------------------------------------- */
+input.navigation-toggle {
+  display: none;
+  position: absolute;
+  top: 0;
+}
+.navigation-toggle-overlay {
+  @apply absolute hidden top-0 left-0 w-full h-full opacity-20 z-20;
+}
+input.navigation-toggle + label {
+  cursor: pointer;
+}
+input.navigation-toggle:checked ~ label.navigation-toggle-overlay {
+  /*@apply block bg-amber-500;*/
+}
+
+.navigation-panel.noscript:has(input.navigation-toggle:checked) {
+  @apply block;
+}
+.navigation-panel.noscript:has(input.navigation-toggle)  {
+  @apply hidden md:block;
+}
+
+/* ----------------------------------------------------------------------- */
+input.navigation-toggle ~ label .open-icon,
+input.navigation-toggle:checked ~ label .close-icon {
+  display: block;
+}
+input.navigation-toggle:checked ~ label .open-icon,
+input.navigation-toggle + label .close-icon {
+  display: none;
 }
 
 /* ----------------------------------------------------------------------- */

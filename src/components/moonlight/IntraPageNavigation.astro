@@ -1,10 +1,8 @@
 ---
 import type { MarkdownHeading } from 'astro';
-import { PilcrowLeft, PilcrowRight } from 'lucide-astro';
 import type { HeadingsList } from '../../lib/types';
 import { ANCHOR_TOP, NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationPanel from '../site/NavigationPanel.astro';
-import NavigationToggle from '../site/NavigationToggle.astro';
 import IntraPageLink from './IntraPageLink.astro';
 import IntraPageLinkList from './IntraPageLinkList.astro';
 
@@ -34,18 +32,11 @@ function groupHeadings(headings: Array<MarkdownHeading>, depth: number): Heading
 }
 ---
 
-<NavigationToggle
-  navId="intra-page-navigation"
-  breakpoint={NavigationPanelBreakpoint.LG}
-  class="fixed right-6"
-  CloseIcon={PilcrowRight}
-  OpenIcon={PilcrowLeft}
-/>
 <NavigationPanel
   navId="intra-page-navigation"
   breakpoint={NavigationPanelBreakpoint.LG}
   panelDir={NavigationPanelDirection.RIGHT}
-  class="min-h-screen max-h-screen overflow-scroll mt-12 lg:mt-0 px-6 pb-6 lg:w-2/5 lg:min-w-[14rem] bg-color-bg-light dark:bg-color-bg-dark opacity-90 md:opacity-100"
+  class="max-h-[85%] lg:max-h-full overflow-x-clip overflow-y-auto overscroll-none mt-1 lg:mt-0 px-6 pb-16 lg:w-1/5 lg:min-w-[14rem] bg-color-bg-light dark:bg-color-bg-dark"
 >
   <nav>
     <ul>

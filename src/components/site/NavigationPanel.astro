@@ -16,10 +16,14 @@ const panelDirClassNamesLookup: Record<NavigationPanelDirection, string> = {
 };
 
 const { navId, panelDir, breakpoint, class: classNames } = Astro.props;
-const panelFunctionalClassNames = `noscript navigation-panel ${breakpoint} overflow-x-clip overflow-y-scroll w-full h-full hidden ${breakpoint}:block fixed ${breakpoint}:static`;
+const toggleId = `${navId}-toggle`;
+const panelFunctionalClassNames = `noscript navigation-panel ${breakpoint} w-full h-full hidden ${breakpoint}:block fixed ${breakpoint}:static z-30`;
 const panelClassNames = classNames + ' ' + panelFunctionalClassNames + ' ' + panelDirClassNamesLookup[panelDir];
 ---
 
 <div id={navId} class={panelClassNames}>
+  <input id={toggleId} class="navigation-toggle" type="checkbox" />
+  <label for={toggleId} class="navigation-toggle-overlay hidden"></label>
+
   <slot />
 </div>

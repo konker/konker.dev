@@ -34,11 +34,15 @@ const { pageTitle, breadcrumbs } = Astro.props;
       ) : undefined
     }
     <div id="container" class="w-full h-full max-w-screen-2xl mx-auto flex flex-col">
-      <Header breadcrumbs={breadcrumbs} />
-      <main class="w-full flex flex-1 flex-row flex-nowrap">
-        <slot />
+      <Header breadcrumbs={breadcrumbs}>
+        <slot name="secondary-navigation" slot="secondary-navigation" />
+      </Header>
+      <main class="w-full flex-1 flex flex-col mt-0 overflow-y-auto md:overflow-visible">
+        <div class="content-wrapper flex-1 flex flex-row flex-nowrap">
+          <slot />
+        </div>
+        <Footer />
       </main>
-      <Footer />
     </div>
   </body>
   <script is:inline>
@@ -52,6 +56,11 @@ const { pageTitle, breadcrumbs } = Astro.props;
   </script>
 </html>
 
+<style>
+  main {
+    //overflow: inherit;
+  }
+</style>
 <script>
   import '../../scripts/navigation';
   import '../../scripts/theme';

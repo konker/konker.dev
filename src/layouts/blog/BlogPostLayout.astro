@@ -19,7 +19,7 @@ const { pageTitle, title, description, breadcrumbs, sectionNavigation } = Astro.
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <section id="content" class="content grow w-full mx-6 md:mx-auto mt-2 md:mt-16 mb-4">
+  <section id="content" class="content w-full mx-6 md:mx-auto mt-2 md:mt-6 mb-4">
     <article>
       <h1 set:html={title} />
       <ArticleMetadata {...Astro.props} />

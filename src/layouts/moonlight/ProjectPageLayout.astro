@@ -1,11 +1,14 @@
 ---
 import type { MarkdownHeading, MarkdownInstance } from 'astro';
 import type { CollectionEntry } from 'astro:content';
+import { PanelLeftClose, PanelLeftOpen, PilcrowLeft, PilcrowRight } from 'lucide-astro';
 import ContentNavigation from '../../components/moonlight/ContentNavigation.astro';
 import IntraPageNavigation from '../../components/moonlight/IntraPageNavigation.astro';
 import PageContent from '../../components/moonlight/PageContent.astro';
+import NavigationToggle from '../../components/site/NavigationToggle.astro';
 import type { MoonlightCollectionName } from '../../lib/moonlight/config';
 import type { LinkT } from '../../lib/types';
+import { NavigationPanelBreakpoint } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
 
 interface Props {
@@ -22,6 +25,23 @@ const { breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, 
 ---
 
 <BaseLayout pageTitle="FIXME" breadcrumbs={breadcrumbs}>
+  <Fragment slot="secondary-navigation">
+    <NavigationToggle
+      navId="content-navigation"
+      breakpoint={NavigationPanelBreakpoint.MD}
+      class="flex-1 pl-3"
+      CloseIcon={PanelLeftClose}
+      OpenIcon={PanelLeftOpen}
+    />
+    <NavigationToggle
+      navId="intra-page-navigation"
+      breakpoint={NavigationPanelBreakpoint.LG}
+      class="flex-shrink pr-6"
+      CloseIcon={PilcrowRight}
+      OpenIcon={PilcrowLeft}
+    />
+  </Fragment>
+
   <ContentNavigation projectEntries={projectEntries} projectRootEntry={projectRootEntry} />
   <PageContent Content={Content} prevEntry={prevEntry} nextEntry={nextEntry} />
   <IntraPageNavigation headings={headings} />

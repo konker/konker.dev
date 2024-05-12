@@ -1,10 +1,8 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-astro';
 import type { MoonlightCollectionName } from '../../lib/moonlight/config';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationPanel from '../site/NavigationPanel.astro';
-import NavigationToggle from '../site/NavigationToggle.astro';
 import EntryLink from './EntryLink.astro';
 
 interface Props {
@@ -20,18 +18,11 @@ const navLinksSelectedLookup = projectEntries.map(
 const isProjectRoot = urlPathSlug === projectRootEntry.slug;
 ---
 
-<NavigationToggle
-  navId="content-navigation"
-  breakpoint={NavigationPanelBreakpoint.MD}
-  class="fixed left-6"
-  CloseIcon={PanelLeftClose}
-  OpenIcon={PanelLeftOpen}
-/>
 <NavigationPanel
   navId="content-navigation"
   breakpoint={NavigationPanelBreakpoint.MD}
   panelDir={NavigationPanelDirection.LEFT}
-  class="min-h-screen max-h-screen overflow-scroll mt-12 md:mt-0 pl-16 pr-6 py-8 md:w-2/5 p-6 bg-color-bg-light dark:bg-color-bg-dark opacity-90 md:opacity-100"
+  class="min-h-screen h-full overflow-hidden mt-1 md:mt-0 pl-8 pr-6 py-3 md:w-1/5 bg-color-bg-light dark:bg-color-bg-dark opacity-100 md:opacity-100"
 >
   <nav>
     <ul>

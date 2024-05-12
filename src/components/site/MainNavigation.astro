@@ -2,7 +2,8 @@
 import { Menu, PanelTopClose } from 'lucide-astro';
 import { getUrlPathParts } from '../../lib';
 import type { LinkT } from '../../lib/types';
-import { NavigationPanelBreakpoint } from '../../scripts/consts';
+import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
+import NavigationPanel from './NavigationPanel.astro';
 import NavigationToggle from './NavigationToggle.astro';
 import ThemeModeToggle from './ThemeModeToggle.astro';
 
@@ -19,40 +20,23 @@ const urlPathParts = getUrlPathParts(Astro.url);
 const navLinksSelectedLookup = navLinks.map(
   (link, i) => (urlPathParts.length === 0 && i == 0) || urlPathParts[0] === link.url.replaceAll('/', '')
 );
-const navId = 'main-navigation';
 ---
 
 <NavigationToggle
-  navId={navId}
+  navId="main-navigation"
   breakpoint={NavigationPanelBreakpoint.MD}
-  class="absolute top-6 right-6"
+  class="absolute top-6 right-6 z-50"
   CloseIcon={PanelTopClose}
   OpenIcon={Menu}
 />
-<div
-  id={navId}
-  class="main-navigation
-    navigation-panel
-    w-full
-    h-full
-    md:h-auto
-    pr-0
-    md:pr-6
-    mt-[-2px]
-    md:mt-0
-    opacity-90
-    md:opacity-100
-    hidden
-    md:block
-    fixed
-    md:relative
-    font-sans
-    bg-kdd-nav
-    md:bg-transparent
-    dark:md:bg-transparent
-    z-10"
+
+<NavigationPanel
+  navId="main-navigation"
+  breakpoint={NavigationPanelBreakpoint.MD}
+  panelDir={NavigationPanelDirection.TOP}
+  class="main-navigation w-full h-full md:h-auto pr-0 md:pr-6 mt-[6.5rem] md:mt-0 opacity-100 md:opacity-100 hidden md:block fixed md:relative font-sans bg-kdd-nav md:bg-transparent dark:md:bg-transparent"
 >
-  <nav class="nav-links h-full flex flex-col md:flex-row md:justify-end">
+  <nav class="nav-links flex flex-col md:flex-row md:justify-end z-30">
     {
       navLinks.map((link, idx) => (
         <a href={link.url} class={navLinksSelectedLookup[idx] ? 'nav-link selected' : 'nav-link'}>
@@ -62,7 +46,7 @@ const navId = 'main-navigation';
     }
     <ThemeModeToggle navId="theme-mode-toggle-main-nav" initLightMode={true} class="block md:hidden my-12 mx-auto" />
   </nav>
-</div>
+</NavigationPanel>
 
 <style>
   .main-navigation .nav-links a,
