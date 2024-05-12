@@ -22,7 +22,7 @@ const { breadcrumbs } = Astro.props;
   </SiteLogo>
   <MainNavigation />
   <BreadcrumbsNavigation breadcrumbs={breadcrumbs} />
-  <div class="secondary-navigation-wrapper flex flex-row mt-3 ml-16 justify-evenly pb-1">
+  <div class="secondary-navigation-wrapper flex flex-row mt-3 ml-16 justify-between pb-1">
     <slot name="secondary-navigation" />
   </div>
 </header>
