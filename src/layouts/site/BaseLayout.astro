@@ -10,9 +10,11 @@ import '@fontsource-variable/work-sans';
 interface Props {
   readonly pageTitle: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
+  readonly fixedHeader?: boolean;
 }
 
-const { pageTitle, breadcrumbs } = Astro.props;
+const { pageTitle, breadcrumbs, fixedHeader } = Astro.props;
+const mainClassNames = 'w-full flex-1 flex flex-col' + (!!fixedHeader ? ' overflow-y-auto md:overflow-visible' : '');
 ---
 
 <!doctype html>
@@ -37,7 +39,7 @@ const { pageTitle, breadcrumbs } = Astro.props;
       <Header breadcrumbs={breadcrumbs}>
         <slot name="secondary-navigation" slot="secondary-navigation" />
       </Header>
-      <main class="w-full flex-1 flex flex-col mt-0 overflow-y-auto md:overflow-visible">
+      <main class={mainClassNames}>
         <div class="content-wrapper flex-1 flex flex-row flex-nowrap">
           <slot />
         </div>

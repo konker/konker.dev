@@ -24,7 +24,7 @@ interface Props {
 const { breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, projectEntries } = Astro.props;
 ---
 
-<BaseLayout pageTitle="FIXME" breadcrumbs={breadcrumbs}>
+<BaseLayout pageTitle="FIXME" breadcrumbs={breadcrumbs} fixedHeader={true}>
   <Fragment slot="secondary-navigation">
     <NavigationToggle
       navId="content-navigation"
