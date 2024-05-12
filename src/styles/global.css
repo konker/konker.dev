@@ -24,7 +24,7 @@
   --kdd-classic-link-light: #0000ee;
   --kdd-classic-link-visited-light: #551a8b;
   --kdd-classic-link-active-light: #222222;
-  --kdd-color-bg-nav-light: #ffffff;
+  --kdd-color-bg-nav-light: #eeeeee;
 
   --kdd-color-bg-project-dark: #233146;
   --kdd-color-bg-blog-dark: #444444;
@@ -177,7 +177,7 @@ input.navigation-toggle {
   top: 0;
 }
 .navigation-toggle-overlay {
-  @apply absolute hidden top-0 left-0 w-full h-full opacity-20 z-20;
+  @apply absolute hidden top-0 left-0 w-full h-full opacity-20;
 }
 input.navigation-toggle + label {
   cursor: pointer;

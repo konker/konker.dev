@@ -59,6 +59,9 @@ export function navigationPanelOpen(panel: NavigationPanelStackEntry): boolean {
   if (!panel?.element) return false;
   if (navigationPanelIsOpen(panel.element)) return false;
 
+  // First close any other open panels
+  navigationPanelCloseAll();
+
   panel.element.classList.remove('hidden');
   panel.element.classList.remove(`${panel.breakpoint}:hidden`);
   if (panel.panelDirection === NavigationPanelDirection.TOP) panel.element.classList.add('navigation-panel-top');

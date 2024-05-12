@@ -34,9 +34,9 @@ const navLinksSelectedLookup = navLinks.map(
   navId="main-navigation"
   breakpoint={NavigationPanelBreakpoint.MD}
   panelDir={NavigationPanelDirection.TOP}
-  class="main-navigation w-full h-full md:h-auto pr-0 md:pr-6 mt-[6.5rem] md:mt-0 opacity-100 md:opacity-100 hidden md:block fixed md:relative font-sans bg-kdd-nav md:bg-transparent dark:md:bg-transparent"
+  class="main-navigation w-full h-full md:h-auto pr-0 md:pr-6 pt-20 md:pt-0 md:mt-0 hidden md:block fixed md:relative font-sans bg-color-bg-light dark:bg-color-bg-dark md:bg-transparent dark:md:bg-transparent"
 >
-  <nav class="nav-links flex flex-col md:flex-row md:justify-end z-30">
+  <nav class="nav-links flex flex-col md:flex-row md:justify-end">
     {
       navLinks.map((link, idx) => (
         <a href={link.url} class={navLinksSelectedLookup[idx] ? 'nav-link selected' : 'nav-link'}>
