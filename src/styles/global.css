@@ -189,7 +189,7 @@ input.navigation-toggle:checked ~ label.navigation-toggle-overlay {
 .navigation-panel.noscript:has(input.navigation-toggle:checked) {
   @apply block;
 }
-.navigation-panel.noscript:has(input.navigation-toggle)  {
+.navigation-panel.noscript:has(input.navigation-toggle) {
   @apply hidden md:block;
 }
 

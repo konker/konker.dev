@@ -17,7 +17,6 @@
     - SSL?
   - Codeberg?
     - Mirror to github for deployment? [6]
- 
   - search [4]
     - check astro/starlight and just do that for a start
   - ~~main-navigation is full screen in sm [?][9]~~

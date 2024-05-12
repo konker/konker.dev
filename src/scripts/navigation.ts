@@ -29,7 +29,7 @@ export function navigationPanelRegistryGetToggleTarget(
   // True if the event target id is for a registered toggle element,
   // and the associated label element is visible.
   return NAVIGATION_PANEL_TOGGLE_REGISTRY.find(
-    ({ panel: { toggle, label } }) => toggle.id === targetId && label.checkVisibility()
+    ({ panel: { label, toggle } }) => toggle.id === targetId && label.checkVisibility()
   );
 }
 
