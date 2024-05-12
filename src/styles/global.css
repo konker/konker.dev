@@ -194,16 +194,6 @@ input.navigation-toggle:checked ~ label.navigation-toggle-overlay {
 }
 
 /* ----------------------------------------------------------------------- */
-input.navigation-toggle ~ label .open-icon,
-input.navigation-toggle:checked ~ label .close-icon {
-  display: block;
-}
-input.navigation-toggle:checked ~ label .open-icon,
-input.navigation-toggle + label .close-icon {
-  display: none;
-}
-
-/* ----------------------------------------------------------------------- */
 .theme-mode-toggle .theme-mode-toggle-icon {
   cursor: pointer;
 }

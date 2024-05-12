@@ -9,6 +9,9 @@ export const NAVIGATION_PANEL_CLASS_CLOSED = 'navigation-panel-closed' as const;
 type NavigationPanelStackEntry = {
   readonly element: Element;
   readonly toggle: HTMLInputElement;
+  readonly label: Element;
+  readonly openIcon: Element | null;
+  readonly closeIcon: Element | null;
   readonly panelDirection: NavigationPanelDirection;
   readonly breakpoint: NavigationPanelBreakpoint;
 };
@@ -16,7 +19,6 @@ let NAVIGATION_PANEL_OPEN_STACK: Array<NavigationPanelStackEntry> = [];
 
 type NavigationPanelToggleRegistryEntry = {
   readonly panel: NavigationPanelStackEntry;
-  readonly label: Element;
   readonly autoClose: boolean;
 };
 const NAVIGATION_PANEL_TOGGLE_REGISTRY: Array<NavigationPanelToggleRegistryEntry> = [];
@@ -27,7 +29,7 @@ export function navigationPanelRegistryGetToggleTarget(
   // True if the event target id is for a registered toggle element,
   // and the associated label element is visible.
   return NAVIGATION_PANEL_TOGGLE_REGISTRY.find(
-    ({ label, panel: { toggle } }) => toggle.id === targetId && label.checkVisibility()
+    ({ panel: { toggle, label } }) => toggle.id === targetId && label.checkVisibility()
   );
 }
 
@@ -40,7 +42,7 @@ export function navigationPanelRegistryIsToggleTarget(targetId: string): boolean
 export function navigationPanelRegistryHasToggleTarget(): boolean {
   // True if there is at least one registered toggle element,
   // and the associated label element is visible.
-  return NAVIGATION_PANEL_TOGGLE_REGISTRY.some(({ label }) => label.checkVisibility());
+  return NAVIGATION_PANEL_TOGGLE_REGISTRY.some(({ panel: { label } }) => label.checkVisibility());
 }
 
 // --------------------------------------------------------------------------
@@ -67,6 +69,8 @@ export function navigationPanelOpen(panel: NavigationPanelStackEntry): boolean {
   panel.element.classList.remove(NAVIGATION_PANEL_CLASS_CLOSED);
   panel.element.classList.add(NAVIGATION_PANEL_CLASS_OPENED);
   panel.toggle.checked = true;
+  panel.openIcon?.classList?.add('hidden');
+  panel.closeIcon?.classList?.remove('hidden');
 
   NAVIGATION_PANEL_OPEN_STACK.push(panel);
 
@@ -91,6 +95,8 @@ export function navigationPanelClose(panel: NavigationPanelStackEntry): boolean 
   panel.element.classList.remove(NAVIGATION_PANEL_CLASS_OPENED);
   panel.element.classList.add(NAVIGATION_PANEL_CLASS_CLOSED);
   panel.toggle.checked = false;
+  panel.closeIcon?.classList?.add('hidden');
+  panel.openIcon?.classList?.remove('hidden');
 
   return true;
 }
@@ -143,6 +149,9 @@ export function navigationPanelInit(
     console.log(`[navigation] label init: could not find element: ${labelId}`);
     return false;
   }
+  const openIcon = label.querySelector('.open-icon');
+  const closeIcon = label.querySelector('.close-icon');
+
   const toggle = document.querySelector<HTMLInputElement>(`#${toggleId}`);
   if (!toggle) {
     console.log(`[navigation] panel init: could not find element: ${toggleId}`);
@@ -150,8 +159,7 @@ export function navigationPanelInit(
   }
   toggle.checked = false;
   NAVIGATION_PANEL_TOGGLE_REGISTRY.push({
-    panel: { element, toggle, panelDirection, breakpoint },
-    label,
+    panel: { element, toggle, label, openIcon, closeIcon, panelDirection, breakpoint },
     autoClose,
   });
 
@@ -162,7 +170,7 @@ export function navigationPanelInit(
   element.classList.remove('navigation-panel-bottom');
 
   label.addEventListener('click', () => {
-    navigationPanelToggle({ element, toggle, panelDirection, breakpoint });
+    navigationPanelToggle({ element, toggle, label, openIcon, closeIcon, panelDirection, breakpoint });
   });
 
   if (autoClose) {
