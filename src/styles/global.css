@@ -30,9 +30,9 @@
   --kdd-color-bg-blog-dark: #444444;
   --kdd-color-bg-tag-dark: #0000ff;
 
-  --kdd-color-bg-project-light: #efefef;
-  --kdd-color-bg-blog-light: #efefef;
-  --kdd-color-bg-tag-light: #efefef;
+  --kdd-color-bg-project-light: #ccddee;
+  --kdd-color-bg-blog-light: #ededed;
+  --kdd-color-bg-tag-light: #eeeeee;
 
   --kdd-color-text: var(--kdd-color-text-dark);
   --kdd-color-heading: var(--kdd-color-heading-dark);
