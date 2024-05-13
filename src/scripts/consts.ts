@@ -27,3 +27,7 @@ export enum Theme {
 export const DEFAULT_THEME_STORAGE_KEY = 'kdd-theme';
 
 export const ANCHOR_TOP = '_top';
+
+export const TITLE_ICON_SIZE = '32';
+export const ITEM_ICON_SIZE = '26';
+export const TAG_ICON_SIZE = '18';

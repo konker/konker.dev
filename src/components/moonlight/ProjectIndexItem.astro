@@ -2,45 +2,56 @@
 import type { CollectionEntry } from 'astro:content';
 import { itemIconLookup } from '../../lib/collections/helpers';
 import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import { ITEM_ICON_SIZE } from '../../scripts/consts';
+import ArticleMetadata from '../site/ArticleMetadata.astro';
 
 interface Props {
-  readonly entry: CollectionEntry<MoonlightCollectionName>;
+  readonly item: CollectionEntry<MoonlightCollectionName>;
   readonly itemIconName?: string | undefined;
 }
 
-const { entry, itemIconName } = Astro.props;
+const { item, itemIconName } = Astro.props;
 const ItemIcon = itemIconLookup(itemIconName);
 ---
 
 <article
   class={[
     'blog-post',
+    'index-item',
     'mb-6',
     'pt-6',
     'pb-1',
-    'px-6',
+    'px-8',
     'min-h-32',
-    'bg-gray-200',
-    'rounded-t-lg',
-    'rounded-b-xl',
     'border-b-4',
     'border-gray-300',
     'dark:border-gray-500',
     itemIconName,
   ].join(' ')}
 >
-  <div class="wrapper">
-    <h2 class="mt-0 mb-5 font-sans text-lg bg-kdd-nav py-2 pl-1 pr-6 rounded-md">
-      <span class="separator float-left inline-block mb-[-0.40rem] px-1"><ItemIcon size="28" /></span>
-      <a href={entry.slug} class="block pl-[36px]">{entry.data.title}</a>
+  <div class="wrapper pb-2">
+    <h2 class="mt-0 mb-5 font-sans text-lg py-2 pl-1 pr-6 rounded-md bg-kdd-nav">
+      <span class="separator float-left inline-block mb-[-0.40rem] px-1"><ItemIcon size={ITEM_ICON_SIZE} /></span>
+      <a href={item.slug} class="block pl-[36px]">{item.data.title}</a>
     </h2>
-    <p class="abstract mb-8 font-serif">{entry.data.description}</p>
+    <p class="abstract mb-6 font-serif">{item.data.description}</p>
+    <ArticleMetadata tags={item.data.tags} />
   </div>
 </article>
 
 <style>
+  article.blog-post {
+    /* @apply 'bg-gray-200'; */
+    background-color: rgb(229 231 235);
+  }
+
+  article.blog-post.blog,
+  article.blog-post.til {
+    @apply bg-kdd-blog;
+  }
+
   article.blog-post.project,
   article.blog-post.projects {
-    background-color: var(--kdd-color-bg-project);
+    @apply bg-kdd-project;
   }
 </style>

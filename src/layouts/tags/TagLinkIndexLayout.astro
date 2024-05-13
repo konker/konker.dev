@@ -3,6 +3,7 @@ import TagIndexItem from '../../components/tags/TagIndexItem.astro';
 import { itemIconLookup } from '../../lib/collections/helpers';
 import type { TagLinkT } from '../../lib/collections/tags';
 import type { LinkT } from '../../lib/types';
+import { TITLE_ICON_SIZE } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
 
 interface Props {
@@ -22,7 +23,7 @@ const TitleIcon = itemIconLookup(titleIconName);
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
   <section id="content" class="content w-full mx-6 md:mx-auto mt-2 md:mt-6 mb-4">
     <h1>
-      <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
+      <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size={TITLE_ICON_SIZE} /></span>
       <span set:html={pageTitle} />
     </h1>
     <p class="mb-12" set:html={intro} />

@@ -1,0 +1,12 @@
+---
+interface Props {
+  readonly url: string | undefined;
+  readonly title: string;
+  readonly selected?: boolean;
+}
+
+const { url, title, selected } = Astro.props;
+const classNames = !!selected ? 'nav-link selected' : 'nav-link';
+---
+
+<a href={url} class={classNames}>{title}</a>

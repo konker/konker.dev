@@ -19,20 +19,20 @@
 
   --kdd-color-text-light: #222222;
   --kdd-color-heading-light: #000000;
-  --kdd-color-bg-light: #fcfcfc;
+  --kdd-color-bg-light: #eeeeee;
   --kdd-color-hr-light: #999999;
   --kdd-classic-link-light: #0000ee;
   --kdd-classic-link-visited-light: #551a8b;
   --kdd-classic-link-active-light: #222222;
-  --kdd-color-bg-nav-light: #eeeeee;
+  --kdd-color-bg-nav-light: #ffffff;
 
   --kdd-color-bg-project-dark: #233146;
-  --kdd-color-bg-blog-dark: #444444;
+  --kdd-color-bg-blog-dark: #333333;
   --kdd-color-bg-tag-dark: #0000ff;
 
-  --kdd-color-bg-project-light: #ccddee;
-  --kdd-color-bg-blog-light: #ededed;
-  --kdd-color-bg-tag-light: #eeeeee;
+  --kdd-color-bg-project-light: #dddddd;
+  --kdd-color-bg-blog-light: #dddddd;
+  --kdd-color-bg-tag-light: #dddddd;
 
   --kdd-color-text: var(--kdd-color-text-dark);
   --kdd-color-heading: var(--kdd-color-heading-dark);
@@ -151,13 +151,23 @@ nav ul ul {
   margin-left: 1rem;
 }
 nav ul li {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+nav a:hover {
+  text-decoration: none;
+}
+nav a.selected {
+  font-weight: bold;
+  text-decoration: none;
+}
+nav a.selected::before {
+  content: '> ';
 }
 
 /* ----------------------------------------------------------------------- */
 .main-navigation .nav-links a,
 .main-navigation .nav-links a:visited {
-  @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l text-kdd-link bg-kdd-nav;
+  @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l text-kdd-link bg-kdd md:bg-kdd-nav;
 }
 .main-navigation .nav-links a.nav-link:first-of-type {
   @apply border-t md:border-t-0;

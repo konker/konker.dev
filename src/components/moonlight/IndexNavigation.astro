@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import type { MoonlightCollectionName } from '../../lib/moonlight/config';
-import EntryLink from './EntryLink.astro';
+import NavigationLink from './NavigationLink.astro';
 
 interface Props {
   readonly indexEntries: Array<CollectionEntry<MoonlightCollectionName>>;
@@ -16,7 +16,7 @@ const { indexEntries } = Astro.props;
     {
       indexEntries.map((x) => (
         <p>
-          <EntryLink url={x.slug} title={x.data.title} />
+          <NavigationLink url={x.slug} title={x.data.title} />
         </p>
       ))
     }

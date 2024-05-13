@@ -1,6 +1,7 @@
 ---
 import { itemIconLookup } from '../../lib/collections/helpers';
 import type { LinkT } from '../../lib/types';
+import { TITLE_ICON_SIZE } from '../../scripts/consts';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -17,7 +18,7 @@ const TitleIcon = itemIconLookup(titleIconName);
   <div id="page-content-wrapper" class="w-full grow flex-1 h-full md:max-h-screen md:overflow-y-auto mt-8 mb-6">
     <section id="page-content" class="content pr-6 ml-6 md:ml-auto md:mr-auto">
       <h1>
-        <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size="36" /></span>
+        <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size={TITLE_ICON_SIZE} /></span>
         {pageTitle}
       </h1>
       <slot />

@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import type { MoonlightCollectionName } from '../../lib/moonlight/config';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationPanel from '../site/NavigationPanel.astro';
-import EntryLink from './EntryLink.astro';
+import NavigationLink from './NavigationLink.astro';
 
 interface Props {
   readonly projectRootEntry: CollectionEntry<MoonlightCollectionName>;
@@ -26,25 +26,16 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
 >
   <nav>
     <ul>
-      <li class={isProjectRoot ? 'selected' : ''}>
-        <EntryLink url={projectRootEntry.slug} title={projectRootEntry.data.title} />
+      <li>
+        <NavigationLink url={projectRootEntry.slug} title={projectRootEntry.data.title} selected={isProjectRoot} />
       </li>
       {
         projectEntries.map((x, i) => (
-          <li class={navLinksSelectedLookup[i] ? 'selected' : ''}>
-            <EntryLink url={x.slug} title={x.data.title} />
+          <li>
+            <NavigationLink url={x.slug} title={x.data.title} selected={navLinksSelectedLookup[i]} />
           </li>
         ))
       }
     </ul>
   </nav>
 </NavigationPanel>
-
-<style>
-  nav ul li {
-    margin-bottom: 0.5rem;
-  }
-  nav ul li.selected {
-    font-weight: bold;
-  }
-</style>

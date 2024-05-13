@@ -11,7 +11,7 @@ const last = breadcrumbs?.length ? breadcrumbs.length - 1 : 0;
 
 {
   breadcrumbs ? (
-    <nav class="breadcrumbs float-left hidden md:inline-block max-w-50 ml-14 mt-2 px-2 pb-1 bg-kdd-nav rounded-lg">
+    <nav class="breadcrumbs hidden max-w-screen-md overflow-hidden md:inline-block max-w-50 ml-14 mt-4 px-2 pb-1 bg-kdd-nav rounded-lg">
       {breadcrumbs.map((breadcrumb, idx: number) => (
         <span class="breadcrumb font-sans">
           {idx === 0 ? (

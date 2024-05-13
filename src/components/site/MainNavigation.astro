@@ -3,11 +3,11 @@ import { Menu, PanelTopClose } from 'lucide-astro';
 import { getUrlPathParts } from '../../lib';
 import type { LinkT } from '../../lib/types';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
+import NavigationLink from '../moonlight/NavigationLink.astro';
 import NavigationPanel from './NavigationPanel.astro';
 import NavigationToggle from './NavigationToggle.astro';
 import ThemeModeToggle from './ThemeModeToggle.astro';
 
-// How to use tailwind vars for width, colors, fonts?
 const navLinks: ReadonlyArray<LinkT> = [
   { url: '/', title: 'Home' },
   { url: '/projects/', title: 'Projects' },
@@ -39,28 +39,9 @@ const navLinksSelectedLookup = navLinks.map(
   <nav class="nav-links flex flex-col md:flex-row md:justify-end">
     {
       navLinks.map((link, idx) => (
-        <a href={link.url} class={navLinksSelectedLookup[idx] ? 'nav-link selected' : 'nav-link'}>
-          {link.title}
-        </a>
+        <NavigationLink url={link.url} title={link.title} selected={navLinksSelectedLookup[idx]} />
       ))
     }
     <ThemeModeToggle navId="theme-mode-toggle-main-nav" initLightMode={true} class="block md:hidden my-12 mx-auto" />
   </nav>
 </NavigationPanel>
-
-<style>
-  .main-navigation .nav-links a,
-  .main-navigation .nav-links a:visited {
-    @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l text-kdd-link bg-kdd-nav;
-  }
-  .main-navigation .nav-links a.nav-link:first-of-type {
-    @apply border-t md:border-t-0;
-  }
-  .main-navigation .nav-links a.nav-link:last-of-type {
-    @apply md:border-r;
-  }
-  .main-navigation .nav-links a.selected,
-  .main-navigation .nav-links a:hover {
-    @apply bg-konker-flash-blue-dark dark:bg-konker-flash-blue-dark text-white dark:text-white no-underline;
-  }
-</style>
