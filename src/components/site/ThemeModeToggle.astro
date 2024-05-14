@@ -8,12 +8,21 @@ interface Props {
 }
 
 const { navId, initLightMode, class: classNames } = Astro.props;
-const themeModeToggleClassNames = `theme-mode-toggle flex flex-row rounded-full p-1 bg-color-bg-light dark:bg-color-bg-dark border-color-text-light dark:border-color-text-dark rounded-full border ${classNames} ${initLightMode ? 'light' : 'dark'}`;
+const themeModeToggleClassNames = `theme-mode-toggle noscript flex flex-row rounded-full p-1 bg-color-bg-light dark:bg-color-bg-dark border-color-text-light dark:border-color-text-dark rounded-full border ${classNames} ${initLightMode ? 'light' : 'dark'}`;
 const darkId = `${navId}-dark`;
 const lightId = `${navId}-light`;
 ---
 
 <div id={navId} class={themeModeToggleClassNames} title="Theme Mode">
-  <MoonStar id={darkId} class="theme-mode-toggle-icon theme-mode-toggle-icon-dark" size="20" />
-  <Sun id={lightId} class="theme-mode-toggle-icon theme-mode-toggle-icon-light" size="20" />
+  <MoonStar id={darkId} class="theme-mode-toggle-icon theme-mode-toggle-icon-dark" size="18" />
+  <Sun id={lightId} class="theme-mode-toggle-icon theme-mode-toggle-icon-light" size="18" />
 </div>
+
+<style>
+  .theme-mode-toggle.noscript {
+    display: none;
+  }
+  .theme-mode-toggle:hover {
+    border-color: var(--kdd-konker-flash-red);
+  }
+</style>

@@ -12,7 +12,7 @@ const { tags } = Astro.props;
   <span class="separator inline-block float-left py-0 pr-2 pt-1 mb-6"><Tags size="24" class="" /></span>
   {
     tags.map((tag: string) => (
-      <span class="tag inline-block py-1 px-3 bg-kdd-nav mb-2 mr-2 rounded-lg font-sans">
+      <span class="tag inline-block pt-0 pb-1 px-3 bg-kdd-nav mb-2 mr-2 rounded-lg font-sans">
         <a href={`/tags/${tag}`} class="text-blue-800">
           #{tag}
         </a>

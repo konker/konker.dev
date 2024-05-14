@@ -12,8 +12,8 @@
   --kdd-color-heading-dark: #ffffff;
   --kdd-color-bg-dark: #222222;
   --kdd-color-hr-dark: #666666;
-  --kdd-classic-link-dark: #5fbcd3;
-  --kdd-classic-link-visited-dark: #3672c5;
+  --kdd-classic-link-dark: #2299ff;
+  --kdd-classic-link-visited-dark: #227799;
   --kdd-classic-link-active-dark: #efefef;
   --kdd-color-bg-nav-dark: #404040;
 
@@ -26,9 +26,9 @@
   --kdd-classic-link-active-light: #222222;
   --kdd-color-bg-nav-light: #ffffff;
 
-  --kdd-color-bg-project-dark: #233146;
+  --kdd-color-bg-project-dark: #333333;
   --kdd-color-bg-blog-dark: #333333;
-  --kdd-color-bg-tag-dark: #0000ff;
+  --kdd-color-bg-tag-dark: #333333;
 
   --kdd-color-bg-project-light: #dddddd;
   --kdd-color-bg-blog-light: #dddddd;
@@ -160,7 +160,7 @@ nav a.selected {
   font-weight: bold;
   text-decoration: none;
 }
-nav a.selected::before {
+#content-navigation nav a.selected::before {
   content: '> ';
 }
 
@@ -204,7 +204,7 @@ input.navigation-toggle:checked ~ label.navigation-toggle-overlay {
 }
 
 /* ----------------------------------------------------------------------- */
-.theme-mode-toggle .theme-mode-toggle-icon {
+.theme-mode-toggle {
   cursor: pointer;
 }
 :not([data-theme-mode='light']) .theme-mode-toggle-icon-light,

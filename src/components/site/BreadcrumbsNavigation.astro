@@ -11,19 +11,19 @@ const last = breadcrumbs?.length ? breadcrumbs.length - 1 : 0;
 
 {
   breadcrumbs ? (
-    <nav class="breadcrumbs hidden max-w-screen-md overflow-hidden md:inline-block max-w-50 ml-14 mt-4 px-2 pb-1 bg-kdd-nav rounded-lg">
+    <nav class="breadcrumbs w-fit hidden md:flex flex-row flex-nowrap justify-between ml-14 mt-4 px-2 pb-1 bg-kdd-nav rounded-lg">
       {breadcrumbs.map((breadcrumb, idx: number) => (
-        <span class="breadcrumb font-sans">
+        <span class="breadcrumb md:flex flex-row flex-nowrap font-sans">
           {idx === 0 ? (
-            <span class="separator inline-block pt-2 px-1 mb-[-0.35rem]">
-              <Home size="24" />
+            <span class="float-left separator inline-block mt-[0.70rem] px-1 mb-3">
+              <Home size="18" />
             </span>
           ) : undefined}
-          <a href={breadcrumb.url} class="inline-block py-1 pl-1 pr-2 visited:text-classic-link-light">
+          <a href={breadcrumb.url} class="inline-block pt-2 pb-2 pl-1 pr-2 visited:text-classic-link-light">
             <span class="title">{breadcrumb.title}</span>
           </a>
           {idx < last ? (
-            <span class="separator inline-block mb-[-0.55rem] py-1 px-1">
+            <span class="separator inline-block mt-2 py-1 px-1">
               <MoveRight size="18" />
             </span>
           ) : undefined}

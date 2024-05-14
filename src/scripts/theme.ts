@@ -76,7 +76,7 @@ export function themeInit(themeModeToggleNavIds: Array<string> = []): boolean {
   themeModeToggleNavIds.forEach((navId) => {
     const darkId = `${navId}-dark`;
     const lightId = `${navId}-light`;
-    const toggle = document.querySelector<HTMLInputElement>(`#${navId}`);
+    const toggle = document.querySelector<Element>(`#${navId}`);
     if (!toggle) {
       console.log(`[theme] toggle init: could not find element: ${navId}`);
       return;
@@ -87,11 +87,10 @@ export function themeInit(themeModeToggleNavIds: Array<string> = []): boolean {
       console.log(`[theme] toggle init: could not find element(s): ${darkId}/${lightId}`);
       return;
     }
-    dark.addEventListener('click', () => {
-      themeSet(Theme.DARK);
-    });
-    light.addEventListener('click', () => {
-      themeSet(Theme.LIGHT);
+    toggle.classList.remove('noscript');
+
+    toggle.addEventListener('click', () => {
+      themeToggle();
     });
 
     console.log(`[theme] toggle init: ${navId}`);

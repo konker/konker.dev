@@ -39,7 +39,7 @@ const navLinksSelectedLookup = navLinks.map(
   <nav class="nav-links flex flex-col md:flex-row md:justify-end">
     {
       navLinks.map((link, idx) => (
-        <NavigationLink url={link.url} title={link.title} selected={navLinksSelectedLookup[idx]} />
+        <NavigationLink url={link.url} title={link.title} selected={!!navLinksSelectedLookup[idx]} />
       ))
     }
     <ThemeModeToggle navId="theme-mode-toggle-main-nav" initLightMode={true} class="block md:hidden my-12 mx-auto" />

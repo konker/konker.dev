@@ -1,7 +1,6 @@
 ---
 import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
-import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
-import { BLOG_COLLECTIONS, TagCollection } from '../../lib/collections';
+import { isBlogCollection, type TagCollection } from '../../lib/collections';
 import { itemIconLookup } from '../../lib/collections/helpers';
 import type { TagEntry } from '../../lib/collections/tags';
 import type { LinkT } from '../../lib/types';
@@ -31,14 +30,18 @@ const TitleIcon = itemIconLookup(titleIconName);
     <nav class="my-6 md:my-16 not-prose">
       {
         tagEntries.map((tagEntry) =>
-          BLOG_COLLECTIONS.includes(tagEntry.collection) ? (
+          isBlogCollection(tagEntry.collection) ? (
             <BlogPostIndexItem
               collection={tagEntry.collection}
               item={tagEntry.entry}
               itemIconName={tagEntry.collection}
             />
           ) : (
-            <ProjectIndexItem item={tagEntry.entry} itemIconName={tagEntry.collection} />
+            <BlogPostIndexItem
+              collection={tagEntry.collection}
+              item={tagEntry.entry}
+              itemIconName={tagEntry.collection}
+            />
           )
         )
       }

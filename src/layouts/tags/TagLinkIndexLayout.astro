@@ -27,7 +27,7 @@ const TitleIcon = itemIconLookup(titleIconName);
       <span set:html={pageTitle} />
     </h1>
     <p class="mb-12" set:html={intro} />
-    <nav class="links my-6 md:my-16 not-prose">
+    <nav class="links max-w-screen-sm my-6 md:my-16 not-prose">
       {links.map((link) => <TagIndexItem tag={link} total={total} itemIconName={itemIconName} />)}
     </nav>
   </section>

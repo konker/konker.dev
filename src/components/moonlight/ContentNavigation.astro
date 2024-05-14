@@ -22,7 +22,7 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
   navId="content-navigation"
   breakpoint={NavigationPanelBreakpoint.MD}
   panelDir={NavigationPanelDirection.LEFT}
-  class="min-h-screen h-full overflow-hidden pt-6 md:pt-0 pl-8 pr-6 py-3 md:w-1/5 bg-color-bg-light dark:bg-color-bg-dark"
+  class="h-full md:w-1/5 overflow-hidden pt-6 md:pt-0 pb-3 pl-8 pr-6 bg-color-bg-light dark:bg-color-bg-dark"
 >
   <nav>
     <ul>
@@ -32,7 +32,7 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
       {
         projectEntries.map((x, i) => (
           <li>
-            <NavigationLink url={x.slug} title={x.data.title} selected={navLinksSelectedLookup[i]} />
+            <NavigationLink url={x.slug} title={x.data.title} selected={!!navLinksSelectedLookup[i]} />
           </li>
         ))
       }
