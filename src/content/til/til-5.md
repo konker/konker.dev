@@ -1,5 +1,6 @@
 ---
 title: SWC to speed up typescript
+slug: swc-to-speed-up-typescript
 author: Konrad Markus
 description: 'SWC is a great project which re-implements `tsc` the Typescript transpiler in Rust. Using this can significantly speed up typescript builds.'
 pubDate: 2022-08-08
@@ -15,4 +16,8 @@ https://swc.rs/
 
 ## Example usage
 
+### npx
+TODO
+
+### jest
 TODO

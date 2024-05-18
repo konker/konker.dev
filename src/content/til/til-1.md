@@ -1,13 +1,11 @@
 ---
 title: Notes on registering a domain with AWS Route53
+slug: notes-on-registering-a-domain-with-aws-route53
 pubDate: 2024-04-08
 description: Some notes related to registering a cheap
   domain via AWS. At the time of writing, `.click` domains are
   the cheapest, both to initially register, and also to renew.
 author: 'Konrad Markus'
-image:
-  url: 'https://docs.astro.build/assets/full-logo-dark.png'
-  alt: 'The full Astro logo.'
 tags: ['til', 'aws', 'www']
 ---
 

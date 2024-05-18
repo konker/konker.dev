@@ -7,6 +7,7 @@ import SecondaryNavigation from './SecondaryNavigation.astro';
 import SiteLogo from './SiteLogo.astro';
 import SocialBar from './SocialBar.astro';
 import ThemeModeToggle from './ThemeModeToggle.astro';
+import logoImage from '../../images/konker-flash-1-dark-mode.png';
 
 interface Props {
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
@@ -16,7 +17,7 @@ const { breadcrumbs } = Astro.props;
 ---
 
 <header class="mb-3 md:mb-12 pb-4 md:pb-0 pl-0 w-full bg-kdd">
-  <SiteLogo siteTitle={SITE_TITLE} logoImagePath="/konker-flash-1-dark-mode.png">
+  <SiteLogo siteTitle={SITE_TITLE} logoImage={logoImage}>
     <SocialBar class="hidden md:block md:absolute top-0 right-2">
       <ThemeModeToggle navId="theme-mode-toggle-header" initLightMode={true} />
     </SocialBar>

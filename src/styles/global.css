@@ -11,7 +11,7 @@
   --kdd-color-text-dark: #efefef;
   --kdd-color-heading-dark: #ffffff;
   --kdd-color-bg-dark: #222222;
-  --kdd-color-hr-dark: #666666;
+  --kdd-color-hr-dark: #444444;
   --kdd-classic-link-dark: #2299ff;
   --kdd-classic-link-visited-dark: #227799;
   --kdd-classic-link-active-dark: #efefef;
@@ -20,7 +20,7 @@
   --kdd-color-text-light: #222222;
   --kdd-color-heading-light: #000000;
   --kdd-color-bg-light: #eeeeee;
-  --kdd-color-hr-light: #999999;
+  --kdd-color-hr-light: #d0d0d0;
   --kdd-classic-link-light: #0000ee;
   --kdd-classic-link-visited-light: #551a8b;
   --kdd-classic-link-active-light: #222222;
@@ -219,12 +219,17 @@ input.navigation-toggle:checked ~ label.navigation-toggle-overlay {
 
 /* ----------------------------------------------------------------------- */
 .content {
-  @apply prose prose-sm prose-neutral dark:prose-invert md:prose-sm max-w-screen-md;
+  @apply prose prose-sm prose-neutral prose-headings:font-headings dark:prose-invert md:prose max-w-screen-md;
 }
 
 .content hr {
   margin-left: auto;
   margin-right: auto;
   max-width: 60px;
-  border-top: 10px dotted var(--kdd-color-hr);
+  height: 12px;
+  background: radial-gradient(circle closest-side, var(--kdd-color-hr) 100%, #0000) 0/calc(100%/3) 100%;
+}
+
+.content code {
+  font-size: 0.85rem;
 }

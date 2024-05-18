@@ -1,15 +1,17 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
-  readonly logoImagePath: string;
+  readonly logoImage: ReturnType<typeof Image>;
   readonly siteTitle: string;
 }
 
-const { logoImagePath, siteTitle } = Astro.props;
+const { logoImage, siteTitle } = Astro.props;
 ---
 
 <div id="logo" class="relative font-serif m-6 mb-0">
   <a href="/" class="block">
-    <img src={logoImagePath} alt="" class="absolute h-20 top-0 left-0" />
+    <Image src={logoImage} alt="" quality="max" class="absolute w-[2.64rem] h-[5rem] top-0 left-0" />
     <span class="title block text-3xl my-0 ml-14 pt-0 pb-4 border-b border-gray-400 dark:border-gray-500"
       >{siteTitle}</span
     >

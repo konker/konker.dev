@@ -7,12 +7,15 @@ export default defineConfig({
   integrations: [tailwind({})],
   outDir: 'www',
   server: { port: 4321, host: true },
+  image: {
+    domains: [],
+  },
   markdown: {
     remarkPlugins: [
       /*remarkSectionize*/
     ],
     shikiConfig: {
-      theme: 'github-dark-dimmed',
+      theme: 'github-dark-default',
       wrap: true,
     },
   },

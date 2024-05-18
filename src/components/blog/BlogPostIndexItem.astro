@@ -20,7 +20,7 @@ const ItemIcon = itemIconLookup(itemIconName);
     'blog-post',
     'index-item',
     'mb-6',
-    'pt-6',
+    'pt-8',
     'pb-1',
     'px-8',
     'min-h-32',
@@ -31,11 +31,15 @@ const ItemIcon = itemIconLookup(itemIconName);
   ].join(' ')}
 >
   <div class="wrapper pb-2">
-    <h2 class="mt-0 mb-5 py-2 pl-1 pr-6 font-sans text-lg rounded-md bg-kdd-nav">
-      <span class="separator float-left inline-block mt-1 md:mt-0 md:mb-[-0.30rem] px-1"><ItemIcon size={ITEM_ICON_SIZE} /></span>
+    <h2 class="mb-5 font-headings font-bold text-xl">
+      <span class="separator float-left inline-block mt-1 md:mt-0 md:mb-[-0.30rem]"><ItemIcon size={ITEM_ICON_SIZE} /></span>
       <a href=`/${collection}/${item.slug}` class="block pl-[36px]">{item.data.title}</a>
     </h2>
-    <p class="abstract mb-6 font-serif">{item.data.description}</p>
+    <p class="abstract mb-6 font-serif">
+      {item.data.description}
+      <br>
+      <span class="block text-right"><a href=`/${collection}/${item.slug}` class="inline-block mt-3 mr-3 px-2 font-sans rounded-md bg-kdd-nav">Read more...</a></span>
+    </p>
     <ArticleMetadata tags={item.data.tags} />
   </div>
 </article>
@@ -44,6 +48,10 @@ const ItemIcon = itemIconLookup(itemIconName);
   article.blog-post {
     /* @apply 'bg-gray-200'; */
     background-color: rgb(229 231 235);
+  }
+  article.blog-post h2 a {
+    text-decoration: none;
+    color: var(--kdd-color-heading);
   }
 
   article.blog-post.blog,

@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import ArticleMetadata from '../../components/site/ArticleMetadata.astro';
 import PrevNextNavigation from '../../components/site/PrevNextNavigation.astro';
 import type { LinkT, SectionNavigationT } from '../../lib/types';
@@ -11,11 +12,12 @@ interface Props {
   readonly author: string;
   readonly description: string;
   readonly tags: Array<string>;
+  readonly image?: ReturnType<typeof Image>;
   readonly breadcrumbs?: ReadonlyArray<LinkT>;
   readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 
-const { pageTitle, title, description, breadcrumbs, sectionNavigation } = Astro.props;
+const { pageTitle, title, description, image, breadcrumbs, sectionNavigation } = Astro.props;
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
@@ -23,6 +25,13 @@ const { pageTitle, title, description, breadcrumbs, sectionNavigation } = Astro.
     <article>
       <h1 set:html={title} />
       <ArticleMetadata {...Astro.props} />
+      {
+        image ? (
+          <div class="text-center">
+            <Image src={image.src} alt={image.alt} />
+          </div>
+        ) : undefined
+      }
       <hr />
       <p class="attention-grabber">{description}</p>
       <slot />
@@ -40,6 +49,7 @@ const { pageTitle, title, description, breadcrumbs, sectionNavigation } = Astro.
 
 <style>
   .attention-grabber {
+    @apply font-sans;
     font-size: 125%;
   }
 </style>

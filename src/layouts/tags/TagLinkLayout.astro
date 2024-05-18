@@ -1,11 +1,13 @@
 ---
 import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
-import { isBlogCollection, type TagCollection } from '../../lib/collections';
+import { isBlogCollection, isBlogEntry, isTagCollection, type TagCollection } from '../../lib/collections';
 import { itemIconLookup } from '../../lib/collections/helpers';
 import type { TagEntry } from '../../lib/collections/tags';
 import type { LinkT } from '../../lib/types';
 import { TITLE_ICON_SIZE } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
+import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
+import { isProjectEntry } from '../../lib/moonlight/config';
 
 interface Props {
   readonly pageTitle: string;
@@ -30,19 +32,18 @@ const TitleIcon = itemIconLookup(titleIconName);
     <nav class="my-6 md:my-16 not-prose">
       {
         tagEntries.map((tagEntry) =>
-          isBlogCollection(tagEntry.collection) ? (
+          isBlogEntry(tagEntry.entry) ? (
             <BlogPostIndexItem
               collection={tagEntry.collection}
               item={tagEntry.entry}
               itemIconName={tagEntry.collection}
             />
-          ) : (
-            <BlogPostIndexItem
-              collection={tagEntry.collection}
+          ) : isProjectEntry(tagEntry.entry) ? (
+            <ProjectIndexItem
               item={tagEntry.entry}
               itemIconName={tagEntry.collection}
             />
-          )
+          ) : <p>UNKNOWN ENTRY</p>
         )
       }
     </nav>

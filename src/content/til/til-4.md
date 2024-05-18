@@ -1,5 +1,6 @@
 ---
 title: Madge circular dependency detection for node.js
+slug: madge-circular-dependency-detection-for-nodejs
 author: Konrad Markus
 description: 'Madge is a tool which detects circular dependencies in your javascript imports.'
 pubDate: 2022-08-08

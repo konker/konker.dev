@@ -17,6 +17,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+const { image } = entry.data;
 const { Content } = await entry.render();
 const collection = 'til' as const;
 const indexBreadcrumb: LinkT = { title: 'TIL', url: `/${collection}/` };
@@ -35,6 +36,7 @@ const sectionNavigation = collectionEntryToSectionNavigation(collection, indexBr
 
 <BlogPostLayout
   {...entry.data}
+  image={image}
   pageTitle={entry.data.title}
   breadcrumbs={breadcrumbs}
   sectionNavigation={sectionNavigation}
