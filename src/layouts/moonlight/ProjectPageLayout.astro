@@ -12,6 +12,7 @@ import { NavigationPanelBreakpoint } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
 
 interface Props {
+  readonly pageTitle: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly headings: Array<MarkdownHeading>;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
@@ -21,10 +22,11 @@ interface Props {
   readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
 }
 
-const { breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, projectEntries } = Astro.props;
+const { pageTitle, breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, projectEntries } =
+  Astro.props;
 ---
 
-<BaseLayout pageTitle="FIXME" breadcrumbs={breadcrumbs} fixedHeader={true}>
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} fixedHeader={true}>
   <Fragment slot="secondary-navigation">
     <NavigationToggle
       navId="content-navigation"

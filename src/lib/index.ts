@@ -21,3 +21,7 @@ export function toReadableDate(date: Date | undefined): string {
 export function getUrlPathParts(url: URL): Array<string> {
   return url.pathname.split('/').filter((part) => part.length > 0);
 }
+
+export function isHomePage(url: URL | undefined): boolean {
+  return url?.pathname === '/';
+}

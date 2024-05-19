@@ -42,13 +42,21 @@ const breadcrumbs: ReadonlyArray<LinkT> =
             ]
           : []
       );
+
+const pageTitle =
+  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX
+    ? 'Projects'
+    : breadcrumbs
+        .slice(2)
+        .map((b) => b.title)
+        .join(' / ');
 ---
 
 {
   Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX ? (
     <ProjectIndexLayout
-      pageTitle="Projects"
-      intro="INDEX INTRO FIXME"
+      pageTitle={pageTitle}
+      intro="Some code and other bits and pieces that I have been working on."
       indexEntries={Astro.props.indexEntries}
       breadcrumbs={breadcrumbs}
       titleIconName="project"
@@ -56,6 +64,7 @@ const breadcrumbs: ReadonlyArray<LinkT> =
     />
   ) : (
     <ProjectPageLayout
+      pageTitle={pageTitle}
       breadcrumbs={breadcrumbs}
       projectEntries={Astro.props.projectEntries}
       projectRootEntry={Astro.props.projectRootEntry}

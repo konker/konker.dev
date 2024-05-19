@@ -7,6 +7,8 @@ import Footer from '../../components/site/Footer.astro';
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/merriweather';
 import '@fontsource-variable/work-sans';
+import { SITE_TITLE } from '../../scripts/consts';
+import { isHomePage } from '../../lib';
 
 interface Props {
   readonly pageTitle: string;
@@ -16,6 +18,7 @@ interface Props {
 
 const { pageTitle, breadcrumbs, fixedHeader } = Astro.props;
 const mainClassNames = 'w-full flex-1 flex flex-col' + (!!fixedHeader ? ' overflow-y-auto md:overflow-visible' : '');
+const title = SITE_TITLE + (isHomePage(Astro.url) ? '' : ` / ${pageTitle}`);
 ---
 
 <!doctype html>
@@ -23,11 +26,11 @@ const mainClassNames = 'w-full flex-1 flex flex-col' + (!!fixedHeader ? ' overfl
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{pageTitle}</title>
+    <title>{title}</title>
   </head>
   <body class="h-full text-base bg-kdd text-kdd font-serif">
     {
-      import.meta.env.DEV && false ? (
+      import.meta.env.DEV ? (
         <div id="debug" class="absolute top-0 left-1/2">
           <span class="hidden sm:inline-block">sm</span>
           <span class="hidden md:inline-block">md</span>
