@@ -25,9 +25,11 @@ $ realpath src/content/til/til-2.md
 ```
 
 ## Additional
+
 Also handy can be this snippet to put into scripts to establish the absolute path of the script itself. From there every other path reference can be made relative to this fixed point.
 
 ### Example Usage
+
 ```bash
 #!/usr/bin/env bash
 

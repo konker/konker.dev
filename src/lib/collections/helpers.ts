@@ -1,5 +1,5 @@
 import type { CollectionEntry, ContentCollectionKey } from 'astro:content';
-import { Box, FileText, Lightbulb, Tag, Tags } from 'lucide-astro';
+import { Box, Fingerprint, Home, Lightbulb, Tag, Tags } from 'lucide-astro';
 
 import type { LinkT, SectionNavigationT } from '../types.ts';
 
@@ -47,6 +47,8 @@ export function collectionEntryToSectionNavigation<T extends ContentCollectionKe
 
 export function itemIconLookup(itemIconName: string | undefined) {
   switch (itemIconName) {
+    case 'home':
+      return Home;
     case 'blog':
     case 'til':
       return Lightbulb;
@@ -57,7 +59,29 @@ export function itemIconLookup(itemIconName: string | undefined) {
       return Tag;
     case 'tags':
       return Tags;
+    case 'about':
+      return Fingerprint;
     default:
-      return FileText;
+      return undefined;
+  }
+}
+
+export function itemTextClassLookup(itemIconName: string | undefined, selected = false) {
+  if (selected) {
+    return 'text-white';
+  }
+
+  switch (itemIconName) {
+    case 'blog':
+    case 'til':
+      return 'text-kdd-blog';
+    case 'project':
+    case 'projects':
+      return 'text-kdd-project';
+    case 'tag':
+    case 'tags':
+      return 'text-kdd-tag';
+    default:
+      return 'text-kdd';
   }
 }

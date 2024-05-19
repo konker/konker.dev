@@ -1,11 +1,11 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 
 import { notDraftFilterPredicate } from '../collections/helpers.ts';
-import type { MoonlightCollectionName } from './config.ts';
+import type { MoonlightCollection } from './config.ts';
 import { countSlugPathParts, extractProject } from './utils.ts';
 
 // --------------------------------------------------------------------------
-export type MoonlightEntry<T extends CollectionEntry<MoonlightCollectionName>> = {
+export type MoonlightEntry<T extends CollectionEntry<MoonlightCollection>> = {
   readonly collectionRootPagesPath: string;
   readonly project: string;
   readonly entry: T;
@@ -13,7 +13,7 @@ export type MoonlightEntry<T extends CollectionEntry<MoonlightCollectionName>> =
 
 export const toMoonlightEntry =
   (collectionRootPagesPath: string) =>
-  <T extends CollectionEntry<MoonlightCollectionName>>(entry: T): MoonlightEntry<T> => ({
+  <T extends CollectionEntry<MoonlightCollection>>(entry: T): MoonlightEntry<T> => ({
     collectionRootPagesPath,
     project: extractProject(entry.slug),
     entry: {
@@ -23,14 +23,14 @@ export const toMoonlightEntry =
   });
 
 // --------------------------------------------------------------------------
-export function indexEntriesFilterPredicate<T extends CollectionEntry<MoonlightCollectionName>>(
+export function indexEntriesFilterPredicate<T extends CollectionEntry<MoonlightCollection>>(
   moonlightEntry: MoonlightEntry<T>
 ): boolean {
   return notDraftFilterPredicate(moonlightEntry.entry) && countSlugPathParts(moonlightEntry.entry.slug) === 2;
 }
 
 // --------------------------------------------------------------------------
-export async function moonlightGetAllEntries(collectionName: MoonlightCollectionName, collectionRootPagesPath: string) {
+export async function moonlightGetAllEntries(collectionName: MoonlightCollection, collectionRootPagesPath: string) {
   const allEntries = await getCollection(collectionName);
 
   const moonlightEntries = allEntries.filter(notDraftFilterPredicate).map(toMoonlightEntry(collectionRootPagesPath));
@@ -47,20 +47,20 @@ export async function moonlightGetAllEntries(collectionName: MoonlightCollection
   });
 }
 
-export function moonlightGetIndexEntries<T extends CollectionEntry<MoonlightCollectionName>>(
+export function moonlightGetIndexEntries<T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>
 ): Array<T> {
   return allEntries.filter(indexEntriesFilterPredicate).map((x) => x.entry);
 }
 
-export function moonlightGetProjectAndRootEntries<T extends CollectionEntry<MoonlightCollectionName>>(
+export function moonlightGetProjectAndRootEntries<T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>,
   project: string
 ) {
   return allEntries.filter((x) => x.project === project);
 }
 
-export function moonlightGetProjectEntries<T extends CollectionEntry<MoonlightCollectionName>>(
+export function moonlightGetProjectEntries<T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>,
   project: string
 ) {
@@ -69,7 +69,7 @@ export function moonlightGetProjectEntries<T extends CollectionEntry<MoonlightCo
     .map((x) => x.entry);
 }
 
-export function moonlightGetProjectRootEntry<T extends CollectionEntry<MoonlightCollectionName>>(
+export function moonlightGetProjectRootEntry<T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>,
   project: string
 ) {
@@ -77,7 +77,7 @@ export function moonlightGetProjectRootEntry<T extends CollectionEntry<Moonlight
   return projectRoot?.entry;
 }
 
-export function moonlightGetPrevEntry<T extends CollectionEntry<MoonlightCollectionName>>(
+export function moonlightGetPrevEntry<T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>,
   moonlightEntry: MoonlightEntry<T>
 ) {
@@ -86,7 +86,7 @@ export function moonlightGetPrevEntry<T extends CollectionEntry<MoonlightCollect
   return projectEntryIndex > 0 ? projectEntries[projectEntryIndex - 1] : undefined;
 }
 
-export function moonlightGetNextEntry<T extends CollectionEntry<MoonlightCollectionName>>(
+export function moonlightGetNextEntry<T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>,
   moonlightEntry: MoonlightEntry<T>
 ) {

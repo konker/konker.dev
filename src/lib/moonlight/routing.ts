@@ -1,6 +1,6 @@
 import { type CollectionEntry } from 'astro:content';
 
-import type { MoonlightCollectionName, MoonlightConfig } from './config.ts';
+import type { MoonlightCollection, MoonlightConfig } from './config.ts';
 import {
   type MoonlightEntry,
   moonlightGetAllEntries,
@@ -13,7 +13,7 @@ import {
 import { MOONLIGHT_PAGE_TYPE_ENTRY, MOONLIGHT_PAGE_TYPE_INDEX } from './index.ts';
 import { RecordKeysOf } from './utils.ts';
 
-export const formatRootIndexStaticPath = <T extends CollectionEntry<MoonlightCollectionName>>(
+export const formatRootIndexStaticPath = <T extends CollectionEntry<MoonlightCollection>>(
   allEntries: Array<MoonlightEntry<T>>,
   collectionRootPagesPath: string
 ) => ({
@@ -26,7 +26,7 @@ export const formatRootIndexStaticPath = <T extends CollectionEntry<MoonlightCol
 });
 
 export const formatEntryStaticPath =
-  <T extends CollectionEntry<MoonlightCollectionName>>(allEntries: Array<MoonlightEntry<T>>) =>
+  <T extends CollectionEntry<MoonlightCollection>>(allEntries: Array<MoonlightEntry<T>>) =>
   async (moonlightEntry: MoonlightEntry<T>) => {
     const { Content, headings } = await moonlightEntry.entry.render();
     const prevEntry = moonlightGetPrevEntry(allEntries, moonlightEntry);

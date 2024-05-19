@@ -1,13 +1,14 @@
 ---
 import PageLayout from '../layouts/site/PageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
+import { itemIconLookup } from '../lib/collections/helpers';
 import type { LinkT } from '../lib/types';
 
 // --------------------------------------------------------------------------
 const pageTitle = 'About';
 
 // --------------------------------------------------------------------------
-const thisBreadcrumb: LinkT = { title: pageTitle, url: `/about/` };
+const thisBreadcrumb: LinkT = { title: pageTitle, url: `/about/`, Icon: itemIconLookup('about') };
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 ---
 

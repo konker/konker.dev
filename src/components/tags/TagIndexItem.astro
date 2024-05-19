@@ -1,8 +1,7 @@
 ---
-import { itemIconLookup } from '../../lib/collections/helpers';
+import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import type { TagLinkT } from '../../lib/collections/tags';
-import { TAG_ICON_SIZE } from '../../scripts/consts';
-import NavigationLink from '../moonlight/NavigationLink.astro';
+import NavigationLink from '../site/NavigationLink.astro';
 
 interface Props {
   readonly tag: TagLinkT;
@@ -12,13 +11,11 @@ interface Props {
 
 const { tag, itemIconName } = Astro.props;
 const ItemIcon = itemIconLookup(itemIconName);
+const textClass = itemTextClassLookup(itemIconName);
 // const factor = Math.round((1 + tag.count / total) * 100 * 1.2);
 // const linkClassName = `text-[${factor}%]`;
 ---
 
 <div class={`inline-block mt-0 mb-3 mr-3 font-sans bg-kdd-nav px-3 pt-1 pb-2 pr-4 rounded-xl`}>
-  <span class="separator inline-block mt-1 mb-[-0.30rem] pr-0">
-    <ItemIcon size={TAG_ICON_SIZE} />
-  </span>
-  <NavigationLink url={tag.link.url} title={tag.link.title} />
+  <NavigationLink url={tag.link.url} title={tag.link.title} Icon={ItemIcon} textClass={textClass} />
 </div>

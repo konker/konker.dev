@@ -91,6 +91,9 @@ export default {
         'kdd-hr': 'var(--kdd-color-hr)',
         'kdd-heading': 'var(--kdd-color-heading)',
         'kdd-link': 'var(--kdd-color-link)',
+        'kdd-blog': 'var(--kdd-color-text-blog)',
+        'kdd-project': 'var(--kdd-color-text-project)',
+        'kdd-tag': 'var(--kdd-color-text-tag)',
       }),
       backgroundColor: ({ theme }) => ({
         dark: theme('colors.color-bg-dark'),

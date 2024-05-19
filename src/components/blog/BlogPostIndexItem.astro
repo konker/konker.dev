@@ -4,6 +4,7 @@ import type { BlogCollection, TagCollection } from '../../lib/collections';
 import { itemIconLookup } from '../../lib/collections/helpers';
 import { ITEM_ICON_SIZE } from '../../scripts/consts';
 import ArticleMetadata from '../site/ArticleMetadata.astro';
+import ReadMoreLink from '../site/ReadMoreLink.astro';
 
 interface Props {
   readonly collection: BlogCollection | TagCollection;
@@ -32,14 +33,19 @@ const ItemIcon = itemIconLookup(itemIconName);
 >
   <div class="wrapper pb-2">
     <h2 class="mb-5 font-headings font-bold text-xl">
-      <span class="separator float-left inline-block mt-1 md:mt-0 md:mb-[-0.30rem]"><ItemIcon size={ITEM_ICON_SIZE} /></span>
-      <a href=`/${collection}/${item.slug}` class="block pl-[36px]">{item.data.title}</a>
+      {
+        ItemIcon ? (
+          <span class="separator float-left inline-block mt-1 md:mt-0">
+            <ItemIcon size={ITEM_ICON_SIZE} />
+          </span>
+        ) : undefined
+      }
+      <a href=`/${collection}/${item.slug}` class="block pl-[36px] pt-1 md:pt-0">{item.data.title}</a>
     </h2>
-    <p class="abstract mb-6 font-serif">
+    <p class="abstract mb-3 font-serif">
       {item.data.description}
-      <br>
-      <span class="block text-right"><a href=`/${collection}/${item.slug}` class="inline-block mt-3 mr-3 px-2 font-sans rounded-md bg-kdd-nav">Read more...</a></span>
     </p>
+    <ReadMoreLink item={item} />
     <ArticleMetadata tags={item.data.tags} />
   </div>
 </article>
@@ -58,9 +64,17 @@ const ItemIcon = itemIconLookup(itemIconName);
   article.blog-post.til {
     @apply bg-kdd-blog;
   }
+  article.blog-post.blog .separator,
+  article.blog-post.til .separator {
+    @apply text-kdd-blog;
+  }
 
   article.blog-post.project,
   article.blog-post.projects {
     @apply bg-kdd-project;
+  }
+  article.blog-post.project .separator,
+  article.blog-post.projects .separator {
+    @apply text-kdd-project;
   }
 </style>

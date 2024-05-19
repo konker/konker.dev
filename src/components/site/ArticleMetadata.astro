@@ -1,6 +1,7 @@
 ---
 import { Calendar, User } from 'lucide-astro';
 import { toDisplayDate, toReadableDate } from '../../lib';
+import { META_ICON_SIZE } from '../../scripts/consts';
 import TagBar from '../tags/TagBar.astro';
 
 interface Props {
@@ -20,7 +21,7 @@ const readablePubDate = toReadableDate(pubDate);
       pubDate ? (
         <span class="pubDate flex min-w-fit font-sans mr-8 mt-1 mb-2 md:mb-0" title={readablePubDate}>
           <span class="separator inline-block px-0 mr-2">
-            <Calendar size="24" />
+            <Calendar size={META_ICON_SIZE} />
           </span>
           {displayPubDate}
         </span>
@@ -30,7 +31,7 @@ const readablePubDate = toReadableDate(pubDate);
       author ? (
         <span class="author flex min-w-fit font-sans mr-8 mt-1 mb-2 md:mb-0">
           <span class="separator inline-block px-0 mr-2">
-            <User size="24" />
+            <User size={META_ICON_SIZE} />
           </span>
           <a href="/about">{author}</a>
         </span>

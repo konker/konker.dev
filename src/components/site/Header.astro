@@ -1,4 +1,5 @@
 ---
+import logoImage from '../../images/konker-flash-1-dark-mode.png';
 import type { LinkT, SectionNavigationT } from '../../lib/types';
 import { SITE_TITLE } from '../../scripts/consts';
 import BreadcrumbsNavigation from './BreadcrumbsNavigation.astro';
@@ -7,7 +8,6 @@ import SecondaryNavigation from './SecondaryNavigation.astro';
 import SiteLogo from './SiteLogo.astro';
 import SocialBar from './SocialBar.astro';
 import ThemeModeToggle from './ThemeModeToggle.astro';
-import logoImage from '../../images/konker-flash-1-dark-mode.png';
 
 interface Props {
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;

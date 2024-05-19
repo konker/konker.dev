@@ -1,5 +1,5 @@
 ---
-import { itemIconLookup } from '../../lib/collections/helpers';
+import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import type { LinkT } from '../../lib/types';
 import { TITLE_ICON_SIZE } from '../../scripts/consts';
 import BaseLayout from './BaseLayout.astro';
@@ -7,21 +7,25 @@ import BaseLayout from './BaseLayout.astro';
 interface Props {
   readonly pageTitle: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
-  readonly titleIconName?: string;
+  readonly titleIconName?: string | undefined;
 }
 
 const { pageTitle, breadcrumbs, titleIconName } = Astro.props;
 const TitleIcon = itemIconLookup(titleIconName);
+const textClass = itemTextClassLookup(titleIconName);
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <div id="page-content-wrapper" class="w-full grow flex-1 h-full md:max-h-screen md:overflow-y-auto mt-8 mb-6">
-    <section id="page-content" class="content pr-6 ml-6 md:ml-auto md:mr-auto">
-      <h1>
-        <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size={TITLE_ICON_SIZE} /></span>
-        {pageTitle}
-      </h1>
-      <slot />
-    </section>
-  </div>
+  <section id="page-content" class="content w-full mb-12 pr-6 ml-6 md:ml-auto md:mr-auto">
+    <h1 set:html={pageTitle}>
+      {
+        TitleIcon ? (
+          <span class={`separator inline-block mb-[-0.40rem] pr-0 ${textClass}`}>
+            <TitleIcon size={TITLE_ICON_SIZE} />
+          </span>
+        ) : undefined
+      }
+    </h1>
+    <slot />
+  </section>
 </BaseLayout>

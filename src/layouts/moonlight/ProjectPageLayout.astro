@@ -6,7 +6,7 @@ import ContentNavigation from '../../components/moonlight/ContentNavigation.astr
 import IntraPageNavigation from '../../components/moonlight/IntraPageNavigation.astro';
 import PageContent from '../../components/moonlight/PageContent.astro';
 import NavigationToggle from '../../components/site/NavigationToggle.astro';
-import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import type { MoonlightCollection } from '../../lib/moonlight/config';
 import type { LinkT } from '../../lib/types';
 import { NavigationPanelBreakpoint } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
@@ -15,10 +15,10 @@ interface Props {
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly headings: Array<MarkdownHeading>;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
-  readonly prevEntry: CollectionEntry<MoonlightCollectionName> | undefined;
-  readonly nextEntry: CollectionEntry<MoonlightCollectionName> | undefined;
-  readonly projectRootEntry: CollectionEntry<MoonlightCollectionName>;
-  readonly projectEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+  readonly prevEntry: CollectionEntry<MoonlightCollection> | undefined;
+  readonly nextEntry: CollectionEntry<MoonlightCollection> | undefined;
+  readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
+  readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
 }
 
 const { breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, projectEntries } = Astro.props;
@@ -47,4 +47,10 @@ const { breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, 
   <ContentNavigation projectEntries={projectEntries} projectRootEntry={projectRootEntry} />
   <PageContent Content={Content} prevEntry={prevEntry} nextEntry={nextEntry} />
   <IntraPageNavigation headings={headings} />
+  <script is:inline>
+    // --------------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      navigationOverviewLinksInit('overview-link');
+    });
+  </script>
 </BaseLayout>

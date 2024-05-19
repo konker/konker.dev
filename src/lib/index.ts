@@ -1,10 +1,13 @@
 import * as D from 'date-fns';
+import { Home } from 'lucide-astro';
 
 import type { LinkT } from './types.ts';
 
 export const HomeBreadcrumb: LinkT = {
   url: '/',
   title: 'Home',
+  Icon: Home,
+  textClass: 'text-kdd',
 };
 
 export function toDisplayDate(date: Date | undefined): string {

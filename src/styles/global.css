@@ -3,7 +3,8 @@
 ::backdrop {
   --kdd-footer-height: 15rem;
   --kdd-konker-flash-red: #b70404;
-  --kdd-konker-flash-red-dark: #a00000;
+  --kdd-konker-flash-red-light: #ff0606;
+  --kdd-konker-flash-red-dark: #900000;
   --kdd-konker-flash-blue: #2c5aa0;
   --kdd-konker-flash-blue-light: #5fbcd3;
   --kdd-konker-flash-blue-dark: #214478;
@@ -26,12 +27,18 @@
   --kdd-classic-link-active-light: #222222;
   --kdd-color-bg-nav-light: #ffffff;
 
+  --kdd-color-text-project-dark: var(--kdd-konker-flash-red-light);
   --kdd-color-bg-project-dark: #333333;
+  --kdd-color-text-blog-dark: #beb646;
   --kdd-color-bg-blog-dark: #333333;
+  --kdd-color-text-tag-dark: var(--kdd-konker-flash-blue-light);
   --kdd-color-bg-tag-dark: #333333;
 
+  --kdd-color-text-project-light: var(--kdd-konker-flash-red-dark);
   --kdd-color-bg-project-light: #dddddd;
+  --kdd-color-text-blog-light: #75702b;
   --kdd-color-bg-blog-light: #dddddd;
+  --kdd-color-text-tag-light: var(--kdd-konker-flash-blue);
   --kdd-color-bg-tag-light: #dddddd;
 
   --kdd-color-text: var(--kdd-color-text-dark);
@@ -41,8 +48,11 @@
   --kdd-color-link: var(--kdd-classic-link-dark);
   --kdd-color-bg-nav: var(--kdd-color-bg-nav-dark);
 
+  --kdd-color-text-project: var(--kdd-color-text-project-dark);
   --kdd-color-bg-project: var(--kdd-color-bg-project-dark);
+  --kdd-color-text-blog: var(--kdd-color-text-blog-dark);
   --kdd-color-bg-blog: var(--kdd-color-bg-blog-dark);
+  --kdd-color-text-tag: var(--kdd-color-text-tag-dark);
   --kdd-color-bg-tag: var(--kdd-color-bg-tag-dark);
 }
 
@@ -55,8 +65,11 @@
   --kdd-color-link: var(--kdd-classic-link-light);
   --kdd-color-bg-nav: var(--kdd-color-bg-nav-light);
 
+  --kdd-color-text-project: var(--kdd-color-text-project-light);
   --kdd-color-bg-project: var(--kdd-color-bg-project-light);
+  --kdd-color-text-blog: var(--kdd-color-text-blog-light);
   --kdd-color-bg-blog: var(--kdd-color-bg-blog-light);
+  --kdd-color-text-tag: var(--kdd-color-text-tag-light);
   --kdd-color-bg-tag: var(--kdd-color-bg-tag-light);
 }
 
@@ -106,7 +119,7 @@ nav a.selected {
   margin-right: auto;
   max-width: 60px;
   height: 12px;
-  background: radial-gradient(circle closest-side, var(--kdd-color-hr) 100%, #0000) 0/calc(100%/3) 100%;
+  background: radial-gradient(circle closest-side, var(--kdd-color-hr) 100%, #0000) 0 / calc(100% / 3) 100%;
 }
 .content code {
   font-size: 0.85rem;

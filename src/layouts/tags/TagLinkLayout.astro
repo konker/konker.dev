@@ -1,13 +1,11 @@
 ---
 import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
-import { isBlogCollection, isBlogEntry, isTagCollection, type TagCollection } from '../../lib/collections';
-import { itemIconLookup } from '../../lib/collections/helpers';
-import type { TagEntry } from '../../lib/collections/tags';
-import type { LinkT } from '../../lib/types';
-import { TITLE_ICON_SIZE } from '../../scripts/consts';
-import BaseLayout from '../site/BaseLayout.astro';
 import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
+import { isBlogEntry, type TagCollection } from '../../lib/collections';
+import type { TagEntry } from '../../lib/collections/tags';
 import { isProjectEntry } from '../../lib/moonlight/config';
+import type { LinkT } from '../../lib/types';
+import PageLayout from '../site/PageLayout.astro';
 
 interface Props {
   readonly pageTitle: string;
@@ -19,33 +17,25 @@ interface Props {
 }
 
 const { pageTitle, breadcrumbs, intro, tagEntries, titleIconName } = Astro.props;
-const TitleIcon = itemIconLookup(titleIconName);
 ---
 
-<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <section id="content" class="content w-full mx-6 md:mr-auto md:ml-auto mt-2 md:mt-6 mb-4">
-    <h1>
-      <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size={TITLE_ICON_SIZE} /></span>
-      <span set:html={pageTitle} />
-    </h1>
-    <p class="mb-12" set:html={intro} />
-    <nav class="my-6 md:my-16 not-prose">
-      {
-        tagEntries.map((tagEntry) =>
-          isBlogEntry(tagEntry.entry) ? (
-            <BlogPostIndexItem
-              collection={tagEntry.collection}
-              item={tagEntry.entry}
-              itemIconName={tagEntry.collection}
-            />
-          ) : isProjectEntry(tagEntry.entry) ? (
-            <ProjectIndexItem
-              item={tagEntry.entry}
-              itemIconName={tagEntry.collection}
-            />
-          ) : <p>UNKNOWN ENTRY</p>
+<PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} titleIconName={titleIconName}>
+  <p class="mb-12" set:html={intro} />
+  <nav class="my-6 md:my-16 not-prose">
+    {
+      tagEntries.map((tagEntry) =>
+        isBlogEntry(tagEntry.entry) ? (
+          <BlogPostIndexItem
+            collection={tagEntry.collection}
+            item={tagEntry.entry}
+            itemIconName={tagEntry.collection}
+          />
+        ) : isProjectEntry(tagEntry.entry) ? (
+          <ProjectIndexItem item={tagEntry.entry} itemIconName={tagEntry.collection} />
+        ) : (
+          <p>UNKNOWN ENTRY</p>
         )
-      }
-    </nav>
-  </section>
-</BaseLayout>
+      )
+    }
+  </nav>
+</PageLayout>

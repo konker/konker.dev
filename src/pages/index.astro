@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/site/BaseLayout.astro';
+import PageLayout from '../layouts/site/PageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import type { LinkT } from '../lib/types';
 
@@ -10,4 +10,6 @@ const pageTitle = 'Home';
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb];
 ---
 
-<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} />
+<PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
+  <p>Home content</p>
+</PageLayout>

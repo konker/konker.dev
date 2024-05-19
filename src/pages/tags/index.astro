@@ -2,6 +2,7 @@
 import TagLinkIndexLayout from '../../layouts/tags/TagLinkIndexLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
 import { TAG_COLLECTIONS } from '../../lib/collections';
+import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import { tagsGetAllCollectionTags } from '../../lib/collections/tags';
 import type { LinkT } from '../../lib/types';
 
@@ -20,7 +21,12 @@ const links = tags.map((tag) => ({
 }));
 
 // --------------------------------------------------------------------------
-const thisBreadcrumb: LinkT = { title: pageTitle, url: '/tags/' };
+const thisBreadcrumb: LinkT = {
+  title: pageTitle,
+  url: '/tags/',
+  Icon: itemIconLookup('tags'),
+  textClass: itemTextClassLookup('tags'),
+};
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 ---
 

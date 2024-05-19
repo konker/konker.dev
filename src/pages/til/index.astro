@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BlogIndexLayout from '../../layouts/blog/BlogIndexLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
 import type { TagCollection } from '../../lib/collections';
+import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import type { LinkT } from '../../lib/types';
 import '../../styles/global.css';
 
@@ -16,7 +17,12 @@ const pageTitle = 'TIL';
 const intro = 'This is a collection of my "Today I Learned" posts.';
 
 // --------------------------------------------------------------------------
-const thisBreadcrumb: LinkT = { title: pageTitle, url: `/${collection}/` };
+const thisBreadcrumb: LinkT = {
+  title: pageTitle,
+  url: `/${collection}/`,
+  Icon: itemIconLookup(collection),
+  textClass: itemTextClassLookup(collection),
+};
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 ---
 

@@ -1,34 +1,25 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
-import { itemIconLookup } from '../../lib/collections/helpers';
-import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import type { MoonlightCollection } from '../../lib/moonlight/config';
 import type { LinkT } from '../../lib/types';
-import { TITLE_ICON_SIZE } from '../../scripts/consts';
-import BaseLayout from '../site/BaseLayout.astro';
+import PageLayout from '../site/PageLayout.astro';
 
 interface Props {
   readonly pageTitle: string;
   readonly intro: string;
-  readonly indexEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+  readonly indexEntries: Array<CollectionEntry<MoonlightCollection>>;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly titleIconName?: string;
   readonly itemIconName?: string;
 }
 
 const { pageTitle, intro, breadcrumbs, indexEntries, titleIconName, itemIconName } = Astro.props;
-const TitleIcon = itemIconLookup(titleIconName);
 ---
 
-<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <section id="content" class="content w-full mx-6 md:mx-auto mt-2 md:mt-6 mb-4">
-    <h1>
-      <span class="separator inline-block mb-[-0.40rem] pr-0"><TitleIcon size={TITLE_ICON_SIZE} /></span>
-      {pageTitle}
-    </h1>
-    <p class="mb-12">{intro}</p>
-    <nav class="my-6 md:my-16 not-prose">
-      {indexEntries.map((entry) => <ProjectIndexItem item={entry} itemIconName={itemIconName} />)}
-    </nav>
-  </section>
-</BaseLayout>
+<PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} titleIconName={titleIconName}>
+  <p class="mb-12">{intro}</p>
+  <nav class="my-6 md:my-16 not-prose">
+    {indexEntries.map((entry) => <ProjectIndexItem item={entry} itemIconName={itemIconName} />)}
+  </nav>
+</PageLayout>

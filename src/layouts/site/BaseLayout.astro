@@ -27,7 +27,7 @@ const mainClassNames = 'w-full flex-1 flex flex-col' + (!!fixedHeader ? ' overfl
   </head>
   <body class="h-full text-base bg-kdd text-kdd font-serif">
     {
-      import.meta.env.DEV ? (
+      import.meta.env.DEV && false ? (
         <div id="debug" class="absolute top-0 left-1/2">
           <span class="hidden sm:inline-block">sm</span>
           <span class="hidden md:inline-block">md</span>

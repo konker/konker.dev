@@ -1,13 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import type { MoonlightCollectionName } from '../../lib/moonlight/config';
+import type { MoonlightCollection } from '../../lib/moonlight/config';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
+import NavigationLink from '../site/NavigationLink.astro';
 import NavigationPanel from '../site/NavigationPanel.astro';
-import NavigationLink from './NavigationLink.astro';
 
 interface Props {
-  readonly projectRootEntry: CollectionEntry<MoonlightCollectionName>;
-  readonly projectEntries: Array<CollectionEntry<MoonlightCollectionName>>;
+  readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
+  readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
 }
 
 const { projectEntries, projectRootEntry } = Astro.props;
@@ -22,7 +22,7 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
   navId="content-navigation"
   breakpoint={NavigationPanelBreakpoint.MD}
   panelDir={NavigationPanelDirection.LEFT}
-  class="h-full md:w-1/5 overflow-hidden pt-6 md:pt-0 pb-3 pl-8 pr-6 bg-color-bg-light dark:bg-color-bg-dark"
+  class="h-full md:w-1/5 lg:w-3/12 overflow-hidden pt-6 md:pt-0 pb-3 pl-8 pr-6 lg:pr-0 bg-color-bg-light dark:bg-color-bg-dark"
 >
   <nav>
     <ul>

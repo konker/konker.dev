@@ -3,7 +3,12 @@ import { getCollection } from 'astro:content';
 
 import BlogPostLayout from '../../layouts/blog/BlogPostLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
-import { collectionEntryToSectionNavigation, collectionEntryToUrl } from '../../lib/collections/helpers';
+import {
+  collectionEntryToSectionNavigation,
+  collectionEntryToUrl,
+  itemIconLookup,
+  itemTextClassLookup,
+} from '../../lib/collections/helpers';
 import type { LinkT } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -20,7 +25,12 @@ const { entry } = Astro.props;
 const { image } = entry.data;
 const { Content } = await entry.render();
 const collection = 'til' as const;
-const indexBreadcrumb: LinkT = { title: 'TIL', url: `/${collection}/` };
+const indexBreadcrumb: LinkT = {
+  title: 'TIL',
+  url: `/${collection}/`,
+  Icon: itemIconLookup(collection),
+  textClass: itemTextClassLookup(collection),
+};
 
 const breadcrumbs: ReadonlyArray<LinkT> = [
   HomeBreadcrumb,

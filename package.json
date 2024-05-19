@@ -20,7 +20,7 @@
     "prettier-fix": "pnpm run prettier-check --write",
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
-    "pre-push": "pnpm run lint-check && pnpm run typecheck"
+    "pre-push": "pnpm run lint-check && pnpm run typecheck && pnpm run build"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.10",

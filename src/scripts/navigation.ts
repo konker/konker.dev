@@ -209,3 +209,30 @@ export function navigationPanelInit(
 }
 // @ts-expect-error adding to global window object
 window.navigationPanelInit = navigationPanelInit;
+
+// --------------------------------------------------------------------------
+export function navigationOverviewLinksInit(className: string): boolean {
+  const elements = document.querySelectorAll(`.${className}`);
+  if (!elements) {
+    console.log(`[navigation] overview links init: could not find elements: ${className}`);
+    return false;
+  }
+
+  elements.forEach((element) => {
+    element.classList.remove('noscript');
+    element.classList.remove('noscript');
+    element.addEventListener('click', (_event: any) => {
+      setTimeout(() => {
+        console.log('KONK80', window.scrollY);
+        window.scrollTo(0, 0);
+        console.log('KONK81', window.scrollY);
+      }, 100);
+      return true;
+    });
+  });
+
+  console.log(`[navigation] overview links init: ${className}`);
+  return true;
+}
+// @ts-expect-error adding to global window object
+window.navigationOverviewLinksInit = navigationOverviewLinksInit;

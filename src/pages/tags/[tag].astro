@@ -1,5 +1,6 @@
 ---
 import { TAG_COLLECTIONS } from '../../lib/collections';
+import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import { tagsGetAllCollectionTagEntries } from '../../lib/collections/tags';
 
 import TagLinkLayout from '../../layouts/tags/TagLinkLayout.astro';
@@ -30,12 +31,17 @@ export async function getStaticPaths() {
 
 // --------------------------------------------------------------------------
 const { tag } = Astro.params;
-const indexBreadcrumb: LinkT = { title: 'Tags', url: '/tags/' };
+const indexBreadcrumb: LinkT = {
+  title: 'Tags',
+  url: '/tags/',
+  Icon: itemIconLookup('tags'),
+  textClass: itemTextClassLookup('tags'),
+};
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb, { title: tag, url: `/tags/${tag}/` }];
 
 // --------------------------------------------------------------------------
 const { entries } = Astro.props;
-const pageTitle = `Tag: <code>#${tag}</code>`;
+const pageTitle = `Tag: <span class="font-mono font-normal">#${tag}</span>`;
 const intro = `This is a collection of all the content tagged <code>#${tag}</code>`;
 ---
 
