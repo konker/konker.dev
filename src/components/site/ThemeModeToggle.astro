@@ -18,11 +18,24 @@ const lightId = `${navId}-light`;
   <Sun id={lightId} class="theme-mode-toggle-icon theme-mode-toggle-icon-light" size="18" />
 </div>
 
-<style>
+<style is:global>
   .theme-mode-toggle.noscript {
     display: none;
   }
   .theme-mode-toggle:hover {
     border-color: var(--kdd-konker-flash-red);
+  }
+
+  .theme-mode-toggle {
+    cursor: pointer;
+  }
+  :not([data-theme-mode='light']) .theme-mode-toggle-icon-light,
+  [data-theme-mode='light'] .theme-mode-toggle .theme-mode-toggle-icon-dark {
+    visibility: visible;
+  }
+
+  :not([data-theme-mode='light']) .theme-mode-toggle-icon-dark,
+  [data-theme-mode='light'] .theme-mode-toggle .theme-mode-toggle-icon-light {
+    visibility: hidden;
   }
 </style>

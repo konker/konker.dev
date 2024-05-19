@@ -23,7 +23,69 @@ const panelClassNames = classNames + ' ' + panelFunctionalClassNames + ' ' + pan
 
 <div id={navId} class={panelClassNames}>
   <input id={toggleId} class="navigation-toggle" type="checkbox" />
-  <label for={toggleId} class="navigation-toggle-overlay hidden"></label>
-
   <slot />
 </div>
+
+<style is:global>
+  .navigation-panel.noscript:has(input.navigation-toggle:checked) {
+    @apply block;
+  }
+  .navigation-panel.noscript:has(input.navigation-toggle) {
+    @apply hidden md:block;
+  }
+  .navigation-panel {
+    animation-duration: 300ms;
+    animation-timing-function: ease-out;
+  }
+  .navigation-panel a {
+    @apply font-sans;
+  }
+  .navigation-panel-top {
+    animation-name: slide-in-top;
+  }
+  .navigation-panel-left {
+    animation-name: slide-in-left;
+  }
+  .navigation-panel-right {
+    animation-name: slide-in-right;
+  }
+  .navigation-panel-bottom {
+    animation-name: slide-in-bottom;
+  }
+
+  @keyframes slide-in-top {
+    from {
+      transform: translateY(-100vw);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100vw);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100vw);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-bottom {
+    from {
+      transform: translateY(100vw);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+</style>

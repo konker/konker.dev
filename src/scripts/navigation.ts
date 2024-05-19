@@ -1,9 +1,12 @@
 // --------------------------------------------------------------------------
-import type { NavigationPanelBreakpoint } from './consts.ts';
+import {
+  NAVIGATION_PANEL_CLASS_CLOSED,
+  NAVIGATION_PANEL_CLASS_OPENED,
+  NAVIGATION_PANEL_ICON_CLASS_HIDDEN,
+  NAVIGATION_PANEL_ICON_CLASS_VISIBLE,
+  type NavigationPanelBreakpoint,
+} from './consts.ts';
 import { NavigationPanelDirection } from './consts.ts';
-
-export const NAVIGATION_PANEL_CLASS_OPENED = 'navigation-panel-opened' as const;
-export const NAVIGATION_PANEL_CLASS_CLOSED = 'navigation-panel-closed' as const;
 
 // --------------------------------------------------------------------------
 type NavigationPanelStackEntry = {
@@ -72,8 +75,10 @@ export function navigationPanelOpen(panel: NavigationPanelStackEntry): boolean {
   panel.element.classList.remove(NAVIGATION_PANEL_CLASS_CLOSED);
   panel.element.classList.add(NAVIGATION_PANEL_CLASS_OPENED);
   panel.toggle.checked = true;
-  panel.openIcon?.classList?.add('hidden');
-  panel.closeIcon?.classList?.remove('hidden');
+  panel.openIcon?.classList?.remove(NAVIGATION_PANEL_ICON_CLASS_VISIBLE);
+  panel.openIcon?.classList?.add(NAVIGATION_PANEL_ICON_CLASS_HIDDEN);
+  panel.closeIcon?.classList?.remove(NAVIGATION_PANEL_ICON_CLASS_HIDDEN);
+  panel.closeIcon?.classList?.add(NAVIGATION_PANEL_ICON_CLASS_VISIBLE);
 
   NAVIGATION_PANEL_OPEN_STACK.push(panel);
 
@@ -98,8 +103,10 @@ export function navigationPanelClose(panel: NavigationPanelStackEntry): boolean 
   panel.element.classList.remove(NAVIGATION_PANEL_CLASS_OPENED);
   panel.element.classList.add(NAVIGATION_PANEL_CLASS_CLOSED);
   panel.toggle.checked = false;
-  panel.closeIcon?.classList?.add('hidden');
-  panel.openIcon?.classList?.remove('hidden');
+  panel.closeIcon?.classList?.remove(NAVIGATION_PANEL_ICON_CLASS_VISIBLE);
+  panel.closeIcon?.classList?.add(NAVIGATION_PANEL_ICON_CLASS_HIDDEN);
+  panel.openIcon?.classList?.remove(NAVIGATION_PANEL_ICON_CLASS_HIDDEN);
+  panel.openIcon?.classList?.add(NAVIGATION_PANEL_ICON_CLASS_VISIBLE);
 
   return true;
 }

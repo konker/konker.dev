@@ -17,6 +17,11 @@ export enum NavigationPanelBreakpoint {
   XS = 'xs',
 }
 
+export const NAVIGATION_PANEL_CLASS_OPENED = 'navigation-panel-opened' as const;
+export const NAVIGATION_PANEL_CLASS_CLOSED = 'navigation-panel-closed' as const;
+export const NAVIGATION_PANEL_ICON_CLASS_HIDDEN = 'opacity-0' as const;
+export const NAVIGATION_PANEL_ICON_CLASS_VISIBLE = 'opacity-100' as const;
+
 // --------------------------------------------------------------------------
 export enum Theme {
   LIGHT = 'light',

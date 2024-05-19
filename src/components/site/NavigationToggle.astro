@@ -1,27 +1,41 @@
 ---
-import { NavigationPanelBreakpoint } from '../../scripts/consts';
+import {
+  NAVIGATION_PANEL_ICON_CLASS_HIDDEN,
+  NAVIGATION_PANEL_ICON_CLASS_VISIBLE,
+  NavigationPanelBreakpoint,
+} from '../../scripts/consts';
 interface Props {
   readonly navId: string;
   readonly breakpoint: NavigationPanelBreakpoint;
   readonly class: string;
+  readonly isAbsolute?: boolean;
   readonly CloseIcon: Function;
   readonly OpenIcon: Function;
 }
 
-const { navId, breakpoint, class: classNames, CloseIcon, OpenIcon } = Astro.props;
+const { navId, breakpoint, class: classNames, isAbsolute, CloseIcon, OpenIcon } = Astro.props;
 
-const functionalClassNamesLabel = `${breakpoint}:hidden`;
+const functionalClassNamesLabel = `w-[28px] h-[28px] ${breakpoint}:hidden` + (!!isAbsolute ? ' ' : ' relative');
 const classNamesLabel = classNames + ' navigation-toggle-label ' + functionalClassNamesLabel;
+
+const classNamesCloseIcon = `close-icon absolute top-0 left-0 transition-all duration-0 delay-200 ${NAVIGATION_PANEL_ICON_CLASS_HIDDEN}`;
+const classNamesOpenIcon = `open-icon absolute top-0 left-0 transition-all duration-700 delay-0 ${NAVIGATION_PANEL_ICON_CLASS_VISIBLE}`;
+
 const toggleId = `${navId}-toggle`;
 const labelId = `${navId}-label`;
 ---
 
 <label for={toggleId} id={labelId} class={classNamesLabel}>
-  <CloseIcon class="close-icon hidden" size="28" />
-  <OpenIcon class="open-icon" size="28" />
+  <CloseIcon class={classNamesCloseIcon} size="28" />
+  <OpenIcon class={classNamesOpenIcon} size="28" />
 </label>
 
-<style>
+<style is:global>
+  input.navigation-toggle {
+    display: none;
+    position: absolute;
+    top: 0;
+  }
   .navigation-toggle-label {
     cursor: pointer;
   }

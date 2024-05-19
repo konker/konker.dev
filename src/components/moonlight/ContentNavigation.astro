@@ -39,3 +39,9 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
     </ul>
   </nav>
 </NavigationPanel>
+
+<style is:global>
+  #content-navigation nav a.selected::before {
+    content: '> ';
+  }
+</style>

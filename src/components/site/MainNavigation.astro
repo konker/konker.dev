@@ -25,7 +25,8 @@ const navLinksSelectedLookup = navLinks.map(
 <NavigationToggle
   navId="main-navigation"
   breakpoint={NavigationPanelBreakpoint.MD}
-  class="absolute top-6 right-6 z-50"
+  class="absolute inline-block top-6 right-6 z-50"
+  isAbsolute={true}
   CloseIcon={PanelTopClose}
   OpenIcon={Menu}
 />
@@ -45,3 +46,20 @@ const navLinksSelectedLookup = navLinks.map(
     <ThemeModeToggle navId="theme-mode-toggle-main-nav" initLightMode={true} class="block md:hidden my-12 mx-auto" />
   </nav>
 </NavigationPanel>
+
+<style is:global>
+  .main-navigation .nav-links a,
+  .main-navigation .nav-links a:visited {
+    @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l text-kdd-link bg-kdd md:bg-kdd-nav;
+  }
+  .main-navigation .nav-links a.nav-link:first-of-type {
+    @apply border-t md:border-t-0;
+  }
+  .main-navigation .nav-links a.nav-link:last-of-type {
+    @apply md:border-r;
+  }
+  .main-navigation .nav-links a.selected,
+  .main-navigation .nav-links a:hover {
+    @apply bg-konker-flash-blue-dark dark:bg-konker-flash-blue-dark text-white dark:text-white no-underline;
+  }
+</style>
