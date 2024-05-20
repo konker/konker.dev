@@ -13,10 +13,8 @@ const allPosts = await getCollection(collection);
 const filteredPosts = allPosts.filter((post) => !post.data.draft);
 
 // --------------------------------------------------------------------------
-const pageTitle = 'TIL';
-const intro = 'This is a collection of my "Today I Learned" posts.';
-
-// --------------------------------------------------------------------------
+const content = (await Astro.glob('./index-content.md'))[0];
+const pageTitle = content?.frontmatter.title;
 const thisBreadcrumb: LinkT = {
   title: pageTitle,
   url: `/${collection}/`,
@@ -29,7 +27,7 @@ const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 <BlogIndexLayout
   pageTitle={pageTitle}
   breadcrumbs={breadcrumbs}
-  intro={intro}
+  content={content}
   collection={collection}
   posts={filteredPosts}
   titleIconName="blog"

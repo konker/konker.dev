@@ -10,8 +10,6 @@ import type { LinkT } from '../../lib/types';
 const { total, tags } = await tagsGetAllCollectionTags(TAG_COLLECTIONS);
 
 // --------------------------------------------------------------------------
-const pageTitle = 'Tags';
-const intro = '';
 const links = tags.map((tag) => ({
   ...tag,
   link: {
@@ -21,6 +19,8 @@ const links = tags.map((tag) => ({
 }));
 
 // --------------------------------------------------------------------------
+const content = (await Astro.glob('./index-content.md'))[0];
+const pageTitle = content?.frontmatter.title;
 const thisBreadcrumb: LinkT = {
   title: pageTitle,
   url: '/tags/',
@@ -33,7 +33,7 @@ const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 <TagLinkIndexLayout
   pageTitle={pageTitle}
   breadcrumbs={breadcrumbs}
-  intro={intro}
+  content={content}
   links={links}
   total={total}
   titleIconName="tags"

@@ -1,0 +1,11 @@
+---
+import type { MarkdownInstance } from 'astro';
+
+interface Props {
+  readonly markdownInstance: MarkdownInstance<Record<string, unknown>> | undefined;
+}
+
+const { markdownInstance } = Astro.props;
+---
+
+{markdownInstance ? <markdownInstance.Content /> : <p>CONTENT MISSING</p>}

@@ -43,9 +43,12 @@ const breadcrumbs: ReadonlyArray<LinkT> =
           : []
       );
 
+const content =
+  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX ? (await Astro.glob('./projects-content.md'))[0] : undefined;
+
 const pageTitle =
   Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX
-    ? 'Projects'
+    ? content?.frontmatter.title
     : breadcrumbs
         .slice(2)
         .map((b) => b.title)
@@ -56,7 +59,7 @@ const pageTitle =
   Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX ? (
     <ProjectIndexLayout
       pageTitle={pageTitle}
-      intro="Some code and other bits and pieces that I have been working on."
+      content={content}
       indexEntries={Astro.props.indexEntries}
       breadcrumbs={breadcrumbs}
       titleIconName="project"

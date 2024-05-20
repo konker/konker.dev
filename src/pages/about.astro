@@ -1,17 +1,17 @@
 ---
+import MarkdownContent from '../components/content/MarkdownContent.astro';
 import PageLayout from '../layouts/site/PageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import { itemIconLookup } from '../lib/collections/helpers';
 import type { LinkT } from '../lib/types';
 
 // --------------------------------------------------------------------------
-const pageTitle = 'About';
-
-// --------------------------------------------------------------------------
+const content = (await Astro.glob('./about-content.md'))[0];
+const pageTitle = content?.frontmatter.title;
 const thisBreadcrumb: LinkT = { title: pageTitle, url: `/about/`, Icon: itemIconLookup('about') };
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, thisBreadcrumb];
 ---
 
 <PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <p>About content</p>
+  <MarkdownContent markdownInstance={content} />
 </PageLayout>

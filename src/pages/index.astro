@@ -1,15 +1,15 @@
 ---
+import MarkdownContent from '../components/content/MarkdownContent.astro';
 import PageLayout from '../layouts/site/PageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import type { LinkT } from '../lib/types';
 
 // --------------------------------------------------------------------------
-const pageTitle = 'Home';
-
-// --------------------------------------------------------------------------
+const content = (await Astro.glob('./index-content.md'))[0];
+const pageTitle = content?.frontmatter.title;
 const breadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb];
 ---
 
 <PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <p>Home content</p>
+  <MarkdownContent markdownInstance={content} />
 </PageLayout>
