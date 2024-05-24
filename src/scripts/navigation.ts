@@ -223,9 +223,7 @@ export function navigationOverviewLinksInit(className: string): boolean {
     element.classList.remove('noscript');
     element.addEventListener('click', (_event: any) => {
       setTimeout(() => {
-        console.log('KONK80', window.scrollY);
         window.scrollTo(0, 0);
-        console.log('KONK81', window.scrollY);
       }, 100);
       return true;
     });

@@ -20,12 +20,12 @@
 
   --kdd-color-text-light: #222222;
   --kdd-color-heading-light: #000000;
-  --kdd-color-bg-light: #eeeeee;
+  --kdd-color-bg-light: #fbfbfb;
   --kdd-color-hr-light: #d0d0d0;
   --kdd-classic-link-light: #0000ee;
   --kdd-classic-link-visited-light: #551a8b;
   --kdd-classic-link-active-light: #222222;
-  --kdd-color-bg-nav-light: #ffffff;
+  --kdd-color-bg-nav-light: #f3f3f3;
 
   --kdd-color-text-project-dark: var(--kdd-konker-flash-red-light);
   --kdd-color-bg-project-dark: #333333;
@@ -35,9 +35,9 @@
   --kdd-color-bg-tag-dark: #333333;
 
   --kdd-color-text-project-light: var(--kdd-konker-flash-red-dark);
-  --kdd-color-bg-project-light: #dddddd;
+  --kdd-color-bg-project-light: #f0f0f0;
   --kdd-color-text-blog-light: #75702b;
-  --kdd-color-bg-blog-light: #dddddd;
+  --kdd-color-bg-blog-light: #f0f0f0;
   --kdd-color-text-tag-light: var(--kdd-konker-flash-blue);
   --kdd-color-bg-tag-light: #dddddd;
 
@@ -112,7 +112,7 @@ nav a.selected {
 
 /* ----------------------------------------------------------------------- */
 .content {
-  @apply prose prose-sm prose-neutral prose-headings:font-headings dark:prose-invert md:prose max-w-screen-md;
+  @apply prose prose-sm prose-neutral prose-headings:font-headings prose-h1:font-medium dark:prose-invert md:prose max-w-screen-md;
 }
 .content hr {
   margin-left: auto;

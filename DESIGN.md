@@ -6,11 +6,11 @@
   - ~~scrollbars on main content [1]~~
   - ~~amend lint rules to remove most FP [2]~~
   - aria props [2]
-  - giscus comments / (also reactions?) [3]
-    - Do we want to create a codeberg equivalent?
   - RSS feed [2]
   - Sitemap? [3]
   - Test favicon [3]
+  - giscus comments / (also reactions?) [3]
+    - Do we want to create a codeberg equivalent?
   - Check vitals/performance [2]
     - https://pagespeed.web.dev/
     - Lighthouse?
@@ -44,11 +44,9 @@
   - Analytics
     - https://usefathom.com/pricing [?]
     - https://plausible.io/#pricing [?]
-  - aria
-  - sitemap / rss
-  - nojs navigation not working
-  - footer content
-    - see: social links above as part of it
+  - ~~nojs navigation not working~~
+  - ~~footer content~~
+    - ~~see: social links above as part of it~~
 
 - Idea:
 

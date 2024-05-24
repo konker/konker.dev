@@ -23,6 +23,6 @@ const { pageTitle, breadcrumbs, content, collection, posts, itemIconName, titleI
 <PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} titleIconName={titleIconName}>
   <MarkdownContent markdownInstance={content} />
   <nav class="my-6 md:my-16 not-prose">
-    {posts.map((post) => <BlogPostIndexItem collection={collection} item={post} itemIconName={itemIconName} />)}
+    {posts.map((post) => <BlogPostIndexItem item={post} itemIconName={itemIconName} />)}
   </nav>
 </PageLayout>

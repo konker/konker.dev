@@ -17,7 +17,7 @@ const textClass = itemTextClassLookup(titleIconName);
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
   <section id="page-content" class="content w-full mb-12 pr-6 ml-6 md:ml-auto md:mr-auto">
-    <h1 set:html={pageTitle}>
+    <h1>
       {
         TitleIcon ? (
           <span class={`separator inline-block mb-[-0.40rem] pr-0 ${textClass}`}>
@@ -25,6 +25,7 @@ const textClass = itemTextClassLookup(titleIconName);
           </span>
         ) : undefined
       }
+      {pageTitle}
     </h1>
     <slot />
   </section>

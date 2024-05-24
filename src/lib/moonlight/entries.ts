@@ -1,4 +1,4 @@
-import { type CollectionEntry, getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 
 import { notDraftFilterPredicate } from '../collections/helpers.ts';
 import type { MoonlightCollection } from './config.ts';
@@ -18,7 +18,7 @@ export const toMoonlightEntry =
     project: extractProject(entry.slug),
     entry: {
       ...entry,
-      slug: `${collectionRootPagesPath}/${entry.slug}`,
+      slug: `${entry.slug}`,
     },
   });
 
@@ -26,7 +26,7 @@ export const toMoonlightEntry =
 export function indexEntriesFilterPredicate<T extends CollectionEntry<MoonlightCollection>>(
   moonlightEntry: MoonlightEntry<T>
 ): boolean {
-  return notDraftFilterPredicate(moonlightEntry.entry) && countSlugPathParts(moonlightEntry.entry.slug) === 2;
+  return notDraftFilterPredicate(moonlightEntry.entry) && countSlugPathParts(moonlightEntry.entry.slug) === 1;
 }
 
 // --------------------------------------------------------------------------

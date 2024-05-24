@@ -7,17 +7,18 @@ import ArticleMetadata from '../site/ArticleMetadata.astro';
 import ReadMoreLink from '../site/ReadMoreLink.astro';
 
 interface Props {
-  readonly collection: BlogCollection | TagCollection;
   readonly item: CollectionEntry<BlogCollection | TagCollection>;
   readonly itemIconName?: string | undefined;
 }
 
-const { collection, item, itemIconName } = Astro.props;
+const { item, itemIconName } = Astro.props;
 const ItemIcon = itemIconLookup(itemIconName);
+const href = `/${item.collection}/${item.slug}`;
 ---
 
 <article
   class={[
+    'relative',
     'blog-post',
     'index-item',
     'mb-6',
@@ -32,20 +33,20 @@ const ItemIcon = itemIconLookup(itemIconName);
   ].join(' ')}
 >
   <div class="wrapper pb-2">
-    <h2 class="mb-5 font-sans font-medium text-xl">
-      {
-        ItemIcon ? (
-          <span class="separator float-left inline-block mt-1 md:mt-0">
-            <ItemIcon size={ITEM_ICON_SIZE} />
-          </span>
-        ) : undefined
-      }
-      <a href=`/${collection}/${item.slug}` class="block pl-[36px] pt-1 md:pt-0">{item.data.title}</a>
+    {
+      ItemIcon ? (
+        <span class="separator absolute top-0 right-0 inline-block px-3 py-3 bg-kdd">
+          <ItemIcon size={ITEM_ICON_SIZE} />
+        </span>
+      ) : undefined
+    }
+    <h2 class="mb-5 font-serif font-normal text-xl pr-8">
+      <a href={href} class="block pt-1 md:pt-0">{item.data.title}</a>
     </h2>
     <p class="abstract mb-3 font-serif">
       {item.data.description}
     </p>
-    <ReadMoreLink item={item} />
+    <ReadMoreLink href={href} />
     <ArticleMetadata tags={item.data.tags} />
   </div>
 </article>
@@ -58,6 +59,9 @@ const ItemIcon = itemIconLookup(itemIconName);
   article.blog-post h2 a {
     text-decoration: none;
     color: var(--kdd-color-heading);
+  }
+  article.blog-post h2 a:hover {
+    text-decoration: underline;
   }
 
   article.blog-post.blog,

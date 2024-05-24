@@ -33,7 +33,7 @@ export const formatEntryStaticPath =
     const nextEntry = moonlightGetNextEntry(allEntries, moonlightEntry);
     return {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      params: { moonlight_slug: moonlightEntry.entry.slug },
+      params: { moonlight_slug: `${moonlightEntry.collectionRootPagesPath}/${moonlightEntry.entry.slug}` },
       props: {
         type: MOONLIGHT_PAGE_TYPE_ENTRY,
         projectRootEntry: moonlightGetProjectRootEntry(allEntries, moonlightEntry.project),

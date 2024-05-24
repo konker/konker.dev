@@ -1,21 +1,18 @@
 ---
-import type { CollectionEntry } from 'astro:content';
 import { FileInput } from 'lucide-astro';
-import type { BlogCollection, TagCollection } from '../../lib/collections';
-import type { MoonlightCollection } from '../../lib/moonlight/config';
 import { NAV_ICON_SIZE } from '../../scripts/consts';
 
 interface Props {
-  readonly item: CollectionEntry<BlogCollection | TagCollection | MoonlightCollection>;
+  readonly href: string;
 }
 
-const { item } = Astro.props;
+const { href } = Astro.props;
 ---
 
 <div class="read-more text-right">
   <span class="inline-block mr-3 mb-6 py-1 px-3 rounded-md bg-kdd-nav">
-    <a href={item.slug} class="font-sans"> Read more</a>
-    <a href={item.slug} class="font-sans">
+    <a href={href} class="font-sans"> Read more</a>
+    <a href={href} class="font-sans">
       <span class="separator inline-block py-1 px-0 mb-[-0.55rem] mr-0">
         <FileInput size={NAV_ICON_SIZE} />
       </span>
