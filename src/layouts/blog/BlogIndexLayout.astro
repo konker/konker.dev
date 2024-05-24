@@ -10,14 +10,13 @@ import PageLayout from '../site/PageLayout.astro';
 interface Props {
   readonly pageTitle: string;
   readonly content: MarkdownInstance<Record<string, unknown>> | undefined;
-  readonly collection: BlogCollection;
   readonly posts: Array<CollectionEntry<BlogCollection>>;
   readonly itemIconName?: string;
   readonly titleIconName?: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT>;
 }
 
-const { pageTitle, breadcrumbs, content, collection, posts, itemIconName, titleIconName } = Astro.props;
+const { pageTitle, breadcrumbs, content, posts, itemIconName, titleIconName } = Astro.props;
 ---
 
 <PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} titleIconName={titleIconName}>

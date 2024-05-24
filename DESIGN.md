@@ -19,6 +19,9 @@
     - Mirror to github for deployment? [6]
   - search [4]
     - check astro/starlight and just do that for a start
+  - Analytics
+    - https://usefathom.com/pricing [?]
+    - https://plausible.io/#pricing [?]
   - ~~main-navigation is full screen in sm [?][9]~~
   - ~~animate main-navigation [6]~~
   - ~~auto-close for intra-page navigation~~
@@ -35,15 +38,8 @@
   - ~~dark/light mode toggle [2]~~
     - light mode code for dark mode?
   - easter_eggs?
-    - clacks
+    - ~~clacks~~
     - ...
-  - Check vitals/performance
-    - https://pagespeed.web.dev/
-    - Lighthouse?
-    - SSL?
-  - Analytics
-    - https://usefathom.com/pricing [?]
-    - https://plausible.io/#pricing [?]
   - ~~nojs navigation not working~~
   - ~~footer content~~
     - ~~see: social links above as part of it~~

@@ -29,6 +29,8 @@ const title = SITE_TITLE + (isHomePage(Astro.url) ? '' : ` / ${pageTitle}`);
     <meta name="description" content="Technical writings and projects by Konrad Markus" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class="h-full text-base bg-kdd text-kdd font-serif">
     {

@@ -1,12 +1,16 @@
+import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://konker.dev',
-  integrations: [tailwind({})],
+  integrations: [tailwind({}), sitemap()],
   outDir: 'www',
-  server: { port: 4321, host: true },
+  server: {
+    port: 4321,
+    host: true,
+  },
   image: {
     domains: [],
   },
@@ -18,8 +22,5 @@ export default defineConfig({
       theme: 'github-dark-default',
       wrap: true,
     },
-  },
-  moonlight: {
-    projects: '/projects',
   },
 });
