@@ -1,5 +1,5 @@
 ---
-import logoImage from '../../images/konker-flash-1-dark-mode.png';
+import logoImage from '../../images/konker-flash-1.png';
 import type { LinkT, SectionNavigationT } from '../../lib/types';
 import { SITE_TITLE } from '../../scripts/consts';
 import BreadcrumbsNavigation from './BreadcrumbsNavigation.astro';
@@ -16,7 +16,7 @@ interface Props {
 const { breadcrumbs } = Astro.props;
 ---
 
-<header class="mb-3 md:mb-12 pb-4 md:pb-0 pl-0 w-full bg-kdd">
+<header class="mb-10 md:mb-12 pl-0 w-full bg-kdd">
   <SiteLogo siteTitle={SITE_TITLE} logoImage={logoImage}>
     <SocialBar class="hidden md:block md:absolute top-0 right-2">
       <ThemeModeToggle navId="theme-mode-toggle-header" initLightMode={true} />

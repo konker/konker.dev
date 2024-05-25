@@ -40,12 +40,10 @@ const href = `/${item.collection}/${item.slug}`;
         </span>
       ) : undefined
     }
-    <h2 class="mb-5 font-serif font-normal text-xl pr-8">
+    <h2 class="mb-5 font-serif font-[500] text-xl pr-8">
       <a href={href} class="block pt-1 md:pt-0">{item.data.title}</a>
     </h2>
-    <p class="abstract mb-3 font-serif">
-      {item.data.description}
-    </p>
+    <p class="abstract mb-3 font-serif" set:html={item.data.description} />
     <ReadMoreLink href={href} />
     <ArticleMetadata tags={item.data.tags} />
   </div>

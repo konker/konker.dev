@@ -51,7 +51,7 @@ export default {
       '2xl': '1536px',
     },
     fontFamily: {
-      headings: ['Computer Modern Serif', ...defaultTheme.fontFamily.serif],
+      headings: ['Merriweather', ...defaultTheme.fontFamily.serif],
       serif: ['Merriweather', ...defaultTheme.fontFamily.serif],
       sans: ['Work Sans Variable', ...defaultTheme.fontFamily.sans],
       mono: ['JetBrains Mono Variable', ...defaultTheme.fontFamily.mono],

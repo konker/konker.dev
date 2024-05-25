@@ -1,11 +1,13 @@
 ---
 import type { LinkT } from '../../lib/types';
 import '../../styles/global.css';
-import '../../../public/fonts/Computer-Modern-Serif/cmun-serif.css';
 import Header from '../../components/site/Header.astro';
 import Footer from '../../components/site/Footer.astro';
 import '@fontsource-variable/jetbrains-mono';
-import '@fontsource/merriweather';
+import '@fontsource/merriweather/300.css';
+import '@fontsource/merriweather/400.css';
+import '@fontsource/merriweather/700.css';
+import '@fontsource/merriweather/900.css';
 import '@fontsource-variable/work-sans';
 import { SITE_TITLE } from '../../scripts/consts';
 import { isHomePage } from '../../lib';
@@ -48,7 +50,7 @@ const title = SITE_TITLE + (isHomePage(Astro.url) ? '' : ` / ${pageTitle}`);
         <slot name="secondary-navigation" slot="secondary-navigation" />
       </Header>
       <main class={mainClassNames}>
-        <div class="content-wrapper flex-1 flex flex-row flex-nowrap">
+        <div class="wrapper flex-1 flex flex-row flex-nowrap">
           <slot />
         </div>
         <Footer />

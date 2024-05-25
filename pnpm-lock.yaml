@@ -8,6 +8,9 @@ dependencies:
   '@astrojs/check':
     specifier: ^0.5.10
     version: 0.5.10(prettier@3.2.5)(typescript@5.4.5)
+  '@astrojs/rss':
+    specifier: ^4.0.6
+    version: 4.0.6
   '@astrojs/sitemap':
     specifier: ^3.1.5
     version: 3.1.5
@@ -17,13 +20,10 @@ dependencies:
   '@fontsource-variable/jetbrains-mono':
     specifier: ^5.0.21
     version: 5.0.21
-  '@fontsource-variable/open-sans':
-    specifier: ^5.0.29
-    version: 5.0.29
   '@fontsource-variable/work-sans':
     specifier: ^5.0.19
     version: 5.0.19
-  '@fontsource/ibm-plex-mono':
+  '@fontsource/ibm-plex-serif':
     specifier: ^5.0.13
     version: 5.0.13
   '@fontsource/merriweather':
@@ -226,6 +226,13 @@ packages:
     engines: {node: ^18.17.1 || ^20.3.0 || >=21.0.0}
     dependencies:
       prismjs: 1.29.0
+    dev: false
+
+  /@astrojs/rss@4.0.6:
+    resolution: {integrity: sha512-hpfHz6OZVD4ME1ZmpNQim0yV0AOetVFUHv0vmL8+Bw4GNcmL0ibGkGtMv+PY72HLJUVfDtizrBjfN5HHg+LScA==}
+    dependencies:
+      fast-xml-parser: 4.4.0
+      kleur: 4.1.5
     dev: false
 
   /@astrojs/sitemap@3.1.5:
@@ -1111,16 +1118,12 @@ packages:
     resolution: {integrity: sha512-LL/57KBbM3r0UMuN6tSeYExiBObt0QuGq49m1FyoDFIv1GAcuKU0EQ/GAKJ/yt3R8onOCD3f5X9Dln//G6uzRQ==}
     dev: false
 
-  /@fontsource-variable/open-sans@5.0.29:
-    resolution: {integrity: sha512-p8T55iQwhErREcjY997t4ah9JKTyJNSBDDVfvVsWIQRGpA2fcTPk9rLue/Mkrr5/efkehxTSbT8JpTTRaFbM5A==}
-    dev: false
-
   /@fontsource-variable/work-sans@5.0.19:
     resolution: {integrity: sha512-UAHRcHDhCt1RyDwzigdQXFwL6skyVDQJxcnD7neHEdAHP9aQuDPWDWeHUfWsmPiBlseOlyczpfsQQcAllOxA9w==}
     dev: false
 
-  /@fontsource/ibm-plex-mono@5.0.13:
-    resolution: {integrity: sha512-gtlMmvk//2AgDEZDFsoL5z9mgW3ZZg/9SC7pIfDwNKp5DtZpApgqd1Fua3HhPwYRIHrT76IQ1tMTzQKLEGtJGQ==}
+  /@fontsource/ibm-plex-serif@5.0.13:
+    resolution: {integrity: sha512-cJsfWHOljHPbFTXjrsYiNw6i2YclggFb6YTueFiw9gr0AJxtgzizh2ObgrvVtEZlQt/UFmCetpK4W27UM5v5/A==}
     dev: false
 
   /@fontsource/merriweather@5.0.13:
@@ -4113,6 +4116,13 @@ packages:
 
   /fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
+    dev: false
+
+  /fast-xml-parser@4.4.0:
+    resolution: {integrity: sha512-kLY3jFlwIYwBNDojclKsNAC12sfD6NwW74QB2CoNGPvtVxjliYehVunB3HYyNi+n4Tt1dAcgwYvmKF/Z18flqg==}
+    hasBin: true
+    dependencies:
+      strnum: 1.0.5
     dev: false
 
   /fastq@1.17.1:
@@ -7549,6 +7559,10 @@ packages:
     resolution: {integrity: sha512-Op+UycaUt/8FbN/Z2TWPBLge3jWrP3xj10f3fnYxf052bKuS3EKs1ZQcVGjnEMdsNVAM+plXRdmjrZ/KgG3Skw==}
     dependencies:
       js-tokens: 9.0.0
+    dev: false
+
+  /strnum@1.0.5:
+    resolution: {integrity: sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==}
     dev: false
 
   /stylus-lookup@3.0.2:

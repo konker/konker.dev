@@ -10,13 +10,13 @@ const { url, title, Icon, textClass, selected } = Astro.props;
 const classNames = !!selected ? 'nav-link selected' : 'nav-link';
 ---
 
-<a href={url} class={classNames}>
+<span class={classNames}>
   {
     Icon ? (
       <span
         class={`float-left md:float-none separator inline-block ml-3 md:ml-0 md:mr-1 mb-[-0.20rem] ${textClass ?? ''}`}
       >
-        <Icon size={NAV_ICON_SIZE} />
+        <a href={url}><Icon class={textClass} size={NAV_ICON_SIZE} /></a>
       </span>
     ) : (
       <span
@@ -24,5 +24,5 @@ const classNames = !!selected ? 'nav-link selected' : 'nav-link';
       />
     )
   }
-  {title}
-</a>
+  <a href={url} class="text">{title}</a>
+</span>

@@ -12,7 +12,7 @@
   --kdd-color-text-dark: #efefef;
   --kdd-color-heading-dark: #ffffff;
   --kdd-color-bg-dark: #222222;
-  --kdd-color-hr-dark: #444444;
+  --kdd-color-hr-dark: #999999;
   --kdd-classic-link-dark: #2299ff;
   --kdd-classic-link-visited-dark: #227799;
   --kdd-classic-link-active-dark: #efefef;
@@ -21,7 +21,7 @@
   --kdd-color-text-light: #222222;
   --kdd-color-heading-light: #000000;
   --kdd-color-bg-light: #fbfbfb;
-  --kdd-color-hr-light: #d0d0d0;
+  --kdd-color-hr-light: #696969;
   --kdd-classic-link-light: #0000ee;
   --kdd-classic-link-visited-light: #551a8b;
   --kdd-classic-link-active-light: #222222;
@@ -112,14 +112,15 @@ nav a.selected {
 
 /* ----------------------------------------------------------------------- */
 .content {
-  @apply prose prose-sm prose-neutral prose-headings:font-headings prose-h1:font-medium dark:prose-invert md:prose max-w-screen-md;
+  @apply prose prose-neutral prose-headings:font-headings prose-headings:text-3xl prose-h1:font-[500] dark:prose-invert max-w-screen-md;
 }
 .content hr {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 60px;
-  height: 12px;
-  background: radial-gradient(circle closest-side, var(--kdd-color-hr) 100%, #0000) 0 / calc(100% / 3) 100%;
+  @apply mx-auto mt-1 mb-10 md:mt-6 md:mb-14 h-4 text-kdd-hr text-center border-0 text-2xl;
+  line-height: 0.75;
+}
+.content hr:before {
+  content: "• • •";
+  letter-spacing: 0.25em;
 }
 .content code {
   font-size: 0.85rem;
@@ -127,4 +128,8 @@ nav a.selected {
 .content h3:target,
 .content h4:target {
   background-color: #ff0;
+}
+
+.content-wrapper {
+  @apply w-full mx-6 md:mx-auto mt-2 md:mt-6 mb-12;
 }

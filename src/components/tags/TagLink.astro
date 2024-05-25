@@ -1,0 +1,27 @@
+---
+import type { LinkT } from '../../lib/types';
+import { NAV_ICON_SIZE } from '../../scripts/consts';
+
+type Props = LinkT & {
+  readonly selected?: boolean;
+};
+
+const { url, title, Icon, textClass, selected } = Astro.props;
+const classNames = !!selected ? 'nav-link selected' : 'nav-link';
+---
+
+
+  {
+    Icon ? (
+      <span
+        class={`float-none separator inline-block ml-0 mr-1 mb-[-0.30rem] ${textClass ?? ''}`}
+      >
+        <a href={url} class={classNames}><Icon size={NAV_ICON_SIZE} /></a>
+      </span>
+    ) : (
+      <span
+        class={`float-none separator inline-block ml-0 mr-1 mb-[-0.30rem] w-[${NAV_ICON_SIZE}px]`}
+      />
+    )
+  }
+<a href={url} class={classNames}>{title}</a>

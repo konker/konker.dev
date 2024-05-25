@@ -11,11 +11,11 @@ const { logoImage, siteTitle } = Astro.props;
 
 <div id="logo" class="relative font-serif m-6 md:pt-6 mb-0">
   <a href="/" class="block">
-    <Image src={logoImage} alt="" quality="max" class="absolute w-[2.64rem] h-[5rem] top-0 md:top-5 left-0" />
-    <span class="title block text-3xl my-0 ml-14 pt-0 pb-4 border-b border-gray-400 dark:border-gray-500"
-      >{siteTitle}</span
-    >
-  </a>
+    <Image src={logoImage} alt="" quality="max" class="absolute w-[2.64rem] h-[5.0rem] top-0 md:top-5 left-0" /></a
+  >
+  <div class="title block text-3xl my-0 ml-14 pt-0 pb-3 border-b border-gray-400 dark:border-gray-500">
+    <a href="/" class="inline-block">{siteTitle}</a>
+  </div>
   <slot />
 </div>
 

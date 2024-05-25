@@ -22,9 +22,8 @@ const { pageTitle, title, description, lastModified, image, breadcrumbs, section
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
-  <section id="content" class="content w-full mx-6 md:mx-auto mt-2 md:mt-6 mb-12">
-    <article>
-      <h1 set:html={title} />
+  <article id="content" class="content content-wrapper">
+      <h1 class="text-center md:text-left">{title}</h1>
       <ArticleMetadata {...Astro.props} lastModified={lastModified} />
       {
         image ? (
@@ -34,9 +33,9 @@ const { pageTitle, title, description, lastModified, image, breadcrumbs, section
         ) : undefined
       }
       <hr />
-      <p class="attention-grabber">{description}</p>
+      <p class="attention-grabber" set:html={description} />
       <slot />
-      <hr class="mt-10" />
+      <hr />
       <div class="article-footer mt-16">
         {
           sectionNavigation ? (
@@ -44,8 +43,7 @@ const { pageTitle, title, description, lastModified, image, breadcrumbs, section
           ) : undefined
         }
       </div>
-    </article>
-  </section>
+  </article>
 </BaseLayout>
 
 <style>

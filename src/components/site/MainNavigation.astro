@@ -61,21 +61,25 @@ const navLinks: ReadonlyArray<LinkT> = navLinksConfig.map((linkConfig, i) => ({
 </NavigationPanel>
 
 <style is:global>
-  .main-navigation .nav-links a,
-  .main-navigation .nav-links a:visited {
-    @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l text-kdd-link bg-kdd md:bg-kdd-nav;
+  .main-navigation .nav-links .nav-link {
+    @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l bg-kdd md:bg-kdd-nav;
   }
-  .main-navigation .nav-links a.nav-link:first-of-type {
+  .main-navigation .nav-links .nav-link a.text:visited {
+    @apply text-kdd-link;
+  }
+  .main-navigation .nav-links .nav-link:first-of-type {
     @apply border-t md:border-t-0;
   }
-  .main-navigation .nav-links a.nav-link:last-of-type {
+  .main-navigation .nav-links .nav-link:last-of-type {
     @apply md:border-r;
   }
-  .main-navigation .nav-links a.selected,
-  .main-navigation .nav-links a:hover {
-    @apply bg-konker-flash-blue-dark dark:bg-konker-flash-blue-dark text-white dark:text-white no-underline;
+  .main-navigation .nav-links .nav-link.selected,
+  .main-navigation .nav-links .nav-link:hover {
+    @apply bg-konker-flash-blue-dark dark:bg-konker-flash-blue-dark;
   }
-  .main-navigation .nav-links a:hover .separator {
-    @apply text-white;
+  .main-navigation .nav-links .nav-link.selected a.text,
+  .main-navigation .nav-links .nav-link:hover a.text,
+  .main-navigation .nav-links .nav-link:hover a * {
+    @apply text-white no-underline;
   }
 </style>
