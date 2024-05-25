@@ -23,7 +23,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { image } = entry.data;
-const { Content } = await entry.render();
+const { Content, remarkPluginFrontmatter } = await entry.render();
 const collection = 'til' as const;
 const indexBreadcrumb: LinkT = {
   title: 'TIL',
@@ -46,6 +46,7 @@ const sectionNavigation = collectionEntryToSectionNavigation(collection, indexBr
 
 <BlogPostLayout
   {...entry.data}
+  lastModified={remarkPluginFrontmatter.lastModified}
   image={image}
   pageTitle={entry.data.title}
   breadcrumbs={breadcrumbs}

@@ -12,19 +12,20 @@ interface Props {
   readonly author: string;
   readonly description: string;
   readonly tags: Array<string>;
+  readonly lastModified: string;
   readonly image?: ReturnType<typeof Image>;
   readonly breadcrumbs?: ReadonlyArray<LinkT>;
   readonly sectionNavigation?: SectionNavigationT | undefined;
 }
 
-const { pageTitle, title, description, image, breadcrumbs, sectionNavigation } = Astro.props;
+const { pageTitle, title, description, lastModified, image, breadcrumbs, sectionNavigation } = Astro.props;
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs}>
   <section id="content" class="content w-full mx-6 md:mx-auto mt-2 md:mt-6 mb-12">
     <article>
       <h1 set:html={title} />
-      <ArticleMetadata {...Astro.props} />
+      <ArticleMetadata {...Astro.props} lastModified={lastModified} />
       {
         image ? (
           <div class="text-center">
@@ -49,7 +50,6 @@ const { pageTitle, title, description, image, breadcrumbs, sectionNavigation } =
 
 <style>
   .attention-grabber {
-    @apply font-sans;
-    font-size: 125%;
+    @apply font-serif font-semibold;
   }
 </style>
