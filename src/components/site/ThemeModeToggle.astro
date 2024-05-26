@@ -8,7 +8,22 @@ interface Props {
 }
 
 const { navId, initLightMode, class: classNames } = Astro.props;
-const themeModeToggleClassNames = `theme-mode-toggle noscript flex flex-row rounded-full p-1 bg-color-bg-light dark:bg-color-bg-dark border-color-text-light dark:border-color-text-dark rounded-full border ${classNames} ${initLightMode ? 'light' : 'dark'}`;
+const themeModeToggleClassNames = [
+  'theme-mode-toggle',
+  'noscript',
+  'flex',
+  'flex-row',
+  'rounded-full',
+  'p-[3px]',
+  'bg-color-bg-light',
+  'dark:bg-color-bg-dark',
+  'border-color-text-light',
+  'dark:border-color-text-dark',
+  'rounded-full',
+  'border',
+  classNames,
+  initLightMode ? 'light' : 'dark'
+].join(' ');
 const darkId = `${navId}-dark`;
 const lightId = `${navId}-light`;
 ---

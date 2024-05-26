@@ -2,26 +2,33 @@
 
 - POA
 
-  - ~~next / prev links on moonlight [1]~~
-  - ~~scrollbars on main content [1]~~
-  - ~~amend lint rules to remove most FP [2]~~
-  - aria props [2]
+  - Aria props [2]
   - RSS feed [2]
-  - Sitemap? [3]
-  - Test favicon [3]
-  - giscus comments / (also reactions?) [3]
-    - Do we want to create a codeberg equivalent?
+  - Print CSS [2]
+    - https://github.com/BafS/Gutenberg/blob/master/docs/index.html
+  - Analytics [2]
+    - https://usefathom.com/pricing [?]
+    - https://plausible.io/#pricing [?]
+  - Fallback for noscript [2]
   - Check vitals/performance [2]
     - https://pagespeed.web.dev/
     - Lighthouse?
     - SSL?
   - Codeberg?
     - Mirror to github for deployment? [6]
+  - Test favicon [3]
+  - Fallback for very small screen? [3]
+    - Could be quite similar to fallback for noscript?
+  - Contact form? [3]
+  - Article reactions? [3]
+  - giscus comments / (also reactions?) [3]
+    - Do we want to create a codeberg equivalent?
   - search [4]
-    - check astro/starlight and just do that for a start
-  - Analytics
-    - https://usefathom.com/pricing [?]
-    - https://plausible.io/#pricing [?]
+    - pagefind
+  - ~~next / prev links on moonlight [1]~~
+  - ~~scrollbars on main content [1]~~
+  - ~~amend lint rules to remove most FP [2]~~
+  - ~~Sitemap? [3]~~
   - ~~main-navigation is full screen in sm [?][9]~~
   - ~~animate main-navigation [6]~~
   - ~~auto-close for intra-page navigation~~
@@ -36,137 +43,10 @@
       - fediverse [? but should set that up]
       - keybase [?]
   - ~~dark/light mode toggle [2]~~
-    - light mode code for dark mode?
+    - ~~light mode code for dark mode?~~
   - easter_eggs?
     - ~~clacks~~
     - ...
   - ~~nojs navigation not working~~
   - ~~footer content~~
     - ~~see: social links above as part of it~~
-
-- Idea:
-
-  - Implement an Astro ??? to implement the layout of https://diataxis.fr/reference/
-  - Fundamentals first:
-    - Use tailwind vars everywhere for consistency
-      - Own src/styles/css files
-      - <style></style> sections in components
-    - Streamline the use of tailwind
-      - Make sure repeating combinations are abstracted out
-        - How?
-  - Make sure we have full control over responsiveness
-    - sm: phone
-      - collapse left and right
-    - md: tablet / small screen
-      - collapse right
-    - lg: desktop
-      - collapse none
-
-- Projects
-
-  - ~~Content collection per project?~~
-  - Content collection for all projects
-  - A project is a top-level folder inside `content/projects`
-  - Need to auto-index all project content
-    - Files in sub-folders [is this needed for first version?]
-    - Heading levels within files
-      - Can we use: https://github.com/vcarl/remark-headings [?]
-  - Need to generate navigation for project content
-    - Similar to starlight: sidebar with files/folders; right-hand bar with in-page navigation [?]
-  - See: https://diataxis.fr/reference/
-    - Left nav slides out, right nav slides out (on small screens)
-    - Right nav is collapsed first on medium screens
-  - Can we re-use some features of starlight?
-    - Code rendering, diffs/etc?
-    - Search?
-
-- TODO
-
-  - ~~Metadata~~
-    - ~~Format readable date properly~~
-    - ~~Use proper name for author?~~
-    - ~~Remove email from author?~~
-    - ~~Better icons?: https://lucide-astro.dzeio.com/~~
-  - ~~Tag index pages~~
-  - ~~TIL index page~~
-  - ~~Selected items for MainNavigation~~
-  - Comments/feedback for TIL posts
-    - https://elazizi.com/posts/add-comments-section-to-your-astro-blog/
-  - Projects index page
-    - Project page template
-      - More like a documentation style
-      - Can we somehow use/leverage starlight here?
-        - This is a tradeoff:
-          - PRO: very good documentation features, responsive, light/dark, auto-index doc folder trees
-          - CON: not designed to be per-project, more like for a standalone site
-          - CON: will need a lot of hacking to make it fit with the rest of the site design
-            - QUESTION: is this hacking worth it, or should we go to the effort of creating our own implementation?
-  - About page content
-  - Footer content
-    - Share links?
-    - Links to main parts of site?
-    - Link to analytics??
-      - See: https://harrk.dev/why-i-switched-from-plausible-to-fathom-analytics/
-  - Hamburger menu
-    - Animate?
-    - Make wider/longer?
-  - Analytics
-    - https://usefathom.com/pricing [?]
-    - https://plausible.io/#pricing [?]
-
-- RSS feed?
-  - Just for TIL?
-  - Could have separate one for tags?
-- Accessibility?
-- PGP signatures
-  - Could make an Astro integration?
-    - Project/TIL material
-- Search?
-- Sitemap?
-
-- Add navigation:
-  - Home
-  - Projects
-  - TIL
-    - tags
-      - (or should these be top-level, for any content, e.g. projects, etc?)
-      - but then projects would also have to be content collections?
-        - Can content collections be metadata only and refer to pages?
-  - About
-    - Contact
-- ~~Hamburger menu~~
-- Add some TIL posts
-- Add skeleton project pages?
-  - ???
-  - Would be good to get to a point where I just need to write
-- Develop footer further
-  - Links to github?
-  - Other links?
-    - Astro
-    - Tailwind
-    - AWS
-- Print CSS
-  - https://github.com/BafS/Gutenberg/blob/master/docs/index.html
-- Fallback for noscript
-- Fallback for very small screen?
-  - Could be quite similar to fallback for noscript?
-- Analytics
-  - Page views counter for posts?
-- Documentation pages?
-  - (Or even project pages)
-  - Do they need to be different from current typographical style?
-    - Starlight even?
-      - Does starlight use tailwind?
-- Dark mode?
-- Search?
-- Contact form?
-- SEO?
-- Test favicon
-- Check vitals/performance
-  - https://pagespeed.web.dev/
-  - Lighthouse?
-  - SSL?
-- Codeberg?
-  - Mirror to github?
-  - What about codestar link to github for site-o-matic CD?
-- Pratchett clacks?

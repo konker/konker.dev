@@ -1,0 +1,11 @@
+---
+interface Props {
+  readonly tag: string;
+}
+
+const { tag } = Astro.props;
+---
+
+<span class="tag inline-block pt-0 pb-1 px-3 bg-kdd-nav mb-2 mr-2 rounded-lg font-sans">
+  <a href={`/tags/${tag}`} class="text-blue-800">#{tag}</a>
+</span>

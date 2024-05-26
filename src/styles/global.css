@@ -35,9 +35,9 @@
   --kdd-color-bg-tag-dark: #333333;
 
   --kdd-color-text-project-light: var(--kdd-konker-flash-red-dark);
-  --kdd-color-bg-project-light: #f0f0f0;
+  --kdd-color-bg-project-light: #e9e9e9;
   --kdd-color-text-blog-light: #75702b;
-  --kdd-color-bg-blog-light: #f0f0f0;
+  --kdd-color-bg-blog-light: #e9e9e9;
   --kdd-color-text-tag-light: var(--kdd-konker-flash-blue);
   --kdd-color-bg-tag-light: #dddddd;
 

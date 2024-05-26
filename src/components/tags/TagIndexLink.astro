@@ -14,13 +14,13 @@ const classNames = !!selected ? 'nav-link selected' : 'nav-link';
   {
     Icon ? (
       <span
-        class={`float-none separator inline-block ml-0 mr-1 mb-[-0.30rem] ${textClass ?? ''}`}
+        class={`float-none separator inline-block ml-0 mr-1 mb-[-0.35rem] ${textClass ?? ''}`}
       >
         <a href={url} class={classNames}><Icon size={NAV_ICON_SIZE} /></a>
       </span>
     ) : (
       <span
-        class={`float-none separator inline-block ml-0 mr-1 mb-[-0.30rem] w-[${NAV_ICON_SIZE}px]`}
+        class={`float-none separator inline-block ml-0 mr-1 mb-[-0.35rem] w-[${NAV_ICON_SIZE}px]`}
       />
     )
   }

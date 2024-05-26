@@ -66,22 +66,28 @@ export function itemIconLookup(itemIconName: string | undefined) {
   }
 }
 
+export const ITEM_ICON_CLASS_SELECTED = 'text-white';
+export const ITEM_ICON_CLASS_BLOG = 'text-kdd-blog';
+export const ITEM_ICON_CLASS_PROJECT = 'text-kdd-project';
+export const ITEM_ICON_CLASS_TAG = 'text-kdd-tag';
+export const ITEM_ICON_CLASS_DEFAULT = 'text-kdd';
+
 export function itemTextClassLookup(itemIconName: string | undefined, selected = false) {
   if (selected) {
-    return 'text-white';
+    return ITEM_ICON_CLASS_SELECTED;
   }
 
   switch (itemIconName) {
     case 'blog':
     case 'til':
-      return 'text-kdd-blog';
+      return ITEM_ICON_CLASS_BLOG;
     case 'project':
     case 'projects':
-      return 'text-kdd-project';
+      return ITEM_ICON_CLASS_PROJECT;
     case 'tag':
     case 'tags':
-      return 'text-kdd-tag';
+      return ITEM_ICON_CLASS_TAG;
     default:
-      return 'text-kdd';
+      return ITEM_ICON_CLASS_DEFAULT;
   }
 }
