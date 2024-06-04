@@ -1,8 +1,16 @@
 import { z } from 'astro/zod';
 
+import { MOONLIGHT_ENTRY_KIND_REFERENCE, MOONLIGHT_ENTRY_KIND_REGULAR } from './index.ts';
+
 export const MoonlightSchema = z.object({
   /** The title of the current page. Required. */
   title: z.string(),
+
+  /** The kind of non-index page. Optional, default: `regular`. */
+  kind: z
+    .enum([MOONLIGHT_ENTRY_KIND_REGULAR, MOONLIGHT_ENTRY_KIND_REFERENCE])
+    .optional()
+    .default(MOONLIGHT_ENTRY_KIND_REGULAR),
 
   /**
    * A short description of the current page’s content. Optional, but recommended.

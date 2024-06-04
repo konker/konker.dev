@@ -1,18 +1,18 @@
 ---
 import type { MarkdownHeading } from 'astro';
-import type { HeadingsList } from '../../lib/types';
+import type { DepthGroupT } from '../../lib/moonlight/navigation';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationPanel from '../site/NavigationPanel.astro';
 import IntraPageLink from './IntraPageLink.astro';
 import IntraPageLinkList from './IntraPageLinkList.astro';
-import IntraPageOverviewLink from './IntraPageOverviewLink.astro';
 
 interface Props {
-  readonly headings: Array<MarkdownHeading>;
+  readonly headingGroups: DepthGroupT<MarkdownHeading>;
 }
 
-const { headings } = Astro.props;
+const { headingGroups } = Astro.props;
 
+/*FIXME: remove
 function groupHeadings(headings: Array<MarkdownHeading>, depth: number): HeadingsList {
   let skipIdx = -1;
   return headings.reduce((acc, val, i) => {
@@ -31,6 +31,7 @@ function groupHeadings(headings: Array<MarkdownHeading>, depth: number): Heading
     return acc.concat(val);
   }, [] as HeadingsList);
 }
+*/
 ---
 
 <NavigationPanel
@@ -41,9 +42,8 @@ function groupHeadings(headings: Array<MarkdownHeading>, depth: number): Heading
 >
   <nav>
     <ul>
-      <li><IntraPageOverviewLink /></li>
       {
-        groupHeadings(headings, 2).map((x) =>
+        headingGroups.map((x) =>
           Array.isArray(x) ? (
             <ul>
               <IntraPageLinkList list={x} />

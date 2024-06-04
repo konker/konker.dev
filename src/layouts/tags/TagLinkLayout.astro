@@ -3,7 +3,7 @@ import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
 import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
 import { isBlogEntry, type TagCollection } from '../../lib/collections';
 import type { TagEntry } from '../../lib/collections/tags';
-import { isProjectEntry } from '../../lib/moonlight/config';
+import { isMoonlightEntry } from '../../lib/moonlight/config';
 import type { LinkT } from '../../lib/types';
 import PageLayout from '../site/PageLayout.astro';
 
@@ -29,7 +29,7 @@ const { pageTitle, breadcrumbs, intro, tagEntries, titleIconName } = Astro.props
             item={tagEntry.entry}
             itemIconName={tagEntry.collection}
           />
-        ) : isProjectEntry(tagEntry.entry) ? (
+        ) : isMoonlightEntry(tagEntry.entry) ? (
           <ProjectIndexItem item={tagEntry.entry} itemIconName={tagEntry.collection} />
         ) : (
           <p>UNKNOWN ENTRY</p>

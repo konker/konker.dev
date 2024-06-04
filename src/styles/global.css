@@ -112,7 +112,7 @@ nav a.selected {
 
 /* ----------------------------------------------------------------------- */
 .content {
-  @apply prose prose-neutral prose-headings:font-headings prose-headings:text-3xl prose-h1:font-[500] dark:prose-invert max-w-screen-md;
+  @apply prose prose-neutral prose-headings:font-headings prose-headings:font-[500] dark:prose-invert max-w-screen-md;
 }
 .content hr {
   @apply mx-auto mt-1 mb-10 md:mt-6 md:mb-14 h-4 text-kdd-hr text-center border-0 text-2xl;

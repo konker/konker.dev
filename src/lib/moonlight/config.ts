@@ -15,6 +15,6 @@ export function isMoonlightCollection(x: unknown): x is MoonlightCollection {
   return MOONLIGHT_COLLECTION_NAMES.includes(x as any);
 }
 
-export function isProjectEntry(x: unknown): x is CollectionEntry<MoonlightCollection> {
+export function isMoonlightEntry(x: unknown): x is CollectionEntry<MoonlightCollection> {
   return !!x && typeof x === 'object' && 'collection' in x && isMoonlightCollection(x.collection);
 }

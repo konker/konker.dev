@@ -1,19 +1,21 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
 import type { MoonlightCollection } from '../../lib/moonlight/config';
+import type { DepthGroupT } from '../../lib/moonlight/navigation';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationLink from '../site/NavigationLink.astro';
 import NavigationPanel from '../site/NavigationPanel.astro';
 
 interface Props {
   readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
-  readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
+  readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
 }
 
-const { projectEntries, projectRootEntry } = Astro.props;
+const { projectNavigation, projectRootEntry } = Astro.props;
 const urlPathSlug = Astro.url.pathname;
-const navLinksSelectedLookup = projectEntries.map(
-  (entry, i) => (urlPathSlug.length === 0 && i == 0) || urlPathSlug === entry.slug
+const navLinksSelectedLookup = projectNavigation.map(
+  (item, i) => (urlPathSlug.length === 0 && i == 0) ||  Array.isArray(item) ? false : urlPathSlug === item.entry.slug
 );
 const isProjectRoot = urlPathSlug === projectRootEntry.slug;
 ---
@@ -30,9 +32,9 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
         <NavigationLink url={projectRootEntry.slug} title={projectRootEntry.data.title} selected={isProjectRoot} />
       </li>
       {
-        projectEntries.map((x, i) => (
+        projectNavigation.map((x, i) => (
           <li>
-            <NavigationLink url={x.slug} title={x.data.title} selected={!!navLinksSelectedLookup[i]} />
+            <NavigationLink url={Array.isArray(x) ? 'ARR1' : x.entry.slug} title={Array.isArray(x) ? 'ARR2' : x.entry.data.title} selected={!!navLinksSelectedLookup[i]} />
           </li>
         ))
       }

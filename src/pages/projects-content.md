@@ -2,4 +2,4 @@
 title: Projects
 ---
 
-FIXME
+Documentation for various projects, mostly software projects. In no particular order.

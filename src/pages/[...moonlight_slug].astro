@@ -1,21 +1,21 @@
 ---
-import ProjectIndexLayout from '../layouts/moonlight/ProjectIndexLayout.astro';
 import ProjectPageLayout from '../layouts/moonlight/ProjectPageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import { itemIconLookup, itemTextClassLookup } from '../lib/collections/helpers';
-import { MOONLIGHT_PAGE_TYPE_INDEX, type MoonlightPageProps } from '../lib/moonlight';
-import { moonlightGetStaticPaths } from '../lib/moonlight/routing';
+import type { MoonlightPagePropsEntry } from '../lib/moonlight';
+import { moonlightGetStaticPathsEntries } from '../lib/moonlight/routing';
 import type { LinkT } from '../lib/types';
 
 export async function getStaticPaths() {
-  return moonlightGetStaticPaths({
+  return moonlightGetStaticPathsEntries({
     projects: '/projects',
   });
 }
 
-type Props = MoonlightPageProps;
+type Props = MoonlightPagePropsEntry;
 
 // --------------------------------------------------------------------------
+// FIXME: breadcrumbs are knackered
 const indexBreadcrumb: LinkT = {
   title: 'Projects',
   url: '/projects/',
@@ -23,57 +23,37 @@ const indexBreadcrumb: LinkT = {
   textClass: itemTextClassLookup('projects'),
 };
 const indexBreadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb];
-const breadcrumbs: ReadonlyArray<LinkT> =
-  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX
-    ? indexBreadcrumbs
-    : [
-        ...indexBreadcrumbs,
+const breadcrumbs: ReadonlyArray<LinkT> = [
+  ...indexBreadcrumbs,
+  {
+    title: Astro.props.item.entry.data.title,
+    url: Astro.props.item.entry.slug,
+  },
+].concat(
+  Astro.props.item.entry.slug !== Astro.props.item.entry.slug
+    ? [
         {
-          title: Astro.props.projectRootEntry.data.title,
-          url: Astro.props.projectRootEntry.slug,
+          title: Astro.props.item.entry.data.title,
+          url: Astro.props.item.entry.slug,
         },
-      ].concat(
-        Astro.props.entry.slug !== Astro.props.projectRootEntry.slug
-          ? [
-              {
-                title: Astro.props.entry.data.title,
-                url: Astro.props.entry.slug,
-              },
-            ]
-          : []
-      );
+      ]
+    : []
+);
 
-const content =
-  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX ? (await Astro.glob('./projects-content.md'))[0] : undefined;
-
-const pageTitle =
-  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX
-    ? content?.frontmatter.title
-    : breadcrumbs
-        .slice(2)
-        .map((b) => b.title)
-        .join(' / ');
+const pageTitle = breadcrumbs
+  .slice(2)
+  .map((b) => b.title)
+  .join(' / ');
 ---
 
-{
-  Astro.props.type === MOONLIGHT_PAGE_TYPE_INDEX ? (
-    <ProjectIndexLayout
-      pageTitle={pageTitle}
-      content={content}
-      indexEntries={Astro.props.indexEntries}
-      breadcrumbs={breadcrumbs}
-      itemIconName="project"
-    />
-  ) : (
-    <ProjectPageLayout
-      pageTitle={pageTitle}
-      breadcrumbs={breadcrumbs}
-      projectEntries={Astro.props.projectEntries}
-      projectRootEntry={Astro.props.projectRootEntry}
-      prevEntry={Astro.props.prevEntry}
-      nextEntry={Astro.props.nextEntry}
-      Content={Astro.props.Content}
-      headings={Astro.props.headings}
-    />
-  )
-}
+<ProjectPageLayout
+  pageTitle={pageTitle}
+  breadcrumbs={breadcrumbs}
+  kind={Astro.props.kind}
+  entry={Astro.props.item.entry}
+  projectNavigation={Astro.props.projectNavigation}
+  prevEntry={Astro.props.prevItem?.entry}
+  nextEntry={Astro.props.nextItem?.entry}
+  Content={Astro.props.Content}
+  headingGroups={Astro.props.headingGroups}
+/>

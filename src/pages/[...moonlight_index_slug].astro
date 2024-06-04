@@ -1,0 +1,35 @@
+---
+import ProjectIndexLayout from '../layouts/moonlight/ProjectIndexLayout.astro';
+import { HomeBreadcrumb } from '../lib';
+import { itemIconLookup, itemTextClassLookup } from '../lib/collections/helpers';
+import type { MoonlightPagePropsIndex } from '../lib/moonlight';
+import { moonlightGetStaticPathsIndex } from '../lib/moonlight/routing';
+import type { LinkT } from '../lib/types';
+
+export async function getStaticPaths() {
+  return moonlightGetStaticPathsIndex({
+    projects: '/projects',
+  });
+}
+
+type Props = MoonlightPagePropsIndex;
+
+// --------------------------------------------------------------------------
+const indexBreadcrumb: LinkT = {
+  title: 'Projects',
+  url: '/projects/',
+  Icon: itemIconLookup('projects'),
+  textClass: itemTextClassLookup('projects'),
+};
+const indexBreadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb];
+const content = (await Astro.glob('./projects-content.md'))[0];
+const pageTitle = content?.frontmatter.title;
+---
+
+<ProjectIndexLayout
+  pageTitle={pageTitle}
+  content={content}
+  indexItems={Astro.props.indexItems}
+  breadcrumbs={indexBreadcrumbs}
+  itemIconName="project"
+/>

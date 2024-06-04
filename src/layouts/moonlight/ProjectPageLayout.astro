@@ -1,4 +1,5 @@
 ---
+import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
 import type { MarkdownHeading, MarkdownInstance } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { PanelLeftClose, PanelLeftOpen, PilcrowLeft, PilcrowRight } from 'lucide-astro';
@@ -6,27 +7,32 @@ import ContentNavigation from '../../components/moonlight/ContentNavigation.astr
 import IntraPageNavigation from '../../components/moonlight/IntraPageNavigation.astro';
 import PageContent from '../../components/moonlight/PageContent.astro';
 import NavigationToggle from '../../components/site/NavigationToggle.astro';
-import type { MoonlightCollection } from '../../lib/moonlight/config';
 import type { LinkT } from '../../lib/types';
 import { NavigationPanelBreakpoint } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
+import type { MoonlightEntryKind } from '../../lib/moonlight';
+import type { MoonlightCollection } from '../../lib/moonlight/config';
+import type { DepthGroupT } from '../../lib/moonlight/navigation';
 
 interface Props {
+  readonly kind: MoonlightEntryKind;
   readonly pageTitle: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
-  readonly headings: Array<MarkdownHeading>;
+  readonly headingGroups: DepthGroupT<MarkdownHeading>;
+  readonly entry: CollectionEntry<MoonlightCollection>;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
+  readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
   readonly prevEntry: CollectionEntry<MoonlightCollection> | undefined;
   readonly nextEntry: CollectionEntry<MoonlightCollection> | undefined;
-  readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
-  readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
+  // readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
+  // readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
 }
 
-const { pageTitle, breadcrumbs, headings, Content, projectRootEntry, prevEntry, nextEntry, projectEntries } =
-  Astro.props;
+const { pageTitle, breadcrumbs, kind, entry, headingGroups, Content, projectNavigation, prevEntry, nextEntry } = Astro.props;
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} fixedHeader={true}>
+  KONK90: [<p>{kind}</p>]
   <Fragment slot="secondary-navigation">
     <NavigationToggle
       navId="content-navigation"
@@ -46,9 +52,9 @@ const { pageTitle, breadcrumbs, headings, Content, projectRootEntry, prevEntry, 
     />
   </Fragment>
 
-  <ContentNavigation projectEntries={projectEntries} projectRootEntry={projectRootEntry} />
+  <ContentNavigation projectNavigation={projectNavigation} projectRootEntry={entry} />
   <PageContent Content={Content} prevEntry={prevEntry} nextEntry={nextEntry} />
-  <IntraPageNavigation headings={headings} />
+  <IntraPageNavigation headingGroups={headingGroups} />
   <script is:inline>
     // --------------------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {

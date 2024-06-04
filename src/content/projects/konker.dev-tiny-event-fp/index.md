@@ -6,4 +6,7 @@ pubDate: 2024-05-20
 tags: ['FIXME', 'project', 'nodejs', 'typescript', 'effect', 'fp', 'lib']
 ---
 
-FIXME this is the index content for @konker.dev/tiny-event-fp
+# @konker.dev/tiny-event-fp
+
+A small, one-file, typescript library for creating event listeners and emitters, designed for programs based on the [Effect](https://effect.website/) functional programming framework.
+
