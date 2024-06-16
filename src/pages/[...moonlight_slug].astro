@@ -3,41 +3,34 @@ import ProjectPageLayout from '../layouts/moonlight/ProjectPageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import { itemIconLookup, itemTextClassLookup } from '../lib/collections/helpers';
 import type { MoonlightPagePropsEntry } from '../lib/moonlight';
+import { MOONLIGHT_CONFIG, type MoonlightCollection } from '../lib/moonlight/config';
 import { moonlightGetStaticPathsEntries } from '../lib/moonlight/routing';
 import type { LinkT } from '../lib/types';
 
+/* Astro dynamic page paths */
 export async function getStaticPaths() {
-  return moonlightGetStaticPathsEntries({
-    projects: '/projects',
-  });
+  return moonlightGetStaticPathsEntries(MOONLIGHT_CONFIG);
 }
 
-type Props = MoonlightPagePropsEntry;
+type Props = MoonlightPagePropsEntry<MoonlightCollection>;
+
+const collectionName = Astro.props.item.collectionName;
+const rootPathTitle = MOONLIGHT_CONFIG[collectionName]?.rootPathTitle!;
+const rootPathUrl = `/${collectionName}/`;
 
 // --------------------------------------------------------------------------
-// FIXME: breadcrumbs are knackered
 const indexBreadcrumb: LinkT = {
-  title: 'Projects',
-  url: '/projects/',
-  Icon: itemIconLookup('projects'),
-  textClass: itemTextClassLookup('projects'),
+  title: rootPathTitle,
+  url: rootPathUrl,
+  Icon: itemIconLookup(collectionName),
+  textClass: itemTextClassLookup(collectionName),
 };
 const indexBreadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb];
-const breadcrumbs: ReadonlyArray<LinkT> = [
-  ...indexBreadcrumbs,
-  {
-    title: Astro.props.item.entry.data.title,
-    url: Astro.props.item.entry.slug,
-  },
-].concat(
-  Astro.props.item.entry.slug !== Astro.props.item.entry.slug
-    ? [
-        {
-          title: Astro.props.item.entry.data.title,
-          url: Astro.props.item.entry.slug,
-        },
-      ]
-    : []
+const breadcrumbs: ReadonlyArray<LinkT> = indexBreadcrumbs.concat(
+  Astro.props.breadcrumbNavigation.map((x) => ({
+    title: x.entry.data.title,
+    url: x.entry.data.navigable ? `${rootPathUrl}${x.entry.slug}` : undefined,
+  }))
 );
 
 const pageTitle = breadcrumbs
@@ -50,10 +43,9 @@ const pageTitle = breadcrumbs
   pageTitle={pageTitle}
   breadcrumbs={breadcrumbs}
   kind={Astro.props.kind}
-  entry={Astro.props.item.entry}
   projectNavigation={Astro.props.projectNavigation}
-  prevEntry={Astro.props.prevItem?.entry}
-  nextEntry={Astro.props.nextItem?.entry}
+  prevItem={Astro.props.prevItem}
+  nextItem={Astro.props.nextItem}
   Content={Astro.props.Content}
   headingGroups={Astro.props.headingGroups}
 />

@@ -4,3 +4,4 @@ www
 coverage
 **/.cdk-*.out
 **/.serverless/**/*
+*.txt.ts

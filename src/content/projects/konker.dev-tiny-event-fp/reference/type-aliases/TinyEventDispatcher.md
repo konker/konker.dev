@@ -1,10 +1,12 @@
 ---
-title: 'Type alias: TinyEventDispatcher\<T, X\>'
+title: 'TinyEventDispatcher'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 2
+kind: reference
 ---
-# Type alias: TinyEventDispatcher\<T, X\>
+
+# TinyEventDispatcher
 
 ```ts
 type TinyEventDispatcher<T, X>: object;

@@ -1,13 +1,15 @@
 ---
-title: 'Function: removeStarListener()'
+title: 'removeStarListener()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 1
+kind: reference
 ---
-# Function: removeStarListener()
+
+# removeStarListener()
 
 ```ts
-function removeStarListener<T, A>(listener): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>
+function removeStarListener<T, A>(listener): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>;
 ```
 
 ## Type parameters
@@ -18,7 +20,7 @@ function removeStarListener<T, A>(listener): (dispatcher) => Effect<TinyEventDis
 
 ## Parameters
 
-• **listener**: [`TinyEventListener`](../type-aliases/TinyEventListener.md)\<`T`, `A`\>
+• **listener**: [`TinyEventListener`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventlistener)\<`T`, `A`\>
 
 ## Returns
 
@@ -26,11 +28,11 @@ function removeStarListener<T, A>(listener): (dispatcher) => Effect<TinyEventDis
 
 ### Parameters
 
-• **dispatcher**: [`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>
+• **dispatcher**: [`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>
 
 ### Returns
 
-`Effect`\<[`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>, `Error`, `never`\>
+`Effect`\<[`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>, `Error`, `never`\>
 
 ## Source
 

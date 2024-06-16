@@ -1,13 +1,15 @@
 ---
-title: 'Function: notify()'
+title: 'notify()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 1
+kind: reference
 ---
-# Function: notify()
+
+# notify()
 
 ```ts
-function notify<T, A>(eventType, eventData?): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>
+function notify<T, A>(eventType, eventData?): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>;
 ```
 
 ## Type parameters
@@ -28,11 +30,11 @@ function notify<T, A>(eventType, eventData?): (dispatcher) => Effect<TinyEventDi
 
 ### Parameters
 
-• **dispatcher**: [`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>
+• **dispatcher**: [`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>
 
 ### Returns
 
-`Effect`\<[`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>, `Error`, `never`\>
+`Effect`\<[`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>, `Error`, `never`\>
 
 ## Source
 

@@ -1,23 +1,17 @@
 ---
-import type { CollectionEntry } from 'astro:content';
 import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
-import type { MoonlightCollection } from '../../lib/moonlight/config';
 import type { DepthGroupT } from '../../lib/moonlight/navigation';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
-import NavigationLink from '../site/NavigationLink.astro';
 import NavigationPanel from '../site/NavigationPanel.astro';
+import ContentLink from './ContentLink.astro';
+import ContentLinkList from './ContentLinkList.astro';
 
 interface Props {
-  readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
   readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
 }
 
-const { projectNavigation, projectRootEntry } = Astro.props;
-const urlPathSlug = Astro.url.pathname;
-const navLinksSelectedLookup = projectNavigation.map(
-  (item, i) => (urlPathSlug.length === 0 && i == 0) ||  Array.isArray(item) ? false : urlPathSlug === item.entry.slug
-);
-const isProjectRoot = urlPathSlug === projectRootEntry.slug;
+const { projectNavigation } = Astro.props;
+const selectedUrlPathSlug = Astro.url.pathname;
 ---
 
 <NavigationPanel
@@ -28,15 +22,18 @@ const isProjectRoot = urlPathSlug === projectRootEntry.slug;
 >
   <nav>
     <ul>
-      <li>
-        <NavigationLink url={projectRootEntry.slug} title={projectRootEntry.data.title} selected={isProjectRoot} />
-      </li>
       {
-        projectNavigation.map((x, i) => (
-          <li>
-            <NavigationLink url={Array.isArray(x) ? 'ARR1' : x.entry.slug} title={Array.isArray(x) ? 'ARR2' : x.entry.data.title} selected={!!navLinksSelectedLookup[i]} />
-          </li>
-        ))
+        projectNavigation.map((x) =>
+          Array.isArray(x) ? (
+            <ul>
+              <ContentLinkList list={x} selectedUrlPathSlug={selectedUrlPathSlug} />
+            </ul>
+          ) : (
+            <li>
+              <ContentLink item={x} selectedUrlPathSlug={selectedUrlPathSlug} />
+            </li>
+          )
+        )
       }
     </ul>
   </nav>

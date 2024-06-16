@@ -1,7 +1,6 @@
 ---
 import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
 import type { MarkdownHeading, MarkdownInstance } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 import { PanelLeftClose, PanelLeftOpen, PilcrowLeft, PilcrowRight } from 'lucide-astro';
 import ContentNavigation from '../../components/moonlight/ContentNavigation.astro';
 import IntraPageNavigation from '../../components/moonlight/IntraPageNavigation.astro';
@@ -11,7 +10,6 @@ import type { LinkT } from '../../lib/types';
 import { NavigationPanelBreakpoint } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
 import type { MoonlightEntryKind } from '../../lib/moonlight';
-import type { MoonlightCollection } from '../../lib/moonlight/config';
 import type { DepthGroupT } from '../../lib/moonlight/navigation';
 
 interface Props {
@@ -19,20 +17,16 @@ interface Props {
   readonly pageTitle: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly headingGroups: DepthGroupT<MarkdownHeading>;
-  readonly entry: CollectionEntry<MoonlightCollection>;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
   readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
-  readonly prevEntry: CollectionEntry<MoonlightCollection> | undefined;
-  readonly nextEntry: CollectionEntry<MoonlightCollection> | undefined;
-  // readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
-  // readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
+  readonly prevItem: MoonlightProjectNavigationItem | undefined;
+  readonly nextItem: MoonlightProjectNavigationItem | undefined;
 }
 
-const { pageTitle, breadcrumbs, kind, entry, headingGroups, Content, projectNavigation, prevEntry, nextEntry } = Astro.props;
+const { pageTitle, breadcrumbs, kind, headingGroups, Content, projectNavigation, prevItem, nextItem } = Astro.props;
 ---
 
-<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} fixedHeader={true}>
-  KONK90: [<p>{kind}</p>]
+<BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} fixedHeader={true} kind={kind}>
   <Fragment slot="secondary-navigation">
     <NavigationToggle
       navId="content-navigation"
@@ -52,8 +46,8 @@ const { pageTitle, breadcrumbs, kind, entry, headingGroups, Content, projectNavi
     />
   </Fragment>
 
-  <ContentNavigation projectNavigation={projectNavigation} projectRootEntry={entry} />
-  <PageContent Content={Content} prevEntry={prevEntry} nextEntry={nextEntry} />
+  <ContentNavigation projectNavigation={projectNavigation} />
+  <PageContent kind={kind} Content={Content} prevItem={prevItem} nextItem={nextItem} />
   <IntraPageNavigation headingGroups={headingGroups} />
   <script is:inline>
     // --------------------------------------------------------------------------

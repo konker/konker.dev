@@ -1,5 +1,9 @@
+import { isArray, pairWise } from './utils.ts';
+
 export type HasDepthT = { readonly depth: number };
 export type DepthGroupT<T extends HasDepthT> = Array<T | DepthGroupT<T>>;
+
+export type HasPathT = HasDepthT & { readonly path: string };
 
 /**
  * Recursive function to group items by their `depth` property.
@@ -27,4 +31,46 @@ export function groupItemsByDepth<T extends HasDepthT>(items: Array<T>, depth = 
     }
     return acc.concat(val);
   }, [] as DepthGroupT<T>);
+}
+
+/**
+ * TODO: comments
+ */
+export function createPathLookup<T extends HasPathT>(
+  allItems: Array<T>,
+  groupedItems: DepthGroupT<T>
+): Record<string, Array<T>> {
+  function _searchPath(_groupedItems: DepthGroupT<T>, path: string, acc: Array<T>): Array<T> {
+    for (const [a, b] of pairWise(_groupedItems)) {
+      if (isArray(a)) {
+        // We already checked this array as b, so skip it
+        continue;
+      }
+      if (a.path === path) {
+        // We have found the target in a
+        return [...acc, a];
+      }
+      if (isArray(b)) {
+        // b is an array, so the target could be in a sub-list
+        const _subAcc: Array<T> = _searchPath(b, path, [a]);
+        if (_subAcc.length > 1) {
+          // We have found the target in a sub-list
+          return [...acc, ..._subAcc];
+        }
+      } else if (b.path === path) {
+        // We have found the target in b
+        return [...acc, b];
+      }
+    }
+    return acc;
+  }
+
+  const allPaths = allItems.map((x) => x.path);
+  const ret = allPaths.reduce((acc, val) => {
+    return {
+      ...acc,
+      [val]: _searchPath(groupedItems, val, []),
+    };
+  }, {});
+  return ret;
 }

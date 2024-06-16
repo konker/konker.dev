@@ -1,10 +1,12 @@
 ---
-title: 'Type alias: TinyEventListener()\<T, X\>'
+title: 'TinyEventListener()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 2
+kind: reference
 ---
-# Type alias: TinyEventListener()\<T, X\>
+
+# TinyEventListener()
 
 ```ts
 type TinyEventListener<T, X>: (eventType, eventData?) => P.Effect.Effect<void, Error>;

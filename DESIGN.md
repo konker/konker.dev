@@ -1,30 +1,38 @@
 # konker.dev
 
-- POA
+- Immediate
 
-  - Aria props [2]
-  - RSS feed [2]
-  - Print CSS [2]
-    - https://github.com/BafS/Gutenberg/blob/master/docs/index.html
-  - Analytics [2]
-    - https://usefathom.com/pricing [?]
-    - https://plausible.io/#pricing [?]
-  - Fallback for noscript [2]
-  - Check vitals/performance [2]
-    - https://pagespeed.web.dev/
-    - Lighthouse?
-    - SSL?
-  - Codeberg?
-    - Mirror to github for deployment? [6]
-  - Test favicon [3]
-  - Fallback for very small screen? [3]
-    - Could be quite similar to fallback for noscript?
-  - Contact form? [3]
+  - Breadcrumbs a bit long for reference content?
+  - ~~Hardcoded '/projects' still there?~~
+  - ~~mdx for reference?~~
+  - ~~Links on reference index page~~
+  - ~~Links to internal pages on reference content pages~~
+
+- POA
+  - ~~Analytics [2]~~
+    - https://beamanalytics.io/dashboard/analytics [✓]
+    - https://usefathom.com/pricing [x]
+    - https://plausible.io/#pricing [x]
   - Article reactions? [3]
   - giscus comments / (also reactions?) [3]
     - Do we want to create a codeberg equivalent?
   - search [4]
     - pagefind
+  - RSS feed [2]
+  - Contact form? [3]
+  - Aria props [2]
+  - Print CSS [2]
+    - https://github.com/BafS/Gutenberg/blob/master/docs/index.html
+  - Fallback for noscript [2]
+  - Check vitals/performance [2]
+    - https://pagespeed.web.dev/
+    - Lighthouse?
+    - SSL?
+      \*\*- Codeberg?
+    - Mirror to github for deployment? [6]\*\*
+  - Test favicon [3]
+  - Fallback for very small screen? [3]
+    - Could be quite similar to fallback for noscript?
   - ~~next / prev links on moonlight [1]~~
   - ~~scrollbars on main content [1]~~
   - ~~amend lint rules to remove most FP [2]~~

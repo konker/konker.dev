@@ -1,13 +1,15 @@
 ---
-title: 'Function: removeListener()'
+title: 'removeListener()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 1
+kind: reference
 ---
-# Function: removeListener()
+
+# removeListener()
 
 ```ts
-function removeListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>
+function removeListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>;
 ```
 
 ## Type parameters
@@ -20,7 +22,7 @@ function removeListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyE
 
 • **eventType**: `T`
 
-• **listener**: [`TinyEventListener`](../type-aliases/TinyEventListener.md)\<`T`, `A`\>
+• **listener**: [`TinyEventListener`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventlistener)\<`T`, `A`\>
 
 ## Returns
 
@@ -28,11 +30,11 @@ function removeListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyE
 
 ### Parameters
 
-• **dispatcher**: [`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>
+• **dispatcher**: [`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>
 
 ### Returns
 
-`Effect`\<[`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>, `Error`, `never`\>
+`Effect`\<[`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>, `Error`, `never`\>
 
 ## Source
 

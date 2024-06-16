@@ -1,26 +1,28 @@
 ---
-title: '@konker.dev/tiny-event-fp'
+title: 'Reference'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 3
+kind: reference
 ---
-# @konker.dev/tiny-event-fp
+
+# Reference
 
 ## Type Aliases
 
-| Type alias | Description |
-| :------ | :------ |
-| [TinyEventDispatcher](type-aliases/TinyEventDispatcher.md) | - |
-| [TinyEventListener](type-aliases/TinyEventListener.md) | - |
+| Type alias                                                                                          | Description |
+| :-------------------------------------------------------------------------------------------------- | :---------- |
+| [TinyEventDispatcher](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher) | -           |
+| [TinyEventListener](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventlistener)     | -           |
 
 ## Functions
 
-| Function | Description |
-| :------ | :------ |
-| [addListener](functions/addListener.md) | - |
-| [addStarListener](functions/addStarListener.md) | - |
-| [createTinyEventDispatcher](functions/createTinyEventDispatcher.md) | - |
-| [notify](functions/notify.md) | - |
-| [removeAllListeners](functions/removeAllListeners.md) | - |
-| [removeListener](functions/removeListener.md) | - |
-| [removeStarListener](functions/removeStarListener.md) | - |
+| Function                                                                                                     | Description |
+| :----------------------------------------------------------------------------------------------------------- | :---------- |
+| [addListener](/projects/konkerdev-tiny-event-fp/reference/functions/addlistener)                             | -           |
+| [addStarListener](/projects/konkerdev-tiny-event-fp/reference/functions/addstarlistener)                     | -           |
+| [createTinyEventDispatcher](/projects/konkerdev-tiny-event-fp/reference/functions/createtinyeventdispatcher) | -           |
+| [notify](/projects/konkerdev-tiny-event-fp/reference/functions/notify)                                       | -           |
+| [removeAllListeners](/projects/konkerdev-tiny-event-fp/reference/functions/removealllisteners)               | -           |
+| [removeListener](/projects/konkerdev-tiny-event-fp/reference/functions/removelistener)                       | -           |
+| [removeStarListener](/projects/konkerdev-tiny-event-fp/reference/functions/removestarlistener)               | -           |

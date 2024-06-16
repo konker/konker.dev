@@ -1,0 +1,25 @@
+---
+title: 'defaultDynamoDBClientFactory()'
+author: 'Konrad Markus'
+description: 'FIXME-DESC'
+order: 1
+kind: reference
+---
+
+# defaultDynamoDBClientFactory()
+
+```ts
+function defaultDynamoDBClientFactory(config): DynamoDBClient;
+```
+
+## Parameters
+
+• **config**: `DynamoDBClientConfig`
+
+## Returns
+
+`DynamoDBClient`
+
+## Source
+
+[src/index.ts:14](https://github.com/konkerdotdev/aws-client-effect-dynamodb/blob/61cc23ece48bc14ff19d7990e27b716d0c6ee7ed/src/index.ts#L14)

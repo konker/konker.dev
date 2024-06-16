@@ -13,6 +13,18 @@ export const MoonlightSchema = z.object({
     .default(MOONLIGHT_ENTRY_KIND_REGULAR),
 
   /**
+   * An ordering property, defaults to 0.
+   * The higher the value, the higher up in the order the item will appear.
+   */
+  order: z.number().default(0),
+
+  /**
+   * Whether the page should be navigated to,
+   * or whether it is a logical placeholder for navigation display.
+   */
+  navigable: z.boolean().optional().default(true),
+
+  /**
    * A short description of the current page’s content. Optional, but recommended.
    * A good description is 150–160 characters long and outlines the key content
    * of the page in a clear and engaging way.

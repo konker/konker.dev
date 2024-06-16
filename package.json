@@ -22,6 +22,10 @@
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck && pnpm run build"
   },
+  "devDependencies": {
+    "@types/gulp": "^4.0.17",
+    "@types/node": "^20.12.12"
+  },
   "dependencies": {
     "@astrojs/check": "^0.5.10",
     "@astrojs/mdx": "^3.0.1",
@@ -34,7 +38,6 @@
     "@fontsource/merriweather": "^5.0.13",
     "@microsoft/api-documenter": "^7.25.3",
     "@tailwindcss/typography": "^0.5.13",
-    "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@typescript-eslint/typescript-estree": "^6.21.0",
@@ -53,10 +56,7 @@
     "eslint-plugin-sort-destructure-keys": "^1.6.0",
     "execa": "^9.2.0",
     "gulp": "^5.0.0",
-    "gulp-clean": "^0.4.0",
-    "gulp-each": "^0.5.0",
-    "gulp-run": "^1.7.1",
-    "gulp-tap": "^2.0.0",
+    "gulp-prettier": "^6.0.0",
     "handlebars": "^4.7.8",
     "husky": "^8.0.3",
     "leasot": "^13.3.0",

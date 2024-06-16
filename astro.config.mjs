@@ -1,9 +1,9 @@
+import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig } from 'astro/config';
-import { remarkModifiedTime } from './src/lib/remark/remark-modified-time.mjs';
 
-import mdx from "@astrojs/mdx";
+import { remarkModifiedTime } from './src/lib/remark/remark-modified-time.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,16 +12,16 @@ export default defineConfig({
   outDir: 'www',
   server: {
     port: 4321,
-    host: true
+    host: true,
   },
   image: {
-    domains: []
+    domains: [],
   },
   markdown: {
     remarkPlugins: [remarkModifiedTime],
     shikiConfig: {
       theme: 'github-dark-default',
-      wrap: true
-    }
-  }
+      wrap: true,
+    },
+  },
 });

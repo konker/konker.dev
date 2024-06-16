@@ -1,13 +1,15 @@
 ---
-title: 'Function: removeAllListeners()'
+title: 'removeAllListeners()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 1
+kind: reference
 ---
-# Function: removeAllListeners()
+
+# removeAllListeners()
 
 ```ts
-function removeAllListeners<T, A>(): (_dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>
+function removeAllListeners<T, A>(): (_dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>;
 ```
 
 ## Type parameters
@@ -22,11 +24,11 @@ function removeAllListeners<T, A>(): (_dispatcher) => Effect<TinyEventDispatcher
 
 ### Parameters
 
-• **\_dispatcher**: [`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>
+• **\_dispatcher**: [`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>
 
 ### Returns
 
-`Effect`\<[`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>, `Error`, `never`\>
+`Effect`\<[`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>, `Error`, `never`\>
 
 ## Source
 

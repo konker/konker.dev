@@ -1,13 +1,15 @@
 ---
-title: 'Function: addListener()'
+title: 'addListener()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 1
+kind: reference
 ---
-# Function: addListener()
+
+# addListener()
 
 ```ts
-function addListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>
+function addListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyEventDispatcher<T, A>, Error, never>;
 ```
 
 ## Type parameters
@@ -20,7 +22,7 @@ function addListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyEven
 
 • **eventType**: `T`
 
-• **listener**: [`TinyEventListener`](../type-aliases/TinyEventListener.md)\<`T`, `A`\>
+• **listener**: [`TinyEventListener`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventlistener)\<`T`, `A`\>
 
 ## Returns
 
@@ -28,11 +30,11 @@ function addListener<T, A>(eventType, listener): (dispatcher) => Effect<TinyEven
 
 ### Parameters
 
-• **dispatcher**: [`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>
+• **dispatcher**: [`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>
 
 ### Returns
 
-`Effect`\<[`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>, `Error`, `never`\>
+`Effect`\<[`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>, `Error`, `never`\>
 
 ## Source
 

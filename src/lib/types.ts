@@ -2,7 +2,7 @@ import type { MarkdownHeading } from 'astro';
 import type { Props } from 'lucide-astro';
 
 export type LinkT = {
-  readonly url: string;
+  readonly url: string | undefined;
   readonly title: string;
   readonly Icon?: ((props: Props) => any) | undefined;
   readonly textClass?: string | undefined;

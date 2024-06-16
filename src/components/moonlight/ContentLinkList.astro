@@ -1,0 +1,27 @@
+---
+import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+import type { DepthGroupT } from '../../lib/moonlight/navigation';
+import ContentLink from './ContentLink.astro';
+import ContentLinkListMutual from './ContentLinkListMutual.astro';
+
+interface Props {
+  readonly list: DepthGroupT<MoonlightProjectNavigationItem>;
+  readonly selectedUrlPathSlug: string;
+}
+
+const { list, selectedUrlPathSlug } = Astro.props;
+---
+
+{
+  list.map((x) =>
+    Array.isArray(x) ? (
+      <ul>
+        <ContentLinkListMutual list={x} selectedUrlPathSlug={selectedUrlPathSlug} />
+      </ul>
+    ) : (
+      <li>
+        <ContentLink item={x} selectedUrlPathSlug={selectedUrlPathSlug} />
+      </li>
+    )
+  )
+}

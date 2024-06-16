@@ -1,0 +1,66 @@
+---
+import { ArrowLeft, ArrowRight } from 'lucide-astro';
+import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+
+interface Props {
+  readonly prevItem: MoonlightProjectNavigationItem | undefined;
+  readonly nextItem: MoonlightProjectNavigationItem | undefined;
+}
+
+const { prevItem, nextItem } = Astro.props;
+
+const prevItemUrl = `${prevItem?.collectionRootPagesPath}/${prevItem?.entry?.slug}`;
+const prevItemTitle = prevItem?.entry?.data?.title;
+
+const nextItemUrl = `${nextItem?.collectionRootPagesPath}/${nextItem?.entry?.slug}`;
+const nextItemTitle = nextItem?.entry?.data?.title;
+---
+
+<div class="prev-next-navigation flex flex-col md:flex-row mt-12 mb-12 font-sans">
+  {
+    prevItem ? (
+      <div class="prev-next prev">
+        <span class="label">previous</span>
+        <a href={prevItemUrl} class="text-left">
+          <ArrowLeft class="block float-left mr-3 mt-1 mb-2" />
+          <span>{prevItemTitle}</span>
+        </a>
+      </div>
+    ) : undefined
+  }
+  {
+    nextItem ? (
+      <div class="prev-next next">
+        <span class="label">next</span>
+        <a href={nextItemUrl} class="text-right">
+          <ArrowRight class="block float-right ml-3 mt-1 mb-2" />
+          {nextItemTitle}
+        </a>
+      </div>
+    ) : undefined
+  }
+</div>
+
+<style>
+  .prev-next-navigation .prev-next {
+    @apply block relative flex-1 pt-8 pb-4 px-4 align-middle rounded-xl bg-kdd-nav mb-3 border-gray-400 dark:border-gray-500 border;
+  }
+  .prev-next-navigation .prev-next:nth-child(2) {
+    @apply md:ml-6;
+  }
+  .prev-next-navigation .prev-next a {
+    @apply inline-block w-full;
+  }
+  .prev-next-navigation .prev-next a:visited {
+    @apply text-kdd-link;
+  }
+  .prev-next-navigation .prev-next .label {
+    @apply absolute top-1;
+  }
+  .prev-next-navigation .prev-next.prev .label {
+    @apply left-5;
+  }
+  .prev-next-navigation .prev-next.next .label {
+    @apply right-5;
+  }
+</style>

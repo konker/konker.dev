@@ -1,13 +1,15 @@
 ---
-title: 'Function: createTinyEventDispatcher()'
+title: 'createTinyEventDispatcher()'
 author: 'Konrad Markus'
-description: FIXME-DESC
-type: reference
+description: 'FIXME-DESC'
+order: 1
+kind: reference
 ---
-# Function: createTinyEventDispatcher()
+
+# createTinyEventDispatcher()
 
 ```ts
-function createTinyEventDispatcher<T, A>(): P.Effect.Effect<TinyEventDispatcher<T, A>, Error>
+function createTinyEventDispatcher<T, A>(): P.Effect.Effect<TinyEventDispatcher<T, A>, Error>;
 ```
 
 ## Type parameters
@@ -18,7 +20,7 @@ function createTinyEventDispatcher<T, A>(): P.Effect.Effect<TinyEventDispatcher<
 
 ## Returns
 
-`P.Effect.Effect`\<[`TinyEventDispatcher`](../type-aliases/TinyEventDispatcher.md)\<`T`, `A`\>, `Error`\>
+`P.Effect.Effect`\<[`TinyEventDispatcher`](/projects/konkerdev-tiny-event-fp/reference/type-aliases/tinyeventdispatcher)\<`T`, `A`\>, `Error`\>
 
 ## Source
 

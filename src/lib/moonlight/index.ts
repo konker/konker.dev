@@ -22,19 +22,29 @@ export type MoonlightEntryKindReference = typeof MOONLIGHT_ENTRY_KIND_REFERENCE;
 export type MoonlightEntryKind = MoonlightEntryKindRegular | MoonlightEntryKindReference;
 
 // --------------------------------------------------------------------------
-export type MoonlightItem<T extends CollectionEntry<MoonlightCollection>> = {
+export type MoonlightItem<T extends MoonlightCollection> = {
+  readonly collectionName: T;
   readonly collectionRootPagesPath: string;
   readonly project: string;
   readonly depth: number;
-  readonly entry: T;
+  readonly path: string;
+  readonly order: number;
+  readonly entry: CollectionEntry<T>;
 };
 
+export function moonlightItemDepth<T extends CollectionEntry<MoonlightCollection>>(entry: T): number {
+  return Math.max(1, countSlugPathParts(entry.slug));
+}
+
 export const toMoonlightItem =
-  (collectionRootPagesPath: string) =>
-  <T extends CollectionEntry<MoonlightCollection>>(entry: T): MoonlightItem<T> => ({
+  <T extends MoonlightCollection>(collectionName: T, collectionRootPagesPath: string) =>
+  <E extends CollectionEntry<T>>(entry: E): MoonlightItem<T> => ({
+    collectionName,
     collectionRootPagesPath,
     project: extractProject(entry.slug),
-    depth: countSlugPathParts(entry.slug),
+    depth: moonlightItemDepth(entry),
+    path: entry.slug,
+    order: entry.data.order ?? 0,
     entry: {
       ...entry,
       slug: `${entry.slug}`,
@@ -42,38 +52,26 @@ export const toMoonlightItem =
   });
 
 // --------------------------------------------------------------------------
-export type MoonlightProjectNavigationItem = MoonlightItem<CollectionEntry<MoonlightCollection>>;
-
-/*
-export type MoonlightProjectNavigationItem = {
-  readonly title: string;
-  readonly slug: string;
-  readonly depth: number;
-  // readonly entry: CollectionEntry<MoonlightCollection>;
-};
-*/
+export type MoonlightProjectNavigationItem = MoonlightItem<MoonlightCollection>;
 
 // --------------------------------------------------------------------------
 export type MoonlightPagePropsIndex = {
   readonly type: MoonlightPageTypeIndex;
   readonly indexItems: Array<MoonlightProjectNavigationItem>;
-  // readonly pageTitle: string;
 };
 
 // --------------------------------------------------------------------------
-export type MoonlightPagePropsEntry = {
+export type MoonlightPagePropsEntry<T extends MoonlightCollection> = {
   readonly type: MoonlightPageTypeEntry;
   readonly kind: MoonlightEntryKind;
 
-  // readonly projectRootEntry: CollectionEntry<MoonlightCollection>;
-  // readonly projectEntries: Array<CollectionEntry<MoonlightCollection>>;
-
-  readonly item: MoonlightItem<CollectionEntry<MoonlightCollection>>;
+  readonly item: MoonlightItem<T>;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
   readonly headings: Array<MarkdownHeading>;
   readonly headingGroups: DepthGroupT<MarkdownHeading>;
 
   readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
+  readonly breadcrumbNavigation: Array<MoonlightProjectNavigationItem>;
   readonly prevItem: MoonlightProjectNavigationItem | undefined;
   readonly nextItem: MoonlightProjectNavigationItem | undefined;
 };

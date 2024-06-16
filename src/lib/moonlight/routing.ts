@@ -1,4 +1,3 @@
-import { type CollectionEntry } from 'astro:content';
 import * as fs from 'node:fs';
 
 import type { MoonlightCollection, MoonlightConfig } from './config.ts';
@@ -17,26 +16,28 @@ import {
   moonlightGetPrevItem,
   moonlightGetProjectItems,
 } from './items.ts';
-import { groupItemsByDepth } from './navigation.ts';
+import { createPathLookup, groupItemsByDepth } from './navigation.ts';
 import { RecordKeysOf } from './utils.ts';
 
 // --------------------------------------------------------------------------
 export type StaticPathIndex = {
   readonly params: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     readonly moonlight_index_slug: string;
   };
   props: MoonlightPagePropsIndex;
 };
 
-export type StaticPathEntry = {
+export type StaticPathEntry<T extends MoonlightCollection> = {
   readonly params: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     readonly moonlight_slug: string;
   };
-  props: MoonlightPagePropsEntry;
+  props: MoonlightPagePropsEntry<T>;
 };
 
 // --------------------------------------------------------------------------
-export const formatStaticPathIndex = <T extends CollectionEntry<MoonlightCollection>>(
+export const formatStaticPathIndex = <T extends MoonlightCollection>(
   allItems: Array<MoonlightItem<T>>,
   collectionRootPagePath: string
 ): StaticPathIndex => ({
@@ -50,32 +51,32 @@ export const formatStaticPathIndex = <T extends CollectionEntry<MoonlightCollect
 
 // --------------------------------------------------------------------------
 export const formatStaticPathEntry =
-  <T extends CollectionEntry<MoonlightCollection>>(allItems: Array<MoonlightItem<T>>) =>
-  async (moonlightItem: MoonlightItem<T>): Promise<StaticPathEntry> => {
+  <T extends MoonlightCollection>(allItems: Array<MoonlightItem<T>>) =>
+  async (moonlightItem: MoonlightItem<T>): Promise<StaticPathEntry<T>> => {
     const { Content, headings } = await moonlightItem.entry.render();
     const allProjectItems = moonlightGetProjectItems(allItems, moonlightItem.project);
-    const prevItem = moonlightGetPrevItem(allItems, moonlightItem);
-    const nextItem = moonlightGetNextItem(allItems, moonlightItem);
+    const prevItem = moonlightGetPrevItem(allProjectItems, moonlightItem);
+    const nextItem = moonlightGetNextItem(allProjectItems, moonlightItem);
+    const projectNavigation = groupItemsByDepth(allProjectItems);
+    const navigationPathLookup = createPathLookup(allProjectItems, projectNavigation);
+
     fs.writeFileSync('/tmp/KONK60.json', JSON.stringify(allProjectItems, null, 2));
-    fs.writeFileSync('/tmp/KONK61.json', JSON.stringify(groupItemsByDepth(allProjectItems), null, 2));
+    fs.writeFileSync('/tmp/KONK61.json', JSON.stringify(groupItemsByDepth(allProjectItems, 1), null, 2));
     return {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       params: { moonlight_slug: `${moonlightItem.collectionRootPagesPath}/${moonlightItem.entry.slug}` },
       props: {
         type: MOONLIGHT_PAGE_TYPE_ENTRY,
-        kind: MOONLIGHT_ENTRY_KIND_REGULAR, // FIXME
-
-        // projectRootEntry: moonlightGetProjectRootEntry(allItems, moonlightItem.project),
-        // projectEntries: moonlightGetProjectEntries(allItems, moonlightItem.project),
+        kind: moonlightItem.entry.data.kind ?? MOONLIGHT_ENTRY_KIND_REGULAR,
 
         item: moonlightItem,
         Content,
         headings,
         headingGroups: groupItemsByDepth(headings),
-
-        projectNavigation: groupItemsByDepth(allProjectItems),
-        prevItem: prevItem,
-        nextItem: nextItem,
+        projectNavigation,
+        breadcrumbNavigation: navigationPathLookup[moonlightItem.path] ?? [],
+        prevItem,
+        nextItem,
       },
     };
   };
@@ -85,7 +86,8 @@ export async function moonlightGetStaticPathsIndex(moonlightConfig: MoonlightCon
   const ret = [];
 
   for (const collectionName of RecordKeysOf(moonlightConfig)) {
-    const collectionRootPagePath = moonlightConfig[collectionName]!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+    const collectionRootPagePath = `/${collectionName}`;
     const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
     const rootIndexStaticPath = formatStaticPathIndex(allItems, collectionRootPagePath);
 
@@ -97,11 +99,12 @@ export async function moonlightGetStaticPathsIndex(moonlightConfig: MoonlightCon
 // --------------------------------------------------------------------------
 export async function moonlightGetStaticPathsEntries(
   moonlightConfig: MoonlightConfig
-): Promise<Array<StaticPathEntry>> {
+): Promise<Array<StaticPathEntry<MoonlightCollection>>> {
   const ret = [];
 
   for (const collectionName of RecordKeysOf(moonlightConfig)) {
-    const collectionRootPagePath = moonlightConfig[collectionName]!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+    const collectionRootPagePath = `/${collectionName}`;
     const allEntries = await moonlightGetAllItems(collectionName, collectionRootPagePath);
     const contentPaths = await Promise.all(allEntries.map(formatStaticPathEntry(allEntries)));
 
@@ -109,15 +112,3 @@ export async function moonlightGetStaticPathsEntries(
   }
   return ret.flat();
 }
-
-/*FIXME: remove
-// --------------------------------------------------------------------------
-export async function moonlightGetStaticPaths(moonlightConfig: MoonlightConfig) {
-  const ret = await Promise.all([
-    moonlightGetStaticPathsIndex(moonlightConfig),
-    moonlightGetStaticPathsEntries(moonlightConfig),
-  ]);
-
-  return ret.flat();
-}
-*/

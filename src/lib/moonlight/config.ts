@@ -4,11 +4,15 @@ export const MOONLIGHT_COLLECTION_NAMES = ['projects'] as const;
 export type MoonlightCollection = (typeof MOONLIGHT_COLLECTION_NAMES)[number];
 
 export type MoonlightConfig = {
-  readonly [key in MoonlightCollection]?: `/${string}`;
+  readonly [key in MoonlightCollection]?: {
+    readonly rootPathTitle: string;
+  };
 };
 
 export const MOONLIGHT_CONFIG: MoonlightConfig = {
-  projects: '/projects',
+  projects: {
+    rootPathTitle: 'Projects',
+  },
 } as const;
 
 export function isMoonlightCollection(x: unknown): x is MoonlightCollection {

@@ -1,9 +1,7 @@
 {
   "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
-    "paths": {
-//      "~/*": ["./src/*"]
-    },
+    "paths": {},
     "esModuleInterop": true,
   },
   "ts-node": {

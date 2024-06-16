@@ -1,0 +1,16 @@
+---
+import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+
+interface Props {
+  readonly item: MoonlightProjectNavigationItem;
+  readonly selectedUrlPathSlug: string;
+  readonly titleOverride?: string | undefined;
+}
+
+const { item, selectedUrlPathSlug, titleOverride } = Astro.props;
+const url = `${item.collectionRootPagesPath}/${item.entry.slug}`;
+const title = titleOverride ?? item.entry.data.title;
+const classNames = selectedUrlPathSlug.endsWith(item.entry.slug) ? 'nav-link selected' : 'nav-link'
+---
+
+{!item.entry.data.navigable ? title : <a class={classNames} href={`${url}`}>{title}</a>}
