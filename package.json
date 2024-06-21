@@ -8,7 +8,6 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "prepare": "husky install",
     "clean": "rm -rf www && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "type-coverage-check": "type-coverage --detail --at-least 100",
