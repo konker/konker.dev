@@ -12,6 +12,7 @@ import '@fontsource/merriweather/900.css';
 import '@fontsource-variable/work-sans';
 import { SITE_TITLE } from '../../scripts/consts';
 import { isHomePage } from '../../lib';
+import AnalyticsBug from '../../components/site/AnalyticsBug.astro';
 
 interface Props {
   readonly pageTitle: string;
@@ -70,6 +71,7 @@ const title = SITE_TITLE + (isHomePage(Astro.url) ? '' : ` / ${pageTitle}`);
       navigationPanelInit('intra-page-navigation', 'right', 'lg', true);
     });
   </script>
+  <AnalyticsBug />
 </html>
 
 <script>

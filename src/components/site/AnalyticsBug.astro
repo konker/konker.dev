@@ -1,0 +1,14 @@
+---
+
+---
+
+{
+  import.meta.env.PROD ? (
+    <script
+      is:inline
+      src="https://beamanalytics.b-cdn.net/beam.min.js"
+      data-token={import.meta.env.SITE_ANALYTICS_BEAM_TOKEN}
+      async
+    />
+  ) : undefined
+}
