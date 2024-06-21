@@ -3,7 +3,8 @@ import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig } from 'astro/config';
 
-import { remarkModifiedTime } from './src/lib/remark/remark-modified-time.mjs';
+// FIXME: this does not work with CI, assumes git repo?
+// import { remarkModifiedTime } from './src/lib/remark/remark-modified-time.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,7 +19,7 @@ export default defineConfig({
     domains: [],
   },
   markdown: {
-    remarkPlugins: [remarkModifiedTime],
+    remarkPlugins: [],
     shikiConfig: {
       theme: 'github-dark-default',
       wrap: true,
