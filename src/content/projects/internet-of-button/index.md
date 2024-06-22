@@ -3,6 +3,7 @@ title: 'internet-of-button'
 author: Konrad Markus
 description: 'FIXME desc'
 pubDate: 2024-06-02
+draft: true
 tags: ['FIXME', 'project', 'esp32', 'hardware', 'C', 'C++', 'electronics']
 ---
 

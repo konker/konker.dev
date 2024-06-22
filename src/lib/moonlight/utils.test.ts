@@ -10,6 +10,7 @@ describe('utils', () => {
         [2, 3],
         [3, 4],
       ]);
+      expect(unit.pairWise([1])).toStrictEqual([]);
     });
   });
 });

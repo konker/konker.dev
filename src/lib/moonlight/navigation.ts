@@ -40,8 +40,18 @@ export function createPathLookup<T extends HasPathT>(
   allItems: Array<T>,
   groupedItems: DepthGroupT<T>
 ): Record<string, Array<T>> {
-  function _searchPath(_groupedItems: DepthGroupT<T>, path: string, acc: Array<T>): Array<T> {
-    for (const [a, b] of pairWise(_groupedItems)) {
+  function _searchPath(groupedItems: DepthGroupT<T>, path: string, acc: Array<T>): Array<T> {
+    if (groupedItems.length === 1) {
+      const a = groupedItems[0]!;
+      if (isArray(a)) {
+        return acc;
+      } else if (a.path === path) {
+        // We have found the target in the only item
+        return [...acc, a];
+      }
+    }
+
+    for (const [a, b] of pairWise(groupedItems)) {
       if (isArray(a)) {
         // We already checked this array as b, so skip it
         continue;

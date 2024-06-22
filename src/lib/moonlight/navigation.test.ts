@@ -81,6 +81,7 @@ describe('navigation', () => {
   describe('groupItemsByDepth', () => {
     it('should work as expected', () => {
       expect(unit.groupItemsByDepth([])).toStrictEqual([]);
+      expect(unit.groupItemsByDepth([{ depth: 1, path: '/foo' }])).toStrictEqual([{ depth: 1, path: '/foo' }]);
       expect(unit.groupItemsByDepth(TEST_ALL_ITEMS)).toStrictEqual(TEST_ITEMS_DEPTH_GROUP);
       expect(
         unit.groupItemsByDepth([{ depth: 1 }, { depth: 1 }, { depth: 2 }, { depth: 3 }, { depth: 1 }])
@@ -90,6 +91,10 @@ describe('navigation', () => {
 
   describe('createPathLookup', () => {
     it('should work as expected', () => {
+      expect(createPathLookup([], [])).toStrictEqual({});
+      expect(createPathLookup([{ depth: 1, path: '/foo' }], [{ depth: 1, path: '/foo' }])).toStrictEqual({
+        '/foo': [{ depth: 1, path: '/foo' }],
+      });
       expect(createPathLookup(TEST_ALL_ITEMS, TEST_ITEMS_DEPTH_GROUP)).toStrictEqual(TEST_PATH_LOOKUP);
     });
   });

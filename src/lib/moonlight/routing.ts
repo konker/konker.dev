@@ -38,20 +38,14 @@ export type StaticPathEntry<T extends MoonlightCollection> = {
 export const formatStaticPathIndex = <T extends MoonlightCollection>(
   collectionRootPagePath: string,
   indexItems: Array<MoonlightItem<T>>
-): StaticPathIndex => {
-  console.log(
-    'KONK90',
-    indexItems.map((x: any) => [x.entry.data.indexOrder, x.path])
-  );
-  return {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    params: { moonlight_index_slug: collectionRootPagePath },
-    props: {
-      type: MOONLIGHT_PAGE_TYPE_INDEX,
-      indexItems,
-    },
-  };
-};
+): StaticPathIndex => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  params: { moonlight_index_slug: collectionRootPagePath },
+  props: {
+    type: MOONLIGHT_PAGE_TYPE_INDEX,
+    indexItems,
+  },
+});
 
 // --------------------------------------------------------------------------
 export const formatStaticPathEntry =
@@ -95,10 +89,6 @@ export async function moonlightGetStaticPathsIndex(moonlightConfig: MoonlightCon
     const collectionRootPagePath = `/${collectionName}`;
     const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
     const indexItems = moonlightGetIndexItems(allItems);
-    console.log(
-      'KONK80',
-      indexItems.map((x: any) => [x.entry.data.indexOrder, x.path])
-    );
     const rootIndexStaticPath = formatStaticPathIndex(collectionRootPagePath, indexItems);
 
     ret.push(rootIndexStaticPath);

@@ -5,6 +5,7 @@ description: 'FIXME desc'
 pubDate: 2024-05-20
 order: 1
 indexOrder: 2
+draft: true
 tags: ['FIXME', 'project', 'nodejs', 'typescript', 'effect', 'fp', 'games']
 ---
 
