@@ -24,7 +24,7 @@ export const ASTRO_REF_DOCS_CONFIG = [
     sectionTitle: 'Reference',
   },
   {
-    _enabled: true,
+    _enabled: false,
     name: '@konker.dev/tiny-filesystem-fp',
     author: 'Konrad Markus',
     src: '/home/konker/WORKING/konker/@konker.dev/tiny-filesystem-fp',
@@ -34,7 +34,7 @@ export const ASTRO_REF_DOCS_CONFIG = [
     sectionTitle: 'Reference',
   },
   {
-    _enabled: true,
+    _enabled: false,
     name: '@konker.dev/tiny-treecrawler-fp',
     author: 'Konrad Markus',
     src: '/home/konker/WORKING/konker/@konker.dev/tiny-treecrawler-fp',
@@ -44,7 +44,7 @@ export const ASTRO_REF_DOCS_CONFIG = [
     sectionTitle: 'Reference',
   },
   {
-    _enabled: true,
+    _enabled: false,
     name: '@konker.dev/tiny-rules-fp',
     author: 'Konrad Markus',
     src: '/home/konker/WORKING/konker/@konker.dev/tiny-rules-fp',
@@ -54,7 +54,7 @@ export const ASTRO_REF_DOCS_CONFIG = [
     sectionTitle: 'Reference',
   },
   {
-    _enabled: true,
+    _enabled: false,
     name: '@konker.dev/aws-client-effect-dynamodb',
     author: 'Konrad Markus',
     src: '/home/konker/WORKING/konker/@konker.dev/aws-client-effect-dynamodb',
@@ -64,7 +64,7 @@ export const ASTRO_REF_DOCS_CONFIG = [
     sectionTitle: 'Reference',
   },
   {
-    _enabled: true,
+    _enabled: false,
     name: '@konker.dev/aws-client-effect-s3',
     author: 'Konrad Markus',
     src: '/home/konker/WORKING/konker/@konker.dev/aws-client-effect-s3',

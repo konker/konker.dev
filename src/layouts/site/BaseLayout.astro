@@ -41,10 +41,10 @@ const title = SITE_TITLE + (isHomePage(Astro.url) ? '' : ` / ${pageTitle}`);
     {
       import.meta.env.DEV ? (
         <div id="debug" class="absolute top-0 left-1/2">
-          <span class="hidden sm:inline-block text-color-bg-light">sm</span>
-          <span class="hidden md:inline-block text-color-bg-light">md</span>
-          <span class="hidden lg:inline-block text-color-bg-light">lg</span>
-          <span class="hidden xl:inline-block text-color-bg-light">xl</span>
+          <span class="hidden sm:inline-block text-kdd-bg">sm</span>
+          <span class="hidden md:inline-block text-kdd-bg">md</span>
+          <span class="hidden lg:inline-block text-kdd-bg">lg</span>
+          <span class="hidden xl:inline-block text-kdd-bg">xl</span>
         </div>
       ) : undefined
     }

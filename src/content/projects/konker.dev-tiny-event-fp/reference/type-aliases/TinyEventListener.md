@@ -9,20 +9,26 @@ kind: reference
 # TinyEventListener()
 
 ```ts
-type TinyEventListener<T, X>: (eventType, eventData?) => P.Effect.Effect<void, Error>;
+type TinyEventListener<T, A>: (eventType, eventData?) => P.Effect.Effect<void, Error>;
 ```
+
+Signature of an event listener function.
 
 ## Type parameters
 
 • **T**
 
-• **X**
+The possible event types that can be received
+
+• **A**
+
+The type of the event data which can be received
 
 ## Parameters
 
 • **eventType**: `T`
 
-• **eventData?**: `X`
+• **eventData?**: `A`
 
 ## Returns
 
@@ -30,4 +36,4 @@ type TinyEventListener<T, X>: (eventType, eventData?) => P.Effect.Effect<void, E
 
 ## Source
 
-[index.ts:4](https://github.com/konkerdotdev/tiny-event-fp/blob/35c286bc511870798a7f3d70c0cc704e7c0c0006/src/index.ts#L4)
+[index.ts:11](https://github.com/konkerdotdev/tiny-event-fp/blob/35c286bc511870798a7f3d70c0cc704e7c0c0006/src/index.ts#L11)
