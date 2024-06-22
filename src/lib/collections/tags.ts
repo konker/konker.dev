@@ -1,7 +1,7 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 
 import type { LinkT } from '../types.ts';
-import { notDraftFilterPredicate } from './helpers.ts';
+import { notEntryDraftFilterPredicate } from './helpers.ts';
 import { type TagCollection } from './index';
 
 // --------------------------------------------------------------------------
@@ -34,7 +34,7 @@ export async function tagsGetAllCollectionTags(
   sorter: TagSorterT = tagsSorterCountDesc
 ): Promise<{ readonly total: number; readonly tags: ReadonlyArray<TagT> }> {
   const allEntries = await Promise.all(collections.map((collection) => getCollection(collection)));
-  const filteredEntries = allEntries.flat().filter(notDraftFilterPredicate);
+  const filteredEntries = allEntries.flat().filter(notEntryDraftFilterPredicate);
   const allTags = filteredEntries.flatMap((x) => x.data.tags ?? []);
 
   const tagCounts = allTags.reduce(
@@ -73,5 +73,5 @@ export async function tagsGetAllCollectionTagEntries<T extends TagCollection>(
     [] as ReadonlyArray<TagEntry<T>>
   );
 
-  return allTagEntries.filter((x) => notDraftFilterPredicate(x.entry));
+  return allTagEntries.filter((x) => notEntryDraftFilterPredicate(x.entry));
 }

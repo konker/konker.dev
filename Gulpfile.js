@@ -76,11 +76,11 @@ export const ASTRO_REF_DOCS_CONFIG = [
 ];
 
 // --------------------------------------------------------------------------
-export const DEFAULT_REFERENCE_ORDERING = 2;
+export const DEFAULT_REFERENCE_ORDERING = 5;
 export const REFERENCE_ORDERING_LOOKUP = {
-  functions: 1,
-  'type-aliases': 2,
-  index: 3,
+  functions: 6,
+  'type-aliases': 5,
+  index: 4,
 };
 
 // --------------------------------------------------------------------------

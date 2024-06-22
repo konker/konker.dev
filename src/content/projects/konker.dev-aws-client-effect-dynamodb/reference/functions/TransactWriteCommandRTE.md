@@ -2,7 +2,7 @@
 title: 'TransactWriteCommandRTE()'
 author: 'Konrad Markus'
 description: 'FIXME-DESC'
-order: 1
+order: 6
 kind: reference
 ---
 

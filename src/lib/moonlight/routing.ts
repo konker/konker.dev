@@ -36,16 +36,22 @@ export type StaticPathEntry<T extends MoonlightCollection> = {
 
 // --------------------------------------------------------------------------
 export const formatStaticPathIndex = <T extends MoonlightCollection>(
-  allItems: Array<MoonlightItem<T>>,
-  collectionRootPagePath: string
-): StaticPathIndex => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  params: { moonlight_index_slug: collectionRootPagePath },
-  props: {
-    type: MOONLIGHT_PAGE_TYPE_INDEX,
-    indexItems: moonlightGetIndexItems(allItems),
-  },
-});
+  collectionRootPagePath: string,
+  indexItems: Array<MoonlightItem<T>>
+): StaticPathIndex => {
+  console.log(
+    'KONK90',
+    indexItems.map((x: any) => [x.entry.data.indexOrder, x.path])
+  );
+  return {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    params: { moonlight_index_slug: collectionRootPagePath },
+    props: {
+      type: MOONLIGHT_PAGE_TYPE_INDEX,
+      indexItems,
+    },
+  };
+};
 
 // --------------------------------------------------------------------------
 export const formatStaticPathEntry =
@@ -88,7 +94,12 @@ export async function moonlightGetStaticPathsIndex(moonlightConfig: MoonlightCon
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const collectionRootPagePath = `/${collectionName}`;
     const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
-    const rootIndexStaticPath = formatStaticPathIndex(allItems, collectionRootPagePath);
+    const indexItems = moonlightGetIndexItems(allItems);
+    console.log(
+      'KONK80',
+      indexItems.map((x: any) => [x.entry.data.indexOrder, x.path])
+    );
+    const rootIndexStaticPath = formatStaticPathIndex(collectionRootPagePath, indexItems);
 
     ret.push(rootIndexStaticPath);
   }
@@ -104,8 +115,8 @@ export async function moonlightGetStaticPathsEntries(
   for (const collectionName of RecordKeysOf(moonlightConfig)) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const collectionRootPagePath = `/${collectionName}`;
-    const allEntries = await moonlightGetAllItems(collectionName, collectionRootPagePath);
-    const contentPaths = await Promise.all(allEntries.map(formatStaticPathEntry(allEntries)));
+    const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
+    const contentPaths = await Promise.all(allItems.map(formatStaticPathEntry(allItems)));
 
     ret.push(contentPaths);
   }

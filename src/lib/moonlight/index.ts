@@ -29,6 +29,7 @@ export type MoonlightItem<T extends MoonlightCollection> = {
   readonly depth: number;
   readonly path: string;
   readonly order: number;
+  readonly indexOrder: number;
   readonly entry: CollectionEntry<T>;
 };
 
@@ -44,7 +45,8 @@ export const toMoonlightItem =
     subCollectionName: extractSubCollectionName(entry.slug),
     depth: moonlightItemDepth(entry),
     path: entry.slug,
-    order: entry.data.order ?? 0,
+    order: entry.data.order,
+    indexOrder: entry.data.indexOrder,
     entry: {
       ...entry,
       slug: `${entry.slug}`,

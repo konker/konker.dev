@@ -14,15 +14,15 @@ export const MoonlightSchema = z.object({
 
   /**
    * An ordering property, for where the page appears in the sub-collection navigation.
-   * The higher the value, the higher up in the order the item will appear, defaults to 0.
+   * The lower the value, the higher up in the order the item will appear, defaults to 1.
    */
-  order: z.number().default(0),
+  order: z.number().default(1),
 
   /**
    * An ordering property, for where the sub-collection appears in the index.
-   * The higher the value, the higher up in the order the item will appear, defaults to 0.
+   * The lower the value, the higher up in the order the item will appear, defaults to MAX_SAFE_INTEGER.
    */
-  indexOrder: z.number().default(0),
+  indexOrder: z.number().default(Number.MAX_SAFE_INTEGER),
 
   /**
    * Whether the page should be navigated to,

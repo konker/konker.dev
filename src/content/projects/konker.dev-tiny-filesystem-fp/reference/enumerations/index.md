@@ -2,7 +2,7 @@
 title: 'Enumerations'
 author: 'Konrad Markus'
 description: 'FIXME-INDEX-DESC'
-order: 2
+order: 5
 kind: reference
 navigable: false
 ---

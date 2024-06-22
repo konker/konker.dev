@@ -3,6 +3,8 @@ title: site-o-matic
 author: Konrad Markus
 description: 'FIXME desc'
 pubDate: 2022-08-08
+order: 1
+indexOrder: 1
 tags: ['FIXME', 'project', 'nodejs', 'typescript', 'aws', 'cdk']
 ---
 

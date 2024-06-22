@@ -2,7 +2,7 @@
 title: 'Rule()'
 author: 'Konrad Markus'
 description: 'FIXME-DESC'
-order: 2
+order: 5
 kind: reference
 ---
 
