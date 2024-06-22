@@ -1,8 +1,8 @@
 ---
-import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+import type { MoonlightSubCollectionNavigationItem } from '../../lib/moonlight';
 import type { MarkdownHeading, MarkdownInstance } from 'astro';
 import { PanelLeftClose, PanelLeftOpen, PilcrowLeft, PilcrowRight } from 'lucide-astro';
-import ContentNavigation from '../../components/moonlight/ContentNavigation.astro';
+import SubCollectionNavigation from '../../components/moonlight/SubCollectionNavigation.astro';
 import IntraPageNavigation from '../../components/moonlight/IntraPageNavigation.astro';
 import PageContent from '../../components/moonlight/PageContent.astro';
 import NavigationToggle from '../../components/site/NavigationToggle.astro';
@@ -18,12 +18,12 @@ interface Props {
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly headingGroups: DepthGroupT<MarkdownHeading>;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
-  readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
-  readonly prevItem: MoonlightProjectNavigationItem | undefined;
-  readonly nextItem: MoonlightProjectNavigationItem | undefined;
+  readonly subCollectionNavigation: DepthGroupT<MoonlightSubCollectionNavigationItem>;
+  readonly prevItem: MoonlightSubCollectionNavigationItem | undefined;
+  readonly nextItem: MoonlightSubCollectionNavigationItem | undefined;
 }
 
-const { pageTitle, breadcrumbs, kind, headingGroups, Content, projectNavigation, prevItem, nextItem } = Astro.props;
+const { pageTitle, breadcrumbs, kind, headingGroups, Content, subCollectionNavigation, prevItem, nextItem } = Astro.props;
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} fixedHeader={true} kind={kind}>
@@ -46,7 +46,7 @@ const { pageTitle, breadcrumbs, kind, headingGroups, Content, projectNavigation,
     />
   </Fragment>
 
-  <ContentNavigation projectNavigation={projectNavigation} />
+  <SubCollectionNavigation subCollectionNavigation={subCollectionNavigation} />
   <PageContent kind={kind} Content={Content} prevItem={prevItem} nextItem={nextItem} />
   <IntraPageNavigation headingGroups={headingGroups} />
   <script is:inline>

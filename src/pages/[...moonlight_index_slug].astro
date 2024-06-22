@@ -1,5 +1,5 @@
 ---
-import ProjectIndexLayout from '../layouts/moonlight/ProjectIndexLayout.astro';
+import SubCollectionIndexLayout from '../layouts/moonlight/SubCollectionIndexLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import { itemIconLookup, itemTextClassLookup } from '../lib/collections/helpers';
 import type { MoonlightPagePropsIndex } from '../lib/moonlight';
@@ -26,7 +26,7 @@ const content = (await Astro.glob('./projects-content.md'))[0];
 const pageTitle = content?.frontmatter.title;
 ---
 
-<ProjectIndexLayout
+<SubCollectionIndexLayout
   pageTitle={pageTitle}
   content={content}
   indexItems={Astro.props.indexItems}

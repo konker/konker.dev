@@ -13,10 +13,16 @@ export const MoonlightSchema = z.object({
     .default(MOONLIGHT_ENTRY_KIND_REGULAR),
 
   /**
-   * An ordering property, defaults to 0.
-   * The higher the value, the higher up in the order the item will appear.
+   * An ordering property, for where the page appears in the sub-collection navigation.
+   * The higher the value, the higher up in the order the item will appear, defaults to 0.
    */
   order: z.number().default(0),
+
+  /**
+   * An ordering property, for where the sub-collection appears in the index.
+   * The higher the value, the higher up in the order the item will appear, defaults to 0.
+   */
+  indexOrder: z.number().default(0),
 
   /**
    * Whether the page should be navigated to,

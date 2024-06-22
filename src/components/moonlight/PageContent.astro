@@ -1,14 +1,14 @@
 ---
 import type { MarkdownInstance } from 'astro';
-import type { MoonlightEntryKind, MoonlightProjectNavigationItem } from '../../lib/moonlight';
+import type { MoonlightEntryKind, MoonlightSubCollectionNavigationItem } from '../../lib/moonlight';
 import { ANCHOR_TOP } from '../../scripts/consts';
 import PrevNextItemNavigation from './PrevNextItemNavigation.astro';
 
 interface Props {
   readonly kind: MoonlightEntryKind;
   readonly Content: MarkdownInstance<object>['Content']; // AstroComponentFactory;
-  readonly prevItem: MoonlightProjectNavigationItem | undefined;
-  readonly nextItem: MoonlightProjectNavigationItem | undefined;
+  readonly prevItem: MoonlightSubCollectionNavigationItem | undefined;
+  readonly nextItem: MoonlightSubCollectionNavigationItem | undefined;
 }
 
 const { kind, Content, prevItem, nextItem } = Astro.props;

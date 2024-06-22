@@ -22,7 +22,7 @@ export function countSlugPathParts(slug: string): number {
   return getSlugPathParts(slug).length;
 }
 
-export function extractProject(slug: string): string {
+export function extractSubCollectionName(slug: string): string {
   const slugParts = slug.split('/');
   return slugParts[0]!;
 }

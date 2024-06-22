@@ -1,6 +1,6 @@
 ---
 import BlogPostIndexItem from '../../components/blog/BlogPostIndexItem.astro';
-import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
+import SubCollectionIndexItem from '../../components/moonlight/SubCollectionIndexItem.astro';
 import { isBlogEntry, type TagCollection } from '../../lib/collections';
 import type { TagEntry } from '../../lib/collections/tags';
 import { isMoonlightEntry } from '../../lib/moonlight/config';
@@ -30,7 +30,7 @@ const { pageTitle, breadcrumbs, intro, tagEntries, titleIconName } = Astro.props
             itemIconName={tagEntry.collection}
           />
         ) : isMoonlightEntry(tagEntry.entry) ? (
-          <ProjectIndexItem item={tagEntry.entry} itemIconName={tagEntry.collection} />
+          <SubCollectionIndexItem item={tagEntry.entry} itemIconName={tagEntry.collection} />
         ) : (
           <p>UNKNOWN ENTRY</p>
         )

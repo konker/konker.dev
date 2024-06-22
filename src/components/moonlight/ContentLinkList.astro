@@ -1,11 +1,11 @@
 ---
-import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+import type { MoonlightSubCollectionNavigationItem } from '../../lib/moonlight';
 import type { DepthGroupT } from '../../lib/moonlight/navigation';
 import ContentLink from './ContentLink.astro';
 import ContentLinkListMutual from './ContentLinkListMutual.astro';
 
 interface Props {
-  readonly list: DepthGroupT<MoonlightProjectNavigationItem>;
+  readonly list: DepthGroupT<MoonlightSubCollectionNavigationItem>;
   readonly selectedUrlPathSlug: string;
 }
 

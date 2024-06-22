@@ -1,15 +1,15 @@
 ---
 import type { MarkdownInstance } from 'astro';
 import MarkdownContent from '../../components/content/MarkdownContent.astro';
-import ProjectIndexItem from '../../components/moonlight/ProjectIndexItem.astro';
-import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+import SubCollectionIndexItem from '../../components/moonlight/SubCollectionIndexItem.astro';
+import type { MoonlightSubCollectionNavigationItem } from '../../lib/moonlight';
 import type { LinkT } from '../../lib/types';
 import PageLayout from '../site/PageLayout.astro';
 
 interface Props {
   readonly pageTitle: string;
   readonly content: MarkdownInstance<Record<string, unknown>> | undefined;
-  readonly indexItems: Array<MoonlightProjectNavigationItem>;
+  readonly indexItems: Array<MoonlightSubCollectionNavigationItem>;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly titleIconName?: string;
   readonly itemIconName?: string;
@@ -21,6 +21,6 @@ const { pageTitle, content, breadcrumbs, indexItems, titleIconName, itemIconName
 <PageLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} titleIconName={titleIconName}>
   <MarkdownContent markdownInstance={content} />
   <nav class="my-6 md:my-16 not-prose">
-    {indexItems.map((item) => <ProjectIndexItem item={item.entry} itemIconName={itemIconName} />)}
+    {indexItems.map((item) => <SubCollectionIndexItem item={item.entry} itemIconName={itemIconName} />)}
   </nav>
 </PageLayout>

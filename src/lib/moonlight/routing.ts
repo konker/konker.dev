@@ -1,5 +1,3 @@
-import * as fs from 'node:fs';
-
 import type { MoonlightCollection, MoonlightConfig } from './config.ts';
 import {
   MOONLIGHT_ENTRY_KIND_REGULAR,
@@ -14,7 +12,7 @@ import {
   moonlightGetIndexItems,
   moonlightGetNextItem,
   moonlightGetPrevItem,
-  moonlightGetProjectItems,
+  moonlightGetSubCollectionItems,
 } from './items.ts';
 import { createPathLookup, groupItemsByDepth } from './navigation.ts';
 import { RecordKeysOf } from './utils.ts';
@@ -54,14 +52,15 @@ export const formatStaticPathEntry =
   <T extends MoonlightCollection>(allItems: Array<MoonlightItem<T>>) =>
   async (moonlightItem: MoonlightItem<T>): Promise<StaticPathEntry<T>> => {
     const { Content, headings } = await moonlightItem.entry.render();
-    const allProjectItems = moonlightGetProjectItems(allItems, moonlightItem.project);
-    const prevItem = moonlightGetPrevItem(allProjectItems, moonlightItem);
-    const nextItem = moonlightGetNextItem(allProjectItems, moonlightItem);
-    const projectNavigation = groupItemsByDepth(allProjectItems);
-    const navigationPathLookup = createPathLookup(allProjectItems, projectNavigation);
+    const headingGroups = groupItemsByDepth(headings);
 
-    fs.writeFileSync('/tmp/KONK60.json', JSON.stringify(allProjectItems, null, 2));
-    fs.writeFileSync('/tmp/KONK61.json', JSON.stringify(groupItemsByDepth(allProjectItems, 1), null, 2));
+    const allSubCollectionItems = moonlightGetSubCollectionItems(allItems, moonlightItem.subCollectionName);
+    const prevItem = moonlightGetPrevItem(allSubCollectionItems, moonlightItem);
+    const nextItem = moonlightGetNextItem(allSubCollectionItems, moonlightItem);
+    const subCollectionNavigation = groupItemsByDepth(allSubCollectionItems);
+    const navigationPathLookup = createPathLookup(allSubCollectionItems, subCollectionNavigation);
+    const breadcrumbNavigation = navigationPathLookup[moonlightItem.path] ?? [];
+
     return {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       params: { moonlight_slug: `${moonlightItem.collectionRootPagesPath}/${moonlightItem.entry.slug}` },
@@ -72,9 +71,9 @@ export const formatStaticPathEntry =
         item: moonlightItem,
         Content,
         headings,
-        headingGroups: groupItemsByDepth(headings),
-        projectNavigation,
-        breadcrumbNavigation: navigationPathLookup[moonlightItem.path] ?? [],
+        headingGroups,
+        subCollectionNavigation,
+        breadcrumbNavigation,
         prevItem,
         nextItem,
       },

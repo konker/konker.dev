@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { MoonlightCollection } from './config.ts';
 import type { DepthGroupT } from './navigation.ts';
-import { countSlugPathParts, extractProject } from './utils.ts';
+import { countSlugPathParts, extractSubCollectionName } from './utils.ts';
 
 // --------------------------------------------------------------------------
 export const MOONLIGHT_PAGE_TYPE_INDEX = 'index' as const;
@@ -25,7 +25,7 @@ export type MoonlightEntryKind = MoonlightEntryKindRegular | MoonlightEntryKindR
 export type MoonlightItem<T extends MoonlightCollection> = {
   readonly collectionName: T;
   readonly collectionRootPagesPath: string;
-  readonly project: string;
+  readonly subCollectionName: string;
   readonly depth: number;
   readonly path: string;
   readonly order: number;
@@ -41,7 +41,7 @@ export const toMoonlightItem =
   <E extends CollectionEntry<T>>(entry: E): MoonlightItem<T> => ({
     collectionName,
     collectionRootPagesPath,
-    project: extractProject(entry.slug),
+    subCollectionName: extractSubCollectionName(entry.slug),
     depth: moonlightItemDepth(entry),
     path: entry.slug,
     order: entry.data.order ?? 0,
@@ -52,12 +52,12 @@ export const toMoonlightItem =
   });
 
 // --------------------------------------------------------------------------
-export type MoonlightProjectNavigationItem = MoonlightItem<MoonlightCollection>;
+export type MoonlightSubCollectionNavigationItem = MoonlightItem<MoonlightCollection>;
 
 // --------------------------------------------------------------------------
 export type MoonlightPagePropsIndex = {
   readonly type: MoonlightPageTypeIndex;
-  readonly indexItems: Array<MoonlightProjectNavigationItem>;
+  readonly indexItems: Array<MoonlightSubCollectionNavigationItem>;
 };
 
 // --------------------------------------------------------------------------
@@ -70,8 +70,8 @@ export type MoonlightPagePropsEntry<T extends MoonlightCollection> = {
   readonly headings: Array<MarkdownHeading>;
   readonly headingGroups: DepthGroupT<MarkdownHeading>;
 
-  readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
-  readonly breadcrumbNavigation: Array<MoonlightProjectNavigationItem>;
-  readonly prevItem: MoonlightProjectNavigationItem | undefined;
-  readonly nextItem: MoonlightProjectNavigationItem | undefined;
+  readonly subCollectionNavigation: DepthGroupT<MoonlightSubCollectionNavigationItem>;
+  readonly breadcrumbNavigation: Array<MoonlightSubCollectionNavigationItem>;
+  readonly prevItem: MoonlightSubCollectionNavigationItem | undefined;
+  readonly nextItem: MoonlightSubCollectionNavigationItem | undefined;
 };

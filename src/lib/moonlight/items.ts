@@ -31,38 +31,43 @@ export function moonlightGetIndexItems<T extends MoonlightCollection>(
 }
 
 // --------------------------------------------------------------------------
-export function moonlightGetProjectItems<T extends MoonlightCollection>(
+export function moonlightGetSubCollectionItems<T extends MoonlightCollection>(
   allItems: Array<MoonlightItem<T>>,
-  project: string
+  subCollectionName: string
 ): Array<MoonlightItem<T>> {
-  return allItems.filter((x) => x.project === project);
+  return allItems.filter((x) => x.subCollectionName === subCollectionName);
 }
 
 // --------------------------------------------------------------------------
 export function moonlightGetPrevItem<T extends MoonlightCollection>(
-  allProjectItems: Array<MoonlightItem<T>>,
+  allSubCollectionItems: Array<MoonlightItem<T>>,
   moonlightItem: MoonlightItem<T>
 ): MoonlightItem<T> | undefined {
-  const projectItemIndex = allProjectItems.findIndex((x) => x.entry.slug === moonlightItem.entry.slug);
-  const ret = projectItemIndex > 0 ? allProjectItems[projectItemIndex - 1] : undefined;
+  const subCollectionItemIndex = allSubCollectionItems.findIndex((x) => x.entry.slug === moonlightItem.entry.slug);
+  const ret = subCollectionItemIndex > 0 ? allSubCollectionItems[subCollectionItemIndex - 1] : undefined;
   if (!ret || ret.entry.data.navigable) {
     return ret;
   }
 
   // Attempt to skip an item, if the prev item is not navigable
-  return projectItemIndex > 1 ? allProjectItems[projectItemIndex - 2] : undefined;
+  return subCollectionItemIndex > 1 ? allSubCollectionItems[subCollectionItemIndex - 2] : undefined;
 }
 
 export function moonlightGetNextItem<T extends MoonlightCollection>(
-  allProjectItems: Array<MoonlightItem<T>>,
+  allSubCollectionItems: Array<MoonlightItem<T>>,
   moonlightItem: MoonlightItem<T>
 ): MoonlightItem<T> | undefined {
-  const projectItemIndex = allProjectItems.findIndex((x) => x.entry.slug === moonlightItem.entry.slug);
-  const ret = projectItemIndex < allProjectItems.length - 1 ? allProjectItems[projectItemIndex + 1] : undefined;
+  const subCollectionItemIndex = allSubCollectionItems.findIndex((x) => x.entry.slug === moonlightItem.entry.slug);
+  const ret =
+    subCollectionItemIndex < allSubCollectionItems.length - 1
+      ? allSubCollectionItems[subCollectionItemIndex + 1]
+      : undefined;
   if (!ret || ret.entry.data.navigable) {
     return ret;
   }
 
   // Attempt to skip an item, if the next item is not navigable
-  return projectItemIndex < allProjectItems.length - 2 ? allProjectItems[projectItemIndex + 2] : undefined;
+  return subCollectionItemIndex < allSubCollectionItems.length - 2
+    ? allSubCollectionItems[subCollectionItemIndex + 2]
+    : undefined;
 }

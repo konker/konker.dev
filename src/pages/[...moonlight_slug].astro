@@ -1,5 +1,5 @@
 ---
-import ProjectPageLayout from '../layouts/moonlight/ProjectPageLayout.astro';
+import SubCollectionPageLayout from '../layouts/moonlight/SubCollectionPageLayout.astro';
 import { HomeBreadcrumb } from '../lib';
 import { itemIconLookup, itemTextClassLookup } from '../lib/collections/helpers';
 import type { MoonlightPagePropsEntry } from '../lib/moonlight';
@@ -39,11 +39,11 @@ const pageTitle = breadcrumbs
   .join(' / ');
 ---
 
-<ProjectPageLayout
+<SubCollectionPageLayout
   pageTitle={pageTitle}
   breadcrumbs={breadcrumbs}
   kind={Astro.props.kind}
-  projectNavigation={Astro.props.projectNavigation}
+  subCollectionNavigation={Astro.props.subCollectionNavigation}
   prevItem={Astro.props.prevItem}
   nextItem={Astro.props.nextItem}
   Content={Astro.props.Content}

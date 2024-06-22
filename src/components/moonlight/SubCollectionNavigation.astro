@@ -1,5 +1,5 @@
 ---
-import type { MoonlightProjectNavigationItem } from '../../lib/moonlight';
+import type { MoonlightSubCollectionNavigationItem } from '../../lib/moonlight';
 import type { DepthGroupT } from '../../lib/moonlight/navigation';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationPanel from '../site/NavigationPanel.astro';
@@ -7,10 +7,10 @@ import ContentLink from './ContentLink.astro';
 import ContentLinkList from './ContentLinkList.astro';
 
 interface Props {
-  readonly projectNavigation: DepthGroupT<MoonlightProjectNavigationItem>;
+  readonly subCollectionNavigation: DepthGroupT<MoonlightSubCollectionNavigationItem>;
 }
 
-const { projectNavigation } = Astro.props;
+const { subCollectionNavigation } = Astro.props;
 const selectedUrlPathSlug = Astro.url.pathname;
 ---
 
@@ -23,7 +23,7 @@ const selectedUrlPathSlug = Astro.url.pathname;
   <nav>
     <ul>
       {
-        projectNavigation.map((x) =>
+        subCollectionNavigation.map((x) =>
           Array.isArray(x) ? (
             <ul>
               <ContentLinkList list={x} selectedUrlPathSlug={selectedUrlPathSlug} />
