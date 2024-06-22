@@ -1,13 +1,23 @@
 import { getCollection } from 'astro:content';
+import assert from 'node:assert';
 
-import { isItemDraftFilterPredicate, notItemDraftFilterPredicate } from '../collections/helpers.ts';
-import type { MoonlightCollection } from './config.ts';
-import { type MoonlightItem, toMoonlightItem } from './index.ts';
-import { countSlugPathParts } from './utils.ts';
+import { isEntryDraftFilterPredicate, notEntryDraftFilterPredicate } from '../collections/helpers';
+import type { MoonlightCollection } from './config';
+import { toMoonlightItem } from './index';
+import type { MoonlightItem } from './types';
+import { countSlugPathParts } from './utils';
 
 // --------------------------------------------------------------------------
-export function indexItemFilterPredicate<T extends MoonlightCollection>(moonlightItem: MoonlightItem<T>): boolean {
+export function isItemIndexFilterPredicate<T extends MoonlightCollection>(moonlightItem: MoonlightItem<T>): boolean {
   return countSlugPathParts(moonlightItem.entry.slug) === 1;
+}
+
+export function isItemDraftFilterPredicate<T extends MoonlightCollection>(item: MoonlightItem<T>) {
+  return isEntryDraftFilterPredicate(item.entry);
+}
+
+export function notItemDraftFilterPredicate<T extends MoonlightCollection>(item: MoonlightItem<T>) {
+  return notEntryDraftFilterPredicate(item.entry);
 }
 
 // --------------------------------------------------------------------------
@@ -15,7 +25,7 @@ export function moonlightPruneDraftSubCollections<T extends MoonlightCollection>
   allItems: Array<MoonlightItem<T>>
 ): Array<MoonlightItem<T>> {
   // Find all the index items, for each sub-collection
-  const indexItems = moonlightGetIndexItems(allItems);
+  const indexItems = moonlightGetAllIndexItems(allItems);
 
   // If an index item is a draft, also prune all items from that sub-collection
   return indexItems.reduce((acc, indexItem) => {
@@ -43,13 +53,27 @@ export async function moonlightGetAllItems<T extends MoonlightCollection>(
 }
 
 // --------------------------------------------------------------------------
-export function moonlightGetIndexItems<T extends MoonlightCollection>(
+export function moonlightGetAllIndexItems<T extends MoonlightCollection>(
   allItems: Array<MoonlightItem<T>>
 ): Array<MoonlightItem<T>> {
   return allItems
-    .filter(indexItemFilterPredicate)
+    .filter(isItemIndexFilterPredicate)
     .toSorted((a, b) => a.entry.slug.localeCompare(b.entry.slug))
     .toSorted((a, b) => a.indexOrder - b.indexOrder);
+}
+
+export function moonlightGetIndexItem<T extends MoonlightCollection>(
+  subCollectionItems: Array<MoonlightItem<T>>
+): MoonlightItem<T> {
+  const ret = subCollectionItems
+    .filter(isItemIndexFilterPredicate)
+    .toSorted((a, b) => a.entry.slug.localeCompare(b.entry.slug))
+    .toSorted((a, b) => a.indexOrder - b.indexOrder)
+    .pop();
+
+  assert(ret !== undefined);
+
+  return ret;
 }
 
 // --------------------------------------------------------------------------

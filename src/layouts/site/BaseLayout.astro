@@ -1,5 +1,4 @@
 ---
-import { MOONLIGHT_ENTRY_KIND_REGULAR, type MoonlightEntryKind } from '../../lib/moonlight';
 import type { LinkT } from '../../lib/types';
 import '../../styles/global.css';
 import Header from '../../components/site/Header.astro';
@@ -18,13 +17,12 @@ interface Props {
   readonly pageTitle: string;
   readonly breadcrumbs?: ReadonlyArray<LinkT> | undefined;
   readonly fixedHeader?: boolean;
-  readonly kind?: MoonlightEntryKind | undefined;
+  readonly kind?: string | undefined;
 }
 
 const { pageTitle, breadcrumbs, fixedHeader, kind } = Astro.props;
 const mainClassNames =
-  `kind-${kind ?? MOONLIGHT_ENTRY_KIND_REGULAR} w-full flex-1 flex flex-col` +
-  (!!fixedHeader ? ' overflow-y-auto md:overflow-visible' : '');
+  `kind-${kind ?? 'plain'} w-full flex-1 flex flex-col` + (!!fixedHeader ? ' overflow-y-auto md:overflow-visible' : '');
 const title = SITE_TITLE + (isHomePage(Astro.url) ? '' : ` / ${pageTitle}`);
 ---
 

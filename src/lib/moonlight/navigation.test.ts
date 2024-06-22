@@ -2,7 +2,6 @@
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './navigation';
-import { createPathLookup } from './navigation';
 
 describe('navigation', () => {
   const TEST_ALL_ITEMS = [
@@ -80,22 +79,26 @@ describe('navigation', () => {
 
   describe('groupItemsByDepth', () => {
     it('should work as expected', () => {
-      expect(unit.groupItemsByDepth([])).toStrictEqual([]);
-      expect(unit.groupItemsByDepth([{ depth: 1, path: '/foo' }])).toStrictEqual([{ depth: 1, path: '/foo' }]);
-      expect(unit.groupItemsByDepth(TEST_ALL_ITEMS)).toStrictEqual(TEST_ITEMS_DEPTH_GROUP);
+      expect(unit.groupItemsByDepth([], 1)).toStrictEqual([]);
+      expect(unit.groupItemsByDepth([{ depth: 1, path: '/foo' }], 1)).toStrictEqual([{ depth: 1, path: '/foo' }]);
+      expect(unit.groupItemsByDepth(TEST_ALL_ITEMS, 1)).toStrictEqual(TEST_ITEMS_DEPTH_GROUP);
       expect(
-        unit.groupItemsByDepth([{ depth: 1 }, { depth: 1 }, { depth: 2 }, { depth: 3 }, { depth: 1 }])
+        unit.groupItemsByDepth([{ depth: 1 }, { depth: 1 }, { depth: 2 }, { depth: 3 }, { depth: 1 }], 1)
       ).toStrictEqual([{ depth: 1 }, { depth: 1 }, [{ depth: 2 }, [{ depth: 3 }]], { depth: 1 }]);
     });
   });
 
   describe('createPathLookup', () => {
     it('should work as expected', () => {
-      expect(createPathLookup([], [])).toStrictEqual({});
-      expect(createPathLookup([{ depth: 1, path: '/foo' }], [{ depth: 1, path: '/foo' }])).toStrictEqual({
+      expect(unit.createPathLookup([], { depth: 1, path: '/' }, [])).toStrictEqual({});
+      expect(
+        unit.createPathLookup([{ depth: 1, path: '/foo' }], { depth: 1, path: '/foo' }, [{ depth: 1, path: '/foo' }])
+      ).toStrictEqual({
         '/foo': [{ depth: 1, path: '/foo' }],
       });
-      expect(createPathLookup(TEST_ALL_ITEMS, TEST_ITEMS_DEPTH_GROUP)).toStrictEqual(TEST_PATH_LOOKUP);
+      expect(unit.createPathLookup(TEST_ALL_ITEMS, { depth: 1, path: '/foo' }, TEST_ITEMS_DEPTH_GROUP)).toStrictEqual(
+        TEST_PATH_LOOKUP
+      );
     });
   });
 });

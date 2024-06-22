@@ -1,7 +1,7 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 
-import type { LinkT } from '../types.ts';
-import { notEntryDraftFilterPredicate } from './helpers.ts';
+import type { LinkT } from '../types';
+import { notEntryDraftFilterPredicate } from './helpers';
 import { type TagCollection } from './index';
 
 // --------------------------------------------------------------------------

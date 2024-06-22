@@ -5,8 +5,8 @@ import {
   NAVIGATION_PANEL_ICON_CLASS_HIDDEN,
   NAVIGATION_PANEL_ICON_CLASS_VISIBLE,
   type NavigationPanelBreakpoint,
-} from './consts.ts';
-import { NavigationPanelDirection } from './consts.ts';
+} from './consts';
+import { NavigationPanelDirection } from './consts';
 
 // --------------------------------------------------------------------------
 type NavigationPanelStackEntry = {

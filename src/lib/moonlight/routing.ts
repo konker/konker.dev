@@ -1,4 +1,19 @@
-import type { MoonlightCollection, MoonlightConfig } from './config.ts';
+import { MOONLIGHT_NAVIGATION_TITLE_OVERVIEW, type MoonlightCollection, type MoonlightConfig } from './config';
+import {
+  moonlightGetAllIndexItems,
+  moonlightGetAllItems,
+  moonlightGetIndexItem,
+  moonlightGetNextItem,
+  moonlightGetPrevItem,
+  moonlightGetSubCollectionItems,
+} from './items';
+import {
+  createPathLookup,
+  groupItemsByDepth,
+  renameFirstHeading,
+  renameIndexNavigationItem,
+  shiftDepth,
+} from './navigation';
 import {
   MOONLIGHT_ENTRY_KIND_REGULAR,
   MOONLIGHT_PAGE_TYPE_ENTRY,
@@ -6,16 +21,8 @@ import {
   type MoonlightItem,
   type MoonlightPagePropsEntry,
   type MoonlightPagePropsIndex,
-} from './index.ts';
-import {
-  moonlightGetAllItems,
-  moonlightGetIndexItems,
-  moonlightGetNextItem,
-  moonlightGetPrevItem,
-  moonlightGetSubCollectionItems,
-} from './items.ts';
-import { createPathLookup, groupItemsByDepth } from './navigation.ts';
-import { RecordKeysOf } from './utils.ts';
+} from './types';
+import { RecordKeysOf } from './utils';
 
 // --------------------------------------------------------------------------
 export type StaticPathIndex = {
@@ -52,13 +59,17 @@ export const formatStaticPathEntry =
   <T extends MoonlightCollection>(allItems: Array<MoonlightItem<T>>) =>
   async (moonlightItem: MoonlightItem<T>): Promise<StaticPathEntry<T>> => {
     const { Content, headings } = await moonlightItem.entry.render();
-    const headingGroups = groupItemsByDepth(headings);
+    const headingGroups = groupItemsByDepth(shiftDepth(headings, -1), 1);
 
-    const allSubCollectionItems = moonlightGetSubCollectionItems(allItems, moonlightItem.subCollectionName);
+    const allSubCollectionItems = shiftDepth(
+      moonlightGetSubCollectionItems(allItems, moonlightItem.subCollectionName),
+      -1
+    );
+    const indexItem = moonlightGetIndexItem(allSubCollectionItems);
     const prevItem = moonlightGetPrevItem(allSubCollectionItems, moonlightItem);
     const nextItem = moonlightGetNextItem(allSubCollectionItems, moonlightItem);
-    const subCollectionNavigation = groupItemsByDepth(allSubCollectionItems);
-    const navigationPathLookup = createPathLookup(allSubCollectionItems, subCollectionNavigation);
+    const subCollectionNavigation = groupItemsByDepth(allSubCollectionItems, 1);
+    const navigationPathLookup = createPathLookup(allSubCollectionItems, indexItem, subCollectionNavigation);
     const breadcrumbNavigation = navigationPathLookup[moonlightItem.path] ?? [];
 
     return {
@@ -71,8 +82,11 @@ export const formatStaticPathEntry =
         item: moonlightItem,
         Content,
         headings,
-        headingGroups,
-        subCollectionNavigation,
+        headingGroups: renameFirstHeading(headingGroups, MOONLIGHT_NAVIGATION_TITLE_OVERVIEW),
+        subCollectionNavigation: renameIndexNavigationItem(
+          subCollectionNavigation,
+          MOONLIGHT_NAVIGATION_TITLE_OVERVIEW
+        ),
         breadcrumbNavigation,
         prevItem,
         nextItem,
@@ -88,7 +102,7 @@ export async function moonlightGetStaticPathsIndex(moonlightConfig: MoonlightCon
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const collectionRootPagePath = `/${collectionName}`;
     const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
-    const indexItems = moonlightGetIndexItems(allItems);
+    const indexItems = moonlightGetAllIndexItems(allItems);
     const rootIndexStaticPath = formatStaticPathIndex(collectionRootPagePath, indexItems);
 
     ret.push(rootIndexStaticPath);

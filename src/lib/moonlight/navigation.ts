@@ -1,10 +1,14 @@
-import { isArray, pairWise } from './utils.ts';
+import type { MoonlightCollection } from './config';
+import { isItemIndexFilterPredicate } from './items';
+import type { DepthGroupT, HasDepthT, HasPathT, HasTextT, MoonlightItem } from './types';
+import { isArray, pairWise } from './utils';
 
-export type HasDepthT = { readonly depth: number };
-export type DepthGroupT<T extends HasDepthT> = Array<T | DepthGroupT<T>>;
+// --------------------------------------------------------------------------
+export function shiftDepth<T extends HasDepthT>(items: Array<T>, shift: number): Array<T> {
+  return items.map((x) => ({ ...x, depth: Math.max(1, x.depth + shift) }));
+}
 
-export type HasPathT = HasDepthT & { readonly path: string };
-
+// --------------------------------------------------------------------------
 /**
  * Recursive function to group items by their `depth` property.
  * Depth should be 1-based.
@@ -14,7 +18,7 @@ export type HasPathT = HasDepthT & { readonly path: string };
  * Into:
  * `[{ depth: 1 }, { depth: 1 }, [{ depth: 2 }, [{ depth: 3 }] ], { depth: 1 }]`
  */
-export function groupItemsByDepth<T extends HasDepthT>(items: Array<T>, depth = 1): DepthGroupT<T> {
+export function groupItemsByDepth<T extends HasDepthT>(items: Array<T>, depth: number): DepthGroupT<T> {
   let skipIdx = -1;
   return items.reduce((acc, val, i) => {
     if (skipIdx !== -1 && i < skipIdx) {
@@ -33,11 +37,13 @@ export function groupItemsByDepth<T extends HasDepthT>(items: Array<T>, depth = 
   }, [] as DepthGroupT<T>);
 }
 
+// --------------------------------------------------------------------------
 /**
  * TODO: comments
  */
 export function createPathLookup<T extends HasPathT>(
   allItems: Array<T>,
+  indexItem: T,
   groupedItems: DepthGroupT<T>
 ): Record<string, Array<T>> {
   function _searchPath(groupedItems: DepthGroupT<T>, path: string, acc: Array<T>): Array<T> {
@@ -79,8 +85,36 @@ export function createPathLookup<T extends HasPathT>(
   const ret = allPaths.reduce((acc, val) => {
     return {
       ...acc,
-      [val]: _searchPath(groupedItems, val, []),
+      [val]: _searchPath(groupedItems, val, indexItem.path === val ? [] : [indexItem]),
     };
   }, {});
   return ret;
+}
+
+// --------------------------------------------------------------------------
+export function renameFirstHeading<T extends HasTextT>(headings: DepthGroupT<T>, newTitle: string): DepthGroupT<T> {
+  if (headings.length > 0) {
+    const firstHeading = headings[0]!;
+    if (!isArray(firstHeading) && firstHeading.depth === 1) {
+      return [{ ...firstHeading, text: newTitle }, ...headings.slice(1)];
+    }
+  }
+  return headings;
+}
+
+// --------------------------------------------------------------------------
+export function renameIndexNavigationItem<T extends MoonlightCollection>(
+  items: DepthGroupT<MoonlightItem<T>>,
+  newTitle: string
+): DepthGroupT<MoonlightItem<T>> {
+  const indexItemIdx = items.findIndex((x) => !isArray(x) && isItemIndexFilterPredicate(x));
+  if (indexItemIdx !== -1) {
+    const indexItem = items[indexItemIdx]! as MoonlightItem<T>;
+    return [
+      ...items.slice(0, indexItemIdx),
+      { ...indexItem, entry: { ...indexItem.entry, data: { ...indexItem.entry.data, title: newTitle } } },
+      ...items.slice(indexItemIdx + 1),
+    ];
+  }
+  return items;
 }

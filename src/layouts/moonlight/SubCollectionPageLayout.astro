@@ -1,5 +1,4 @@
 ---
-import type { MoonlightSubCollectionNavigationItem } from '../../lib/moonlight';
 import type { MarkdownHeading, MarkdownInstance } from 'astro';
 import { PanelLeftClose, PanelLeftOpen, PilcrowLeft, PilcrowRight } from 'lucide-astro';
 import SubCollectionNavigation from '../../components/moonlight/SubCollectionNavigation.astro';
@@ -9,8 +8,7 @@ import NavigationToggle from '../../components/site/NavigationToggle.astro';
 import type { LinkT } from '../../lib/types';
 import { NavigationPanelBreakpoint } from '../../scripts/consts';
 import BaseLayout from '../site/BaseLayout.astro';
-import type { MoonlightEntryKind } from '../../lib/moonlight';
-import type { DepthGroupT } from '../../lib/moonlight/navigation';
+import type { DepthGroupT, MoonlightEntryKind, MoonlightSubCollectionNavigationItem } from '../../lib/moonlight/types';
 
 interface Props {
   readonly kind: MoonlightEntryKind;
@@ -23,7 +21,8 @@ interface Props {
   readonly nextItem: MoonlightSubCollectionNavigationItem | undefined;
 }
 
-const { pageTitle, breadcrumbs, kind, headingGroups, Content, subCollectionNavigation, prevItem, nextItem } = Astro.props;
+const { pageTitle, breadcrumbs, kind, headingGroups, Content, subCollectionNavigation, prevItem, nextItem } =
+  Astro.props;
 ---
 
 <BaseLayout pageTitle={pageTitle} breadcrumbs={breadcrumbs} fixedHeader={true} kind={kind}>

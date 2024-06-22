@@ -1,4 +1,4 @@
-import { DEFAULT_THEME_STORAGE_KEY, Theme } from './consts.ts';
+import { DEFAULT_THEME_STORAGE_KEY, Theme } from './consts';
 
 export function themeParse(s: string | undefined | null): Theme | undefined {
   switch (s?.toLowerCase()) {

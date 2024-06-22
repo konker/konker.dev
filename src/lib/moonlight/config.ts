@@ -9,6 +9,8 @@ export type MoonlightConfig = {
   };
 };
 
+export const MOONLIGHT_NAVIGATION_TITLE_OVERVIEW = 'Overview';
+
 export const MOONLIGHT_CONFIG: MoonlightConfig = {
   projects: {
     rootPathTitle: 'Projects',

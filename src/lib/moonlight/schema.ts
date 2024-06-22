@@ -1,6 +1,6 @@
 import { z } from 'astro/zod';
 
-import { MOONLIGHT_ENTRY_KIND_REFERENCE, MOONLIGHT_ENTRY_KIND_REGULAR } from './index.ts';
+import { MOONLIGHT_ENTRY_KIND_REFERENCE, MOONLIGHT_ENTRY_KIND_REGULAR } from './types';
 
 export const MoonlightSchema = z.object({
   /** The title of the current page. Required. */

@@ -3,6 +3,9 @@
 - Immediate
 
   - Breadcrumbs a bit long for reference content?
+  - Naming for moonlight functions
+    - e.g. those without `moonlight` prefix?
+  - Unit tests for lib code
   - ~~Hardcoded '/projects' still there?~~
   - ~~mdx for reference?~~
   - ~~Links on reference index page~~

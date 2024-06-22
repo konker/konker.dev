@@ -1,6 +1,6 @@
 ---
 import type { MarkdownHeading } from 'astro';
-import type { DepthGroupT } from '../../lib/moonlight/navigation';
+import type { DepthGroupT } from '../../lib/moonlight/types';
 import { NavigationPanelBreakpoint, NavigationPanelDirection } from '../../scripts/consts';
 import NavigationPanel from '../site/NavigationPanel.astro';
 import IntraPageLink from './IntraPageLink.astro';
@@ -11,27 +11,6 @@ interface Props {
 }
 
 const { headingGroups } = Astro.props;
-
-/*FIXME: remove
-function groupHeadings(headings: Array<MarkdownHeading>, depth: number): HeadingsList {
-  let skipIdx = -1;
-  return headings.reduce((acc, val, i) => {
-    if (skipIdx !== -1 && i < skipIdx) {
-      return acc;
-    }
-    if (val.depth !== depth) {
-      // Find the next heading with the current depth
-      const nextDepthIdx = headings.slice(i).findIndex((x) => x.depth === depth);
-      const j = nextDepthIdx === -1 ? headings.length : i + nextDepthIdx;
-      skipIdx = j;
-
-      // Recurse for sub-list
-      return [...acc, groupHeadings(headings.slice(i, j), val.depth)];
-    }
-    return acc.concat(val);
-  }, [] as HeadingsList);
-}
-*/
 ---
 
 <NavigationPanel

@@ -1,6 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 
-import { MoonlightSchema } from '../lib/moonlight/schema.ts';
+import { MoonlightSchema } from '../lib/moonlight/schema';
 
 const tilCollection = defineCollection({
   type: 'content',

@@ -1,9 +1,7 @@
 import type { CollectionEntry, ContentCollectionKey } from 'astro:content';
 import { Box, Fingerprint, Home, Lightbulb, Tag, Tags } from 'lucide-astro';
 
-import type { MoonlightItem } from '../moonlight';
-import type { MoonlightCollection } from '../moonlight/config.ts';
-import type { LinkT, SectionNavigationT } from '../types.ts';
+import type { LinkT, SectionNavigationT } from '../types';
 
 // --------------------------------------------------------------------------
 export function isEntryDraftFilterPredicate<T extends ContentCollectionKey>(entry: CollectionEntry<T>): boolean {
@@ -12,14 +10,6 @@ export function isEntryDraftFilterPredicate<T extends ContentCollectionKey>(entr
 
 export function notEntryDraftFilterPredicate<T extends ContentCollectionKey>(entry: CollectionEntry<T>): boolean {
   return !isEntryDraftFilterPredicate(entry);
-}
-
-export function isItemDraftFilterPredicate<T extends MoonlightCollection>(item: MoonlightItem<T>) {
-  return isEntryDraftFilterPredicate(item.entry);
-}
-
-export function notItemDraftFilterPredicate<T extends MoonlightCollection>(item: MoonlightItem<T>) {
-  return notEntryDraftFilterPredicate(item.entry);
 }
 
 // --------------------------------------------------------------------------

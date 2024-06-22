@@ -1,7 +1,7 @@
 import * as D from 'date-fns';
 import { Home } from 'lucide-astro';
 
-import type { LinkT } from './types.ts';
+import type { LinkT } from './types';
 
 export const HomeBreadcrumb: LinkT = {
   url: '/',
