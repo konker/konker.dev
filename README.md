@@ -2,8 +2,9 @@
 
 A small rules engine for [Node.js](https://nodejs.org/) based on [Effect-TS](https://www.effect.website/)
 
-[![CI](https://github.com/konkerdotdev/tiny-rules-fp/actions/workflows/ci.yml/badge.svg)](https://github.com/konkerdotdev/tiny-rules-fp/actions/workflows/ci.yml)
 ![License](https://img.shields.io/github/license/konkerdotdev/tiny-rules-fp)
+[![NPM Version](https://img.shields.io/npm/v/%40konker.dev%2Ftiny-rules-fp)](https://www.npmjs.com/package/@konker.dev/tiny-rules-fp)
+[![codecov](https://codecov.io/gh/konkerdotdev/tiny-rules-fp/graph/badge.svg?token=5CMVHDJZUY)](https://codecov.io/gh/konkerdotdev/tiny-rules-fp)
 
 ## Usage
 
