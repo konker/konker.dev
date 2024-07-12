@@ -45,7 +45,7 @@ describe('effect-prelude', () => {
       expect(
         P.pipe(
           [1, 2, 3],
-          P.Array.map((n) => n * 2)
+          P.ArrayUtils.map((n) => n * 2)
         )
       ).toEqual([2, 4, 6]);
     });
@@ -56,7 +56,7 @@ describe('effect-prelude', () => {
       expect(
         P.pipe(
           [1, 2, 3, 4],
-          P.Array.filter((n) => n % 2 === 0)
+          P.ArrayUtils.filter((n) => n % 2 === 0)
         )
       ).toEqual([2, 4]);
     });
@@ -64,7 +64,7 @@ describe('effect-prelude', () => {
 
   describe('Array.filterUndefined', () => {
     it('should function as expected', () => {
-      expect(P.pipe([1, 0, 2, undefined, 3, null, 4], P.Array.filterUndefined)).toEqual([1, 0, 2, 3, 4]);
+      expect(P.pipe([1, 0, 2, undefined, 3, null, 4], P.ArrayUtils.filterUndefined)).toEqual([1, 0, 2, 3, 4]);
     });
   });
 
@@ -73,7 +73,7 @@ describe('effect-prelude', () => {
       expect(
         P.pipe(
           [1, 2, 3],
-          P.Array.foldl((acc, val) => acc + String(val), '')
+          P.ArrayUtils.foldl((acc, val) => acc + String(val), '')
         )
       ).toEqual('123');
     });
@@ -84,7 +84,7 @@ describe('effect-prelude', () => {
       expect(
         P.pipe(
           [1, 2, 3],
-          P.Array.foldr((acc, val) => acc + String(val), '')
+          P.ArrayUtils.foldr((acc, val) => acc + String(val), '')
         )
       ).toEqual('321');
     });
@@ -92,20 +92,20 @@ describe('effect-prelude', () => {
 
   describe('Array.toSorted', () => {
     it('should function as expected', () => {
-      expect(P.pipe([3, 1, 2], P.Array.toSorted)).toEqual([1, 2, 3]);
+      expect(P.pipe([3, 1, 2], P.ArrayUtils.toSorted)).toEqual([1, 2, 3]);
     });
   });
 
   describe('Array.toReversed', () => {
     it('should function as expected', () => {
-      expect(P.pipe([1, 2, 3], P.Array.toReversed)).toEqual([3, 2, 1]);
+      expect(P.pipe([1, 2, 3], P.ArrayUtils.toReversed)).toEqual([3, 2, 1]);
     });
   });
 
   describe('Array.join', () => {
     it('should function as expected', () => {
-      expect(P.pipe([1, 2, 3], P.Array.join())).toEqual('123');
-      expect(P.pipe([1, 2, 3], P.Array.join('-'))).toEqual('1-2-3');
+      expect(P.pipe([1, 2, 3], P.ArrayUtils.join())).toEqual('123');
+      expect(P.pipe([1, 2, 3], P.ArrayUtils.join('-'))).toEqual('1-2-3');
     });
   });
 

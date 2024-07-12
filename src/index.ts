@@ -21,7 +21,7 @@ export function isDefined<T>(x: T | undefined): x is T {
 }
 
 // Array functions
-export const Array = {
+export const ArrayUtils = {
   map:
     <A, B>(f: (a: A, i: number) => B) =>
     (as: ReadonlyArray<A>): ReadonlyArray<B> =>
