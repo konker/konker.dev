@@ -59,7 +59,7 @@
   "scripts": {
     "prepare": "husky install",
     "test": "jest --no-cache -w 4",
-    "clean": "rm -rf dist && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc && gulp copy-static",
     "type-coverage-check": "type-coverage --detail --at-least 100",
