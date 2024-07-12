@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/effect-ts-prelude",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Prelude for Effect-ts",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -24,8 +24,8 @@
   ],
   "packageManager": "pnpm@8",
   "peerDependencies": {
-    "@effect/schema": "^0.63.2",
-    "effect": "^2.4.1"
+    "@effect/schema": "^0.68.23",
+    "effect": "^3.5.3"
   },
   "devDependencies": {
     "@effect/language-service": "^0.1.0",
