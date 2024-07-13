@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-rules-fp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "Tiny rules engine based on Effect-ts",
   "license": "ISC",
