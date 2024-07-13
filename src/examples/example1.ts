@@ -24,7 +24,7 @@ import * as memFs1Fixture from '../test/fixtures/memfs-1.json';
         P.Effect.flatMap(
           E.addStarListener((_eventType: TreeCrawlerEvent, eventData?: TreeCrawlerData) => {
             accumulator.push(_eventType, eventData);
-            return P.Effect.unit;
+            return P.Effect.void;
           })
         )
       )

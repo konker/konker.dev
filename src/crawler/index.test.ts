@@ -7,8 +7,8 @@ import { TreeCrawlerDataType } from '../index';
 import * as unit from './index';
 
 describe('crawler', () => {
-  const mockDirectoryListener = jest.fn().mockImplementation(() => P.Effect.unit);
-  const mockFileListener = jest.fn().mockImplementation(() => P.Effect.unit);
+  const mockDirectoryListener = jest.fn().mockImplementation(() => P.Effect.void);
+  const mockFileListener = jest.fn().mockImplementation(() => P.Effect.void);
 
   describe('notifyDirectoryEvent', () => {
     afterEach(() => {

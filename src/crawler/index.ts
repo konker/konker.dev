@@ -14,7 +14,7 @@ export function notifyDirectoryEvent(
     P.Option.match({
       onSome: (directoryData) =>
         P.pipe(events, E.notify(TreeCrawlerEvent.Directory, directoryData), P.Effect.mapError(toTinyTreeCrawlerError)),
-      onNone: () => P.Effect.unit,
+      onNone: () => P.Effect.void,
     })
   );
 }
@@ -28,7 +28,7 @@ export function notifyFileEvent(
     P.Option.match({
       onSome: (fileData) =>
         P.pipe(events, E.notify(TreeCrawlerEvent.File, fileData), P.Effect.mapError(toTinyTreeCrawlerError)),
-      onNone: () => P.Effect.unit,
+      onNone: () => P.Effect.void,
     })
   );
 }
