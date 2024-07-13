@@ -22,7 +22,7 @@ describe('depth-first-tree-crawler', () => {
   });
 
   it('should work as expected', async () => {
-    const mockListener = jest.fn().mockImplementation(() => P.Effect.unit);
+    const mockListener = jest.fn().mockImplementation(() => P.Effect.void);
 
     await P.Effect.runPromise(
       P.pipe(
@@ -60,7 +60,7 @@ describe('depth-first-tree-crawler', () => {
   });
 
   it('should work as expected', async () => {
-    const mockListener = jest.fn().mockImplementation(() => P.Effect.unit);
+    const mockListener = jest.fn().mockImplementation(() => P.Effect.void);
 
     await P.Effect.runPromise(
       P.pipe(

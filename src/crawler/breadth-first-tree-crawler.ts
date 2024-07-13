@@ -18,7 +18,7 @@ export const BreadthFirstTreeCrawler: TreeCrawler = (
 ) => {
   const crawlTree = (dirPath: string, rootPath: string, level: number): P.Effect.Effect<void, TinyTreeCrawlerError> => {
     return P.pipe(
-      P.Effect.unit,
+      P.Effect.void,
 
       // Apply directory handler
       P.Effect.flatMap((_) => handlers[DIR](tfs, dirPath, level)),
@@ -45,7 +45,7 @@ export const BreadthFirstTreeCrawler: TreeCrawler = (
                 return filters[DIR](tfs, rootPath, subDirPath, subDirName, level + 1);
               }),
               P.Effect.flatMap(({ filterResult, subDirPath }) =>
-                filterResult ? crawlTree(subDirPath, rootPath, level + 1) : P.Effect.unit
+                filterResult ? crawlTree(subDirPath, rootPath, level + 1) : P.Effect.void
               )
             );
           }
@@ -60,9 +60,9 @@ export const BreadthFirstTreeCrawler: TreeCrawler = (
                 ? P.pipe(
                     handlers[FILE](tfs, dirPath, fileName, level + 1),
                     P.Effect.tap((fileData) => notifyFileEvent(events, fileData)),
-                    P.Effect.flatMap(() => P.Effect.unit)
+                    P.Effect.flatMap(() => P.Effect.void)
                   )
-                : P.Effect.unit
+                : P.Effect.void
             )
           );
         })
@@ -75,7 +75,7 @@ export const BreadthFirstTreeCrawler: TreeCrawler = (
 
   return (dirPath: string, rootPath: string = dirPath, level = 0) =>
     P.pipe(
-      P.Effect.unit,
+      P.Effect.void,
 
       // Notify `Started` event
       P.Effect.tap(() => P.pipe(events, E.notify(TreeCrawlerEvent.Started))),
