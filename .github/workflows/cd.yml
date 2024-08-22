@@ -3,7 +3,7 @@ name: CD
 on:
   push:
     branches:
-      - 'main'
+      - 'disable'
     paths:
       - 'package.json'
 
