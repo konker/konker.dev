@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/momento-cache-client-effect",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "Momento Cache client for Node.js TypeScript projects based on Effect-ts",
   "license": "ISC",
@@ -22,7 +22,7 @@
     "functional-programming",
     "effect-ts"
   ],
-  "packageManager": "pnpm@8",
+  "packageManager": "pnpm@9",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.449.0",
     "@aws-sdk/lib-storage": "^3.449.0",
