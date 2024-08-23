@@ -22,7 +22,10 @@ importers:
         version: 0.0.16(@effect/schema@0.68.26(effect@3.5.6))(effect@3.5.6)
       '@konker.dev/momento-cache-client-effect':
         specifier: ^0.0.1
-        version: 0.0.1
+        version: 0.0.2
+      '@konker.dev/tiny-cache-fp':
+        specifier: ^0.0.1
+        version: 0.0.1(@gomomento/sdk@1.95.0)(@konker.dev/momento-cache-client-effect@0.0.2)
       '@konker.dev/tiny-error-fp':
         specifier: ^0.0.2
         version: 0.0.2
@@ -663,8 +666,14 @@ packages:
       '@effect/schema': ^0.68.23
       effect: ^3.5.3
 
-  '@konker.dev/momento-cache-client-effect@0.0.1':
-    resolution: {integrity: sha512-y5NwKbkOqXR1FpMHP1yENRHyMiMulXdiGdgwAI3pzkAz4Fl01SVaOTFV+8V0cvUXB0an79VOJes8wVi6m8pFpw==}
+  '@konker.dev/momento-cache-client-effect@0.0.2':
+    resolution: {integrity: sha512-qn1SB9QjIUKq1ClPZ/nJVgaEOYpQ7+zf0H3HRWYfJHvT4oAcckdFtvcuuoEM4sCoWV7u19T1u+TpK+mxyJPROQ==}
+
+  '@konker.dev/tiny-cache-fp@0.0.1':
+    resolution: {integrity: sha512-sOPyxVCfMU9Hm6G3Rvki1uYw6uWtgPdOrRYjxGa4U2MiW95gYLnSornu7cXYLz1kfujmed28biXJCOzFtphBKA==}
+    peerDependencies:
+      '@gomomento/sdk': ^1.95.0
+      '@konker.dev/momento-cache-client-effect': ^0.0.2
 
   '@konker.dev/tiny-error-fp@0.0.1':
     resolution: {integrity: sha512-6byqMIkw+5UY0S49XE0vrxE8hdajMSynhhmmXUp//CbN/rvPo035cH2W23qVFvzlJzYNbW6EA7aUNzMWIsKZcw==}
@@ -5428,7 +5437,7 @@ snapshots:
       '@effect/schema': 0.68.26(effect@3.5.6)
       effect: 3.5.6
 
-  '@konker.dev/momento-cache-client-effect@0.0.1':
+  '@konker.dev/momento-cache-client-effect@0.0.2':
     dependencies:
       '@aws-sdk/client-s3': 3.635.0
       '@aws-sdk/lib-storage': 3.635.0(@aws-sdk/client-s3@3.635.0)
@@ -5442,6 +5451,15 @@ snapshots:
       - aws-crt
       - encoding
       - supports-color
+
+  '@konker.dev/tiny-cache-fp@0.0.1(@gomomento/sdk@1.95.0)(@konker.dev/momento-cache-client-effect@0.0.2)':
+    dependencies:
+      '@effect/schema': 0.68.26(effect@3.5.6)
+      '@gomomento/sdk': 1.95.0
+      '@konker.dev/effect-ts-prelude': 0.0.16(@effect/schema@0.68.26(effect@3.5.6))(effect@3.5.6)
+      '@konker.dev/momento-cache-client-effect': 0.0.2
+      '@konker.dev/tiny-error-fp': 0.0.2
+      effect: 3.5.6
 
   '@konker.dev/tiny-error-fp@0.0.1': {}
 
