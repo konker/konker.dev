@@ -1,56 +1,13 @@
 import * as momento from '@gomomento/sdk';
 import * as P from '@konker.dev/effect-ts-prelude';
-import { TextEncoder } from 'util';
 
 import * as unit from './index';
 import { MomentoClientDeps } from './index';
-
-// Taken from: https://github.com/momentohq/client-sdk-javascript/blob/main/packages/client-sdk-nodejs/test/unit/cache-client.test.ts
-export const TEST_MOMENTO_AUTH_TOKEN =
-  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzcXVpcnJlbCIsImNwIjoiY29udHJvbCBwbGFuZSBlbmRwb2ludCIsImMiOiJkYXRhIHBsYW5lIGVuZHBvaW50In0.zsTsEXFawetTCZI';
-
-export const ERROR_KEY = 'ERROR_KEY';
-export const EXCEPTION_KEY = 'EXCEPTION_KEY';
-
-const TEXT_ENCODER = new TextEncoder();
+import { ERROR_KEY, EXCEPTION_KEY, MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from './lib/test';
 
 const TEST_KEY_1 = 'test-key-1';
 const TEST_VALUE_1 = 'test-value';
 const TEST_TTL_SECS = 123;
-
-export const MockMomentoClient = jest.fn<momento.CacheClient, []>(() => {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const __cache: any = {};
-
-  return {
-    get: jest.fn(async (cacheName: string, key: string) => {
-      console.log('KONK900', 'GET', key, __cache);
-      // eslint-disable-next-line fp/no-throw
-      if (key === EXCEPTION_KEY) throw new Error('GET KABOOM!');
-      return key === ERROR_KEY
-        ? new momento.CacheGet.Error(new momento.UnknownError('GET BOOM!'))
-        : __cache[`${cacheName}_${key}`] === undefined
-          ? new momento.CacheGet.Miss()
-          : new momento.CacheGet.Hit(TEXT_ENCODER.encode(__cache[`${cacheName}_${key}`]));
-    }),
-    set: jest.fn(async (cacheName: string, key: string, value: string, _options: any) => {
-      console.log('KONK900', 'SET', key, __cache);
-      // eslint-disable-next-line fp/no-throw
-      if (key === EXCEPTION_KEY) throw new Error('SET KABOOM!');
-      if (key === ERROR_KEY) return new momento.CacheSet.Error(new momento.UnknownError('SET BOOM!'));
-      __cache[`${cacheName}_${key}`] = value;
-      return new momento.CacheSet.Success();
-    }),
-    delete: jest.fn(async (cacheName: string, key: string) => {
-      console.log('KONK900', 'DEL', key, __cache);
-      // eslint-disable-next-line fp/no-throw
-      if (key === EXCEPTION_KEY) throw new Error('DEL KABOOM!');
-      if (key === ERROR_KEY) return new momento.CacheDelete.Error(new momento.UnknownError('DEL BOOM!'));
-      __cache[`${cacheName}_${key}`] = undefined;
-      return new momento.CacheDelete.Success();
-    }),
-  } as unknown as momento.CacheClient;
-});
 
 describe('momento-client-fp', () => {
   let deps: MomentoClientDeps;
