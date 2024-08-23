@@ -63,6 +63,7 @@
     "prettier": "^3.0.3",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
+    "type-coverage": "^2.29.1",
     "typescript": "^5.2.2"
   },
   "staticFiles": [],
@@ -72,6 +73,7 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc && gulp copy-static",
+    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files **/*.test.ts --ignore-files src/lib/test.ts",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
@@ -81,7 +83,7 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run fixme-check",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run fixme-check",
     "cd": "pnpm run build && pnpm publish --access public"
   }
 }

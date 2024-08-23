@@ -120,6 +120,9 @@ importers:
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.16.1)(typescript@5.5.4)
+      type-coverage:
+        specifier: ^2.29.1
+        version: 2.29.1(typescript@5.5.4)
       typescript:
         specifier: ^5.2.2
         version: 5.5.4
@@ -4176,6 +4179,15 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
+
+  type-coverage-core@2.29.1:
+    resolution: {integrity: sha512-lonikLRWnejbW9qsjoUsqXxQ3c4D0LPHaY2fsN5YD78sHAL27AaIoWYOjtitSqmv5UCS+3tv4qYjnj56vUH5eQ==}
+    peerDependencies:
+      typescript: 2 || 3 || 4 || 5
+
+  type-coverage@2.29.1:
+    resolution: {integrity: sha512-hsS1UYDrSltiSqMHJQn5wRFJiAeSA1PItMgeszxBkBjZEbtCzzmAU9dQswR1k8z0/ewj2/SbYEldYRurxgmxhA==}
+    hasBin: true
 
   type-detect@4.0.8:
     resolution: {integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==}
@@ -9752,6 +9764,23 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  type-coverage-core@2.29.1(typescript@5.5.4):
+    dependencies:
+      fast-glob: 3.3.2
+      minimatch: 9.0.3
+      normalize-path: 3.0.0
+      tslib: 2.6.3
+      tsutils: 3.21.0(typescript@5.5.4)
+      typescript: 5.5.4
+
+  type-coverage@2.29.1(typescript@5.5.4):
+    dependencies:
+      chalk: 4.1.2
+      minimist: 1.2.8
+      type-coverage-core: 2.29.1(typescript@5.5.4)
+    transitivePeerDependencies:
+      - typescript
 
   type-detect@4.0.8: {}
 
