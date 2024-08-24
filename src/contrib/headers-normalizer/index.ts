@@ -7,12 +7,12 @@ import type { WithNormalizedHeaders, WithPossibleHeaders, WithPossibleOutputHead
 const TAG = 'header-normalizer';
 
 export const middleware =
-  <I extends WithPossibleHeaders, WO, WE, WR>({
+  <WI extends WithPossibleHeaders, WO, WE, WR>({
     normalizeRequestHeaders = true,
     normalizeResponseHeaders = true,
   } = {}) =>
-  (wrapped: Handler<I & WithNormalizedHeaders, WO, WE, WR>): Handler<I, WO & WithPossibleOutputHeaders, WE, WR> =>
-  (i: I) => {
+  (wrapped: Handler<WI & WithNormalizedHeaders, WO, WE, WR>): Handler<WI, WO & WithPossibleOutputHeaders, WE, WR> =>
+  (i: WI) => {
     return P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

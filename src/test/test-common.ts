@@ -1,18 +1,19 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import type { Handler } from '../index';
+import type { BaseResponse } from '../lib/http';
 
-export type Deps = any;
-export const Deps = P.Context.GenericTag<any>('Deps');
+export type TestDeps = any;
+export const TestDeps = P.Context.GenericTag<any>('Deps');
 
-export function _echoCoreIn<I, E, D>(i: I): P.Effect.Effect<I, E, D> {
+// TODO: type annotation comment
+export function echoCoreIn<I, E = never, R = never>(i: I): P.Effect.Effect<I, E, R> {
   return P.Effect.succeed(i);
 }
-export const echoCoreIn: Handler<any, any, any, any> = _echoCoreIn;
 
-export const _echoCoreInDeps =
-  <E, D, I>(Deps: P.Context.Tag<D, D>) =>
-  (i: I): P.Effect.Effect<unknown, E, D> => {
+// TODO: type annotation comment
+export const echoCoreInDeps =
+  <I, E, R>(Deps: P.Context.Tag<R, R>) =>
+  (i: I): P.Effect.Effect<unknown, E, R> => {
     return P.pipe(
       Deps,
       P.Effect.map((deps) => ({
@@ -21,4 +22,13 @@ export const _echoCoreInDeps =
       }))
     );
   };
-export const echoCoreInDeps: <D = Deps>(deps: P.Context.Tag<D, D>) => Handler<object, any, any, D> = _echoCoreInDeps;
+
+// TODO: type annotation comment
+export function http200CoreIn<I>(_i: I): P.Effect.Effect<BaseResponse> {
+  return P.Effect.succeed({
+    statusCode: 200,
+    headers: { QUX: 'qux_value' },
+    body: JSON.stringify({ result: 'OK' }),
+    isBase64Encoded: false,
+  });
+}
