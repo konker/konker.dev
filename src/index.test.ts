@@ -41,7 +41,7 @@ describe('momento-client-fp', () => {
     let momentoClient: momento.CacheClient;
 
     beforeEach(() => {
-      momentoClient = new MockMomentoClient();
+      momentoClient = MockMomentoClient();
       deps = MomentoClientDeps.of({
         makeMomentoClient: () => P.Effect.succeed(momentoClient),
       });
