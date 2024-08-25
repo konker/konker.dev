@@ -73,7 +73,7 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc && gulp copy-static",
-    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files **/*.test.ts --ignore-files src/lib/test.ts",
+    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files **/*.test.ts --ignore-files src/lib/test.ts --ignore-files src/lib/test.test.ts",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",

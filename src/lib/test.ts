@@ -1,6 +1,9 @@
 /* eslint-disable fp/no-mutation,fp/no-nil,@typescript-eslint/naming-convention */
 import * as momento from '@gomomento/sdk';
+import * as P from '@konker.dev/effect-ts-prelude';
 import { TextEncoder } from 'util';
+
+import type { MomentoClientConfigProps, MomentoClientFactory } from '../index';
 
 // Taken from: https://github.com/momentohq/client-sdk-javascript/blob/main/packages/client-sdk-nodejs/test/unit/cache-client.test.ts
 export const TEST_MOMENTO_AUTH_TOKEN =
@@ -9,12 +12,11 @@ export const TEST_MOMENTO_AUTH_TOKEN =
 export const ERROR_KEY = 'ERROR_KEY';
 export const EXCEPTION_KEY = 'EXCEPTION_KEY';
 
-const TEXT_ENCODER = new TextEncoder();
+export const TEXT_ENCODER = new TextEncoder();
 
-export const MockMomentoClient = jest.fn<momento.CacheClient, []>(() => {
-  const __cache: any = {};
-
-  return {
+// --------------------------------------------------------------------------
+export const MockMomentoClient = (__cache: any = {}) =>
+  ({
     get: jest.fn(async (cacheName: string, key: string) => {
       // eslint-disable-next-line fp/no-throw
       if (key === EXCEPTION_KEY) throw new Error('GET KABOOM!');
@@ -38,5 +40,9 @@ export const MockMomentoClient = jest.fn<momento.CacheClient, []>(() => {
       __cache[`${cacheName}_${key}`] = undefined;
       return new momento.CacheDelete.Success();
     }),
-  } as unknown as momento.CacheClient;
-});
+  }) as unknown as momento.CacheClient;
+
+// --------------------------------------------------------------------------
+export const mockMomentoClientFactory: MomentoClientFactory = (_props: MomentoClientConfigProps) => {
+  return () => P.Effect.succeed(MockMomentoClient());
+};
