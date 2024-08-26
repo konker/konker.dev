@@ -18,6 +18,7 @@ export const TEXT_ENCODER = new TextEncoder();
 // --------------------------------------------------------------------------
 export const MockMomentoClient = (__cache: any = {}) =>
   ({
+    __cache,
     get: jest.fn(async (cacheName: string, key: string) => {
       // eslint-disable-next-line fp/no-throw
       if (key === EXCEPTION_KEY) throw new Error('GET KABOOM!');
@@ -41,11 +42,13 @@ export const MockMomentoClient = (__cache: any = {}) =>
       __cache[`${cacheName}_${key}`] = undefined;
       return new momento.CacheDelete.Success();
     }),
-  }) as unknown as momento.CacheClient;
+  }) as unknown as momento.CacheClient & { __cache: any };
 
 // --------------------------------------------------------------------------
+export const mockMomentoClientThunk = () => P.Effect.succeed(MockMomentoClient());
+
 export const mockMomentoClientFactory: MomentoClientFactory = (_props: MomentoClientConfigProps) => {
-  return () => P.Effect.succeed(MockMomentoClient());
+  return mockMomentoClientThunk;
 };
 
 export const mockMomentoFactoryDeps = P.Effect.provideService(
@@ -56,6 +59,11 @@ export const mockMomentoFactoryDeps = P.Effect.provideService(
   })
 );
 
-export const mockMomentoClientDeps = MomentoClientDeps.of({
-  makeMomentoClient: () => P.Effect.succeed(MockMomentoClient()),
-});
+export const mockMomentoClientMaker = {
+  makeMomentoClient: mockMomentoClientThunk,
+};
+
+export const mockMomentoClientDeps = P.Effect.provideService(
+  MomentoClientDeps,
+  MomentoClientDeps.of(mockMomentoClientMaker)
+);
