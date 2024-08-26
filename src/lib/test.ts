@@ -45,23 +45,30 @@ export const MockMomentoClient = (__cache: any = {}) =>
   }) as unknown as momento.CacheClient & { __cache: any };
 
 // --------------------------------------------------------------------------
-export const mockMomentoClientEffect = () => P.Effect.succeed(MockMomentoClient());
+export const mockMomentoClientEffect =
+  (__cache: any = {}) =>
+  () =>
+    P.Effect.succeed(MockMomentoClient(__cache));
 
-export const mockMomentoClientFactory: MomentoClientFactory = (_props: MomentoClientConfigProps) => {
-  return mockMomentoClientEffect;
-};
+export const mockMomentoClientFactory =
+  (__cache: any = {}): MomentoClientFactory =>
+  (_props: MomentoClientConfigProps) => {
+    return mockMomentoClientEffect(__cache);
+  };
 
-export const mockMomentoClientFactoryDeps = P.Effect.provideService(
-  MomentoClientFactoryDeps,
-  MomentoClientFactoryDeps.of({
-    momentoClientProps: DEFAULT_MOMENTO_CLIENT_CONFIG_PROPS,
-    momentoClientFactory: mockMomentoClientFactory,
-  })
-);
+export const mockMomentoClientFactoryDeps = (__cache: any = {}) =>
+  P.Effect.provideService(
+    MomentoClientFactoryDeps,
+    MomentoClientFactoryDeps.of({
+      momentoClientProps: DEFAULT_MOMENTO_CLIENT_CONFIG_PROPS,
+      momentoClientFactory: mockMomentoClientFactory(__cache),
+    })
+  );
 
-export const mockMomentoClientDeps = P.Effect.provideService(
-  MomentoClientDeps,
-  MomentoClientDeps.of({
-    makeMomentoClient: mockMomentoClientEffect,
-  })
-);
+export const mockMomentoClientDeps = (__cache: any = {}) =>
+  P.Effect.provideService(
+    MomentoClientDeps,
+    MomentoClientDeps.of({
+      makeMomentoClient: mockMomentoClientEffect(__cache),
+    })
+  );
