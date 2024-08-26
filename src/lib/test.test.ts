@@ -65,24 +65,32 @@ describe('lib/test', () => {
 
   describe('mockMomentoClientFactory', () => {
     it('should work as expected', async () => {
-      const actual = unit.mockMomentoClientFactory({});
-      expect(actual).toBeDefined();
-      expect(actual).toBeInstanceOf(Function);
-      expect(actual()).toBeDefined();
+      const actual1 = unit.mockMomentoClientFactory();
+      const actual2 = unit.mockMomentoClientFactory({});
+      expect(actual1).toBeDefined();
+      expect(actual2).toBeDefined();
+      expect(actual1).toBeInstanceOf(Function);
+      expect(actual2).toBeInstanceOf(Function);
+      expect(actual1({})).toBeDefined();
+      expect(actual2({})).toBeDefined();
+      expect(actual1({})()).toBeDefined();
+      expect(actual2({})()).toBeDefined();
     });
   });
 
   describe('mockMomentoClientFactoryDeps', () => {
     it('should work as expected', async () => {
-      const actual = unit.mockMomentoClientFactoryDeps(P.Effect.succeed(true));
+      const actual = unit.mockMomentoClientFactoryDeps();
       expect(actual).toBeDefined();
+      expect(actual(P.Effect.succeed(true))).toBeDefined();
     });
   });
 
   describe('mockMomentoClientDeps', () => {
     it('should work as expected', async () => {
-      const actual = unit.mockMomentoClientDeps(P.Effect.succeed(true));
+      const actual = unit.mockMomentoClientDeps();
       expect(actual).toBeDefined();
+      expect(actual(P.Effect.succeed(true))).toBeDefined();
     });
   });
 });
