@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/momento-cache-client-effect",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "Momento Cache client for Node.js TypeScript projects based on Effect-ts",
   "license": "ISC",
