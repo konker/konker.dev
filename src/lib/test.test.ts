@@ -58,7 +58,7 @@ describe('lib/test', () => {
 
   describe('mockMomentoClientThunk', () => {
     it('should work as expected', async () => {
-      const actual = unit.mockMomentoClientThunk();
+      const actual = unit.mockMomentoClientEffect();
       expect(actual).toBeDefined();
     });
   });
@@ -72,9 +72,9 @@ describe('lib/test', () => {
     });
   });
 
-  describe('mockMomentoFactoryDeps', () => {
+  describe('mockMomentoClientFactoryDeps', () => {
     it('should work as expected', async () => {
-      const actual = unit.mockMomentoFactoryDeps(P.Effect.succeed(true));
+      const actual = unit.mockMomentoClientFactoryDeps(P.Effect.succeed(true));
       expect(actual).toBeDefined();
     });
   });
