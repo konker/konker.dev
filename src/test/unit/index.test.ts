@@ -8,7 +8,11 @@ import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/M
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import * as M from '../../contrib';
-import { mockPathTokenAuthorizerDeps } from '../../contrib/path-token-authorizer/index.test';
+import {
+  CORRECT_TEST_PATH_TOKEN_VALUE,
+  mockPathTokenAuthorizerDeps,
+  TEST_SECRET_TOKEN_ENV_NAME,
+} from '../../contrib/path-token-authorizer/index.test';
 import type { BaseResponse } from '../../lib/http';
 
 const TestObject = P.Schema.Struct({
@@ -30,7 +34,7 @@ type Headers = P.Schema.Schema.Type<typeof Headers>;
 
 const PathParams = P.Schema.Struct({
   id: P.Schema.String,
-  token: P.Schema.String,
+  pathToken: P.Schema.String,
 });
 type PathParams = P.Schema.Schema.Type<typeof PathParams>;
 
@@ -47,6 +51,7 @@ describe('unit tests', () => {
     oldEnv = process.env;
     process.env = {
       MOMENTO_AUTH_TOKEN: 'TEST_MOMENTO_AUTH_TOKEN',
+      [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
     };
 
     __cache = {};
@@ -106,7 +111,7 @@ describe('unit tests', () => {
       body: '{ "foo": "abc", "bar": 123, "baz": true }',
       pathParameters: {
         id: 'test-id',
-        token: 'test-secret-token',
+        pathToken: CORRECT_TEST_PATH_TOKEN_VALUE,
       },
       isBase64Encoded: false,
       // stageVariables?: {},
@@ -116,11 +121,8 @@ describe('unit tests', () => {
       P.Effect.runPromise(
         P.pipe(
           actual1,
-          (x) => x,
           defaultDynamoDBDocClientFactoryDeps,
-          (x) => x,
           mockMomentoClientFactoryDeps(__cache),
-          (x) => x,
           mockPathTokenAuthorizerDeps
         )
       )
@@ -148,6 +150,6 @@ describe('unit tests', () => {
       body: '{"foo":"ABC","bar":246,"baz":false}',
     });
 
-    expect(__cache).toHaveProperty('default-cache_859c0c5a2456fe98ebba3ead703332dd');
+    expect(__cache).toHaveProperty('default-cache_dc38238ad790b39a6d3fa5325c24f112');
   });
 });

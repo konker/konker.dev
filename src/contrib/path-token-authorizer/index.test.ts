@@ -6,9 +6,13 @@ import { http200CoreIn } from '../../test/test-common';
 import * as unit from './index';
 import { PathTokenAuthorizerDeps } from './index';
 
+export const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
+export const INCORRECT_TEST_PATH_TOKEN_VALUE = 'wrong-token-value';
+export const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
+
 export const PATH_TOKEN_AUTHORIZER_TEST_DEPS: unit.PathTokenAuthorizerDeps = unit.PathTokenAuthorizerDeps.of({
-  secretToken: 'test-secret-token',
-  pathParamName: 'token',
+  secretTokenEnvName: TEST_SECRET_TOKEN_ENV_NAME,
+  pathParamName: 'pathToken',
 });
 
 export const mockPathTokenAuthorizerDeps = P.Effect.provideService(
@@ -22,7 +26,7 @@ const TEST_IN_1: APIGatewayProxyEventV2 = {
   requestContext: {} as any,
   body: {},
   pathParameters: {
-    token: 'test-secret-token',
+    pathToken: CORRECT_TEST_PATH_TOKEN_VALUE,
   },
 } as unknown as APIGatewayProxyEventV2;
 
@@ -32,31 +36,31 @@ const TEST_IN_2: APIGatewayProxyEventV2 = {
   requestContext: {} as any,
   body: {},
   pathParameters: {
-    token: 'wrong-token',
+    pathToken: INCORRECT_TEST_PATH_TOKEN_VALUE,
   },
 } as unknown as APIGatewayProxyEventV2;
 
 describe('middleware/path-token-authorizer', () => {
   let errorSpy: jest.SpyInstance;
+  let oldEnv: NodeJS.ProcessEnv;
 
   beforeEach(() => {
+    oldEnv = process.env;
+    process.env = {
+      [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
+    };
+
     jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
     errorSpy = jest.spyOn(P.Effect, 'logError').mockReturnValue(P.Effect.succeed(undefined));
   });
   afterEach(() => {
     jest.restoreAllMocks();
+    process.env = oldEnv;
   });
 
   test('it should work as expected in an success case', async () => {
     const egHandler = P.pipe(http200CoreIn, unit.middleware());
-    const result = await P.pipe(
-      egHandler(TEST_IN_1),
-      (x) => x,
-      mockPathTokenAuthorizerDeps,
-      (x) => x,
-      P.Effect.runPromise,
-      (x) => x
-    );
+    const result = await P.pipe(egHandler(TEST_IN_1), mockPathTokenAuthorizerDeps, P.Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,

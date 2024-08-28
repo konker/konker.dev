@@ -10,7 +10,7 @@ const TAG = 'path-token-authorizer';
 
 // --------------------------------------------------------------------------
 export type PathTokenAuthorizerDeps = {
-  readonly secretToken: string;
+  readonly secretTokenEnvName: string;
   readonly pathParamName: string;
 };
 export const PathTokenAuthorizerDeps = P.Context.GenericTag<PathTokenAuthorizerDeps>('PathTokenAuthorizerDeps');
@@ -25,15 +25,18 @@ export const middleware =
     return P.pipe(
       PathTokenAuthorizerDeps,
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap(({ pathParamName, secretToken }) =>
-        P.Effect.if(i.pathParameters?.[pathParamName] === secretToken, {
-          onTrue: () => P.Effect.succeed(i),
-          onFalse: () =>
-            P.pipe(
-              P.Effect.fail(HttpApiError('UnauthorizedError', 'Invalid token', 401)),
-              P.Effect.tap(P.Effect.logError('UnauthorizedError: Invalid token'))
-            ),
-        })
+      P.Effect.flatMap(({ pathParamName, secretTokenEnvName }) =>
+        P.Effect.if(
+          !!process.env[secretTokenEnvName] && i.pathParameters?.[pathParamName] === process.env[secretTokenEnvName],
+          {
+            onTrue: () => P.Effect.succeed(i),
+            onFalse: () =>
+              P.pipe(
+                P.Effect.fail(HttpApiError('UnauthorizedError', 'Invalid token', 401)),
+                P.Effect.tap(P.Effect.logError('UnauthorizedError: Invalid token'))
+              ),
+          }
+        )
       ),
       P.Effect.flatMap(wrapped),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
