@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as P from '@konker.dev/effect-ts-prelude';
 
+import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb';
 import { defaultDynamoDBDocClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb';
+import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
 import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
@@ -15,12 +17,12 @@ import {
 } from '../../contrib/pathTokenAuthorizer/index.test';
 import type { BaseResponse } from '../../lib/http';
 
-const TestObject = P.Schema.Struct({
+const Body = P.Schema.Struct({
   foo: P.Schema.String,
   bar: P.Schema.Number,
   baz: P.Schema.Boolean,
 });
-type TestObject = P.Schema.Schema.Type<typeof TestObject>;
+type Body = P.Schema.Schema.Type<typeof Body>;
 
 const Env = P.Schema.Struct({
   MOMENTO_AUTH_TOKEN: P.Schema.String,
@@ -62,8 +64,12 @@ describe('unit tests', () => {
 
   it('should work as expected with the kitchen sink', async () => {
     function echoCore(
-      i: APIGatewayProxyEventV2 & M.bodyValidator.WithValidatedBody<TestObject>
-    ): P.Effect.Effect<BaseResponse> {
+      i: APIGatewayProxyEventV2 &
+        M.bodyValidator.WithValidatedBody<Body> &
+        M.pathParametersValidator.WithValidatedPathParameters<PathParams> &
+        M.queryStringValidator.WithValidatedQueryStringParameters<QueryParams> &
+        M.headersValidator.WithValidatedHeaders<Headers>
+    ): P.Effect.Effect<BaseResponse, never, DynamoDBDocumentClientDeps | MomentoClientDeps> {
       return P.Effect.succeed({
         statusCode: 200,
         headers: { 'content-type': 'application/json; charset=UTF-8' },
@@ -73,6 +79,9 @@ describe('unit tests', () => {
           foo: i.body.foo.toUpperCase(),
           bar: i.body.bar * 2,
           baz: !i.body.baz,
+          pt: i.pathParameters.pathToken,
+          q: i.queryStringParameters.q,
+          h: i.headers['content-type'].toUpperCase(),
         },
       });
     }
@@ -80,7 +89,7 @@ describe('unit tests', () => {
     const stack = P.pipe(
       echoCore,
       M.dynamodbDocClientInit.middleware({ region: 'eu-west-1' }),
-      M.bodyValidator.middleware(TestObject),
+      M.bodyValidator.middleware(Body),
       M.jsonBodyParser.middleware(),
       M.base64BodyDecoder.middleware(),
       M.headersValidator.middleware(Headers),
@@ -149,7 +158,7 @@ describe('unit tests', () => {
       },
       multiValueHeaders: {},
       isBase64Encoded: false,
-      body: '{"foo":"ABC","bar":246,"baz":false}',
+      body: '{"foo":"ABC","bar":246,"baz":false,"pt":"test-token-value","q":"wtf","h":"APPLICATION/JSON; CHARSET=UTF-8"}',
     });
 
     expect(__cache).toHaveProperty('default-cache_dc38238ad790b39a6d3fa5325c24f112');
