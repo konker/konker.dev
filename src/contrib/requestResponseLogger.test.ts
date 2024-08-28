@@ -31,9 +31,9 @@ describe('middleware/response-request-logger', () => {
       qux: 'qux',
     });
     expect(logSpy).toHaveBeenCalledTimes(2);
-    expect(logSpy.mock.calls[0][0]).toBe('[request-response-logger] REQUEST');
+    expect(logSpy.mock.calls[0][0]).toBe('[requestResponseLogger] REQUEST');
     expect(logSpy.mock.calls[0][1]).toStrictEqual(TEST_IN);
-    expect(logSpy.mock.calls[1][0]).toBe('[request-response-logger] RESPONSE');
+    expect(logSpy.mock.calls[1][0]).toBe('[requestResponseLogger] RESPONSE');
     expect(logSpy.mock.calls[1][1]).toStrictEqual(TEST_OUT);
   });
 });

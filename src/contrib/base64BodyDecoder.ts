@@ -4,7 +4,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'base64-body-decoder';
+const TAG = 'base64BodyDecoder';
 
 export type WithBase64Body = { body?: string; isBase64Encoded?: boolean };
 

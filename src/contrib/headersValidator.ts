@@ -5,7 +5,7 @@ import type { RequestHeaders } from '../lib/http';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'headers-validator';
+const TAG = 'headersValidator';
 
 export type WithHeaders = {
   headers: RequestHeaders;

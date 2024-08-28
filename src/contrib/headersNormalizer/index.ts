@@ -4,7 +4,7 @@ import type { Handler } from '../../index';
 import { transformInput, transformOutput } from './lib';
 import type { WithNormalizedHeaders, WithPossibleInputHeaders, WithPossibleOutputHeaders } from './types';
 
-const TAG = 'header-normalizer';
+const TAG = 'headerNormalizer';
 
 export const middleware =
   <WI, WO, WE, WR>({ normalizeRequestHeaders = true, normalizeResponseHeaders = true } = {}) =>

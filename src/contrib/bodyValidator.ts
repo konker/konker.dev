@@ -4,7 +4,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'body-validator';
+const TAG = 'bodyValidator';
 
 export type WithBody = { body?: unknown };
 export type WithValidatedBody<V> = { body: V; validatorRawBody: unknown };

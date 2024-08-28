@@ -7,7 +7,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'dynamodb-doc-client-init';
+const TAG = 'dynamodbDocClientInit';
 
 // --------------------------------------------------------------------------
 export function depsSetupDynamoDB<A1 extends DynamoDBDocumentClientFactoryDeps>(config: DynamoDBClientConfig) {

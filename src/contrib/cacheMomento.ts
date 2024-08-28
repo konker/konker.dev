@@ -9,7 +9,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'cache-momento';
+const TAG = 'cacheMomento';
 
 export const middleware =
   <WI, WO, CR>(cacheKeyResolver: CacheKeyResolver<WI, CR>, cache: CacheType<WO, MomentoClientDeps>, ttl?: number) =>

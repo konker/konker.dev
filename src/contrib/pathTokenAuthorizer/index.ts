@@ -6,7 +6,7 @@ import type { Handler } from '../../index';
 import type { BaseResponse } from '../../lib/http';
 import { HttpApiError } from '../../lib/HttpApiError';
 
-const TAG = 'path-token-authorizer';
+const TAG = 'pathTokenAuthorizer';
 
 // --------------------------------------------------------------------------
 export type PathTokenAuthorizerDeps = {

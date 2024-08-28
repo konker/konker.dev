@@ -4,7 +4,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'path-parameters-validator';
+const TAG = 'pathParametersValidator';
 
 export type WithPathParameters = {
   pathParameters?: unknown;

@@ -8,7 +8,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'cache-in-memory';
+const TAG = 'cacheInMemory';
 
 export const middleware =
   <WI, CR>(cacheKeyResolver: CacheKeyResolver<WI, CR>) =>

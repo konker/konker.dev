@@ -5,7 +5,7 @@ import type { Handler } from '../index';
 import type { OptionalResponseHeaders } from '../lib/http';
 
 // Based on : https://helmetjs.github.io/
-const TAG = 'helmet-js-headers';
+const TAG = 'helmetJsHeaders';
 
 export type WithOutputHeaders = {
   readonly headers?: OptionalResponseHeaders;

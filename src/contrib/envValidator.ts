@@ -4,7 +4,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'env-validator';
+const TAG = 'envValidator';
 
 export type WithValidatedEnv<V> = {
   validatedEnv: V;

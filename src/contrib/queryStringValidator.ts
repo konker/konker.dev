@@ -4,7 +4,7 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'query-string-validator';
+const TAG = 'queryStringValidator';
 
 export type WithQueryStringParameters = {
   queryStringParameters?: unknown;

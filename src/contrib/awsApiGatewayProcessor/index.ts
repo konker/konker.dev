@@ -7,7 +7,7 @@ import type { BaseResponse } from '../../lib/http';
 import { UNKNOWN_STRING_EFFECT } from '../../lib/http';
 import { toHttpApiError } from '../../lib/HttpApiError';
 
-const TAG = 'aws-api-gateway-processor';
+const TAG = 'awsApiGatewayProcessor';
 
 // FIXME: rename Wx vars to x if used in both?
 export const middleware =
