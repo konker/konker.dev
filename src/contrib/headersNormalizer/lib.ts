@@ -1,5 +1,10 @@
 // FROM: https://github.com/middyjs/middy/blob/main/packages/http-header-normalizer/index.js
-import type { WithHeaders, WithNormalizedHeaders, WithPossibleHeaders, WithPossibleOutputHeaders } from './types';
+import type {
+  WithNormalizedHeaders,
+  WithOutputHeaders,
+  WithPossibleInputHeaders,
+  WithPossibleOutputHeaders,
+} from './types';
 
 const EXCEPTIONS_LIST = [
   'ALPN',
@@ -33,7 +38,8 @@ const EXCEPTIONS_LIST = [
   'X-XSS-Protection',
 ];
 
-export function isWithHeaders(x: unknown): x is WithHeaders {
+// --------------------------------------------------------------------------
+export function isWithHeaders(x: unknown): x is WithOutputHeaders {
   return !!(x && typeof x === 'object' && 'headers' in x && typeof x.headers === 'object');
 }
 
@@ -75,10 +81,11 @@ export function normalizeKeys(
 
 // --------------------------------------------------------------------------
 export const transformInput =
-  <I extends WithPossibleHeaders>(normalizeRequestHeaders: boolean) =>
+  <I extends WithPossibleInputHeaders>(normalizeRequestHeaders: boolean) =>
   (i: I): I & WithNormalizedHeaders => ({
     ...i,
-    normalizedHeaders: normalizeRequestHeaders ? normalizeKeys(i.headers, lowerCaseNormalizer) : { ...i.headers },
+    headers: normalizeRequestHeaders ? normalizeKeys(i.headers, lowerCaseNormalizer) : { ...i.headers },
+    normalizerRawHeaders: i.headers,
   });
 
 export const transformOutput =
