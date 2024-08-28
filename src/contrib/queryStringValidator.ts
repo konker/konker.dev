@@ -10,7 +10,8 @@ export type WithQueryStringParameters = {
   queryStringParameters?: unknown;
 };
 export type WithValidatedQueryStringParameters<V> = {
-  validatedQueryStringParameters?: V;
+  queryStringParameters: V;
+  validatorRawQueryStringParameters: unknown;
 };
 
 export const middleware =
@@ -28,7 +29,8 @@ export const middleware =
       P.Effect.mapError((e) => toMiddlewareError(e)),
       P.Effect.map((validatedQueryStringParameters: V) => ({
         ...i,
-        validatedQueryStringParameters,
+        queryStringParameters: validatedQueryStringParameters,
+        validatorRawQueryStringParameters: i.queryStringParameters,
       })),
       P.Effect.flatMap(wrapped)
     );

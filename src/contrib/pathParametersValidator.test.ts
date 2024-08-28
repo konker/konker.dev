@@ -20,8 +20,8 @@ describe('middleware/path-parameters-validator', () => {
     const result = P.pipe(egHandler(TEST_IN_1), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
+      validatorRawPathParameters: { foo: 'foo_value' },
       pathParameters: { foo: 'foo_value' },
-      validatedPathParameters: { foo: 'foo_value' },
     });
   });
 

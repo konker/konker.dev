@@ -55,19 +55,20 @@ describe('middleware/headers-normalizer/lib', () => {
   describe('transformInput', () => {
     it('should work as expected', () => {
       expect(unit.transformInput(true)({ headers: { FOO: 'ABC' } })).toStrictEqual({
-        headers: { FOO: 'ABC' },
-        normalizedHeaders: { foo: 'ABC' },
+        headers: { foo: 'ABC' },
+        normalizerRawHeaders: { FOO: 'ABC' },
       });
       expect(unit.transformInput(true)({ headers: { FOO: undefined } })).toStrictEqual({
-        headers: { FOO: undefined },
-        normalizedHeaders: { foo: undefined },
+        headers: { foo: undefined },
+        normalizerRawHeaders: { FOO: undefined },
       });
       expect(unit.transformInput(true)({})).toStrictEqual({
-        normalizedHeaders: {},
+        headers: {},
+        normalizerRawHeaders: undefined,
       });
       expect(unit.transformInput(false)({ headers: { FOO: 'ABC' } })).toStrictEqual({
         headers: { FOO: 'ABC' },
-        normalizedHeaders: { FOO: 'ABC' },
+        normalizerRawHeaders: { FOO: 'ABC' },
       });
     });
   });

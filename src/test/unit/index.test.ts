@@ -12,7 +12,7 @@ import {
   CORRECT_TEST_PATH_TOKEN_VALUE,
   mockPathTokenAuthorizerDeps,
   TEST_SECRET_TOKEN_ENV_NAME,
-} from '../../contrib/path-token-authorizer/index.test';
+} from '../../contrib/pathTokenAuthorizer/index.test';
 import type { BaseResponse } from '../../lib/http';
 
 const TestObject = P.Schema.Struct({
@@ -61,16 +61,18 @@ describe('unit tests', () => {
   });
 
   it('should work as expected with the kitchen sink', async () => {
-    function echoCore(i: APIGatewayProxyEventV2 & { validatedBody: TestObject }): P.Effect.Effect<BaseResponse> {
+    function echoCore(
+      i: APIGatewayProxyEventV2 & M.bodyValidator.WithValidatedBody<TestObject>
+    ): P.Effect.Effect<BaseResponse> {
       return P.Effect.succeed({
         statusCode: 200,
         headers: { 'content-type': 'application/json; charset=UTF-8' },
         multiValueHeaders: {},
         isBase64Encoded: false,
         body: {
-          foo: i.validatedBody.foo.toUpperCase(),
-          bar: i.validatedBody.bar * 2,
-          baz: !i.validatedBody.baz,
+          foo: i.body.foo.toUpperCase(),
+          bar: i.body.bar * 2,
+          baz: !i.body.baz,
         },
       });
     }

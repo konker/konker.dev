@@ -10,7 +10,8 @@ export type WithPathParameters = {
   pathParameters?: unknown;
 };
 export type WithValidatedPathParameters<V> = {
-  validatedPathParameters: V;
+  pathParameters: V;
+  validatorRawPathParameters: unknown;
 };
 
 export const middleware =
@@ -28,7 +29,8 @@ export const middleware =
       P.Effect.mapError((e) => toMiddlewareError(e)),
       P.Effect.map((validatedPathParameters: V) => ({
         ...i,
-        validatedPathParameters,
+        pathParameters: validatedPathParameters,
+        validatorRawPathParameters: i.pathParameters,
       })),
       P.Effect.flatMap(wrapped)
     );

@@ -20,8 +20,8 @@ describe('middleware/query-string-validator', () => {
     const result = P.pipe(egHandler(TEST_IN_1), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
+      validatorRawQueryStringParameters: { foo: 'foo_value' },
       queryStringParameters: { foo: 'foo_value' },
-      validatedQueryStringParameters: { foo: 'foo_value' },
     });
   });
 
