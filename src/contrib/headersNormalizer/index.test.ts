@@ -9,7 +9,7 @@ export type In = { headers: Record<string, string | undefined> };
 const TEST_IN: In = { headers: { FOO: 'foo_value' } };
 const TEST_DEPS: TestDeps = { bar: 'bar' };
 
-export function _testCore<E, D extends TestDeps, I>(i: I): P.Effect.Effect<D, E, any> {
+export function _testCore<E, D extends TestDeps, I extends In>(i: I): P.Effect.Effect<D, E, any> {
   return P.pipe(
     TestDeps,
     P.Effect.flatMap((deps) =>
@@ -17,6 +17,7 @@ export function _testCore<E, D extends TestDeps, I>(i: I): P.Effect.Effect<D, E,
         ...i,
         ...deps,
         headers: {
+          ...i.headers,
           QUX: 'qux_value',
         },
       })
@@ -31,8 +32,11 @@ describe('middleware/headers-normalizer', () => {
     const result = P.pipe(egHandler(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
-      headers: { Qux: 'qux_value' },
-      normalizedHeaders: { foo: 'foo_value' },
+      headers: {
+        Foo: 'foo_value',
+        Qux: 'qux_value',
+      },
+      normalizerRawHeaders: { FOO: 'foo_value' },
     });
   });
 
@@ -41,8 +45,11 @@ describe('middleware/headers-normalizer', () => {
     const result = P.pipe(egHandler(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
-      headers: { Qux: 'qux_value' },
-      normalizedHeaders: { FOO: 'foo_value' },
+      headers: {
+        Foo: 'foo_value',
+        Qux: 'qux_value',
+      },
+      normalizerRawHeaders: { FOO: 'foo_value' },
     });
   });
 
@@ -51,8 +58,11 @@ describe('middleware/headers-normalizer', () => {
     const result = P.pipe(egHandler(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
-      headers: { QUX: 'qux_value' },
-      normalizedHeaders: { foo: 'foo_value' },
+      headers: {
+        foo: 'foo_value',
+        QUX: 'qux_value',
+      },
+      normalizerRawHeaders: { FOO: 'foo_value' },
     });
   });
 });

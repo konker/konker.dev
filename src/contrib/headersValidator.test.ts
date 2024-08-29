@@ -4,15 +4,15 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import { echoCoreInDeps, TestDeps } from '../test/test-common';
 import * as unit from './headersValidator';
 
-export type In = { normalizedHeaders: Record<string, string | undefined> };
+export type In = { headers: Record<string, string | undefined> };
 
 export const testSchema = P.Schema.Struct({
   foo: P.Schema.Literal('foo_value'),
   'content-type': P.Schema.Literal('application/json'),
 });
 
-const TEST_IN_1: In = { normalizedHeaders: { foo: 'foo_value', 'content-type': 'application/json' } };
-const TEST_IN_2: In = { normalizedHeaders: { foo: 'foo_value', 'content-type': 'text/xml' } };
+const TEST_IN_1: In = { headers: { foo: 'foo_value', 'content-type': 'application/json' } };
+const TEST_IN_2: In = { headers: { foo: 'foo_value', 'content-type': 'text/xml' } };
 const TEST_IN_3: any = {};
 const TEST_DEPS: TestDeps = { bar: 'bar' };
 
@@ -22,8 +22,8 @@ describe('middleware/headers-validator', () => {
     const result = P.pipe(egHandler(TEST_IN_1), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
-      normalizedHeaders: { foo: 'foo_value', 'content-type': 'application/json' },
-      validatedNormalizedHeaders: { foo: 'foo_value', 'content-type': 'application/json' },
+      validatorRawHeaders: { foo: 'foo_value', 'content-type': 'application/json' },
+      headers: { foo: 'foo_value', 'content-type': 'application/json' },
     });
   });
 

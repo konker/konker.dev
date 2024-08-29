@@ -4,13 +4,14 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'path-parameters-validator';
+const TAG = 'pathParametersValidator';
 
 export type WithPathParameters = {
   pathParameters?: unknown;
 };
 export type WithValidatedPathParameters<V> = {
-  validatedPathParameters: V;
+  pathParameters: V;
+  validatorRawPathParameters: unknown;
 };
 
 export const middleware =
@@ -28,7 +29,8 @@ export const middleware =
       P.Effect.mapError((e) => toMiddlewareError(e)),
       P.Effect.map((validatedPathParameters: V) => ({
         ...i,
-        validatedPathParameters,
+        pathParameters: validatedPathParameters,
+        validatorRawPathParameters: i.pathParameters,
       })),
       P.Effect.flatMap(wrapped)
     );

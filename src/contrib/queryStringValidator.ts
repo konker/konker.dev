@@ -4,13 +4,14 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'query-string-validator';
+const TAG = 'queryStringValidator';
 
 export type WithQueryStringParameters = {
   queryStringParameters?: unknown;
 };
 export type WithValidatedQueryStringParameters<V> = {
-  validatedQueryStringParameters?: V;
+  queryStringParameters: V;
+  validatorRawQueryStringParameters: unknown;
 };
 
 export const middleware =
@@ -28,7 +29,8 @@ export const middleware =
       P.Effect.mapError((e) => toMiddlewareError(e)),
       P.Effect.map((validatedQueryStringParameters: V) => ({
         ...i,
-        validatedQueryStringParameters,
+        queryStringParameters: validatedQueryStringParameters,
+        validatorRawQueryStringParameters: i.queryStringParameters,
       })),
       P.Effect.flatMap(wrapped)
     );

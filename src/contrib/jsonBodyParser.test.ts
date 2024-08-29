@@ -15,8 +15,8 @@ describe('middleware/json-body-parser', () => {
     const result = P.pipe(egHandler(TEST_IN_1), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       bar: 'bar',
-      body: '{"foo":"ABC"}',
-      parsedBody: { foo: 'ABC' },
+      jsonParserRawBody: '{"foo":"ABC"}',
+      body: { foo: 'ABC' },
     });
   });
 
@@ -29,6 +29,10 @@ describe('middleware/json-body-parser', () => {
   it('should work as expected with missing body', async () => {
     const egHandler = P.pipe(echoCoreInDeps(TestDeps), unit.middleware());
     const result = P.pipe(egHandler({}), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
-    await expect(result).rejects.toThrow('Unexpected end of JSON input');
+    await expect(result).resolves.toStrictEqual({
+      bar: 'bar',
+      body: undefined,
+      jsonParserRawBody: undefined,
+    });
   });
 });

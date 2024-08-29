@@ -4,17 +4,16 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'base64-body-decoder';
+const TAG = 'base64BodyDecoder';
 
 export type WithBase64Body = { body?: string; isBase64Encoded?: boolean };
-export type WithDecodedBase64Body = { body?: string; isBase64Encoded?: boolean };
 
 export const middleware =
   () =>
-  <I extends WithBase64Body, WO, WE, WR>(
-    wrapped: Handler<I & WithDecodedBase64Body, WO, WE, WR>
-  ): Handler<I, WO, WE | MiddlewareError, WR> =>
-  (i: I) =>
+  <WI, WO, WE, WR>(
+    wrapped: Handler<WI & WithBase64Body, WO, WE, WR>
+  ): Handler<WI & WithBase64Body, WO, WE | MiddlewareError, WR> =>
+  (i: WI & WithBase64Body) =>
     P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

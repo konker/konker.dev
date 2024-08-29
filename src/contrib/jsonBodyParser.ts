@@ -4,10 +4,10 @@ import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
 
-const TAG = 'json-body-parser';
+const TAG = 'jsonBodyParser';
 
 export type WithBody = { body?: string };
-export type WithParsedBody = { parsedBody: unknown };
+export type WithParsedBody = { body?: unknown; jsonParserRawBody: string | undefined };
 
 export const middleware =
   () =>
@@ -21,11 +21,14 @@ export const middleware =
       // Log before
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
       // JSON parse the body and add to input
-      P.Effect.flatMap((i) => P.pipe(i.body ?? '', P.Schema.decode(P.Schema.parseJson()))),
+      P.Effect.flatMap((i) =>
+        i.body ? P.pipe(i.body, P.Schema.decode(P.Schema.parseJson())) : P.Effect.succeed(i.body)
+      ),
       P.Effect.mapError(toMiddlewareError),
       P.Effect.map((parsedBody) => ({
         ...i,
-        parsedBody,
+        body: parsedBody,
+        jsonParserRawBody: i.body,
       })),
       // Call the next middleware in the stack
       P.Effect.flatMap(wrapped),

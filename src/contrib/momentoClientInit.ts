@@ -5,7 +5,7 @@ import { MomentoClientDeps, MomentoClientFactoryDeps } from '@konker.dev/momento
 
 import type { Handler } from '../index';
 
-const TAG = 'momento-client-init';
+const TAG = 'momentoClientInit';
 
 // --------------------------------------------------------------------------
 export const middleware =

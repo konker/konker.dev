@@ -2,7 +2,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { Handler } from '../index';
 
-const TAG = 'request-response-logger';
+const TAG = 'requestResponseLogger';
 
 export const middleware =
   () =>
