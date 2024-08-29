@@ -8,12 +8,13 @@ const TAG = 'jsonBodyParser';
 
 export type WithBody = { body?: string };
 export type WithParsedBody = { body?: unknown; jsonParserRawBody: string | undefined };
+export type Adapted<WI> = Exclude<WI, WithParsedBody> & WithBody;
 
 export const middleware =
   () =>
   <WI, WO, WE, WR>(
     wrapped: Handler<WI & WithParsedBody, WO, WE, WR>
-  ): Handler<WI & WithBody, WO, WE | MiddlewareError, WR> =>
+  ): Handler<Adapted<WI>, WO, WE | MiddlewareError, WR> =>
   (i: WI & WithBody) =>
     P.pipe(
       // Lift the input

@@ -42,17 +42,14 @@ export const depsCleanupDynamoDB =
     });
   };
 
+export type Adapted<WR> = Exclude<WR, DynamoDBDocumentClientDeps> | DynamoDBDocumentClientFactoryDeps;
+
 // --------------------------------------------------------------------------
 export const middleware =
   (config: DynamoDBClientConfig) =>
   <WI, WO, WE, WR>(
     wrapped: Handler<WI, WO, WE, WR | DynamoDBDocumentClientDeps>
-  ): Handler<
-    WI,
-    WO,
-    WE | MiddlewareError,
-    Exclude<WR, DynamoDBDocumentClientDeps> | DynamoDBDocumentClientFactoryDeps
-  > =>
+  ): Handler<WI, WO, WE | MiddlewareError, Adapted<WR>> =>
   (i: WI) =>
     P.pipe(
       // TODO: a bit too nested?

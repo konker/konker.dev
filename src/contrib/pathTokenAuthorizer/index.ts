@@ -3,7 +3,6 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import type { Handler } from '../../index';
-import type { BaseResponse } from '../../lib/http';
 import { HttpApiError } from '../../lib/HttpApiError';
 
 const TAG = 'pathTokenAuthorizer';
@@ -18,7 +17,7 @@ export const PathTokenAuthorizerDeps = P.Context.GenericTag<PathTokenAuthorizerD
 // --------------------------------------------------------------------------
 export const middleware =
   () =>
-  <WI extends APIGatewayProxyEventV2, WO extends BaseResponse, WE, WR>(
+  <WI extends APIGatewayProxyEventV2, WO, WE, WR>(
     wrapped: Handler<WI, WO, WE, WR>
   ): Handler<WI, WO, WE | HttpApiError, WR | PathTokenAuthorizerDeps> =>
   (i: WI) => {

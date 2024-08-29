@@ -7,12 +7,12 @@ import type { Handler } from '../index';
 
 const TAG = 'momentoClientInit';
 
+export type Adapted<WR> = Exclude<WR, MomentoClientDeps> | MomentoClientFactoryDeps;
+
 // --------------------------------------------------------------------------
 export const middleware =
   (config: MomentoClientConfigProps) =>
-  <WI, WO, WE, WR>(
-    wrapped: Handler<WI, WO, WE, WR | MomentoClientDeps>
-  ): Handler<WI, WO, WE, Exclude<WR, MomentoClientDeps> | MomentoClientFactoryDeps> =>
+  <WI, WO, WE, WR>(wrapped: Handler<WI, WO, WE, WR | MomentoClientDeps>): Handler<WI, WO, WE, Adapted<WR>> =>
   (i: WI) =>
     P.pipe(
       MomentoClientFactoryDeps,
