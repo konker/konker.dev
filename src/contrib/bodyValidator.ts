@@ -11,9 +11,9 @@ export type WithValidatedBody<V> = { body: V; validatorRawBody: unknown };
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
-  <I extends WithBody, WO, WE, WR>(
-    wrapped: Handler<I & WithValidatedBody<V>, WO, WE, WR>
-  ): Handler<I, WO, WE | MiddlewareError, WR> =>
+  <I extends WithBody, O, E, R>(
+    wrapped: Handler<I & WithValidatedBody<V>, O, E, R>
+  ): Handler<I, O, E | MiddlewareError, R> =>
   (i: I) =>
     P.pipe(
       P.Effect.succeed(i),

@@ -17,9 +17,9 @@ export type WithValidatedHeaders<V> = {
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
-  <I extends WithHeaders, WO, WE, WR>(
-    wrapped: Handler<I & WithValidatedHeaders<V>, WO, WE, WR>
-  ): Handler<I, WO, WE | MiddlewareError, WR> =>
+  <I extends WithHeaders, O, E, R>(
+    wrapped: Handler<I & WithValidatedHeaders<V>, O, E, R>
+  ): Handler<I, O, E | MiddlewareError, R> =>
   (i: I) =>
     P.pipe(
       P.Effect.succeed(i),

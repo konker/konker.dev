@@ -47,10 +47,10 @@ export type Adapted<WR> = Exclude<WR, DynamoDBDocumentClientDeps> | DynamoDBDocu
 // --------------------------------------------------------------------------
 export const middleware =
   (config: DynamoDBClientConfig) =>
-  <WI, WO, WE, WR>(
-    wrapped: Handler<WI, WO, WE, WR | DynamoDBDocumentClientDeps>
-  ): Handler<WI, WO, WE | MiddlewareError, Adapted<WR>> =>
-  (i: WI) =>
+  <I, O, E, R>(
+    wrapped: Handler<I, O, E, R | DynamoDBDocumentClientDeps>
+  ): Handler<I, O, E | MiddlewareError, Adapted<R>> =>
+  (i: I) =>
     P.pipe(
       // TODO: a bit too nested?
       DynamoDBDocumentClientFactoryDeps,

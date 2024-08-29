@@ -12,9 +12,9 @@ import { toMiddlewareError } from '../lib/MiddlewareError';
 const TAG = 'cacheMomento';
 
 export const middleware =
-  <WI, WO, CR>(cacheKeyResolver: CacheKeyResolver<WI, CR>, cache: CacheType<WO, MomentoClientDeps>, ttl?: number) =>
-  <WE, WR>(wrapped: Handler<WI, WO, WE, WR>): Handler<WI, WO, WE | MiddlewareError, WR | CR | MomentoClientDeps> =>
-  (i: WI) =>
+  <I, O, CR>(cacheKeyResolver: CacheKeyResolver<I, CR>, cache: CacheType<O, MomentoClientDeps>, ttl?: number) =>
+  <E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E | MiddlewareError, R | CR | MomentoClientDeps> =>
+  (i: I) =>
     P.pipe(
       // Lift the input
       P.Effect.succeed(i),

@@ -17,10 +17,10 @@ export const PathTokenAuthorizerDeps = P.Context.GenericTag<PathTokenAuthorizerD
 // --------------------------------------------------------------------------
 export const middleware =
   () =>
-  <WI extends APIGatewayProxyEventV2, WO, WE, WR>(
-    wrapped: Handler<WI, WO, WE, WR>
-  ): Handler<WI, WO, WE | HttpApiError, WR | PathTokenAuthorizerDeps> =>
-  (i: WI) => {
+  <I extends APIGatewayProxyEventV2, O, E, R>(
+    wrapped: Handler<I, O, E, R>
+  ): Handler<I, O, E | HttpApiError, R | PathTokenAuthorizerDeps> =>
+  (i: I) => {
     return P.pipe(
       PathTokenAuthorizerDeps,
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
