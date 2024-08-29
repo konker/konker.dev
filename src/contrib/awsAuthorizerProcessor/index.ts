@@ -11,9 +11,9 @@ export const ANON_PRINCIPAL_ID = 'anon';
 export const DEFAULT_ROUTE_ARN = '*';
 
 export const middleware =
-  <I extends APIGatewayRequestAuthorizerEventV2, WO extends APIGatewayAuthorizerResult, WE, WR>(
-    wrapped: Handler<I, WO, WE, WR>
-  ): Handler<I, APIGatewayAuthorizerResult, WE, WR> =>
+  <I extends APIGatewayRequestAuthorizerEventV2, O extends APIGatewayAuthorizerResult, E, R>(
+    wrapped: Handler<I, O, E, R>
+  ): Handler<I, APIGatewayAuthorizerResult, E, R> =>
   (i: I) => {
     return P.pipe(
       P.Effect.succeed(i),
@@ -27,7 +27,7 @@ export const middleware =
             P.Effect.tap(P.Effect.logError('Internal server error', e)),
             P.Effect.map((_) => generateLambdaAuthResultDeny(ANON_PRINCIPAL_ID, DEFAULT_ROUTE_ARN))
           ),
-        onSuccess: (o: WO) => P.Effect.succeed(o),
+        onSuccess: (o: O) => P.Effect.succeed(o),
       })
     );
   };

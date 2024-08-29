@@ -11,10 +11,10 @@ import { toMiddlewareError } from '../lib/MiddlewareError';
 const TAG = 'cacheInMemory';
 
 export const middleware =
-  <WI, CR>(cacheKeyResolver: CacheKeyResolver<WI, CR>) =>
-  <WO, WE, WR>(wrapped: Handler<WI, WO, WE, WR>): Handler<WI, WO, WE | MiddlewareError, WR | CR> => {
-    const cache = InMemoryCache<WO>();
-    return (i: WI) =>
+  <I, CR>(cacheKeyResolver: CacheKeyResolver<I, CR>) =>
+  <O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E | MiddlewareError, R | CR> => {
+    const cache = InMemoryCache<O>();
+    return (i: I) =>
       P.pipe(
         // Lift the input
         P.Effect.succeed(i),

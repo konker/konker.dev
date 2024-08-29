@@ -13,8 +13,8 @@ export type WithOutputHeaders = {
 
 export const middleware =
   () =>
-  <WI, WO, WE, WR>(wrapped: Handler<WI, WO & WithOutputHeaders, WE, WR>): Handler<WI, WO, WE, WR> =>
-  (i: WI) =>
+  <I, O, E, R>(wrapped: Handler<I, O & WithOutputHeaders, E, R>): Handler<I, O, E, R> =>
+  (i: I) =>
     P.pipe(
       // Lift the input
       P.Effect.succeed(i),

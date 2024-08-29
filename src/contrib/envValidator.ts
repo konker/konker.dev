@@ -12,8 +12,8 @@ export type WithValidatedEnv<V> = {
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
-  <WI, WO, WE, WR>(wrapped: Handler<WI & WithValidatedEnv<V>, WO, WE, WR>): Handler<WI, WO, WE | MiddlewareError, WR> =>
-  (i: WI) =>
+  <I, O, E, R>(wrapped: Handler<I & WithValidatedEnv<V>, O, E, R>): Handler<I, O, E | MiddlewareError, R> =>
+  (i: I) =>
     P.pipe(
       // Lift the input
       P.Effect.succeed(i),

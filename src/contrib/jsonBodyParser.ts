@@ -11,10 +11,8 @@ export type WithParsedBody = { body?: unknown; jsonParserRawBody: string | undef
 
 export const middleware =
   () =>
-  <WI, WO, WE, WR>(
-    wrapped: Handler<WI & WithParsedBody, WO, WE, WR>
-  ): Handler<WI & WithBody, WO, WE | MiddlewareError, WR> =>
-  (i: WI & WithBody) =>
+  <I extends WithBody, O, E, R>(wrapped: Handler<I & WithParsedBody, O, E, R>): Handler<I, O, E | MiddlewareError, R> =>
+  (i: I & WithBody) =>
     P.pipe(
       // Lift the input
       P.Effect.succeed(i),

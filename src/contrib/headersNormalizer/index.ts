@@ -2,16 +2,22 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { Handler } from '../../index';
 import { transformInput, transformOutput } from './lib';
-import type { WithNormalizedHeaders, WithPossibleInputHeaders, WithPossibleOutputHeaders } from './types';
+import type {
+  WithNormalizedInputHeaders,
+  WithNormalizedOutputHeaders,
+  WithPossibleInputHeaders,
+  WithPossibleOutputHeaders,
+} from './types';
 
 const TAG = 'headerNormalizer';
 
 export const middleware =
-  <WI, WO, WE, WR>({ normalizeRequestHeaders = true, normalizeResponseHeaders = true } = {}) =>
-  (
-    wrapped: Handler<WI & WithNormalizedHeaders, WO, WE, WR>
-  ): Handler<WI & WithPossibleInputHeaders, WO & WithPossibleOutputHeaders, WE, WR> =>
-  (i: WI & WithPossibleInputHeaders) => {
+  <I extends WithPossibleInputHeaders, O extends WithPossibleOutputHeaders, WE, WR>({
+    normalizeRequestHeaders = true,
+    normalizeResponseHeaders = true,
+  } = {}) =>
+  (wrapped: Handler<I & WithNormalizedInputHeaders, O, WE, WR>): Handler<I, O & WithNormalizedOutputHeaders, WE, WR> =>
+  (i: I) => {
     return P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

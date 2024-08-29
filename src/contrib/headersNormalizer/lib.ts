@@ -1,7 +1,7 @@
 // FROM: https://github.com/middyjs/middy/blob/main/packages/http-header-normalizer/index.js
 import type {
-  WithNormalizedHeaders,
-  WithOutputHeaders,
+  WithNormalizedInputHeaders,
+  WithNormalizedOutputHeaders,
   WithPossibleInputHeaders,
   WithPossibleOutputHeaders,
 } from './types';
@@ -39,7 +39,7 @@ const EXCEPTIONS_LIST = [
 ];
 
 // --------------------------------------------------------------------------
-export function isWithHeaders(x: unknown): x is WithOutputHeaders {
+export function isWithOutputHeaders(x: unknown): x is WithPossibleOutputHeaders {
   return !!(x && typeof x === 'object' && 'headers' in x && typeof x.headers === 'object');
 }
 
@@ -65,7 +65,7 @@ export function canonicalNormalizer(s: string): string {
 }
 
 export function normalizeKeys(
-  rec: Record<string, string | undefined> | undefined,
+  rec: Record<string, string | number | boolean | undefined> | undefined,
   normalizer: (s: string) => string
 ): Record<string, string> {
   return rec
@@ -82,21 +82,21 @@ export function normalizeKeys(
 // --------------------------------------------------------------------------
 export const transformInput =
   <I extends WithPossibleInputHeaders>(normalizeRequestHeaders: boolean) =>
-  (i: I): I & WithNormalizedHeaders => ({
+  (i: I): I & WithNormalizedInputHeaders => ({
     ...i,
     headers: normalizeRequestHeaders ? normalizeKeys(i.headers, lowerCaseNormalizer) : { ...i.headers },
-    normalizerRawHeaders: i.headers,
+    normalizerRawInputHeaders: i.headers,
   });
 
 export const transformOutput =
   (normalizeResponseHeaders: boolean) =>
-  <WO>(wo: WO): WO & WithPossibleOutputHeaders =>
+  <O extends WithPossibleOutputHeaders>(o: O): O & WithNormalizedOutputHeaders =>
     Object.assign(
       {},
-      wo,
-      normalizeResponseHeaders && isWithHeaders(wo)
-        ? { headers: normalizeKeys(wo.headers, canonicalNormalizer) }
-        : isWithHeaders(wo)
-          ? { headers: { ...wo.headers } }
+      o,
+      normalizeResponseHeaders && isWithOutputHeaders(o)
+        ? { headers: normalizeKeys(o.headers, canonicalNormalizer) }
+        : isWithOutputHeaders(o)
+          ? { headers: { ...o.headers } }
           : {}
     );

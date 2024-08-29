@@ -5,11 +5,11 @@ export type In = { headers: Record<string, string | undefined> };
 describe('middleware/headers-normalizer/lib', () => {
   describe('isWithHeaders', () => {
     it('should work as expected', () => {
-      expect(unit.isWithHeaders({ headers: { foo: 'abc' } })).toEqual(true);
-      expect(unit.isWithHeaders({ headers: {} })).toEqual(true);
-      expect(unit.isWithHeaders({ headers: undefined })).toEqual(false);
-      expect(unit.isWithHeaders({})).toEqual(false);
-      expect(unit.isWithHeaders('banana')).toEqual(false);
+      expect(unit.isWithOutputHeaders({ headers: { foo: 'abc' } })).toEqual(true);
+      expect(unit.isWithOutputHeaders({ headers: {} })).toEqual(true);
+      expect(unit.isWithOutputHeaders({ headers: undefined })).toEqual(false);
+      expect(unit.isWithOutputHeaders({})).toEqual(false);
+      expect(unit.isWithOutputHeaders('banana')).toEqual(false);
     });
   });
 
@@ -56,27 +56,31 @@ describe('middleware/headers-normalizer/lib', () => {
     it('should work as expected', () => {
       expect(unit.transformInput(true)({ headers: { FOO: 'ABC' } })).toStrictEqual({
         headers: { foo: 'ABC' },
-        normalizerRawHeaders: { FOO: 'ABC' },
+        normalizerRawInputHeaders: { FOO: 'ABC' },
       });
       expect(unit.transformInput(true)({ headers: { FOO: undefined } })).toStrictEqual({
         headers: { foo: undefined },
-        normalizerRawHeaders: { FOO: undefined },
+        normalizerRawInputHeaders: { FOO: undefined },
       });
       expect(unit.transformInput(true)({})).toStrictEqual({
         headers: {},
-        normalizerRawHeaders: undefined,
+        normalizerRawInputHeaders: undefined,
       });
       expect(unit.transformInput(false)({ headers: { FOO: 'ABC' } })).toStrictEqual({
         headers: { FOO: 'ABC' },
-        normalizerRawHeaders: { FOO: 'ABC' },
+        normalizerRawInputHeaders: { FOO: 'ABC' },
       });
     });
   });
 
   describe('transformInput', () => {
     it('should work as expected', () => {
-      expect(unit.transformOutput(true)({ headers: { FOO: 'ABC' } })).toStrictEqual({ headers: { Foo: 'ABC' } });
-      expect(unit.transformOutput(false)({ headers: { FOO: 'ABC' } })).toStrictEqual({ headers: { FOO: 'ABC' } });
+      expect(unit.transformOutput(true)({ headers: { FOO: 'ABC' } })).toStrictEqual({
+        headers: { Foo: 'ABC' },
+      });
+      expect(unit.transformOutput(false)({ headers: { FOO: 'ABC' } })).toStrictEqual({
+        headers: { FOO: 'ABC' },
+      });
       expect(unit.transformOutput(true)({})).toStrictEqual({});
       expect(unit.transformOutput(false)({})).toStrictEqual({});
     });

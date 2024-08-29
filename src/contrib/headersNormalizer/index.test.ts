@@ -36,7 +36,7 @@ describe('middleware/headers-normalizer', () => {
         Foo: 'foo_value',
         Qux: 'qux_value',
       },
-      normalizerRawHeaders: { FOO: 'foo_value' },
+      normalizerRawInputHeaders: { FOO: 'foo_value' },
     });
   });
 
@@ -49,7 +49,7 @@ describe('middleware/headers-normalizer', () => {
         Foo: 'foo_value',
         Qux: 'qux_value',
       },
-      normalizerRawHeaders: { FOO: 'foo_value' },
+      normalizerRawInputHeaders: { FOO: 'foo_value' },
     });
   });
 
@@ -62,7 +62,7 @@ describe('middleware/headers-normalizer', () => {
         foo: 'foo_value',
         QUX: 'qux_value',
       },
-      normalizerRawHeaders: { FOO: 'foo_value' },
+      normalizerRawInputHeaders: { FOO: 'foo_value' },
     });
   });
 });

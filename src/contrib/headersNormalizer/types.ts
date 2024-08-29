@@ -1,9 +1,13 @@
-import type { OptionalRequestHeaders, RequestHeaders } from '../../lib/http';
+import type { OptionalRequestHeaders, OptionalResponseHeaders, RequestHeaders, ResponseHeaders } from '../../lib/http';
 
 export type WithPossibleInputHeaders = { headers?: OptionalRequestHeaders };
-export type WithPossibleOutputHeaders = { headers?: Record<string, string> };
-export type WithOutputHeaders = { headers: Record<string, string> };
-export type WithNormalizedHeaders = {
+export type WithPossibleOutputHeaders = { headers?: OptionalResponseHeaders };
+
+export type WithNormalizedInputHeaders = {
   headers: RequestHeaders;
-  normalizerRawHeaders: OptionalRequestHeaders;
+  normalizerRawInputHeaders: OptionalRequestHeaders;
+};
+
+export type WithNormalizedOutputHeaders = {
+  headers?: ResponseHeaders;
 };

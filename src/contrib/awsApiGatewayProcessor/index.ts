@@ -9,13 +9,12 @@ import { toHttpApiError } from '../../lib/HttpApiError';
 
 const TAG = 'awsApiGatewayProcessor';
 
-// FIXME: rename Wx vars to x if used in both?
 export const middleware =
   () =>
-  <WI extends APIGatewayProxyEventV2, WO extends BaseResponse, WE, WR>(
-    wrapped: Handler<WI, WO, WE, WR>
-  ): Handler<WI, APIGatewayProxyResult, never, WR> =>
-  (i: WI) => {
+  <I extends APIGatewayProxyEventV2, O extends BaseResponse, E, R>(
+    wrapped: Handler<I, O, E, R>
+  ): Handler<I, APIGatewayProxyResult, never, R> =>
+  (i: I) => {
     return P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
@@ -32,7 +31,7 @@ export const middleware =
                 // Formulate response body
                 { message: `${apiError.name}: ${apiError.message}`, statusCode: apiError.statusCode },
                 P.Schema.encode(P.Schema.parseJson()),
-                P.Effect.orElse<string, never, WR>(UNKNOWN_STRING_EFFECT),
+                P.Effect.orElse<string, never, R>(UNKNOWN_STRING_EFFECT),
                 P.Effect.map((body) => ({
                   statusCode: apiError.statusCode,
                   headers: {
@@ -44,7 +43,7 @@ export const middleware =
               )
             )
           ),
-        onSuccess: (o: WO) =>
+        onSuccess: (o: O) =>
           P.pipe(
             o.body,
             (body) =>
@@ -52,7 +51,7 @@ export const middleware =
                 onTrue: () => P.Effect.succeed(body as string),
                 onFalse: () => P.pipe(body, P.Schema.encode(P.Schema.parseJson())),
               }),
-            P.Effect.orElse<string, never, WR>(UNKNOWN_STRING_EFFECT),
+            P.Effect.orElse<string, never, R>(UNKNOWN_STRING_EFFECT),
             P.Effect.map((body) => ({
               statusCode: 200, // default
               ...o,
