@@ -7,7 +7,7 @@ import type { Handler } from '../index';
 
 const TAG = 'momentoClientInit';
 
-export type Adapted<WR> = Exclude<WR, MomentoClientDeps> | MomentoClientFactoryDeps;
+export type Adapted<R> = Exclude<R, MomentoClientDeps> | MomentoClientFactoryDeps;
 
 // --------------------------------------------------------------------------
 export const middleware =
