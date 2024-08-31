@@ -6,6 +6,7 @@ export * as cacheInMemory from './cacheInMemory';
 export * as cacheMomento from './cacheMomento';
 export * as dynamodbDocClientInit from './dynamodbDocClientInit';
 export * as envValidator from './envValidator';
+export * as headerSignatureAuthorizer from './headerSignatureAuthorizer';
 export * as headersNormalizer from './headersNormalizer';
 export * as headersValidator from './headersValidator';
 export * as helmetJsHeaders from './helmetJsHeaders';

@@ -35,6 +35,9 @@ importers:
       '@konker.dev/tiny-error-fp':
         specifier: ^0.0.7
         version: 0.0.7(@effect/schema@0.68.26(effect@3.5.6))(effect@3.5.6)
+      '@konker.dev/tiny-utils-fp':
+        specifier: ^0.0.1
+        version: 0.0.1
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7
@@ -701,6 +704,9 @@ packages:
 
   '@konker.dev/tiny-error-fp@0.0.7':
     resolution: {integrity: sha512-lsKJ1Hg6BSGQrRHwWcc+YHrBkbr9c5bJWHYISoR0X/O7Nx5r+YEWjbzzWwpITF8lPO+dTtAhtYcer5pALCZuWg==}
+
+  '@konker.dev/tiny-utils-fp@0.0.1':
+    resolution: {integrity: sha512-UqjsWAEl8wtjwvrU61WoPKvuIvCrmfg1UARnOu2APIUmMoXjKtNTfYZE7/n/0x27pqBKZOJN0T9orC6fV8WmVA==}
 
   '@mapbox/node-pre-gyp@1.0.11':
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
@@ -5610,6 +5616,13 @@ snapshots:
     transitivePeerDependencies:
       - '@effect/schema'
       - effect
+
+  '@konker.dev/tiny-utils-fp@0.0.1':
+    dependencies:
+      '@effect/schema': 0.68.26(effect@3.5.6)
+      '@konker.dev/effect-ts-prelude': 0.0.16(@effect/schema@0.68.26(effect@3.5.6))(effect@3.5.6)
+      '@konker.dev/tiny-error-fp': 0.0.7(@effect/schema@0.68.26(effect@3.5.6))(effect@3.5.6)
+      effect: 3.5.6
 
   '@mapbox/node-pre-gyp@1.0.11':
     dependencies:
