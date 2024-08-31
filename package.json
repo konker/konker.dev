@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/middleware-fp",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "Type safe middleware system based on Effect-ts",
   "license": "ISC",
@@ -21,8 +21,8 @@
   ],
   "packageManager": "pnpm@9",
   "peerDependencies": {
-    "@gomomento/sdk": "^1.95.0",
     "@aws-sdk/client-dynamodb": "^3.635.0",
+    "@gomomento/sdk": "^1.95.0",
     "@konker.dev/aws-client-effect-dynamodb": "^0.0.3",
     "@konker.dev/momento-cache-client-effect": "^0.0.7",
     "@konker.dev/tiny-auth-utils-fp": "^0.0.2",
@@ -33,6 +33,7 @@
     "@konker.dev/effect-ts-prelude": "^0.0.16",
     "@konker.dev/tiny-cache-fp": "^0.0.5",
     "@konker.dev/tiny-error-fp": "^0.0.7",
+    "@konker.dev/tiny-utils-fp": "^0.0.1",
     "effect": "^3.5.6",
     "lesslog": "^0.2.7"
   },
