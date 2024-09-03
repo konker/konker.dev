@@ -1,11 +1,16 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClientDeps, DynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb';
+import {
+  cleanupDynamoDBDocumentClientDeps,
+  createDynamoDBDocumentClientDeps,
+  DynamoDBDocumentClientDeps,
+  DynamoDBDocumentClientFactoryDeps,
+} from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 
 import type { Handler } from '../../index';
 import type { MiddlewareError } from '../../lib/MiddlewareError';
-import { depsCleanupDynamoDB, depsSetupDynamoDB } from './lib';
+import { toMiddlewareError } from '../../lib/MiddlewareError';
 
 const TAG = 'dynamodbDocClientInit';
 
@@ -18,20 +23,18 @@ export const middleware =
   ): Handler<I, O, E | MiddlewareError, Adapted<R>> =>
   (i: I) =>
     P.pipe(
-      // TODO: a bit too nested?
-      DynamoDBDocumentClientFactoryDeps,
+      P.Effect.Do,
+      P.Effect.bind('factoryDeps', () => DynamoDBDocumentClientFactoryDeps),
+      P.Effect.bind('dynamoDbDocumentClientDeps', ({ factoryDeps }) =>
+        P.pipe(factoryDeps, createDynamoDBDocumentClientDeps(config), P.Effect.mapError(toMiddlewareError))
+      ),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap((factoryDeps) =>
+      P.Effect.flatMap(({ dynamoDbDocumentClientDeps }) =>
         P.pipe(
-          factoryDeps,
-          depsSetupDynamoDB(config),
-          P.Effect.flatMap((deps) =>
-            P.pipe(
-              wrapped(i),
-              P.Effect.provideService(DynamoDBDocumentClientDeps, deps),
-              P.Effect.tap(depsCleanupDynamoDB(deps))
-            )
-          )
+          wrapped(i),
+          P.Effect.provideService(DynamoDBDocumentClientDeps, dynamoDbDocumentClientDeps),
+          P.Effect.tap(cleanupDynamoDBDocumentClientDeps(dynamoDbDocumentClientDeps)),
+          P.Effect.mapError(toMiddlewareError)
         )
       ),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))

@@ -1,6 +1,9 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import { DynamoDBDocumentClientDeps, DynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb';
+import {
+  DynamoDBDocumentClientDeps,
+  DynamoDBDocumentClientFactoryDeps,
+} from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 
 import { echoCoreInDeps } from '../../test/test-common';
 import * as unit from './index';
