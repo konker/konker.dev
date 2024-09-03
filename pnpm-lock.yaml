@@ -18,8 +18,8 @@ importers:
         specifier: ^1.95.0
         version: 1.95.0
       '@konker.dev/aws-client-effect-dynamodb':
-        specifier: ^0.0.3
-        version: 0.0.3
+        specifier: ^0.0.5
+        version: 0.0.5
       '@konker.dev/effect-ts-prelude':
         specifier: ^0.0.16
         version: 0.0.16(@effect/schema@0.68.26(effect@3.5.6))(effect@3.5.6)
@@ -672,8 +672,8 @@ packages:
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
-  '@konker.dev/aws-client-effect-dynamodb@0.0.3':
-    resolution: {integrity: sha512-axRxlDtpture8QxZkdvaOcfWroo0JuCwL+dmQEb54p8wQWGvV2iBCe4S/syVbb5pAMV8CUt5qaNCyu6fIEKJyQ==}
+  '@konker.dev/aws-client-effect-dynamodb@0.0.5':
+    resolution: {integrity: sha512-ZE6Ag91++psaQuQCOKj8aq6NFZh3QZI11boCdBy4VyXShrBYErEMeBNIA/RbiqDrPGj1mAegkiSk08720qr64A==}
 
   '@konker.dev/effect-ts-prelude@0.0.16':
     resolution: {integrity: sha512-7qaEJN1q0Fmqu4GrYvK8qEDTFFIvMilpc4QXea1t0A/tNQQRr81RdqRZx7YpiyAMEajGE4Qna7M62LKNMlr/vA==}
@@ -5558,7 +5558,7 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
-  '@konker.dev/aws-client-effect-dynamodb@0.0.3':
+  '@konker.dev/aws-client-effect-dynamodb@0.0.5':
     dependencies:
       '@aws-sdk/client-dynamodb': 3.635.0
       '@aws-sdk/lib-dynamodb': 3.635.0(@aws-sdk/client-dynamodb@3.635.0)

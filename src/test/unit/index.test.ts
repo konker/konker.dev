@@ -2,7 +2,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb';
-import { defaultDynamoDBDocClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb';
+import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
@@ -132,7 +132,7 @@ describe('unit tests', () => {
       P.Effect.runPromise(
         P.pipe(
           actual1,
-          defaultDynamoDBDocClientFactoryDeps,
+          defaultDynamoDBDocumentClientFactoryDeps,
           mockMomentoClientFactoryDeps(__cache),
           mockPathTokenAuthorizerDeps
         )
