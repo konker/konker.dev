@@ -2,11 +2,11 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
-import type { Handler } from '../../index';
-import type { BaseResponse } from '../../lib/http';
-import { HttpApiError } from '../../lib/HttpApiError';
-import { TestDeps } from '../../test/test-common';
-import * as unit from './index';
+import type { Handler } from '../index';
+import type { BaseResponse } from '../lib/http';
+import { HttpApiError } from '../lib/HttpApiError';
+import { TestDeps } from '../test/test-common';
+import * as unit from './awsApiGatewayProcessor';
 
 const TEST_IN: APIGatewayProxyEventV2 = {
   headers: {},
@@ -45,7 +45,7 @@ export const testCoreR =
   (_: APIGatewayProxyEventV2) =>
     P.Effect.succeed(out);
 
-describe('middleware/api-gateway-processor', () => {
+describe('middleware/aws-api-gateway-processor', () => {
   let errorSpy: jest.SpyInstance;
 
   beforeEach(() => {

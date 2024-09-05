@@ -2,10 +2,10 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { APIGatewayProxyEventV2, APIGatewayProxyResult } from 'aws-lambda';
 
-import type { Handler } from '../../index';
-import type { BaseResponse } from '../../lib/http';
-import { UNKNOWN_STRING_EFFECT } from '../../lib/http';
-import { toHttpApiError } from '../../lib/HttpApiError';
+import type { Handler } from '../index';
+import type { BaseResponse } from '../lib/http';
+import { UNKNOWN_STRING_EFFECT } from '../lib/http';
+import { toHttpApiError } from '../lib/HttpApiError';
 
 const TAG = 'awsApiGatewayProcessor';
 

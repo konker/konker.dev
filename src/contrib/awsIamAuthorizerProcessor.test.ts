@@ -6,9 +6,9 @@ import {
 } from '@konker.dev/tiny-auth-utils-fp/dist/aws-authorizer';
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
 
-import type { Handler } from '../../index';
-import { TestDeps } from '../../test/test-common';
-import * as unit from './index';
+import type { Handler } from '../index';
+import { TestDeps } from '../test/test-common';
+import * as unit from './awsIamAuthorizerProcessor';
 
 const TEST_IN: APIGatewayRequestAuthorizerEventV2 = {
   headers: {},
@@ -22,7 +22,6 @@ const TEST_OUT_1 = {
   routeArn: 'SOME_ARN',
 };
 
-// const TEST_OUT_2 = MiddlewareError('SomeError', 'Some Error Message', 'SOME_MODULE', 409, 'ROOT_CAUSE', false);
 const TEST_OUT_2 = P.toError('Some Error Message');
 
 export const testCoreL =
@@ -40,7 +39,7 @@ export const testCoreRD =
   (_: APIGatewayRequestAuthorizerEventV2) =>
     P.Effect.succeed(generateLambdaAuthResultDeny(out.principalId, out.routeArn));
 
-describe('middleware/authorizer-processor', () => {
+describe('middleware/aws-iam-authorizer-processor', () => {
   let errorSpy: jest.SpyInstance;
 
   beforeEach(() => {

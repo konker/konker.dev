@@ -3,7 +3,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import { generateLambdaAuthResultDeny } from '@konker.dev/tiny-auth-utils-fp/dist/aws-authorizer';
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
 
-import type { Handler } from '../../index';
+import type { Handler } from '../index';
 
 const TAG = 'awsIamAuthorizerProcessor';
 
