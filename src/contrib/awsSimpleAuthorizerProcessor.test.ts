@@ -52,7 +52,7 @@ describe('middleware/aws-simple-authorizer-processor', () => {
   });
 
   test('it should work as expected in an success case (Allow)', async () => {
-    const stack = P.pipe(testCoreRA(TEST_OUT_1), unit.middleware);
+    const stack = P.pipe(testCoreRA(TEST_OUT_1), unit.middleware());
     const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
 
     expect(result).toStrictEqual({ isAuthorized: true });
@@ -60,7 +60,7 @@ describe('middleware/aws-simple-authorizer-processor', () => {
   });
 
   test('it should work as expected in an success case (Deny)', async () => {
-    const stack = P.pipe(testCoreRD(TEST_OUT_1), unit.middleware);
+    const stack = P.pipe(testCoreRD(TEST_OUT_1), unit.middleware());
     const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
 
     expect(result).toStrictEqual({ isAuthorized: false });
@@ -68,7 +68,7 @@ describe('middleware/aws-simple-authorizer-processor', () => {
   });
 
   test('it should work as expected in an error case', async () => {
-    const stack = P.pipe(testCoreL(TEST_OUT_2), unit.middleware);
+    const stack = P.pipe(testCoreL(TEST_OUT_2), unit.middleware());
     const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
 
     expect(result).toStrictEqual({ isAuthorized: false });

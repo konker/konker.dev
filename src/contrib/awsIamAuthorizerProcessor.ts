@@ -11,6 +11,7 @@ export const ANON_PRINCIPAL_ID = 'anon';
 export const DEFAULT_ROUTE_ARN = '*';
 
 export const middleware =
+  () =>
   <I extends APIGatewayRequestAuthorizerEventV2, O extends APIGatewayAuthorizerResult, E, R>(
     wrapped: Handler<I, O, E, R>
   ): Handler<I, APIGatewayAuthorizerResult, E, R> =>
