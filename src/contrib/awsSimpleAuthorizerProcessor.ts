@@ -11,7 +11,7 @@ export const middleware =
   () =>
   <I extends APIGatewayRequestAuthorizerEventV2, O extends BaseSimpleAuthResponse, E, R>(
     wrapped: Handler<I, O, E, R>
-  ): Handler<I, APIGatewaySimpleAuthorizerResult, E, R> =>
+  ): Handler<I, APIGatewaySimpleAuthorizerResult, never, R> =>
   (i: I) => {
     return P.pipe(
       P.Effect.succeed(i),
