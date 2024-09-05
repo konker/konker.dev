@@ -1,5 +1,5 @@
 export * as awsApiGatewayProcessor from './awsApiGatewayProcessor';
-export * as awsAuthorizerProcessor from './awsAuthorizerProcessor';
+export * as awsIamAuthorizerProcessor from './awsIamAuthorizerProcessor';
 export * as base64BodyDecoder from './base64BodyDecoder';
 export * as bodyValidator from './bodyValidator';
 export * as cacheInMemory from './cacheInMemory';

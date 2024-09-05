@@ -5,7 +5,7 @@ import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } f
 
 import type { Handler } from '../../index';
 
-const TAG = 'authorizerProcessor';
+const TAG = 'awsIamAuthorizerProcessor';
 
 export const ANON_PRINCIPAL_ID = 'anon';
 export const DEFAULT_ROUTE_ARN = '*';
