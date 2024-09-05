@@ -22,6 +22,7 @@ export type ResponseHeaders = P.Schema.Schema.Type<typeof ResponseHeaders>;
 export const OptionalResponseHeaders = P.Schema.Union(ResponseHeaders, P.Schema.Undefined);
 export type OptionalResponseHeaders = P.Schema.Schema.Type<typeof OptionalResponseHeaders>;
 
+// --------------------------------------------------------------------------
 export const BaseResponse = P.Schema.partial(
   P.Schema.Struct({
     statusCode: P.Schema.Number,
@@ -32,6 +33,25 @@ export const BaseResponse = P.Schema.partial(
 );
 export type BaseResponse = P.Schema.Schema.Type<typeof BaseResponse>;
 
+// --------------------------------------------------------------------------
+export const BaseSimpleAuthResponse = P.Schema.Struct({
+  isAuthorized: P.Schema.Boolean,
+});
+export type BaseSimpleAuthResponse = P.Schema.Schema.Type<typeof BaseSimpleAuthResponse>;
+
+export function BaseSimpleAuthResponseWithContext<T>(T: P.Schema.Schema<T>) {
+  return P.Schema.extend(
+    BaseSimpleAuthResponse,
+    P.Schema.Struct({
+      context: T,
+    })
+  );
+}
+export type BaseSimpleAuthResponseWithContext<T> = P.Schema.Schema.Type<
+  ReturnType<typeof BaseSimpleAuthResponseWithContext<T>>
+>;
+
+// --------------------------------------------------------------------------
 export function DEFAULT_500_RESPONSE() {
   return {
     statusCode: 500,
@@ -39,6 +59,7 @@ export function DEFAULT_500_RESPONSE() {
   };
 }
 
+// --------------------------------------------------------------------------
 // eslint-disable-next-line fp/no-nil
 export function CHAOS<T>(_: T): T {
   // eslint-disable-next-line fp/no-throw
