@@ -3,7 +3,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import * as unit from './http';
 
-describe('aws-api-gateway-processor/lib', () => {
+describe('lib/http', () => {
   describe('UNKNOWN_STRING_EFFECT', () => {
     it('should work as expected', () => {
       expect(P.Effect.runSync(unit.UNKNOWN_STRING_EFFECT())).toStrictEqual('UNKNOWN');
@@ -46,6 +46,27 @@ describe('aws-api-gateway-processor/lib', () => {
           body: 'abc',
         })
       );
+    });
+  });
+
+  describe('BaseSimpleAuthResponse', () => {
+    it('should work as expected', () => {
+      expect(P.pipe({ isAuthorized: false }, P.Schema.decode(unit.BaseSimpleAuthResponse))).toStrictEqual(
+        P.Either.right({ isAuthorized: false })
+      );
+    });
+  });
+
+  describe('BaseSimpleAuthResponseWithContext', () => {
+    const TEST_CONTEXT = P.Schema.Struct({ userId: P.Schema.String });
+
+    it('should work as expected', () => {
+      expect(
+        P.pipe(
+          { isAuthorized: false, context: { userId: 'abc' } },
+          P.Schema.decode(unit.BaseSimpleAuthResponseWithContext(TEST_CONTEXT))
+        )
+      ).toStrictEqual(P.Either.right({ isAuthorized: false, context: { userId: 'abc' } }));
     });
   });
 

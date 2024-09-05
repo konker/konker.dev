@@ -6,41 +6,38 @@ import {
 } from '@konker.dev/tiny-auth-utils-fp/dist/aws-authorizer';
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
 
-import type { Handler } from '../../index';
-import { TestDeps } from '../../test/test-common';
-import * as unit from './index';
+import type { Handler } from '../index';
+import * as unit from './awsIamAuthorizerProcessor';
 
 const TEST_IN: APIGatewayRequestAuthorizerEventV2 = {
   headers: {},
   requestContext: {} as any,
   routeArn: 'SOME_ARN',
 } as APIGatewayRequestAuthorizerEventV2;
-const TEST_DEPS: TestDeps = TestDeps.of({ bar: 'bar' });
 
 const TEST_OUT_1 = {
   principalId: 'SOME_PRINCIPAL',
   routeArn: 'SOME_ARN',
 };
 
-// const TEST_OUT_2 = MiddlewareError('SomeError', 'Some Error Message', 'SOME_MODULE', 409, 'ROOT_CAUSE', false);
 const TEST_OUT_2 = P.toError('Some Error Message');
 
 export const testCoreL =
-  (e: Error): Handler<APIGatewayRequestAuthorizerEventV2, APIGatewayAuthorizerResult, Error, unknown> =>
+  (e: Error): Handler<APIGatewayRequestAuthorizerEventV2, APIGatewayAuthorizerResult, Error, never> =>
   (_: APIGatewayRequestAuthorizerEventV2) =>
     P.Effect.fail(e);
 
 export const testCoreRA =
-  (out: any): Handler<APIGatewayRequestAuthorizerEventV2, APIGatewayAuthorizerResult, Error, unknown> =>
+  (out: any): Handler<APIGatewayRequestAuthorizerEventV2, APIGatewayAuthorizerResult, Error, never> =>
   (_: APIGatewayRequestAuthorizerEventV2) =>
     P.Effect.succeed(generateLambdaAuthResultAllow(out.principalId, out.routeArn));
 
 export const testCoreRD =
-  (out: any): Handler<APIGatewayRequestAuthorizerEventV2, APIGatewayAuthorizerResult, Error, unknown> =>
+  (out: any): Handler<APIGatewayRequestAuthorizerEventV2, APIGatewayAuthorizerResult, Error, never> =>
   (_: APIGatewayRequestAuthorizerEventV2) =>
     P.Effect.succeed(generateLambdaAuthResultDeny(out.principalId, out.routeArn));
 
-describe('middleware/authorizer-processor', () => {
+describe('middleware/aws-iam-authorizer-processor', () => {
   let errorSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -52,8 +49,8 @@ describe('middleware/authorizer-processor', () => {
   });
 
   test('it should work as expected in an success case (Allow)', async () => {
-    const stack = P.pipe(testCoreRA(TEST_OUT_1), unit.middleware);
-    const result = await P.pipe(stack(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+    const stack = P.pipe(testCoreRA(TEST_OUT_1), unit.middleware());
+    const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
 
     expect(result).toStrictEqual({
       context: {
@@ -75,8 +72,8 @@ describe('middleware/authorizer-processor', () => {
   });
 
   test('it should work as expected in an success case (Deny)', async () => {
-    const stack = P.pipe(testCoreRD(TEST_OUT_1), unit.middleware);
-    const result = await P.pipe(stack(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+    const stack = P.pipe(testCoreRD(TEST_OUT_1), unit.middleware());
+    const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
 
     expect(result).toStrictEqual({
       context: {
@@ -98,8 +95,8 @@ describe('middleware/authorizer-processor', () => {
   });
 
   test('it should work as expected in an error case', async () => {
-    const stack = P.pipe(testCoreL(TEST_OUT_2), unit.middleware);
-    const result = await P.pipe(stack(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+    const stack = P.pipe(testCoreL(TEST_OUT_2), unit.middleware());
+    const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
 
     expect(result).toStrictEqual({
       context: {
