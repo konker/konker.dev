@@ -27,7 +27,7 @@
     "jsonwebtoken": "^9.0.2"
   },
   "dependencies": {
-    "@effect/schema": "^0.68.23",
+    "@effect/schema": "^0.72.2",
     "@konker.dev/effect-ts-prelude": "^0.0.16",
     "@konker.dev/tiny-error-fp": "^0.0.2",
     "effect": "^3.5.3"

@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@effect/schema':
-        specifier: ^0.68.23
-        version: 0.68.27(effect@3.6.5)
+        specifier: ^0.72.2
+        version: 0.72.2(effect@3.6.5)
       '@konker.dev/effect-ts-prelude':
         specifier: ^0.0.16
-        version: 0.0.16(@effect/schema@0.68.27(effect@3.6.5))(effect@3.6.5)
+        version: 0.0.16(@effect/schema@0.72.2(effect@3.6.5))(effect@3.6.5)
       '@konker.dev/tiny-error-fp':
         specifier: ^0.0.2
         version: 0.0.2
@@ -301,10 +301,10 @@ packages:
   '@effect/language-service@0.1.0':
     resolution: {integrity: sha512-BnlM8LlaqCAYgdRfxlbR7gXGh/FD1scL1fPgNVJEPoOM08od1jtJz+iKhwfaud8TPnnhZR+TED2h5ynjanLeCQ==}
 
-  '@effect/schema@0.68.27':
-    resolution: {integrity: sha512-/rmIb+4QaQTecdTfeYSZtNikIV+BeIbYDl/hpgBTaS96en7pKNW5hcygFQhdocjKguIL7Y/be+oUrVafWV60ew==}
+  '@effect/schema@0.72.2':
+    resolution: {integrity: sha512-/x1BIA2pqcUidNrOMmwYe6Z58KtSgHSc5iJu7bNwIxi2LHMVuUao1BvpI5x6i7T/zkoi4dd1S6qasZzJIYDjdw==}
     peerDependencies:
-      effect: ^3.5.7
+      effect: ^3.7.2
 
   '@eslint-community/eslint-utils@4.4.0':
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
@@ -4048,7 +4048,7 @@ snapshots:
 
   '@effect/language-service@0.1.0': {}
 
-  '@effect/schema@0.68.27(effect@3.6.5)':
+  '@effect/schema@0.72.2(effect@3.6.5)':
     dependencies:
       effect: 3.6.5
       fast-check: 3.22.0
@@ -4282,9 +4282,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@konker.dev/effect-ts-prelude@0.0.16(@effect/schema@0.68.27(effect@3.6.5))(effect@3.6.5)':
+  '@konker.dev/effect-ts-prelude@0.0.16(@effect/schema@0.72.2(effect@3.6.5))(effect@3.6.5)':
     dependencies:
-      '@effect/schema': 0.68.27(effect@3.6.5)
+      '@effect/schema': 0.72.2(effect@3.6.5)
       effect: 3.6.5
 
   '@konker.dev/tiny-error-fp@0.0.2': {}
