@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-auth-utils-fp",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "A basic authentication utils library for Node.js based on Effect-ts",
   "license": "ISC",
@@ -27,7 +27,7 @@
     "jsonwebtoken": "^9.0.2"
   },
   "dependencies": {
-    "@effect/schema": "^0.68.23",
+    "@effect/schema": "^0.72.2",
     "@konker.dev/effect-ts-prelude": "^0.0.16",
     "@konker.dev/tiny-error-fp": "^0.0.2",
     "effect": "^3.5.3"

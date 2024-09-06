@@ -17,7 +17,7 @@ export type JwtVerificationConfigRsa = {
 };
 
 // --------------------------------------------------------------------------
-export function signTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): P.Either.Either<string, Error> {
+export function jwtSignTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): P.Either.Either<string, Error> {
   return P.Either.try({
     try: () =>
       jwt.sign(payload, config.rsaPrivateKey, {
@@ -30,7 +30,7 @@ export function signTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRs
 }
 
 // --------------------------------------------------------------------------
-export function verifyTokenRsa(
+export function jwtVerifyTokenRsa(
   token: string,
   config: JwtVerificationConfigRsa
 ): P.Effect.Effect<JwtPayloadSubIss, Error> {
