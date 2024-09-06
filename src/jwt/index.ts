@@ -3,16 +3,20 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import * as jwt from 'jsonwebtoken';
 
 // --------------------------------------------------------------------------
-export type JwtConfig = {
+export type JwtSigningConfig = {
   signingSecret: string;
   issuer: string;
   maxTtlSec: number;
+};
+export type JwtVerificationConfig = {
+  signingSecret: string;
+  issuer: string;
 };
 
 export type JwtPayloadSubIss = jwt.JwtPayload & { sub: string; iss: string };
 
 // --------------------------------------------------------------------------
-export function signToken(payload: jwt.JwtPayload, config: JwtConfig): P.Either.Either<string, Error> {
+export function signToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.Either.Either<string, Error> {
   return P.Either.try({
     try: () =>
       jwt.sign(payload, config.signingSecret, {
@@ -24,7 +28,7 @@ export function signToken(payload: jwt.JwtPayload, config: JwtConfig): P.Either.
 }
 
 // --------------------------------------------------------------------------
-export function verifyToken(token: string, config: JwtConfig): P.Effect.Effect<JwtPayloadSubIss, Error> {
+export function verifyToken(token: string, config: JwtVerificationConfig): P.Effect.Effect<JwtPayloadSubIss, Error> {
   return P.pipe(
     P.Effect.try({
       try: () =>
