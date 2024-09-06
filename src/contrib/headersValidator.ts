@@ -4,23 +4,21 @@ import type { Handler } from '../index';
 import type { RequestHeaders } from '../lib/http';
 import type { MiddlewareError } from '../lib/MiddlewareError';
 import { toMiddlewareError } from '../lib/MiddlewareError';
+import type { WithPossibleInputHeaders } from './headersNormalizer/types';
 
 const TAG = 'headersValidator';
 
-export type WithHeaders = {
-  headers: RequestHeaders;
-};
 export type WithValidatedHeaders<V> = {
   headers: V;
-  validatorRawHeaders: RequestHeaders;
+  validatorRawHeaders: RequestHeaders | undefined;
 };
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
   <I, O, E, R>(
     wrapped: Handler<I & WithValidatedHeaders<V>, O, E, R>
-  ): Handler<I & WithHeaders, O, E | MiddlewareError, R> =>
-  (i: I & WithHeaders) =>
+  ): Handler<I & WithPossibleInputHeaders, O, E | MiddlewareError, R> =>
+  (i: I & WithPossibleInputHeaders) =>
     P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

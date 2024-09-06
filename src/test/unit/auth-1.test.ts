@@ -55,7 +55,7 @@ describe('auth test 1', () => {
       M.requestResponseLogger.middleware()
     );
 
-    const actual1 = stack(event as unknown as CoreEvent);
+    const actual1 = stack(event as APIGatewayRequestAuthorizerEventV2);
 
     await expect(P.Effect.runPromise(actual1)).resolves.toStrictEqual({
       isAuthorized: true,
