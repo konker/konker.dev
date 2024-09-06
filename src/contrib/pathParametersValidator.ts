@@ -16,10 +16,10 @@ export type WithValidatedPathParameters<V> = {
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
-  <I extends WithPathParameters, O, E, R>(
+  <I, O, E, R>(
     wrapped: Handler<I & WithValidatedPathParameters<V>, O, E, R>
-  ): Handler<I, O, E | MiddlewareError, R> =>
-  (i: I) =>
+  ): Handler<I & WithPathParameters, O, E | MiddlewareError, R> =>
+  (i: I & WithPathParameters) =>
     P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

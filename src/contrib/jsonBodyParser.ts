@@ -11,7 +11,7 @@ export type WithParsedBody = { body?: unknown; jsonParserRawBody: string | undef
 
 export const middleware =
   () =>
-  <I extends WithBody, O, E, R>(wrapped: Handler<I & WithParsedBody, O, E, R>): Handler<I, O, E | MiddlewareError, R> =>
+  <I, O, E, R>(wrapped: Handler<I & WithParsedBody, O, E, R>): Handler<I & WithBody, O, E | MiddlewareError, R> =>
   (i: I & WithBody) =>
     P.pipe(
       // Lift the input

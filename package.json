@@ -25,7 +25,7 @@
     "@gomomento/sdk": "^1.95.0",
     "@konker.dev/aws-client-effect-dynamodb": "^0.0.8",
     "@konker.dev/momento-cache-client-effect": "^0.0.7",
-    "@konker.dev/tiny-auth-utils-fp": "^0.0.2",
+    "@konker.dev/tiny-auth-utils-fp": "^0.0.4",
     "aws-lambda": "^1.0.7"
   },
   "dependencies": {
