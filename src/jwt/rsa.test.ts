@@ -5,11 +5,14 @@ import * as unit from './rsa';
 
 const TEST_NOW_MS = 1671573808123;
 const TEST_PAYLOAD = { foo: 'bar', sub: 'test-sub' };
-const TEST_CONFIG: unit.JwtConfigRsa = {
+const TEST_SIGNING_CONFIG: unit.JwtSigningConfigRsa = {
   rsaPrivateKey: TEST_RSA_KEY_PRIVATE,
-  rsaPublicKey: TEST_RSA_KEY_PUBLIC,
   issuer: 'test-iss',
   maxTtlSec: 3600,
+};
+const TEST_VERIFICATION_CONFIG: unit.JwtVerificationConfigRsa = {
+  rsaPublicKey: TEST_RSA_KEY_PUBLIC,
+  issuer: 'test-iss',
 };
 const TEST_TOKEN =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.L_iuofq2Jt-DAmhwsMuoC4YqpcerPB8p6FHrWd8c7iAA25TiCCMPfFJ-sei0ES44qccfS1-aRKRCnthWKnUhtAsV8acwPE3x017nCoSrw_10tU3m2XrLwvz7QOvrBQYsu9-IhcRSCApJ0a9xy2To_oGjlGa9jcVO_E8MbL50Stf5XWHX6Jjt6MmQ7tVQLvcLAguWazCM7C0w3LNsG9GlGQnf4--wo_IDPok9ELkGR1rYok9p88QGrFjaYRkzV6so4L5RQUsfV_36EsiNekIFeUBJr_b3YoezIFZ-F_YxlZ1EaBtJ3O8rfySLcOQmiQR-iQ5jbs_WSPGrbw1ItPuxbjQwDVfEc3zn2GlwHYjaSaff6DyG_4tRmN96rqb4CGLFb9Nidc2FEeJc9RThc1Ygp65hxGQKM4I12k4jt7BzTfxhxmeRO7IJGFfH3-yJ-wGy1Vf9VWTi4SvjLa8jiF_9sWIaorifRSvvqaHqHjcI54EXlkmEG5BWfF5m4JrVoZhxLFohdlFW0HAP_oA3mKnI_QZUc1XVOtxpJwvo6ByM0A6A1pPdThWljfhZx7r56PSc2J5ZLkHKkavvMTjGaub1a1oLxsK0azX-xSg1fI8oy7yadVjyqY_0ArOhIYy22C1mwyBSLsSVylqig6go54PjVWh4JXepvMibmZQqZToayHA';
@@ -41,47 +44,47 @@ describe('jwt/rsa', () => {
 
   describe('signToken', () => {
     it('should sign a token', () => {
-      const actual = unit.signTokenRsa(TEST_PAYLOAD, TEST_CONFIG);
+      const actual = unit.signTokenRsa(TEST_PAYLOAD, TEST_SIGNING_CONFIG);
       expect(P.Effect.runSync(actual)).toBe(TEST_TOKEN);
     });
   });
 
   describe('verifyToken', () => {
     it('should verify a valid token', () => {
-      const actual = unit.verifyTokenRsa(TEST_TOKEN, TEST_CONFIG);
+      const actual = unit.verifyTokenRsa(TEST_TOKEN, TEST_VERIFICATION_CONFIG);
       expect(P.Effect.runSync(actual)).toStrictEqual(TEST_SIGNED_PAYLOAD);
     });
 
     it('should return an error if the token is invalid, wrong key', () => {
       const actual = unit.verifyTokenRsa(
         TEST_TOKEN,
-        Object.assign({}, TEST_CONFIG, { rsaPublicKey: TEST_RSA_KEY_PUBLIC_OTHER })
+        Object.assign({}, TEST_VERIFICATION_CONFIG, { rsaPublicKey: TEST_RSA_KEY_PUBLIC_OTHER })
       );
       expect(() => P.Effect.runSync(actual)).toThrow('invalid signature');
     });
 
     it('should return an error if the token is invalid, expired', () => {
-      const actual = unit.verifyTokenRsa(TEST_TOKEN_EXPIRED, TEST_CONFIG);
+      const actual = unit.verifyTokenRsa(TEST_TOKEN_EXPIRED, TEST_VERIFICATION_CONFIG);
       expect(() => P.Effect.runSync(actual)).toThrow('jwt expired');
     });
 
     it('should return an error if the token is invalid, wrong issuer', () => {
-      const actual = unit.verifyTokenRsa(TEST_TOKEN_OTHER_ISSUER, TEST_CONFIG);
+      const actual = unit.verifyTokenRsa(TEST_TOKEN_OTHER_ISSUER, TEST_VERIFICATION_CONFIG);
       expect(() => P.Effect.runSync(actual)).toThrow('jwt issuer invalid');
     });
 
     it('should return an error if the token is invalid, missing issuer', () => {
-      const actual = unit.verifyTokenRsa(TEST_TOKEN_MISSING_ISSUER, TEST_CONFIG);
+      const actual = unit.verifyTokenRsa(TEST_TOKEN_MISSING_ISSUER, TEST_VERIFICATION_CONFIG);
       expect(() => P.Effect.runSync(actual)).toThrow('jwt issuer invalid');
     });
 
     it('should return an error if the token is invalid, missing subject', () => {
-      const actual = unit.verifyTokenRsa(TEST_TOKEN_MISSING_SUBJECT, TEST_CONFIG);
+      const actual = unit.verifyTokenRsa(TEST_TOKEN_MISSING_SUBJECT, TEST_VERIFICATION_CONFIG);
       expect(() => P.Effect.runSync(actual)).toThrow('missing iss or sub');
     });
 
     it('should return an error if the token is invalid, string payload', () => {
-      const actual = unit.verifyTokenRsa(TEST_TOKEN_STRING_PAYLOAD, TEST_CONFIG);
+      const actual = unit.verifyTokenRsa(TEST_TOKEN_STRING_PAYLOAD, TEST_VERIFICATION_CONFIG);
       expect(() => P.Effect.runSync(actual)).toThrow('jwt issuer invalid');
     });
   });

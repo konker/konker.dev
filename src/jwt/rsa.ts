@@ -5,15 +5,19 @@ import * as jwt from 'jsonwebtoken';
 import type { JwtPayloadSubIss } from './index';
 
 // --------------------------------------------------------------------------
-export type JwtConfigRsa = {
+export type JwtSigningConfigRsa = {
   rsaPrivateKey: string;
-  rsaPublicKey: string;
   issuer: string;
   maxTtlSec: number;
 };
 
+export type JwtVerificationConfigRsa = {
+  rsaPublicKey: string;
+  issuer: string;
+};
+
 // --------------------------------------------------------------------------
-export function signTokenRsa(payload: jwt.JwtPayload, config: JwtConfigRsa): P.Either.Either<string, Error> {
+export function signTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): P.Either.Either<string, Error> {
   return P.Either.try({
     try: () =>
       jwt.sign(payload, config.rsaPrivateKey, {
@@ -26,7 +30,10 @@ export function signTokenRsa(payload: jwt.JwtPayload, config: JwtConfigRsa): P.E
 }
 
 // --------------------------------------------------------------------------
-export function verifyTokenRsa(token: string, config: JwtConfigRsa): P.Effect.Effect<JwtPayloadSubIss, Error> {
+export function verifyTokenRsa(
+  token: string,
+  config: JwtVerificationConfigRsa
+): P.Effect.Effect<JwtPayloadSubIss, Error> {
   return P.pipe(
     P.Effect.try({
       try: () =>
