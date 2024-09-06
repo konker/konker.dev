@@ -39,10 +39,18 @@ export const SecretsManagerClientDeps = P.Context.GenericTag<SecretsManagerClien
   'aws-client-effect-secretsManager/SecretsManagerClientDeps'
 );
 
-export type SecretsManagerEchoParams<I> = { _Params: I };
+export const defaultSecretsManagerClientDeps = (config: secretsManagerClient.SecretsManagerClientConfig) =>
+  P.Effect.provideService(
+    SecretsManagerClientDeps,
+    SecretsManagerClientDeps.of({
+      secretsManagerClient: defaultSecretsManagerClientFactory(config),
+    })
+  );
 
 // --------------------------------------------------------------------------
 // Wrapper
+export type SecretsManagerEchoParams<I> = { _Params: I };
+
 export function FabricateCommandEffect<
   I extends secretsManagerClient.ServiceInputTypes,
   O extends secretsManagerClient.ServiceOutputTypes,

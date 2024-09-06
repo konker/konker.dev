@@ -43,6 +43,32 @@ describe('aws-client-effect-secrets-manager', () => {
   });
 
   // ------------------------------------------------------------------------
+  describe('defaultSecretsManagerClientFactoryDeps', () => {
+    it('should work as expected', async () => {
+      const actualEffect = P.pipe(
+        unit.SecretsManagerClientFactoryDeps,
+        P.Effect.map((deps) => deps.secretsManagerClientFactory),
+        unit.defaultSecretsManagerClientFactoryDeps
+      );
+      const actual = P.Effect.runSync(actualEffect);
+      expect(actual).toBeInstanceOf(Function);
+    });
+  });
+
+  // ------------------------------------------------------------------------
+  describe('defaultSecretsManagerClientDeps', () => {
+    it('should work as expected', async () => {
+      const actualEffect = P.pipe(
+        unit.SecretsManagerClientDeps,
+        P.Effect.map((deps) => deps.secretsManagerClient),
+        unit.defaultSecretsManagerClientDeps({})
+      );
+      const actual = P.Effect.runSync(actualEffect);
+      expect(actual).toBeInstanceOf(SecretsManagerClient);
+    });
+  });
+
+  // ------------------------------------------------------------------------
   describe('BatchGetSecretValueCommand', () => {
     beforeEach(() => {
       secretsManagerMock.reset();
