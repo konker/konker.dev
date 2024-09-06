@@ -34,10 +34,18 @@ export type SSMClientDeps = {
 };
 export const SSMClientDeps = P.Context.GenericTag<SSMClientDeps>('aws-client-effect-ssm/SSMClientDeps');
 
-export type SSMEchoParams<I> = { _Params: I };
+export const defaultSSMClientDeps = (config: ssmClient.SSMClientConfig) =>
+  P.Effect.provideService(
+    SSMClientDeps,
+    SSMClientDeps.of({
+      ssmClient: defaultSSMClientFactory(config),
+    })
+  );
 
 // --------------------------------------------------------------------------
 // Wrapper
+export type SSMEchoParams<I> = { _Params: I };
+
 export function FabricateCommandEffect<I extends ssmClient.ServiceInputTypes, O extends ssmClient.ServiceOutputTypes>(
   cmdCtor: new (
     params: I
