@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`aws-client-effect-secrets-manager BatchGetSecretValueCommand should fail as expected: {"_tag":"SecretsManagerError"} 1`] = `"{"_tag":"SecretsManagerError","_Params":{"SecretIdList":["secret-id-1","secret-id-2"]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+
+exports[`aws-client-effect-secrets-manager CreateSecretCommand should fail as expected: {"_tag":"SecretsManagerError"} 1`] = `"{"_tag":"SecretsManagerError","_Params":{"Name":"secret-2","SecretString":"secret-2"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+
+exports[`aws-client-effect-secrets-manager DeleteSecretCommand should fail as expected: {"_tag":"SecretsManagerError"} 1`] = `"{"_tag":"SecretsManagerError","_Params":{"SecretId":"secret-1"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+
+exports[`aws-client-effect-secrets-manager GetSecretValueCommand should fail as expected: {"_tag":"SecretsManagerError"} 1`] = `"{"_tag":"SecretsManagerError","_Params":{"SecretId":"secret-1"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+
+exports[`aws-client-effect-secrets-manager ListSecretsCommand should fail as expected: {"_tag":"SecretsManagerError"} 1`] = `"{"_tag":"SecretsManagerError","_Params":{"MaxResults":10},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+
+exports[`aws-client-effect-secrets-manager PutSecretValueCommand should fail as expected: {"_tag":"SecretsManagerError"} 1`] = `"{"_tag":"SecretsManagerError","_Params":{"SecretId":"secret-1","SecretString":"new-secret-1"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
