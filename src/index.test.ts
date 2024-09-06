@@ -43,6 +43,32 @@ describe('aws-client-effect-ssm', () => {
   });
 
   // ------------------------------------------------------------------------
+  describe('defaultSecretsManagerClientFactoryDeps', () => {
+    it('should work as expected', async () => {
+      const actualEffect = P.pipe(
+        unit.SSMClientFactoryDeps,
+        P.Effect.map((deps) => deps.ssmClientFactory),
+        unit.defaultSSMClientFactoryDeps
+      );
+      const actual = P.Effect.runSync(actualEffect);
+      expect(actual).toBeInstanceOf(Function);
+    });
+  });
+
+  // ------------------------------------------------------------------------
+  describe('defaultSSMClientDeps', () => {
+    it('should work as expected', async () => {
+      const actualEffect = P.pipe(
+        unit.SSMClientDeps,
+        P.Effect.map((deps) => deps.ssmClient),
+        unit.defaultSSMClientDeps({})
+      );
+      const actual = P.Effect.runSync(actualEffect);
+      expect(actual).toBeInstanceOf(SSMClient);
+    });
+  });
+
+  // ------------------------------------------------------------------------
   describe('DeleteParameterCommand', () => {
     beforeEach(() => {
       ssmMock.reset();
