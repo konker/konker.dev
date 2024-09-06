@@ -2,31 +2,37 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import * as jwt from 'jsonwebtoken';
 
-export type JwtConfig = {
-  signingSecret: string;
+import type { JwtPayloadSubIss } from './index';
+
+// --------------------------------------------------------------------------
+export type JwtConfigRsa = {
+  rsaPrivateKey: string;
+  rsaPublicKey: string;
   issuer: string;
   maxTtlSec: number;
 };
 
-export type JwtPayloadSubIss = jwt.JwtPayload & { sub: string; iss: string };
-
-export function signToken(payload: jwt.JwtPayload, config: JwtConfig): P.Either.Either<string, Error> {
+// --------------------------------------------------------------------------
+export function signTokenRsa(payload: jwt.JwtPayload, config: JwtConfigRsa): P.Either.Either<string, Error> {
   return P.Either.try({
     try: () =>
-      jwt.sign(payload, config.signingSecret, {
+      jwt.sign(payload, config.rsaPrivateKey, {
         issuer: config.issuer,
         expiresIn: config.maxTtlSec,
+        algorithm: 'RS256',
       }),
     catch: P.toError,
   });
 }
 
-export function verifyToken(token: string, config: JwtConfig): P.Effect.Effect<JwtPayloadSubIss, Error> {
+// --------------------------------------------------------------------------
+export function verifyTokenRsa(token: string, config: JwtConfigRsa): P.Effect.Effect<JwtPayloadSubIss, Error> {
   return P.pipe(
     P.Effect.try({
       try: () =>
-        jwt.verify(token, config.signingSecret, {
+        jwt.verify(token, config.rsaPublicKey, {
           issuer: config.issuer,
+          algorithms: ['RS256'],
           // [FIXME: make this configurable?]
           // maxAge: config.maxTtlSec,
         }),

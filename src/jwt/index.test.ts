@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import * as unit from './jwt';
+import * as unit from './index';
 
 const TEST_NOW_MS = 1671573808123;
 const TEST_PAYLOAD = { foo: 'bar', sub: 'test-sub' };
@@ -28,7 +28,7 @@ const TEST_TOKEN_MISSING_SUBJECT =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE2NzE1NzM4MDgsImV4cCI6MTY3MTU3NzQwOCwiaXNzIjoidGVzdC1pc3MifQ.G5yi_IPSIj5GZp2jz4aV3DfdTotwUy3xivHlU79_ppc';
 const TEST_TOKEN_STRING_PAYLOAD = 'eyJhbGciOiJIUzI1NiJ9.anVzdCBhIHN0cmluZw.WY-fOyNQW58U_kiDUfXPP5m_Bsl2_0Jj0AvVgsrRwWE';
 
-describe('authentication', () => {
+describe('jwt', () => {
   beforeAll(() => {
     jest.spyOn(Date, 'now').mockReturnValue(TEST_NOW_MS);
   });
