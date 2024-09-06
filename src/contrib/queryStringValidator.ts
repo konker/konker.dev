@@ -15,9 +15,9 @@ export type WithValidatedQueryStringParameters<V> = {
 };
 
 export const middleware =
-  <V>(schema: P.Schema.Schema<V>) =>
+  <V0, V1>(schema: P.Schema.Schema<V0, V1>) =>
   <I, O, E, R>(
-    wrapped: Handler<I & WithValidatedQueryStringParameters<V>, O, E, R>
+    wrapped: Handler<I & WithValidatedQueryStringParameters<V0>, O, E, R>
   ): Handler<I & WithQueryStringParameters, O, E | MiddlewareError, R> =>
   (i: I & WithQueryStringParameters) =>
     P.pipe(
@@ -27,7 +27,7 @@ export const middleware =
         P.pipe(i.queryStringParameters, P.Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
       ),
       P.Effect.mapError((e) => toMiddlewareError(e)),
-      P.Effect.map((validatedQueryStringParameters: V) => ({
+      P.Effect.map((validatedQueryStringParameters: V0) => ({
         ...i,
         queryStringParameters: validatedQueryStringParameters,
         validatorRawQueryStringParameters: i.queryStringParameters,

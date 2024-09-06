@@ -1,16 +1,17 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import { echoCoreInDeps, TestDeps } from '../test/test-common';
+import { echoCoreIn } from '../test/test-common';
 import * as unit from './envValidator';
 
 export type In = { foo: 'foo' };
 
 export const testSchema = P.Schema.Struct({
   qux: P.Schema.Literal('qux_value'),
+  str: P.Schema.String,
+  num: P.Schema.NumberFromString,
 });
 
 const TEST_IN: In = { foo: 'foo' };
-const TEST_DEPS: TestDeps = { bar: 'bar' };
 
 describe('middleware/env-validator', () => {
   const OLD_ENV = process.env;
@@ -19,22 +20,21 @@ describe('middleware/env-validator', () => {
   });
 
   it('should work as expected with valid data', async () => {
-    process.env = { qux: 'qux_value' };
+    process.env = { qux: 'qux_value', str: 'some-string', num: '123' };
 
-    const egHandler = P.pipe(echoCoreInDeps(TestDeps), unit.middleware(testSchema));
-    const result = P.pipe(egHandler(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+    const egHandler = P.pipe(echoCoreIn, unit.middleware(testSchema));
+    const result = P.pipe(egHandler(TEST_IN), P.Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
-      bar: 'bar',
       foo: 'foo',
-      validatedEnv: { qux: 'qux_value' },
+      validatedEnv: { qux: 'qux_value', str: 'some-string', num: 123 },
     });
   });
 
   it('should work as expected with invalid data', async () => {
     process.env = { noqux: 'noqux_value' };
 
-    const egHandler = P.pipe(echoCoreInDeps(TestDeps), unit.middleware(testSchema));
-    const result = P.pipe(egHandler(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+    const egHandler = P.pipe(echoCoreIn, unit.middleware(testSchema));
+    const result = P.pipe(egHandler(TEST_IN), P.Effect.runPromise);
     await expect(result).rejects.toThrow('is missing');
   });
 });

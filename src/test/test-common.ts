@@ -6,7 +6,7 @@ export type TestDeps = any;
 export const TestDeps = P.Context.GenericTag<any>('Deps');
 
 // TODO: type annotation comment
-export function echoCoreIn<I, E = never, R = never>(i: I): P.Effect.Effect<I, E, R> {
+export function echoCoreIn<I>(i: I): P.Effect.Effect<I, never, never> {
   return P.Effect.succeed(i);
 }
 
