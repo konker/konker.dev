@@ -10,8 +10,8 @@ export type WithBase64Body = { body?: string; isBase64Encoded?: boolean };
 
 export const middleware =
   () =>
-  <I extends WithBase64Body, O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E | MiddlewareError, R> =>
-  (i: I) =>
+  <I, O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I & WithBase64Body, O, E | MiddlewareError, R> =>
+  (i: I & WithBase64Body) =>
     P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

@@ -16,10 +16,10 @@ export type WithValidatedQueryStringParameters<V> = {
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
-  <I extends WithQueryStringParameters, O, E, R>(
+  <I, O, E, R>(
     wrapped: Handler<I & WithValidatedQueryStringParameters<V>, O, E, R>
-  ): Handler<I, O, E | MiddlewareError, R> =>
-  (i: I) =>
+  ): Handler<I & WithQueryStringParameters, O, E | MiddlewareError, R> =>
+  (i: I & WithQueryStringParameters) =>
     P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),

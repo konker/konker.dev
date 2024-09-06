@@ -45,7 +45,7 @@ const QueryParams = P.Schema.Struct({
 });
 type QueryParams = P.Schema.Schema.Type<typeof QueryParams>;
 
-describe('unit tests', () => {
+describe('kitchen sink', () => {
   let oldEnv: NodeJS.ProcessEnv;
   let __cache: any;
 
@@ -62,7 +62,7 @@ describe('unit tests', () => {
     process.env = oldEnv;
   });
 
-  it('should work as expected with the kitchen sink', async () => {
+  it('should work as expected', async () => {
     function echoCore(
       i: APIGatewayProxyEventV2 &
         M.bodyValidator.WithValidatedBody<Body> &

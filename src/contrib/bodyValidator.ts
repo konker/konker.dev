@@ -11,10 +11,8 @@ export type WithValidatedBody<V> = { body: V; validatorRawBody: unknown };
 
 export const middleware =
   <V>(schema: P.Schema.Schema<V>) =>
-  <I extends WithBody, O, E, R>(
-    wrapped: Handler<I & WithValidatedBody<V>, O, E, R>
-  ): Handler<I, O, E | MiddlewareError, R> =>
-  (i: I) =>
+  <I, O, E, R>(wrapped: Handler<I & WithValidatedBody<V>, O, E, R>): Handler<I & WithBody, O, E | MiddlewareError, R> =>
+  (i: I & WithBody) =>
     P.pipe(
       P.Effect.succeed(i),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
