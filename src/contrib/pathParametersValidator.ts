@@ -15,9 +15,9 @@ export type WithValidatedPathParameters<V> = {
 };
 
 export const middleware =
-  <V>(schema: P.Schema.Schema<V>) =>
+  <V0, V1>(schema: P.Schema.Schema<V0, V1>) =>
   <I, O, E, R>(
-    wrapped: Handler<I & WithValidatedPathParameters<V>, O, E, R>
+    wrapped: Handler<I & WithValidatedPathParameters<V0>, O, E, R>
   ): Handler<I & WithPathParameters, O, E | MiddlewareError, R> =>
   (i: I & WithPathParameters) =>
     P.pipe(
@@ -27,7 +27,7 @@ export const middleware =
         P.pipe(i.pathParameters, P.Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
       ),
       P.Effect.mapError((e) => toMiddlewareError(e)),
-      P.Effect.map((validatedPathParameters: V) => ({
+      P.Effect.map((validatedPathParameters: V0) => ({
         ...i,
         pathParameters: validatedPathParameters,
         validatorRawPathParameters: i.pathParameters,

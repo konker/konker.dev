@@ -11,8 +11,8 @@ export type WithValidatedEnv<V> = {
 };
 
 export const middleware =
-  <V>(schema: P.Schema.Schema<V>) =>
-  <I, O, E, R>(wrapped: Handler<I & WithValidatedEnv<V>, O, E, R>): Handler<I, O, E | MiddlewareError, R> =>
+  <V0, V1>(schema: P.Schema.Schema<V0, V1>) =>
+  <I, O, E, R>(wrapped: Handler<I & WithValidatedEnv<V0>, O, E, R>): Handler<I, O, E | MiddlewareError, R> =>
   (i: I) =>
     P.pipe(
       // Lift the input
@@ -24,7 +24,7 @@ export const middleware =
         P.pipe(process.env, P.Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
       ),
       P.Effect.mapError(toMiddlewareError),
-      P.Effect.map((validatedEnv: V) => ({
+      P.Effect.map((validatedEnv: V0) => ({
         ...i,
         validatedEnv,
       })),
