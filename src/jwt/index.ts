@@ -16,7 +16,7 @@ export type JwtVerificationConfig = {
 export type JwtPayloadSubIss = jwt.JwtPayload & { sub: string; iss: string };
 
 // --------------------------------------------------------------------------
-export function signToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.Either.Either<string, Error> {
+export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.Either.Either<string, Error> {
   return P.Either.try({
     try: () =>
       jwt.sign(payload, config.signingSecret, {
@@ -28,7 +28,7 @@ export function signToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.
 }
 
 // --------------------------------------------------------------------------
-export function verifyToken(token: string, config: JwtVerificationConfig): P.Effect.Effect<JwtPayloadSubIss, Error> {
+export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.Effect.Effect<JwtPayloadSubIss, Error> {
   return P.pipe(
     P.Effect.try({
       try: () =>
