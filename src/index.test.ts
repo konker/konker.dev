@@ -43,7 +43,7 @@ describe('aws-client-effect-ssm', () => {
   });
 
   // ------------------------------------------------------------------------
-  describe('defaultSecretsManagerClientFactoryDeps', () => {
+  describe('defaultSSMClientFactoryDeps', () => {
     it('should work as expected', async () => {
       const actualEffect = P.pipe(
         unit.SSMClientFactoryDeps,
