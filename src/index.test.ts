@@ -36,6 +36,32 @@ describe('aws-client-effect-sns', () => {
   });
 
   // ------------------------------------------------------------------------
+  describe('defaultSNSClientFactoryDeps', () => {
+    it('should work as expected', async () => {
+      const actualEffect = P.pipe(
+        unit.SNSClientFactoryDeps,
+        P.Effect.map((deps) => deps.snsClientFactory),
+        unit.defaultSNSClientFactoryDeps
+      );
+      const actual = P.Effect.runSync(actualEffect);
+      expect(actual).toBeInstanceOf(Function);
+    });
+  });
+
+  // ------------------------------------------------------------------------
+  describe('defaultSNSClientDeps', () => {
+    it('should work as expected', async () => {
+      const actualEffect = P.pipe(
+        unit.SNSClientDeps,
+        P.Effect.map((deps) => deps.snsClient),
+        unit.defaultSNSClientDeps({})
+      );
+      const actual = P.Effect.runSync(actualEffect);
+      expect(actual).toBeInstanceOf(SNSClient);
+    });
+  });
+
+  // ------------------------------------------------------------------------
   describe('PublishCommand', () => {
     beforeEach(() => {
       snsMock.reset();
