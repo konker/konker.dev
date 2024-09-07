@@ -10,6 +10,7 @@ import { toSnsError } from './lib/error';
 
 export { TAG as SNS_ERROR_TAG } from './lib/error';
 
+//------------------------------------------------------
 export type SNSClientFactory = (config: snsClient.SNSClientConfig) => snsClient.SNSClient;
 export const defaultSNSClientFactory: SNSClientFactory = (config: snsClient.SNSClientConfig) =>
   new snsClient.SNSClient(config);
@@ -34,10 +35,18 @@ export type SNSClientDeps = {
 };
 export const SNSClientDeps = P.Context.GenericTag<SNSClientDeps>('aws-client-effect-sns/SNSClientDeps');
 
-export type SNSEchoParams<I> = { _Params: I };
+export const defaultSNSClientDeps = (config: snsClient.SNSClientConfig) =>
+  P.Effect.provideService(
+    SNSClientDeps,
+    SNSClientDeps.of({
+      snsClient: defaultSNSClientFactory(config),
+    })
+  );
 
 // --------------------------------------------------------------------------
 // Wrapper
+export type SNSEchoParams<I> = { _Params: I };
+
 export function FabricateCommandEffect<I extends snsClient.ServiceInputTypes, O extends snsClient.ServiceOutputTypes>(
   cmdCtor: new (
     params: I

@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/aws-client-effect-sns",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "AWS SNS client for Node.js TypeScript projects based on Effect-ts",
   "license": "ISC",
