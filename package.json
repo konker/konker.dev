@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-utils-fp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "General utility functions for Node.js TypeScript projects based on Effect-ts",
   "license": "ISC",
