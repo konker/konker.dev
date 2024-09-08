@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import * as unit from './index';
+import * as unit from './hash';
 
 describe('index', () => {
   describe('md5Hex', () => {
