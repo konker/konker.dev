@@ -7,16 +7,19 @@ export const WithBody = P.Schema.Struct({
 });
 export type WithBody = P.Schema.Schema.Type<typeof WithBody>;
 
-export const RequestHeaders = P.Schema.Record(P.Schema.String, P.Schema.Union(P.Schema.String, P.Schema.Undefined));
+export const RequestHeaders = P.Schema.Record({
+  key: P.Schema.String,
+  value: P.Schema.Union(P.Schema.String, P.Schema.Undefined),
+});
 export type RequestHeaders = P.Schema.Schema.Type<typeof RequestHeaders>;
 
 export const OptionalRequestHeaders = P.Schema.Union(RequestHeaders, P.Schema.Undefined);
 export type OptionalRequestHeaders = P.Schema.Schema.Type<typeof OptionalRequestHeaders>;
 
-export const ResponseHeaders = P.Schema.Record(
-  P.Schema.String,
-  P.Schema.Union(P.Schema.String, P.Schema.Number, P.Schema.Boolean)
-);
+export const ResponseHeaders = P.Schema.Record({
+  key: P.Schema.String,
+  value: P.Schema.Union(P.Schema.String, P.Schema.Number, P.Schema.Boolean),
+});
 export type ResponseHeaders = P.Schema.Schema.Type<typeof ResponseHeaders>;
 
 export const OptionalResponseHeaders = P.Schema.Union(ResponseHeaders, P.Schema.Undefined);
