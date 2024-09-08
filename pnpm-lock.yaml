@@ -27,8 +27,8 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7
       '@konker.dev/tiny-auth-utils-fp':
-        specifier: ^0.0.5
-        version: 0.0.5(aws-lambda@1.0.7)(jsonwebtoken@9.0.2)
+        specifier: ^0.0.7
+        version: 0.0.7(aws-lambda@1.0.7)(jsonwebtoken@9.0.2)
       '@konker.dev/tiny-cache-fp':
         specifier: ^0.0.5
         version: 0.0.5(@gomomento/sdk@1.98.1)(@konker.dev/momento-cache-client-effect@0.0.7)
@@ -697,8 +697,8 @@ packages:
   '@konker.dev/momento-cache-client-effect@0.0.7':
     resolution: {integrity: sha512-2PY4GiQfkWajyd1klyKKTByUdaKuufO9CQ7FlDyXsRe+zCxtcWpP4JN/414px+q7vv+NVVl1f8lsnNjSi0iquw==}
 
-  '@konker.dev/tiny-auth-utils-fp@0.0.5':
-    resolution: {integrity: sha512-MkxtREDUKiE6TcH+z2uEAGebdxiAm/OvCNY92WLbEdlc9itOmUWWZ7PsEELSA8Sx1kvlhizXfP1WRJaNY7X2+Q==}
+  '@konker.dev/tiny-auth-utils-fp@0.0.7':
+    resolution: {integrity: sha512-Tb+W0NGRLtzDmJCiFOzmNJaqS+/SyNhYu/Q2JxnHOMMmEaHdxqlpZJ2XeupwxTV9/soaqwxGYNUp1BS0hIaZpA==}
     peerDependencies:
       aws-lambda: ^1.0.7
       jsonwebtoken: ^9.0.2
@@ -5621,11 +5621,11 @@ snapshots:
       - encoding
       - supports-color
 
-  '@konker.dev/tiny-auth-utils-fp@0.0.5(aws-lambda@1.0.7)(jsonwebtoken@9.0.2)':
+  '@konker.dev/tiny-auth-utils-fp@0.0.7(aws-lambda@1.0.7)(jsonwebtoken@9.0.2)':
     dependencies:
-      '@effect/schema': 0.68.27(effect@3.7.2)
-      '@konker.dev/effect-ts-prelude': 0.0.16(@effect/schema@0.68.27(effect@3.7.2))(effect@3.7.2)
-      '@konker.dev/tiny-error-fp': 0.0.2
+      '@effect/schema': 0.72.3(effect@3.7.2)
+      '@konker.dev/effect-ts-prelude': 0.0.17(@effect/schema@0.72.3(effect@3.7.2))(effect@3.7.2)
+      '@konker.dev/tiny-error-fp': 0.0.8(@effect/schema@0.72.3(effect@3.7.2))(effect@3.7.2)
       aws-lambda: 1.0.7
       effect: 3.7.2
       jsonwebtoken: 9.0.2
