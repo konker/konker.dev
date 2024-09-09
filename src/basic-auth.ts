@@ -8,10 +8,11 @@ export type BasicAuthCredentials = {
   readonly password: string;
 };
 
-export type ValidBasicAuthCredentials = Array<{
+export type ValidBasicAuthCredentials = {
   readonly username: string;
   readonly passwords: NonEmptyArray<string>;
-}>;
+};
+export type ValidBasicAuthCredentialSet = Array<ValidBasicAuthCredentials>;
 
 // --------------------------------------------------------------------------
 export type BasicAuthUserContext =
@@ -22,8 +23,16 @@ export type BasicAuthUserContext =
     };
 
 export function BasicAuthUserContext(validated: boolean, userId?: string): BasicAuthUserContext {
-  return validated ? (!!userId ? { validated: true, userId } : { validated: true }) : { validated: false };
+  return validated
+    ? userId !== undefined && userId !== ''
+      ? { validated: true, userId }
+      : { validated: true }
+    : { validated: false };
 }
+
+// --------------------------------------------------------------------------
+export const basicAuthCredentialMatch = (basicAuth: BasicAuthCredentials) => (valid: ValidBasicAuthCredentials) =>
+  valid.username === basicAuth.username && valid.passwords.includes(basicAuth.password);
 
 // --------------------------------------------------------------------------
 export function basicAuthDecodeHeaderValue(
@@ -48,13 +57,10 @@ export function basicAuthDecodeHeaderValue(
 
 // --------------------------------------------------------------------------
 export const basicAuthValidateCredentials =
-  (valid: ValidBasicAuthCredentials) =>
+  (valid: ValidBasicAuthCredentialSet) =>
   (basicAuth: BasicAuthCredentials): P.Effect.Effect<BasicAuthUserContext> => {
-    return P.Effect.if(
-      valid.some((x) => x.username === basicAuth.username && x.passwords.includes(basicAuth.password)),
-      {
-        onTrue: () => P.Effect.succeed(BasicAuthUserContext(true, basicAuth.username)),
-        onFalse: () => P.Effect.succeed(BasicAuthUserContext(false)),
-      }
-    );
+    return P.Effect.if(valid.some(basicAuthCredentialMatch(basicAuth)), {
+      onTrue: () => P.Effect.succeed(BasicAuthUserContext(true, basicAuth.username)),
+      onFalse: () => P.Effect.succeed(BasicAuthUserContext(false)),
+    });
   };
