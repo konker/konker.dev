@@ -12,7 +12,7 @@ export type ValidBasicAuthCredentials = Array<{
   readonly passwords: NonEmptyArray<string>;
 }>;
 
-export function decodeBasicAuthToken(basicAuthToken: string): P.Effect.Effect<BasicAuthCredentials, Error> {
+export function basicAuthDecodeHeaderValue(basicAuthToken: string): P.Effect.Effect<BasicAuthCredentials, Error> {
   return P.pipe(
     basicAuthToken,
     P.Schema.decode(P.Schema.StringFromBase64),
@@ -30,7 +30,7 @@ export function decodeBasicAuthToken(basicAuthToken: string): P.Effect.Effect<Ba
   );
 }
 
-export const validateBasicAuthCredentials =
+export const basicAuthValidateCredentials =
   (valid: ValidBasicAuthCredentials) =>
   (basicAuth: BasicAuthCredentials): P.Effect.Effect<boolean> => {
     return P.Effect.succeed(
