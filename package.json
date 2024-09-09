@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-auth-utils-fp",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "A basic authentication utils library for Node.js based on Effect-ts",
   "license": "ISC",
