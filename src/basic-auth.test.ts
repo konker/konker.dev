@@ -12,6 +12,11 @@ describe('basic-auth', () => {
       });
     });
 
+    it('should fail as expected with undefined input', () => {
+      const actual = unit.basicAuthDecodeHeaderValue(undefined);
+      expect(() => P.Effect.runSync(actual)).toThrow();
+    });
+
     it('should fail as expected with invalid base64 input', () => {
       const actual = unit.basicAuthDecodeHeaderValue('===');
       expect(() => P.Effect.runSync(actual)).toThrow();

@@ -12,10 +12,12 @@ export type ValidBasicAuthCredentials = Array<{
   readonly passwords: NonEmptyArray<string>;
 }>;
 
-export function basicAuthDecodeHeaderValue(basicAuthToken: string): P.Effect.Effect<BasicAuthCredentials, Error> {
+export function basicAuthDecodeHeaderValue(
+  basicAuthHeaderValue: string | undefined
+): P.Effect.Effect<BasicAuthCredentials, Error> {
   return P.pipe(
-    basicAuthToken,
-    P.Schema.decode(P.Schema.StringFromBase64),
+    basicAuthHeaderValue,
+    P.Schema.decodeUnknown(P.Schema.StringFromBase64),
     P.Effect.flatMap((decoded) => {
       const parts = decoded.split(':');
       return P.Effect.if(parts.length === 2, {
