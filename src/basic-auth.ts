@@ -2,16 +2,30 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { NonEmptyArray } from 'effect/Array';
 
+// --------------------------------------------------------------------------
 export type BasicAuthCredentials = {
-  readonly username?: string;
+  readonly username: string;
   readonly password: string;
 };
 
 export type ValidBasicAuthCredentials = Array<{
-  readonly username?: string;
+  readonly username: string;
   readonly passwords: NonEmptyArray<string>;
 }>;
 
+// --------------------------------------------------------------------------
+export type BasicAuthUserContext =
+  | { readonly validated: false }
+  | {
+      readonly validated: true;
+      readonly userId?: string;
+    };
+
+export function BasicAuthUserContext(validated: boolean, userId?: string): BasicAuthUserContext {
+  return validated ? (!!userId ? { validated: true, userId } : { validated: true }) : { validated: false };
+}
+
+// --------------------------------------------------------------------------
 export function basicAuthDecodeHeaderValue(
   basicAuthHeaderValue: string | undefined
 ): P.Effect.Effect<BasicAuthCredentials, Error> {
@@ -32,10 +46,15 @@ export function basicAuthDecodeHeaderValue(
   );
 }
 
+// --------------------------------------------------------------------------
 export const basicAuthValidateCredentials =
   (valid: ValidBasicAuthCredentials) =>
-  (basicAuth: BasicAuthCredentials): P.Effect.Effect<boolean> => {
-    return P.Effect.succeed(
-      valid.some((x) => (!x.username || x.username === basicAuth.username) && x.passwords.includes(basicAuth.password))
+  (basicAuth: BasicAuthCredentials): P.Effect.Effect<BasicAuthUserContext> => {
+    return P.Effect.if(
+      valid.some((x) => x.username === basicAuth.username && x.passwords.includes(basicAuth.password)),
+      {
+        onTrue: () => P.Effect.succeed(BasicAuthUserContext(true, basicAuth.username)),
+        onFalse: () => P.Effect.succeed(BasicAuthUserContext(false)),
+      }
     );
   };
