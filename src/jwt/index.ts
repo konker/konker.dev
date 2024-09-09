@@ -2,6 +2,9 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import * as jwt from 'jsonwebtoken';
 
+import type { JwtPayloadSubIss } from './common';
+import { checkJwtPayloadIssSub } from './common';
+
 // --------------------------------------------------------------------------
 export type JwtSigningConfig = {
   signingSecret: string;
@@ -13,11 +16,24 @@ export type JwtVerificationConfig = {
   issuer: string;
 };
 
-export type JwtPayloadSubIss = jwt.JwtPayload & { sub: string; iss: string };
+// --------------------------------------------------------------------------
+export function jwtDecodeToken(token: string): P.Effect.Effect<jwt.JwtPayload, Error> {
+  return P.pipe(
+    P.Effect.try({
+      try: () => jwt.decode(token),
+      catch: P.toError,
+    }),
+    P.Effect.flatMap((decoded) =>
+      !decoded || typeof decoded === 'string'
+        ? P.Effect.fail(new Error('Invalid token payload'))
+        : P.Effect.succeed(decoded)
+    )
+  );
+}
 
 // --------------------------------------------------------------------------
-export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.Either.Either<string, Error> {
-  return P.Either.try({
+export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.Effect.Effect<string, Error> {
+  return P.Effect.try({
     try: () =>
       jwt.sign(payload, config.signingSecret, {
         issuer: config.issuer,
@@ -39,20 +55,6 @@ export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.
         }),
       catch: P.toError,
     }),
-    P.Effect.flatMap((payload: jwt.JwtPayload | string) => {
-      // code coverage ignored here, because if the payload is a string,
-      // then issuer verification has already failed
-      /* istanbul ignore next */
-      if (typeof payload === 'string') {
-        return P.Effect.fail(new Error('Invalid token payload: string'));
-      }
-      const sub = payload.sub;
-      const iss = payload.iss;
-      if (!sub || !iss) {
-        return P.Effect.fail(new Error('Invalid token payload: missing iss or sub'));
-      }
-
-      return P.Effect.succeed({ ...payload, sub, iss });
-    })
+    P.Effect.flatMap(checkJwtPayloadIssSub)
   );
 }
