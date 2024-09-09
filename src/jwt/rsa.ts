@@ -1,8 +1,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
+import type { JwtPayload } from 'jsonwebtoken';
 import * as jwt from 'jsonwebtoken';
-
-import type { JwtPayloadSubIss } from './index';
 
 // --------------------------------------------------------------------------
 export type JwtSigningConfigRsa = {
@@ -14,6 +13,11 @@ export type JwtSigningConfigRsa = {
 export type JwtVerificationConfigRsa = {
   rsaPublicKey: string;
   issuer: string;
+};
+
+export type JwtVerification = JwtPayload & {
+  readonly iss: string;
+  readonly sub: string;
 };
 
 // --------------------------------------------------------------------------
@@ -33,7 +37,7 @@ export function jwtSignTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfi
 export function jwtVerifyTokenRsa(
   token: string,
   config: JwtVerificationConfigRsa
-): P.Effect.Effect<JwtPayloadSubIss, Error> {
+): P.Effect.Effect<JwtVerification, Error> {
   return P.pipe(
     P.Effect.try({
       try: () =>
