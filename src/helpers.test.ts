@@ -15,14 +15,14 @@ describe('authentication/helpers', () => {
     });
   });
 
-  describe('basicAuthExtractEncoded', () => {
+  describe('extractBasicAuthHeaderValue', () => {
     it('should behave as expected with good input', () => {
-      const actual = unit.basicAuthExtractEncoded('Basic SOME_TOKEN');
+      const actual = unit.extractBasicAuthHeaderValue('Basic SOME_TOKEN');
       expect(P.Effect.runSync(actual)).toEqual('SOME_TOKEN');
     });
 
     it('should behave as expected with bad input', () => {
-      const actual = unit.basicAuthExtractEncoded('CareBasic: SOME_TOKEN');
+      const actual = unit.extractBasicAuthHeaderValue('CareBasic: SOME_TOKEN');
       expect(() => P.Effect.runSync(actual)).toThrow();
     });
   });
