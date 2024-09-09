@@ -5,7 +5,6 @@ import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import { http200CoreIn } from '../../test/test-common';
 import * as unit from './index';
-import { HeaderSignatureAuthorizerDeps } from './index';
 
 export const CORRECT_TEST_HMAC_VALUE = 'test-hmac-value';
 export const INCORRECT_TEST_HMAC_VALUE = 'wrong-hmac-value';
@@ -19,7 +18,7 @@ export const HEADER_SIGNATURE_AUTHORIZER_TEST_DEPS: unit.HeaderSignatureAuthoriz
   });
 
 export const mockHeaderSignatureAuthorizerDeps = P.Effect.provideService(
-  HeaderSignatureAuthorizerDeps,
+  unit.HeaderSignatureAuthorizerDeps,
   HEADER_SIGNATURE_AUTHORIZER_TEST_DEPS
 );
 

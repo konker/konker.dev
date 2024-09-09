@@ -11,3 +11,7 @@ export type WithNormalizedInputHeaders = {
 export type WithNormalizedOutputHeaders = {
   headers?: ResponseHeaders;
 };
+
+export type WithUserId = {
+  readonly userId: string | undefined;
+};
