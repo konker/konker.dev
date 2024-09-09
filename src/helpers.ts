@@ -7,7 +7,7 @@ export function extractBearerToken(authorization?: string): P.Effect.Effect<stri
   return match?.[1] ? P.Effect.succeed(match?.[1]) : P.Effect.fail(new Error('No token found'));
 }
 
-export function extractBasicAuthToken(authorization?: string): P.Effect.Effect<string, Error> {
+export function basicAuthExtractEncoded(authorization?: string): P.Effect.Effect<string, Error> {
   const BASIC_AUTH_RE = /^Basic (\S+)$/;
   const match = authorization?.match(BASIC_AUTH_RE);
 

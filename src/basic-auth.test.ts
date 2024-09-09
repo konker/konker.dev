@@ -3,6 +3,50 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import * as unit from './basic-auth';
 
 describe('basic-auth', () => {
+  describe('BasicAuthUserContext', () => {
+    it('should work as expected in the true case', () => {
+      expect(unit.BasicAuthUserContext(true, 'user0')).toStrictEqual({
+        validated: true,
+        userId: 'user0',
+      });
+      expect(unit.BasicAuthUserContext(true, '')).toStrictEqual({
+        validated: true,
+      });
+      expect(unit.BasicAuthUserContext(true)).toStrictEqual({
+        validated: true,
+      });
+    });
+
+    it('should work as expected in the false case', () => {
+      expect(unit.BasicAuthUserContext(false)).toStrictEqual({
+        validated: false,
+      });
+    });
+  });
+
+  describe('basicAuthCredentialMatch', () => {
+    it('should work as expected', () => {
+      expect(
+        unit.basicAuthCredentialMatch({ username: 'user0', password: 'secret-0' })({
+          username: 'user0',
+          passwords: ['secret-0', 'secret-1'],
+        })
+      ).toStrictEqual(true);
+      expect(
+        unit.basicAuthCredentialMatch({ username: 'user0', password: 'secret-0' })({
+          username: 'user1',
+          passwords: ['secret-0', 'secret-1'],
+        })
+      ).toStrictEqual(false);
+      expect(
+        unit.basicAuthCredentialMatch({ username: 'user0', password: 'secret-0' })({
+          username: 'user0',
+          passwords: ['secret-1'],
+        })
+      ).toStrictEqual(false);
+    });
+  });
+
   describe('basicAuthDecodeHeaderValue', () => {
     it('should work as expected with valid input', () => {
       const actual = unit.basicAuthDecodeHeaderValue('Zm9vOmJhcg==');
