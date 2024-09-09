@@ -2,12 +2,17 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { NonEmptyArray } from 'effect/Array';
 
-export type BasicAuth = {
-  readonly username: string;
+export type BasicAuthCredentials = {
+  readonly username?: string;
   readonly password: string;
 };
 
-export function decodeBasicAuthToken(basicAuthToken: string): P.Effect.Effect<BasicAuth, Error> {
+export type ValidBasicAuthCredentials = Array<{
+  readonly username?: string;
+  readonly passwords: NonEmptyArray<string>;
+}>;
+
+export function decodeBasicAuthToken(basicAuthToken: string): P.Effect.Effect<BasicAuthCredentials, Error> {
   return P.pipe(
     basicAuthToken,
     P.Schema.decode(P.Schema.StringFromBase64),
@@ -25,8 +30,10 @@ export function decodeBasicAuthToken(basicAuthToken: string): P.Effect.Effect<Ba
   );
 }
 
-export const validateBasicAuthPassword =
-  (passwords: NonEmptyArray<string>) =>
-  (basicAuth: BasicAuth): P.Effect.Effect<boolean> => {
-    return P.Effect.succeed(passwords.includes(basicAuth.password));
+export const validateBasicAuthCredentials =
+  (valid: ValidBasicAuthCredentials) =>
+  (basicAuth: BasicAuthCredentials): P.Effect.Effect<boolean> => {
+    return P.Effect.succeed(
+      valid.some((x) => (!x.username || x.username === basicAuth.username) && x.passwords.includes(basicAuth.password))
+    );
   };
