@@ -17,6 +17,7 @@ export * as identity from './identity';
 export * as jsonBodyParser from './jsonBodyParser';
 export * as jwtAuthenticator from './jwtAuthenticator';
 export * as jwtAuthenticatorRsa from './jwtAuthenticatorRsa';
+export * as jwtDecoder from './jwtDecoder';
 export * as momentoClientInit from './momentoClientInit';
 export * as pathParametersValidator from './pathParametersValidator';
 export * as pathTokenAuthorizer from './pathTokenAuthorizer';
