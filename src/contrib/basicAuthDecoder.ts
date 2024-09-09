@@ -1,7 +1,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
 import { basicAuthDecodeHeaderValue } from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
-import { basicAuthExtractEncoded } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
+import { extractBasicAuthHeaderValue } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import type { Handler } from '../index';
@@ -23,7 +23,7 @@ export const middleware =
     return P.pipe(
       P.Effect.Do,
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.bind('authToken', () => basicAuthExtractEncoded(i.headers['authorization'])),
+      P.Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers['authorization'])),
       P.Effect.bind('decoded', ({ authToken }) => basicAuthDecodeHeaderValue(authToken)),
       P.Effect.map(({ decoded }) => ({
         ...i,
