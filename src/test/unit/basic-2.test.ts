@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as P from '@konker.dev/effect-ts-prelude';
 
+import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
+import { TEST_TOKEN_RSA } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens-rsa';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import * as M from '../../contrib';
+import { mockJwtAuthenticatorRsaDeps } from '../../contrib/jwtAuthenticatorRsa.test';
 import { CORRECT_TEST_PATH_TOKEN_VALUE, TEST_SECRET_TOKEN_ENV_NAME } from '../../contrib/pathTokenAuthorizer.test';
 import type { BaseResponse } from '../../lib/http';
 
@@ -14,14 +17,16 @@ type Env = P.Schema.Schema.Type<typeof Env>;
 
 const Headers = P.Schema.Struct({
   'content-type': P.Schema.String,
+  authorization: P.Schema.String,
 });
 type Headers = P.Schema.Schema.Type<typeof Headers>;
 
 type CoreEvent = APIGatewayProxyEventV2 &
+  M.jwtAuthenticatorRsa.WithUserId &
   M.envValidator.WithValidatedEnv<Env> &
   M.headersValidator.WithValidatedHeaders<Headers>;
 
-describe('basic test 1', () => {
+describe('basic test 2', () => {
   let oldEnv: NodeJS.ProcessEnv;
 
   beforeAll(() => {
@@ -30,8 +35,10 @@ describe('basic test 1', () => {
       MOMENTO_AUTH_TOKEN: 'TEST_MOMENTO_AUTH_TOKEN',
       [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
     };
+    jest.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
   });
   afterAll(() => {
+    jest.restoreAllMocks();
     process.env = oldEnv;
   });
 
@@ -45,12 +52,14 @@ describe('basic test 1', () => {
         body: {
           foo: i.validatedEnv.MOMENTO_AUTH_TOKEN,
           h: i.headers['content-type'].toUpperCase(),
+          u: i.userId,
         },
       });
     }
 
     const stack = P.pipe(
       echoCore,
+      M.jwtAuthenticatorRsa.middleware(),
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
       M.envValidator.middleware(Env),
@@ -64,7 +73,10 @@ describe('basic test 1', () => {
       rawPath: 'string',
       rawQueryString: 'string',
       // cookies?: [],
-      headers: { 'content-type': 'application/json; charset=UTF-8' },
+      headers: {
+        'content-type': 'application/json; charset=UTF-8',
+        authorization: `Bearer ${TEST_TOKEN_RSA}`,
+      },
       queryStringParameters: {
         q: 'wtf',
       },
@@ -78,8 +90,8 @@ describe('basic test 1', () => {
       // stageVariables?: {},
     });
 
-    await expect(P.Effect.runPromise(actual1)).resolves.toStrictEqual({
-      body: '{"foo":"TEST_MOMENTO_AUTH_TOKEN","h":"APPLICATION/JSON; CHARSET=UTF-8"}',
+    await expect(P.Effect.runPromise(P.pipe(actual1, mockJwtAuthenticatorRsaDeps))).resolves.toStrictEqual({
+      body: '{"foo":"TEST_MOMENTO_AUTH_TOKEN","h":"APPLICATION/JSON; CHARSET=UTF-8","u":"test-sub"}',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       },
