@@ -1,10 +1,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { ValidBasicAuthCredentialSet } from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
-import {
-  basicAuthDecodeHeaderValue,
-  basicAuthValidateCredentials,
-} from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
+import { basicAuthDecodeHeaderValue, basicAuthVerifyCredentials } from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
 import { extractBasicAuthHeaderValue } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
@@ -34,21 +31,21 @@ export const middleware =
       P.Effect.bind('deps', () => BasicAuthAuthenticatorDeps),
       P.Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers['authorization'])),
       P.Effect.bind('decoded', ({ authToken }) => basicAuthDecodeHeaderValue(authToken)),
-      P.Effect.bind('validation', ({ decoded, deps }) =>
-        P.pipe(decoded, basicAuthValidateCredentials(deps.validBasicAuthCredentialSet))
+      P.Effect.bind('verification', ({ decoded, deps }) =>
+        P.pipe(decoded, basicAuthVerifyCredentials(deps.validBasicAuthCredentialSet))
       ),
-      P.Effect.flatMap(({ validation }) =>
-        validation.validated
+      P.Effect.flatMap(({ verification }) =>
+        verification.verified
           ? P.Effect.succeed({
               ...i,
-              userId: validation.userId,
+              userId: verification.userId,
             })
           : P.Effect.fail(void 0)
       ),
       P.Effect.mapError((e) =>
         HttpApiError('UnauthorizedError', `Invalid basic auth credentials: ${e?.message}`, 401, TAG, e)
       ),
-      P.Effect.tapError((_) => P.Effect.logError(`UnauthorizedError: Invalid basic auth credentials: ${i.headers}`)),
+      P.Effect.tapError(P.Effect.logError),
       P.Effect.flatMap(wrapped),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
     );

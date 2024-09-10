@@ -29,12 +29,18 @@ export const middleware =
       P.Effect.bind('deps', () => JwtAuthenticatorDeps),
       P.Effect.bind('authToken', () => extractBearerToken(i.headers['authorization'])),
       P.Effect.bind('verification', ({ authToken, deps }) => jwtVerifyToken(authToken, deps)),
-      P.Effect.map(({ verification }) => ({
-        ...i,
-        userId: verification.sub,
-      })),
-      P.Effect.mapError((e) => HttpApiError('UnauthorizedError', `Invalid JWT credentials: ${e.message}`, 401, TAG, e)),
-      P.Effect.tapError((_) => P.Effect.logError(`UnauthorizedError: Invalid JWT credentials: ${i.headers}`)),
+      P.Effect.flatMap(({ verification }) =>
+        verification.verified
+          ? P.Effect.succeed({
+              ...i,
+              userId: verification.sub,
+            })
+          : P.Effect.fail(void 0)
+      ),
+      P.Effect.mapError((e) =>
+        HttpApiError('UnauthorizedError', `Invalid JWT credentials: ${e?.message}`, 401, TAG, e)
+      ),
+      P.Effect.tapError(P.Effect.logError),
       P.Effect.flatMap(wrapped),
       P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
     );
