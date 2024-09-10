@@ -3,7 +3,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import * as jwt from 'jsonwebtoken';
 
 import type { JwtPayloadSubIss } from './common';
-import { checkJwtPayloadIssSub } from './common';
+import { checkJwtPayloadIssSub, JwtUserContext } from './common';
 
 // --------------------------------------------------------------------------
 export type JwtSigningConfig = {
@@ -44,7 +44,7 @@ export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig):
 }
 
 // --------------------------------------------------------------------------
-export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.Effect.Effect<JwtPayloadSubIss, Error> {
+export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.Effect.Effect<JwtUserContext> {
   return P.pipe(
     P.Effect.try({
       try: () =>
@@ -55,6 +55,9 @@ export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.
         }),
       catch: P.toError,
     }),
-    P.Effect.flatMap(checkJwtPayloadIssSub)
+    P.Effect.flatMap(checkJwtPayloadIssSub),
+    P.Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
+    P.Effect.tapError(P.Effect.logError),
+    P.Effect.orElse(() => P.Effect.succeed(JwtUserContext(false)))
   );
 }

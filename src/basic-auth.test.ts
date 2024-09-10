@@ -6,20 +6,17 @@ describe('basic-auth', () => {
   describe('BasicAuthUserContext', () => {
     it('should work as expected in the true case', () => {
       expect(unit.BasicAuthUserContext(true, 'user0')).toStrictEqual({
-        validated: true,
+        verified: true,
         userId: 'user0',
       });
       expect(unit.BasicAuthUserContext(true, '')).toStrictEqual({
-        validated: true,
-      });
-      expect(unit.BasicAuthUserContext(true)).toStrictEqual({
-        validated: true,
+        verified: true,
       });
     });
 
     it('should work as expected in the false case', () => {
       expect(unit.BasicAuthUserContext(false)).toStrictEqual({
-        validated: false,
+        verified: false,
       });
     });
   });
@@ -34,6 +31,12 @@ describe('basic-auth', () => {
       ).toStrictEqual(true);
       expect(
         unit.basicAuthCredentialMatch({ username: 'user0', password: 'secret-0' })({
+          username: '*',
+          passwords: ['secret-0', 'secret-1'],
+        })
+      ).toStrictEqual(true);
+      expect(
+        unit.basicAuthCredentialMatch({ username: '', password: 'secret-0' })({
           username: '*',
           passwords: ['secret-0', 'secret-1'],
         })
@@ -78,50 +81,50 @@ describe('basic-auth', () => {
     });
   });
 
-  describe('basicAuthValidateCredentials', () => {
+  describe('basicAuthVerifyCredentials', () => {
     it('should work as expected in the positive case', () => {
-      const actual = unit.basicAuthValidateCredentials([{ username: 'user0', passwords: ['secret1'] }])({
+      const actual = unit.basicAuthVerifyCredentials([{ username: 'user0', passwords: ['secret1'] }])({
         username: 'user0',
         password: 'secret1',
       });
       expect(actual).toStrictEqual(
         P.Effect.succeed({
-          validated: true,
+          verified: true,
           userId: 'user0',
         })
       );
     });
 
     it('should work as expected in the positive case', () => {
-      const actual = unit.basicAuthValidateCredentials([{ username: '', passwords: ['secret0', 'secret1'] }])({
+      const actual = unit.basicAuthVerifyCredentials([{ username: '', passwords: ['secret0', 'secret1'] }])({
         username: '',
         password: 'secret1',
       });
       expect(actual).toStrictEqual(
         P.Effect.succeed({
-          validated: true,
+          verified: true,
         })
       );
     });
 
     it('should work as expected in the negative case', () => {
-      const actual = unit.basicAuthValidateCredentials([{ username: '', passwords: ['secret1'] }])({
+      const actual = unit.basicAuthVerifyCredentials([{ username: '', passwords: ['secret1'] }])({
         username: '',
         password: 'bad-secret',
       });
       expect(actual).toStrictEqual(
         P.Effect.succeed({
-          validated: false,
+          verified: false,
         })
       );
     });
 
     it('should work as expected in the negative case', () => {
-      const actual = unit.basicAuthValidateCredentials([{ username: 'user0', passwords: ['secret0', 'secret1'] }])({
+      const actual = unit.basicAuthVerifyCredentials([{ username: 'user0', passwords: ['secret0', 'secret1'] }])({
         username: 'not-user0',
         password: 'secret0',
       });
-      expect(actual).toStrictEqual(P.Effect.succeed({ validated: false }));
+      expect(actual).toStrictEqual(P.Effect.succeed({ verified: false }));
     });
   });
 });
