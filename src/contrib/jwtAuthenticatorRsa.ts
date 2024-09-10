@@ -29,12 +29,16 @@ export const middleware =
       P.Effect.bind('deps', () => JwtAuthenticatorRsaDeps),
       P.Effect.bind('authToken', () => extractBearerToken(i.headers['authorization'])),
       P.Effect.bind('verification', ({ authToken, deps }) => jwtVerifyTokenRsa(authToken, deps)),
-      P.Effect.map(({ verification }) => ({
-        ...i,
-        userId: verification.sub,
-      })),
+      P.Effect.flatMap(({ verification }) =>
+        verification.verified
+          ? P.Effect.succeed({
+              ...i,
+              userId: verification.sub,
+            })
+          : P.Effect.fail(void 0)
+      ),
       P.Effect.mapError((e) =>
-        HttpApiError('UnauthorizedError', `Invalid JWT RSA credentials: ${e.message}`, 401, TAG, e)
+        HttpApiError('UnauthorizedError', `Invalid JWT RSA credentials: ${e?.message}`, 401, TAG, e)
       ),
       P.Effect.tapError((_) => P.Effect.logError(`UnauthorizedError: Invalid JWT RSA credentials: ${i.headers}`)),
       P.Effect.flatMap(wrapped),
