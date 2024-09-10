@@ -2,9 +2,8 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
-import { http200CoreIn } from '../../test/test-common';
-import * as unit from './index';
-import { PathTokenAuthorizerDeps } from './index';
+import { http200CoreIn } from '../test/test-common';
+import * as unit from './pathTokenAuthorizer';
 
 export const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 export const INCORRECT_TEST_PATH_TOKEN_VALUE = 'wrong-token-value';
@@ -16,7 +15,7 @@ export const PATH_TOKEN_AUTHORIZER_TEST_DEPS: unit.PathTokenAuthorizerDeps = uni
 });
 
 export const mockPathTokenAuthorizerDeps = P.Effect.provideService(
-  PathTokenAuthorizerDeps,
+  unit.PathTokenAuthorizerDeps,
   PATH_TOKEN_AUTHORIZER_TEST_DEPS
 );
 

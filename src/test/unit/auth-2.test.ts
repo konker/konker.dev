@@ -4,10 +4,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
 
 import * as M from '../../contrib';
-import {
-  CORRECT_TEST_PATH_TOKEN_VALUE,
-  TEST_SECRET_TOKEN_ENV_NAME,
-} from '../../contrib/pathTokenAuthorizer/index.test';
+import { CORRECT_TEST_PATH_TOKEN_VALUE, TEST_SECRET_TOKEN_ENV_NAME } from '../../contrib/pathTokenAuthorizer.test';
 import event from '../fixtures/APIGatewayRequestAuthorizerEventV2-1.json';
 
 const Env = P.Schema.Struct({

@@ -5,16 +5,19 @@ import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-d
 import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
+import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
+import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
 import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import * as M from '../../contrib';
+import { mockJwtAuthenticatorDeps } from '../../contrib/jwtAuthenticator.test';
 import {
   CORRECT_TEST_PATH_TOKEN_VALUE,
   mockPathTokenAuthorizerDeps,
   TEST_SECRET_TOKEN_ENV_NAME,
-} from '../../contrib/pathTokenAuthorizer/index.test';
+} from '../../contrib/pathTokenAuthorizer.test';
 import type { BaseResponse } from '../../lib/http';
 
 const Body = P.Schema.Struct({
@@ -31,6 +34,7 @@ type Env = P.Schema.Schema.Type<typeof Env>;
 
 const Headers = P.Schema.Struct({
   'content-type': P.Schema.String,
+  authorization: P.Schema.String,
 });
 type Headers = P.Schema.Schema.Type<typeof Headers>;
 
@@ -55,10 +59,12 @@ describe('kitchen sink', () => {
       MOMENTO_AUTH_TOKEN: 'TEST_MOMENTO_AUTH_TOKEN',
       [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
     };
+    jest.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
 
     __cache = {};
   });
   afterAll(() => {
+    jest.restoreAllMocks();
     process.env = oldEnv;
   });
 
@@ -68,7 +74,8 @@ describe('kitchen sink', () => {
         M.bodyValidator.WithValidatedBody<Body> &
         M.pathParametersValidator.WithValidatedPathParameters<PathParams> &
         M.queryStringValidator.WithValidatedQueryStringParameters<QueryParams> &
-        M.headersValidator.WithValidatedHeaders<Headers>
+        M.headersValidator.WithValidatedHeaders<Headers> &
+        M.jwtAuthenticator.WithUserId
     ): P.Effect.Effect<BaseResponse, never, DynamoDBDocumentClientDeps | MomentoClientDeps> {
       return P.Effect.succeed({
         statusCode: 200,
@@ -82,6 +89,7 @@ describe('kitchen sink', () => {
           pt: i.pathParameters.pathToken,
           q: i.queryStringParameters.q,
           h: i.headers['content-type'].toUpperCase(),
+          u: i.userId,
         },
       });
     }
@@ -92,6 +100,7 @@ describe('kitchen sink', () => {
       M.bodyValidator.middleware(Body),
       M.jsonBodyParser.middleware(),
       M.base64BodyDecoder.middleware(),
+      M.jwtAuthenticator.middleware(),
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
       M.helmetJsHeaders.middleware(),
@@ -114,7 +123,10 @@ describe('kitchen sink', () => {
       rawPath: 'string',
       rawQueryString: 'string',
       // cookies?: [],
-      headers: { 'content-type': 'application/json; charset=UTF-8' },
+      headers: {
+        'content-type': 'application/json; charset=UTF-8',
+        authorization: `Bearer ${TEST_TOKEN}`,
+      },
       queryStringParameters: {
         q: 'wtf',
       },
@@ -134,7 +146,8 @@ describe('kitchen sink', () => {
           actual1,
           defaultDynamoDBDocumentClientFactoryDeps,
           mockMomentoClientFactoryDeps(__cache),
-          mockPathTokenAuthorizerDeps
+          mockPathTokenAuthorizerDeps,
+          mockJwtAuthenticatorDeps
         )
       )
     ).resolves.toStrictEqual({
@@ -158,9 +171,9 @@ describe('kitchen sink', () => {
       },
       multiValueHeaders: {},
       isBase64Encoded: false,
-      body: '{"foo":"ABC","bar":246,"baz":false,"pt":"test-token-value","q":"wtf","h":"APPLICATION/JSON; CHARSET=UTF-8"}',
+      body: '{"foo":"ABC","bar":246,"baz":false,"pt":"test-token-value","q":"wtf","h":"APPLICATION/JSON; CHARSET=UTF-8","u":"test-sub"}',
     });
 
-    expect(__cache).toHaveProperty('default-cache_dc38238ad790b39a6d3fa5325c24f112');
+    expect(__cache).toHaveProperty('default-cache_d3dc0612e0b4841fccb17c34342c1b38');
   });
 });

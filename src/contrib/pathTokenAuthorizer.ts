@@ -2,8 +2,8 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
-import type { Handler } from '../../index';
-import { HttpApiError } from '../../lib/HttpApiError';
+import type { Handler } from '../index';
+import { HttpApiError } from '../lib/HttpApiError';
 
 const TAG = 'pathTokenAuthorizer';
 
