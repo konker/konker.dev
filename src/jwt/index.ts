@@ -57,7 +57,6 @@ export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.
     }),
     P.Effect.flatMap(checkJwtPayloadIssSub),
     P.Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
-    P.Effect.tapError(P.Effect.logError),
     P.Effect.orElse(() => P.Effect.succeed(JwtUserContext(false)))
   );
 }
