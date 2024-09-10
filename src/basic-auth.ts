@@ -3,6 +3,8 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import type { NonEmptyArray } from 'effect/Array';
 
 // --------------------------------------------------------------------------
+export const BASIC_AUTH_WILDCARD_USERNAME = '*';
+
 export type BasicAuthCredentials = {
   readonly username: string;
   readonly password: string;
@@ -32,7 +34,8 @@ export function BasicAuthUserContext(validated: boolean, userId?: string): Basic
 
 // --------------------------------------------------------------------------
 export const basicAuthCredentialMatch = (basicAuth: BasicAuthCredentials) => (valid: ValidBasicAuthCredentials) =>
-  valid.username === basicAuth.username && valid.passwords.includes(basicAuth.password);
+  (valid.username === BASIC_AUTH_WILDCARD_USERNAME || valid.username === basicAuth.username) &&
+  valid.passwords.includes(basicAuth.password);
 
 // --------------------------------------------------------------------------
 export function basicAuthDecodeHeaderValue(
