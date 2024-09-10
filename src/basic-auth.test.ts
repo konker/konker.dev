@@ -34,6 +34,12 @@ describe('basic-auth', () => {
       ).toStrictEqual(true);
       expect(
         unit.basicAuthCredentialMatch({ username: 'user0', password: 'secret-0' })({
+          username: '*',
+          passwords: ['secret-0', 'secret-1'],
+        })
+      ).toStrictEqual(true);
+      expect(
+        unit.basicAuthCredentialMatch({ username: 'user0', password: 'secret-0' })({
           username: 'user1',
           passwords: ['secret-0', 'secret-1'],
         })
