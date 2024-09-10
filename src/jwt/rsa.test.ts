@@ -1,6 +1,12 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import { TEST_JWT_ISS, TEST_JWT_NOW_MS, TEST_JWT_PAYLOAD, TEST_SIGNED_PAYLOAD } from '../test/fixtures/jwt';
+import {
+  TEST_JWT_ISS,
+  TEST_JWT_NOW_MS,
+  TEST_JWT_PAYLOAD,
+  TEST_JWT_SUB,
+  TEST_SIGNED_PAYLOAD,
+} from '../test/fixtures/jwt';
 import {
   TEST_RSA_KEY_PRIVATE,
   TEST_RSA_KEY_PUBLIC,
@@ -44,7 +50,7 @@ describe('jwt/rsa', () => {
   describe('jwtVerifyTokenRsa', () => {
     it('should verify a valid token', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual(TEST_SIGNED_PAYLOAD);
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: true, userId: TEST_JWT_SUB, ...TEST_SIGNED_PAYLOAD });
     });
 
     it('should return an error if the token is invalid, wrong key', () => {
@@ -52,32 +58,32 @@ describe('jwt/rsa', () => {
         TEST_TOKEN_RSA,
         Object.assign({}, TEST_VERIFICATION_CONFIG, { rsaPublicKey: TEST_RSA_KEY_PUBLIC_OTHER })
       );
-      expect(() => P.Effect.runSync(actual)).toThrow('invalid signature');
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, expired', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_EXPIRED, TEST_VERIFICATION_CONFIG);
-      expect(() => P.Effect.runSync(actual)).toThrow('jwt expired');
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, wrong issuer', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_OTHER_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(() => P.Effect.runSync(actual)).toThrow('jwt issuer invalid');
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, missing issuer', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_MISSING_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(() => P.Effect.runSync(actual)).toThrow('jwt issuer invalid');
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, missing subject', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_MISSING_SUBJECT, TEST_VERIFICATION_CONFIG);
-      expect(() => P.Effect.runSync(actual)).toThrow('missing iss or sub');
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, string payload', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_STRING_PAYLOAD, TEST_VERIFICATION_CONFIG);
-      expect(() => P.Effect.runSync(actual)).toThrow('jwt issuer invalid');
+      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
   });
 });
