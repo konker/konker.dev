@@ -18,18 +18,20 @@ export type ValidBasicAuthCredentialSet = Array<ValidBasicAuthCredentials>;
 
 // --------------------------------------------------------------------------
 export type BasicAuthUserContext =
-  | { readonly validated: false }
+  | { readonly verified: false }
   | {
-      readonly validated: true;
+      readonly verified: true;
       readonly userId?: string;
     };
 
-export function BasicAuthUserContext(validated: boolean, userId?: string): BasicAuthUserContext {
-  return validated
+export function BasicAuthUserContext(verified: false): BasicAuthUserContext;
+export function BasicAuthUserContext(verified: true, userId: string): BasicAuthUserContext;
+export function BasicAuthUserContext(verified: boolean, userId?: string): BasicAuthUserContext {
+  return verified
     ? userId !== undefined && userId !== ''
-      ? { validated: true, userId }
-      : { validated: true }
-    : { validated: false };
+      ? { verified: true, userId }
+      : { verified: true }
+    : { verified: false };
 }
 
 // --------------------------------------------------------------------------
@@ -59,7 +61,7 @@ export function basicAuthDecodeHeaderValue(
 }
 
 // --------------------------------------------------------------------------
-export const basicAuthValidateCredentials =
+export const basicAuthVerifyCredentials =
   (valid: ValidBasicAuthCredentialSet) =>
   (basicAuth: BasicAuthCredentials): P.Effect.Effect<BasicAuthUserContext> => {
     return P.Effect.if(valid.some(basicAuthCredentialMatch(basicAuth)), {

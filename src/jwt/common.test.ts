@@ -2,7 +2,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 
 import * as jwt from 'jsonwebtoken';
 
-import { TEST_JWT_NOW_MS, TEST_SIGNED_PAYLOAD } from '../test/fixtures/jwt';
+import { TEST_JWT_ISS, TEST_JWT_NOW_MS, TEST_JWT_SUB, TEST_SIGNED_PAYLOAD } from '../test/fixtures/jwt';
 import {
   TEST_TOKEN,
   TEST_TOKEN_MISSING_ISSUER,
@@ -17,6 +17,24 @@ describe('jwt/common', () => {
   });
   afterAll(() => {
     jest.restoreAllMocks();
+  });
+
+  describe('JwtUserContext', () => {
+    it('should work as expected in the true case', () => {
+      expect(unit.JwtUserContext(true, { iss: TEST_JWT_ISS, sub: TEST_JWT_SUB, aud: 'some-aud' })).toStrictEqual({
+        verified: true,
+        userId: TEST_JWT_SUB,
+        iss: TEST_JWT_ISS,
+        sub: TEST_JWT_SUB,
+        aud: 'some-aud',
+      });
+    });
+
+    it('should work as expected in the false case', () => {
+      expect(unit.JwtUserContext(false)).toStrictEqual({
+        verified: false,
+      });
+    });
   });
 
   describe('checkJwtPayloadIssSub', () => {
