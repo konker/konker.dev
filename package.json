@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/middleware-fp",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "Type safe middleware system based on Effect-ts",
   "license": "ISC",
