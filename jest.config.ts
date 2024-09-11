@@ -21,7 +21,7 @@ export default {
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   coveragePathIgnorePatterns: [
     // FIXME
-    // 'ChildProcessStreamPipe.ts',
+    'ChildProcessStreamPipe.ts',
     // Non logic directories
     'node_modules',
     '.package',
