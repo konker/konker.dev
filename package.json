@@ -15,8 +15,8 @@
   },
   "keywords": [
     "node",
-    "cache",
-    "momento",
+    "aws",
+    "sns",
     "typescript",
     "functional-programming",
     "effect-ts"
