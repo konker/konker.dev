@@ -1,0 +1,61 @@
+name: CD konker.dev
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'assets/**'
+
+env:
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID_ROOT }}
+  AWS_DEFAULT_REGION: 'eu-west-1'
+  SOURCE_DIR: './www'
+  DEST_DIR: '/www'
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: CD
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.DOMAIN_USER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DOMAIN_USER_AWS_ACCESS_KEY_SECRET }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '9'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Build
+        run: pnpm run build
+
+      - name: Sync files to S3
+        run: |
+          aws s3 sync ${{ env.SOURCE_DIR }} s3://${{ env.AWS_S3_BUCKET }}${{ env.DEST_DIR }} --delete --exclude '.*git*'
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
