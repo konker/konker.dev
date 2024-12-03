@@ -1,0 +1,11 @@
+{
+  "name": "@konker.dev/common-config",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "Konrad Markus <mail@konker.dev>",
+  "license": "ISC",
+  "description": "Common config files for the konker.dev monorepo",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
