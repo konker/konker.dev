@@ -2,25 +2,7 @@
   "name": "@konker.dev/root-website",
   "type": "module",
   "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "clean": "rm -rf www && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
-    "typecheck": "tsc --noEmit",
-    "type-coverage-check": "type-coverage --detail --at-least 100",
-    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning --ts-config ./tsconfig.json src",
-    "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
-    "fixme-check": "leasot --exit-nicely --skip-unsupported --ignore node_modules src",
-    "eslint-fix": "npx eslint --fix||true",
-    "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
-    "prettier-fix": "pnpm run prettier-check --write",
-    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
-    "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
-    "pre-push": "pnpm run lint-check && pnpm run typecheck && pnpm run build"
-  },
+  "author": "Konrad Markus <mail@konker.dev>",
   "devDependencies": {
     "@types/gulp": "^4.0.17",
     "@types/node": "^20.17.9",
@@ -75,5 +57,24 @@
     "unslug": "^0.1.0",
     "vinyl": "^3.0.0",
     "vitest": "^1.6.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "clean": "rm -rf www && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "type-coverage-check": "type-coverage --detail --at-least 100",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning --ts-config ./tsconfig.json src",
+    "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
+    "fixme-check": "leasot --exit-nicely --skip-unsupported --ignore node_modules src",
+    "eslint-fix": "npx eslint --fix||true",
+    "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
+    "prettier-fix": "pnpm run prettier-check --write",
+    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
+    "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
+    "pre-push": "pnpm run lint-check && pnpm run typecheck && pnpm run build"
   }
 }
