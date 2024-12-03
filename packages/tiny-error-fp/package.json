@@ -21,7 +21,7 @@
     "effect-ts"
   ],
   "dependencies": {
-    "@konker.dev/effect-ts-prelude": "^0.0.17"
+    "@konker.dev/effect-ts-prelude": "workspace:*"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
