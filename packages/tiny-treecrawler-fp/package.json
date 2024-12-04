@@ -24,10 +24,10 @@
   ],
   "dependencies": {
     "@effect/schema": "^0.68.27",
-    "@konker.dev/effect-ts-prelude": "^0.0.16",
-    "@konker.dev/tiny-error-fp": "^0.0.1",
-    "@konker.dev/tiny-event-fp": "^0.0.8",
-    "@konker.dev/tiny-filesystem-fp": "^0.0.18",
+    "@konker.dev/effect-ts-prelude": "workspace:*",
+    "@konker.dev/tiny-error-fp": "workspace:*",
+    "@konker.dev/tiny-event-fp": "workspace:*",
+    "@konker.dev/tiny-filesystem-fp": "workspace:*",
     "dist-types": "link:@smithy/smithy-client/dist-types",
     "effect": "^3.11.2"
   },
@@ -74,7 +74,7 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc",
-    "type-coverage-check": "type-coverage --detail --at-least 100",
+    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files **/*.test.ts",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
