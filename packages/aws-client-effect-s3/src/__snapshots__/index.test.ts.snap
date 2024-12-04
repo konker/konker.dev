@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`aws-client-effect-s3 DeleteObjectCommand should fail as expected: {"_tag":"@konker.dev/aws-client-effect-s3/S3Error","message":"NotFound"} 1`] = `"{"_tag":"@konker.dev/aws-client-effect-s3/S3Error","_Params":{"Bucket":"test-bucket","Key":"test-key-not-found"},"message":"NotFound","cause":{"$metadata":{"httpStatusCode":404},"code":"NotFound"}}"`;
+
+exports[`aws-client-effect-s3 GetObjectCommand should fail as expected: {"_tag":"@konker.dev/aws-client-effect-s3/S3Error","message":"NotFound"} 1`] = `"{"_tag":"@konker.dev/aws-client-effect-s3/S3Error","_Params":{"Bucket":"test-bucket","Key":"test-key-not-found"},"message":"NotFound","cause":{"$metadata":{"httpStatusCode":404},"code":"NotFound"}}"`;
+
+exports[`aws-client-effect-s3 HeadObjectCommand should fail as expected: {"_tag":"@konker.dev/aws-client-effect-s3/S3Error","message":"NotFound"} 1`] = `"{"_tag":"@konker.dev/aws-client-effect-s3/S3Error","_Params":{"Bucket":"test-bucket","Key":"test-key-not-found"},"message":"NotFound","cause":{"$metadata":{"httpStatusCode":404},"code":"NotFound"}}"`;
+
+exports[`aws-client-effect-s3 ListObjectsV2Command should fail as expected: {"_tag":"@konker.dev/aws-client-effect-s3/S3Error","message":"NotFound"} 1`] = `"{"_tag":"@konker.dev/aws-client-effect-s3/S3Error","_Params":{"Bucket":"test-bucket-not-found"},"message":"NotFound","cause":{"$metadata":{"httpStatusCode":404},"code":"NotFound"}}"`;
+
+exports[`aws-client-effect-s3 PutObjectCommand should fail as expected: {"_tag":"@konker.dev/aws-client-effect-s3/S3Error","message":"NotFound"} 1`] = `"{"_tag":"@konker.dev/aws-client-effect-s3/S3Error","_Params":{"Bucket":"test-bucket-not-found","Key":"test-key"},"message":"NotFound","cause":{"$metadata":{"httpStatusCode":404},"code":"NotFound"}}"`;
