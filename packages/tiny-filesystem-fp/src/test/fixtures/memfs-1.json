@@ -1,0 +1,8 @@
+{
+  "./foo/a.txt": "A",
+  "./foo/b.txt": "B",
+  "./foo/c.csv": "bam,baz\ntrue,false\n",
+  "./foo/d.json": "{\"bam\": true, \"baz\":  false }",
+  "./foo/bar/e.txt": "E",
+  "./foo/bar/f.log": "F"
+}
