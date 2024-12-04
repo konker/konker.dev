@@ -28,8 +28,8 @@
     "@aws-sdk/s3-request-presigner": "^3.705.0",
     "@effect/schema": "^0.68.27",
     "@gomomento/sdk": "^1.102.0",
-    "@konker.dev/effect-ts-prelude": "^0.0.16",
-    "@konker.dev/tiny-error-fp": "^0.0.1",
+    "@konker.dev/effect-ts-prelude": "workspace:*",
+    "@konker.dev/tiny-error-fp": "workspace:*",
     "effect": "^3.11.2"
   },
   "devDependencies": {
@@ -68,7 +68,7 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc",
-    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files dist/lib/test.d.ts --ignore-files **/*.test.ts --ignore-files src/lib/test.ts --ignore-files src/lib/test.test.ts",
+    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files **/*.test.ts --ignore-files **/lib/test.ts --ignore-files **/lib/error.test.ts --ignore-files **/lib/test.test.ts",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
