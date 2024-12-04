@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@effect/schema": "^0.72.4",
-    "@konker.dev/effect-ts-prelude": "^0.0.17",
-    "@konker.dev/tiny-error-fp": "^0.0.8",
+    "@konker.dev/effect-ts-prelude": "workspace:*",
+    "@konker.dev/tiny-error-fp": "workspace:*",
     "effect": "^3.11.2"
   },
   "devDependencies": {
