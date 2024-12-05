@@ -24,8 +24,8 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.699.0",
     "@effect/schema": "^0.68.27",
-    "@konker.dev/effect-ts-prelude": "^0.0.16",
-    "@konker.dev/tiny-error-fp": "^0.0.2",
+    "@konker.dev/effect-ts-prelude": "workspace:*",
+    "@konker.dev/tiny-error-fp": "workspace:*",
     "effect": "^3.11.3"
   },
   "devDependencies": {
