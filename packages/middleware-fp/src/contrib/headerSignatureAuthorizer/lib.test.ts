@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import * as utils from '@konker.dev/tiny-utils-fp';
+import * as hashUtils from '@konker.dev/tiny-utils-fp/dist/hash';
 
 import * as unit from './lib';
 
@@ -11,7 +11,7 @@ export const TEST_SECRET = 'test-secret';
 
 describe('middleware/header-signature-authorizer/lib', () => {
   beforeEach(() => {
-    jest.spyOn(utils, 'sha256HmacHex').mockReturnValue(P.Effect.succeed(CORRECT_TEST_HMAC_VALUE));
+    jest.spyOn(hashUtils, 'sha256HmacHex').mockReturnValue(P.Effect.succeed(CORRECT_TEST_HMAC_VALUE));
     jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
   });
   afterEach(() => {

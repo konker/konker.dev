@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import * as utils from '@konker.dev/tiny-utils-fp';
+import * as hashUtils from '@konker.dev/tiny-utils-fp/dist/hash';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 import { http200CoreIn } from '../../test/test-common';
@@ -44,7 +44,7 @@ describe('middleware/header-signature-authorizer', () => {
   let errorSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    jest.spyOn(utils, 'sha256HmacHex').mockReturnValue(P.Effect.succeed(CORRECT_TEST_HMAC_VALUE));
+    jest.spyOn(hashUtils, 'sha256HmacHex').mockReturnValue(P.Effect.succeed(CORRECT_TEST_HMAC_VALUE));
     jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
     errorSpy = jest.spyOn(P.Effect, 'logError').mockReturnValue(P.Effect.succeed(undefined));
   });

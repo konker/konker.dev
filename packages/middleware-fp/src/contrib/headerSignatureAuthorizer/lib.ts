@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import { sha256HmacHex } from '@konker.dev/tiny-utils-fp';
+import { sha256HmacHex } from '@konker.dev/tiny-utils-fp/dist/hash';
 
 import type { HttpApiError } from '../../lib/HttpApiError';
 import { toHttpApiError } from '../../lib/HttpApiError';

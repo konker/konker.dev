@@ -22,17 +22,17 @@
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
     "@gomomento/sdk": "^1.95.0",
-    "@konker.dev/aws-client-effect-dynamodb": "^0.0.8",
-    "@konker.dev/momento-cache-client-effect": "^0.0.7",
-    "@konker.dev/tiny-auth-utils-fp": "^0.0.18",
     "aws-lambda": "^1.0.7"
   },
   "dependencies": {
     "@effect/schema": "^0.72.4",
-    "@konker.dev/effect-ts-prelude": "^0.0.17",
-    "@konker.dev/tiny-cache-fp": "^0.0.5",
-    "@konker.dev/tiny-error-fp": "^0.0.8",
-    "@konker.dev/tiny-utils-fp": "^0.0.1",
+    "@konker.dev/aws-client-effect-dynamodb": "workspace:*",
+    "@konker.dev/effect-ts-prelude": "workspace:*",
+    "@konker.dev/momento-cache-client-effect": "workspace:*",
+    "@konker.dev/tiny-auth-utils-fp": "workspace:*",
+    "@konker.dev/tiny-cache-fp": "workspace:*",
+    "@konker.dev/tiny-error-fp": "workspace:*",
+    "@konker.dev/tiny-utils-fp": "workspace:*",
     "effect": "^3.11.3",
     "lesslog": "^0.2.7"
   },
@@ -64,7 +64,6 @@
     "type-coverage": "^2.29.7",
     "typescript": "^5.7.2"
   },
-  "staticFiles": [],
   "scripts": {
     "test": "jest --no-cache -w 4",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",

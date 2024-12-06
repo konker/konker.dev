@@ -4,7 +4,6 @@
   "author": "Konrad Markus <mail@konker.dev>",
   "description": "General utility functions for Node.js TypeScript projects based on Effect-ts",
   "license": "ISC",
-  "main": "dist/index.js",
   "files": [
     "dist/**/*",
     "!dist/**/*.test.*"
@@ -53,7 +52,6 @@
     "type-coverage": "^2.29.7",
     "typescript": "^5.7.2"
   },
-  "staticFiles": [],
   "scripts": {
     "test": "jest --no-cache -w 4",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
