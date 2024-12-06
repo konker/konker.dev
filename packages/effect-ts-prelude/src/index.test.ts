@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import * as P from './index';
 
 describe('effect-prelude', () => {
@@ -110,11 +112,13 @@ describe('effect-prelude', () => {
   });
 
   describe('example usage', () => {
-    function strToNum(s: string): P.Effect.Effect<number, Error> {
-      return P.pipe(s, P.Schema.decode(P.Schema.NumberFromString), P.Effect.mapError(P.toError));
-    }
+    it('should function as expected', () => {
+      function strToNum(s: string): P.Effect.Effect<number, Error> {
+        return P.pipe(s, P.Schema.decode(P.Schema.NumberFromString), P.Effect.mapError(P.toError));
+      }
 
-    P.Console.assert(P.Effect.runSync(strToNum('1')) === 1);
+      P.Console.assert(P.Effect.runSync(strToNum('1')) === 1);
+    });
   });
 
   describe('type test', () => {
