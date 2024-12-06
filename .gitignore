@@ -1,12 +1,16 @@
+# dependencies
+node_modules/
+
 # build output
 dist/
 www/
 
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
 # generated types
 .astro/
-
-# dependencies
-node_modules/
 
 # logs
 npm-debug.log*
@@ -14,6 +18,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# TypeScript cache
+*.tsbuildinfo
 
 # environment variables
 .env
@@ -24,7 +30,5 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .vscode
-
-
 
 .turbo

@@ -1,11 +1,17 @@
 {
   "name": "konker.dev",
   "version": "0.0.1",
-  "description": "Monorepo for @konker.dev projects",
-  "keywords": [],
-  "packageManager": "pnpm@9.6.0",
+  "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
+  "description": "Monorepo for @konker.dev projects",
+  "keywords": [],
+  "homepage": "https://konker.dev/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konker/konker.dev"
+  },
+  "packageManager": "pnpm@9.6.0",
   "devDependencies": {
     "turbo": "^2.3.3"
   },

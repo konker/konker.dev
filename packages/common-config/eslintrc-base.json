@@ -1,7 +1,8 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": ["./tsconfig.json"]
+    "project": ["./tsconfig.json"],
+    "sourceType": "module"
   },
   "plugins": [
     "@typescript-eslint",
@@ -21,7 +22,7 @@
     "plugin:fp/recommended",
     "plugin:deprecation/recommended"
   ],
-  "ignorePatterns": ["*.json", "jest.config.ts"],
+  "ignorePatterns": ["*.json", "jest.config.ts", "vitest.config.ts"],
   "rules": {
     "@typescript-eslint/array-type": ["warn", { "default": "generic" }],
     "@typescript-eslint/naming-convention": [
