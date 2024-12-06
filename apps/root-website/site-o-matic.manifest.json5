@@ -37,6 +37,12 @@
       recordName: '',
       values: ['v=spf1 include:spf.messagingengine.com ?all'],
     },
+    {
+      // Bluesky
+      type: 'TXT',
+      recordName: '_atproto',
+      values: ['did=did:plc:kh47hvtosviannhyeca6iqhv'],
+    },
   ],
 
   // Cloudfront configuration defaults
