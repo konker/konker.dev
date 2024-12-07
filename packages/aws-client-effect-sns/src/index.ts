@@ -1,14 +1,13 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { SNSClient } from '@aws-sdk/client-sns';
 import * as snsClient from '@aws-sdk/client-sns';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
+import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
 
-import type { SnsError } from './lib/error';
-import { toSnsError } from './lib/error';
+import type { SnsError } from './lib/error.js';
+import { toSnsError } from './lib/error.js';
 
-export { TAG as SNS_ERROR_TAG } from './lib/error';
+export { TAG as SNS_ERROR_TAG } from './lib/error.js';
 
 //------------------------------------------------------
 export type SNSClientFactory = (config: snsClient.SNSClientConfig) => snsClient.SNSClient;

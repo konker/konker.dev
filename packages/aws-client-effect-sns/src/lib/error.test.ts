@@ -1,6 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { PublishCommandInput } from '@aws-sdk/client-sns';
+import * as P from '@konker.dev/effect-ts-prelude';
+import { describe, expect, it } from 'vitest';
 
 import * as unit from './error';
 

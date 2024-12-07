@@ -1,3 +1,3 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`aws-client-effect-sns PublishCommand should fail as expected: {"_tag":"SnsError"} 1`] = `"{"_tag":"SnsError","_Params":{"TopicArn":"test-topic-arn","Message":"test-message"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-sns > PublishCommand > should fail as expected > {"_tag":"SnsError"} 1`] = `[(FiberFailure) Error: {"_tag":"SnsError","_Params":{"TopicArn":"test-topic-arn","Message":"test-message"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;

@@ -1,9 +1,9 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { PublishCommandInput } from '@aws-sdk/client-sns';
 import * as snsClient from '@aws-sdk/client-sns';
 import { SNSClient } from '@aws-sdk/client-sns';
+import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 import { SNSClientDeps } from './index';
