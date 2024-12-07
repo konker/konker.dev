@@ -1,14 +1,13 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { SSMClient } from '@aws-sdk/client-ssm';
 import * as ssmClient from '@aws-sdk/client-ssm';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
+import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
 
-import type { SsmError } from './lib/error';
-import { toSsmError } from './lib/error';
+import type { SsmError } from './lib/error.js';
+import { toSsmError } from './lib/error.js';
 
-export { TAG as SSM_ERROR_TAG } from './lib/error';
+export { TAG as SSM_ERROR_TAG } from './lib/error.js';
 
 export type SSMClientFactory = (config: ssmClient.SSMClientConfig) => ssmClient.SSMClient;
 export const defaultSSMClientFactory: SSMClientFactory = (config: ssmClient.SSMClientConfig) =>

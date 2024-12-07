@@ -1,13 +1,13 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`aws-client-effect-ssm DeleteParameterCommand should fail as expected: {"_tag":"SsmError"} 1`] = `"{"_tag":"SsmError","_Params":{"Name":"test-param-name"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-ssm > DeleteParameterCommand > should fail as expected > {"_tag":"SsmError"} 1`] = `[(FiberFailure) Error: {"_tag":"SsmError","_Params":{"Name":"test-param-name"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-ssm DeleteParametersCommand should fail as expected: {"_tag":"SsmError"} 1`] = `"{"_tag":"SsmError","_Params":{"Names":["test-param-name-1","test-param-name-2"]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-ssm > DeleteParametersCommand > should fail as expected > {"_tag":"SsmError"} 1`] = `[(FiberFailure) Error: {"_tag":"SsmError","_Params":{"Names":["test-param-name-1","test-param-name-2"]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-ssm GetParameterCommand should fail as expected: {"_tag":"SsmError"} 1`] = `"{"_tag":"SsmError","_Params":{"Name":"test-param-name"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-ssm > GetParameterCommand > should fail as expected > {"_tag":"SsmError"} 1`] = `[(FiberFailure) Error: {"_tag":"SsmError","_Params":{"Name":"test-param-name"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-ssm GetParametersByPathCommand should fail as expected: {"_tag":"SsmError"} 1`] = `"{"_tag":"SsmError","_Params":{"Path":"/foo/bar"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-ssm > GetParametersByPathCommand > should fail as expected > {"_tag":"SsmError"} 1`] = `[(FiberFailure) Error: {"_tag":"SsmError","_Params":{"Path":"/foo/bar"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-ssm GetParametersCommand should fail as expected: {"_tag":"SsmError"} 1`] = `"{"_tag":"SsmError","_Params":{"Names":["test-param-name-1","test-param-name-2"]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-ssm > GetParametersCommand > should fail as expected > {"_tag":"SsmError"} 1`] = `[(FiberFailure) Error: {"_tag":"SsmError","_Params":{"Names":["test-param-name-1","test-param-name-2"]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-ssm PutParameterCommand should fail as expected: {"_tag":"SsmError"} 1`] = `"{"_tag":"SsmError","_Params":{"Name":"test-param-name-2","Type":"String","Value":"test-value-2"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-ssm > PutParameterCommand > should fail as expected > {"_tag":"SsmError"} 1`] = `[(FiberFailure) Error: {"_tag":"SsmError","_Params":{"Name":"test-param-name-2","Type":"String","Value":"test-value-2"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;

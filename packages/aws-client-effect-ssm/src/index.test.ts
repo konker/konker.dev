@@ -1,5 +1,3 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type {
   DeleteParameterCommandInput,
   DeleteParametersCommandInput,
@@ -10,7 +8,9 @@ import type {
 } from '@aws-sdk/client-ssm';
 import * as ssmClient from '@aws-sdk/client-ssm';
 import { SSMClient } from '@aws-sdk/client-ssm';
+import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 import { SSMClientDeps } from './index';
