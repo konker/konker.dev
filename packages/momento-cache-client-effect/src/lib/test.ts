@@ -3,8 +3,8 @@ import * as momento from '@gomomento/sdk';
 import * as P from '@konker.dev/effect-ts-prelude';
 import { TextEncoder } from 'util';
 
-import type { MomentoClientConfigProps, MomentoClientFactory } from '../index';
-import { DEFAULT_MOMENTO_CLIENT_CONFIG_PROPS, MomentoClientDeps, MomentoClientFactoryDeps } from '../index';
+import type { MomentoClientConfigProps, MomentoClientFactory } from '../index.js';
+import { DEFAULT_MOMENTO_CLIENT_CONFIG_PROPS, MomentoClientDeps, MomentoClientFactoryDeps } from '../index.js';
 
 // Taken from: https://github.com/momentohq/client-sdk-javascript/blob/main/packages/client-sdk-nodejs/test/unit/cache-client.test.ts
 export const TEST_MOMENTO_AUTH_TOKEN =

@@ -89,7 +89,9 @@
       },
       "rules": {
         "fp/no-unused-expression": "off",
-        "fp/no-nil": 0
+        "fp/no-nil": "off",
+        "fp/no-let": "off",
+        "fp/no-mutation": "off"
       }
     },
     {

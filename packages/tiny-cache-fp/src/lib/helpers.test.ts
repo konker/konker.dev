@@ -1,4 +1,5 @@
 import * as P from '@konker.dev/effect-ts-prelude';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Cache } from '../Cache';
 import { InMemoryCache } from '../memory/InMemoryCache';

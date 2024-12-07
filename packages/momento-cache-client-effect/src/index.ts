@@ -1,9 +1,10 @@
 import * as momento from '@gomomento/sdk';
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import type { MomentoClientError } from './lib/error';
-import { toMomentoClientError } from './lib/error';
+import type { MomentoClientError } from './lib/error.js';
+import { toMomentoClientError } from './lib/error.js';
 
+//------------------------------------------------------
 export type MomentoClientConfigProps = {
   readonly authTokenEnvKey?: string;
   readonly loggerFactory?: momento.MomentoLoggerFactory;
