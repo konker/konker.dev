@@ -4,9 +4,9 @@ import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
 import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
 
-import type { S3Error } from './lib/error';
-import { toS3Error } from './lib/error';
-export { TAG as S3_ERROR_TAG } from './lib/error';
+import type { S3Error } from './lib/error.js';
+import { toS3Error } from './lib/error.js';
+export { TAG as S3_ERROR_TAG } from './lib/error.js';
 
 //------------------------------------------------------
 export type S3ClientFactory = (config: s3Client.S3ClientConfig) => s3Client.S3Client;

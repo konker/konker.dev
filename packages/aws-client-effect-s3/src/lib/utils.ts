@@ -16,7 +16,7 @@ export function waitForPromiseDependentWritableStreamPipe(
     try: () =>
       new Promise((resolve, reject) => {
         let size = 0;
-        readStream.on('data', (data) => {
+        readStream.on('data', (data: string) => {
           // eslint-disable-next-line fp/no-mutation
           size = size + data.length;
         });

@@ -1,5 +1,6 @@
 import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import * as P from '@konker.dev/effect-ts-prelude';
+import { describe, expect, it } from 'vitest';
 
 import * as unit from './error';
 import { TAG } from './error';

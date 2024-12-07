@@ -9,6 +9,7 @@ import * as s3Client from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 import { S3ClientDeps } from './index';

@@ -1,26 +1,22 @@
-/* eslint-disable fp/no-mutation,fp/no-let */
-import { describe } from 'node:test';
-
 import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import * as s3Client from '@aws-sdk/client-s3';
-import * as awsStorge from '@aws-sdk/lib-storage';
+import * as awsStorage from '@aws-sdk/lib-storage';
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
 import * as P from '@konker.dev/effect-ts-prelude';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as unit from './extra';
 import { S3ClientDeps } from './index';
 import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableStream';
 
 // https://stackoverflow.com/a/72885576/203284
-jest.mock('@aws-sdk/s3-request-presigner', () => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+vi.mock('@aws-sdk/s3-request-presigner', async () => ({
   __esModule: true,
-  ...jest.requireActual('@aws-sdk/s3-request-presigner'),
+  ...(await vi.importActual('@aws-sdk/s3-request-presigner')),
 }));
-jest.mock('@aws-sdk/lib-storage', () => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+vi.mock('@aws-sdk/lib-storage', async () => ({
   __esModule: true,
-  ...jest.requireActual('@aws-sdk/lib-storage'),
+  ...(await vi.importActual('@aws-sdk/lib-storage')),
 }));
 
 describe('aws-client-effect-s3/extra', () => {
@@ -34,12 +30,12 @@ describe('aws-client-effect-s3/extra', () => {
     });
   });
   beforeEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('GetSignedUrlEffect', () => {
     it('should work as expected', async () => {
-      jest.spyOn(s3RequestPresigner, 'getSignedUrl').mockResolvedValue('https://signedurl.example.com/');
+      vi.spyOn(s3RequestPresigner, 'getSignedUrl').mockResolvedValue('https://signedurl.example.com/');
 
       const params: GetObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const command = P.pipe(unit.GetSignedUrlEffect(params), P.Effect.provideService(S3ClientDeps, deps));
@@ -52,8 +48,8 @@ describe('aws-client-effect-s3/extra', () => {
 
   describe('UploadObjectEffect', () => {
     it('should work as expected with Buffer input', async () => {
-      const mockUpload = { done: jest.fn() } as any;
-      const uploadSpy = jest.spyOn(awsStorge, 'Upload').mockReturnValue(mockUpload);
+      const mockUpload = { done: vi.fn() } as any;
+      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const data = Buffer.from('test-data');
       const command = P.pipe(unit.UploadObjectEffect(params, data), P.Effect.provideService(S3ClientDeps, deps));
@@ -74,8 +70,8 @@ describe('aws-client-effect-s3/extra', () => {
     });
 
     it('should work as expected with string input', async () => {
-      const mockUpload = { done: jest.fn() } as any;
-      const uploadSpy = jest.spyOn(awsStorge, 'Upload').mockReturnValue(mockUpload);
+      const mockUpload = { done: vi.fn() } as any;
+      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const data = 'test-data';
       const command = P.pipe(unit.UploadObjectEffect(params, data), P.Effect.provideService(S3ClientDeps, deps));
@@ -98,8 +94,8 @@ describe('aws-client-effect-s3/extra', () => {
 
   describe('UploadObjectWriteStreamEffect', () => {
     it('should work as expected', async () => {
-      const mockUpload = { done: jest.fn() } as any;
-      const uploadSpy = jest.spyOn(awsStorge, 'Upload').mockReturnValue(mockUpload);
+      const mockUpload = { done: vi.fn() } as any;
+      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const command = P.pipe(unit.UploadObjectWriteStreamEffect(params), P.Effect.provideService(S3ClientDeps, deps));
       const actual = await P.Effect.runPromise(command);

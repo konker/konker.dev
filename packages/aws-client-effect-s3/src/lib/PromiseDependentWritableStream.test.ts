@@ -1,4 +1,5 @@
 import { Writable } from 'stream';
+import { describe, expect, it } from 'vitest';
 
 import { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
 
