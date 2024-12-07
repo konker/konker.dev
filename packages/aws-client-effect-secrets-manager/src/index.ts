@@ -1,14 +1,13 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import * as secretsManagerClient from '@aws-sdk/client-secrets-manager';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
+import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
 
-import type { SecretsManagerError } from './lib/error';
-import { toSecretsManagerError } from './lib/error';
+import type { SecretsManagerError } from './lib/error.js';
+import { toSecretsManagerError } from './lib/error.js';
 
-export { TAG as SECRETS_MANAGER_ERROR_TAG } from './lib/error';
+export { TAG as SECRETS_MANAGER_ERROR_TAG } from './lib/error.js';
 
 export type SecretsManagerClientFactory = (
   config: secretsManagerClient.SecretsManagerClientConfig

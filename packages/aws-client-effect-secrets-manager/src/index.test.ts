@@ -1,5 +1,3 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type {
   BatchGetSecretValueCommandInput,
   CreateSecretCommandInput,
@@ -10,7 +8,9 @@ import type {
 } from '@aws-sdk/client-secrets-manager';
 import * as secretsManagerClient from '@aws-sdk/client-secrets-manager';
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 import { SecretsManagerClientDeps } from './index';
