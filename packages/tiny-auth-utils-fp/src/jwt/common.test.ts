@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { TEST_JWT_ISS, TEST_JWT_NOW_MS, TEST_JWT_SUB, TEST_SIGNED_PAYLOAD } from '../test/fixtures/jwt';
 import {
@@ -13,10 +13,10 @@ import * as unit from './common';
 
 describe('jwt/common', () => {
   beforeAll(() => {
-    jest.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
+    vi.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
   });
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('JwtUserContext', () => {

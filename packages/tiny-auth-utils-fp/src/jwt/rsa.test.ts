@@ -1,4 +1,5 @@
 import * as P from '@konker.dev/effect-ts-prelude';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import {
   TEST_JWT_ISS,
@@ -34,10 +35,10 @@ const TEST_VERIFICATION_CONFIG: unit.JwtVerificationConfigRsa = {
 
 describe('jwt/rsa', () => {
   beforeAll(() => {
-    jest.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
+    vi.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
   });
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('jwtSignTokenRsa', () => {

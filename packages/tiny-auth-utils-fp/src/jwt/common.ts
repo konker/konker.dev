@@ -1,5 +1,4 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import type * as jwt from 'jsonwebtoken';
 
 // --------------------------------------------------------------------------

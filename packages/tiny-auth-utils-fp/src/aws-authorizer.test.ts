@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayAuthorizerResult } from 'aws-lambda';
+import { describe, expect, it } from 'vitest';
 
 import * as unit from './aws-authorizer';
 

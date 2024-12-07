@@ -1,9 +1,8 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as jwt from 'jsonwebtoken';
 
-import type { JwtPayloadSubIss } from './common';
-import { checkJwtPayloadIssSub, JwtUserContext } from './common';
+import type { JwtPayloadSubIss } from './common.js';
+import { checkJwtPayloadIssSub, JwtUserContext } from './common.js';
 
 // --------------------------------------------------------------------------
 export type JwtSigningConfig = {

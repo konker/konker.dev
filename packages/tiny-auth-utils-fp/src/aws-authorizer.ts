@@ -1,5 +1,4 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayAuthorizerResult } from 'aws-lambda';
 
 export function transformLambdaAuthorizerArn(arn: string): P.Effect.Effect<string, Error> {
