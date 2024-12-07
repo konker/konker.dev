@@ -1,6 +1,7 @@
-/* eslint-disable fp/no-mutating-methods,fp/no-throw */
 import * as childProcess from 'node:child_process';
 import { PassThrough, Readable } from 'node:stream';
+
+import { describe, expect, it, vi } from 'vitest';
 
 import { BufferWriteableStream } from './BufferWriteableStream';
 import * as unit from './ChildProcessStreamPipe';
@@ -23,14 +24,14 @@ describe('ChildProcessStreamPipe', () => {
 
     inStream.pipe(actual).pipe(outStream);
     await waitForWriteStreamPromise(outStream);
-    actual._flush(jest.fn);
+    actual._flush(vi.fn());
 
     expect(outStream.string).toEqual('HOI NOI BROIN COI');
   });
 
   // Test fails due to Unhandled error
   // FIXME: Needs further work
-  xit('should work as expected with a stdin error', async () => {
+  it.skip('should work as expected with a stdin error', async () => {
     const actual = new unit.ChildProcessStreamPipe('sed', ['-e', 's/\\(.*\\)/\\U\\1/']).input('-').output('-');
     const inStream = Readable.from(TEST_S);
     const outStream = new BufferWriteableStream();
@@ -56,8 +57,8 @@ describe('ChildProcessStreamPipe', () => {
 
   // Test fails with: TypeError: Cannot redefine property: spawn
   // FIXME: Needs more work
-  xit('should work as expected in error case', () => {
-    jest.spyOn(childProcess, 'spawn').mockImplementationOnce(() => {
+  it.skip('should work as expected in error case', () => {
+    vi.spyOn(childProcess, 'spawn').mockImplementationOnce(() => {
       throw new Error('BOOM!');
     });
     const inStream = Readable.from(TEST_S);
@@ -73,7 +74,7 @@ describe('ChildProcessStreamPipe', () => {
   // Causes Unhandled error, but still passes.
   // Plus is not really a proper test for errors due to tricky stream stuff
   // FIXME: Needs further work
-  xit('should work as expected in error case', () => {
+  it.skip('should work as expected in error case', () => {
     const inStream = Readable.from(TEST_S);
     const outStream = new PassThrough();
     const actual = new unit.ChildProcessStreamPipe('cat', ['/tmp/doesnotexist']);

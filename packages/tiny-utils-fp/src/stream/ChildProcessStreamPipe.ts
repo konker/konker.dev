@@ -82,8 +82,8 @@ export class ChildProcessStreamPipe extends Stream.Transform {
 
       this._childProcess.stdout.on('data', (data: unknown) => this.push(data));
 
-      this._childProcess.stdin?.on('error', (e: any) => {
-        if (e.code === 'EPIPE') {
+      this._childProcess.stdin?.on('error', (e: unknown) => {
+        if (!!e && typeof e === 'object' && 'code' in e && e.code === 'EPIPE') {
           this.emit('end');
         } else {
           onError(e);
@@ -91,7 +91,7 @@ export class ChildProcessStreamPipe extends Stream.Transform {
       });
       this._childProcess.stdout.on('error', onError);
       this._childProcess.stderr.on('error', onError);
-      this._childProcess.stderr.on('data', (data) => onError(new Error(data.toString())));
+      this._childProcess.stderr.on('data', (data: string | Buffer) => onError(new Error(data.toString())));
     } catch (e: unknown) {
       onError(e);
     }

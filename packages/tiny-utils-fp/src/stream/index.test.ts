@@ -1,6 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import { PassThrough, Readable } from 'node:stream';
+
+import * as P from '@konker.dev/effect-ts-prelude';
+import { describe, expect, it } from 'vitest';
 
 import { arrayBufferToString } from '../array';
 import { BufferWriteableStream } from './BufferWriteableStream';

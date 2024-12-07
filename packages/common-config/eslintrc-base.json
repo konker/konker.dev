@@ -92,7 +92,8 @@
         "fp/no-unused-expression": "off",
         "fp/no-nil": "off",
         "fp/no-let": "off",
-        "fp/no-mutation": "off"
+        "fp/no-mutation": "off",
+        "fp/no-throw": "off"
       }
     },
     {

@@ -1,8 +1,9 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-import { toError } from '@konker.dev/effect-ts-prelude';
-
+/* eslint-disable fp/no-unused-expression,fp/no-mutation,fp/no-nil,fp/no-mutating-methods */
 import type { Readable, Writable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
+
+import * as P from '@konker.dev/effect-ts-prelude';
+import { toError } from '@konker.dev/effect-ts-prelude';
 
 import { stringToUint8Array } from '../array';
 
@@ -14,10 +15,8 @@ export function readStreamToBuffer(readStream: Readable | ReadableStream): P.Eff
   return P.Effect.tryPromise({
     try: async () => {
       const chunks: Array<Uint8Array> = [];
-      // FIXME: disabled lint
-      // eslint-disable-next-line fp/no-loops,fp/no-nil
+      // eslint-disable-next-line fp/no-loops
       for await (const chunk of readStream) {
-        // eslint-disable-next-line fp/no-mutating-methods,fp/no-unused-expression
         chunks.push(typeof chunk === 'string' ? stringToUint8Array(chunk) : new Uint8Array(chunk));
       }
 
@@ -32,11 +31,8 @@ export function readStreamToBuffer(readStream: Readable | ReadableStream): P.Eff
  * Wait for a writable stream to finish
  */
 export function waitForWriteStreamPromise(writeStream: Writable): Promise<void> {
-  // eslint-disable-next-line fp/no-nil
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line fp/no-unused-expression
     writeStream.on('finish', resolve);
-    // eslint-disable-next-line fp/no-unused-expression
     writeStream.on('error', reject);
   });
 }
@@ -47,11 +43,8 @@ export function waitForWriteStreamPromise(writeStream: Writable): Promise<void> 
 export function waitForWriteStream(writeStream: Writable): P.Effect.Effect<void, Error> {
   return P.Effect.tryPromise({
     try: () =>
-      // eslint-disable-next-line fp/no-nil
       new Promise((resolve, reject) => {
-        // eslint-disable-next-line fp/no-unused-expression
         writeStream.on('finish', resolve);
-        // eslint-disable-next-line fp/no-unused-expression
         writeStream.on('error', reject);
       }),
     catch: toError,
@@ -64,24 +57,16 @@ export function waitForWriteStream(writeStream: Writable): P.Effect.Effect<void,
 export function waitForStreamPipe(readStream: Readable, writeStream: Writable): P.Effect.Effect<number, Error> {
   return P.Effect.tryPromise({
     try: () =>
-      // eslint-disable-next-line fp/no-nil
       new Promise((resolve, reject) => {
         // eslint-disable-next-line fp/no-let
         let size = 0;
-        // eslint-disable-next-line fp/no-unused-expression,fp/no-nil
-        readStream.on('data', (data) => {
-          // eslint-disable-next-line fp/no-mutation
+        readStream.on('data', (data: string) => {
           size = size + data.length;
         });
-        // eslint-disable-next-line fp/no-unused-expression
         readStream.on('error', reject);
-        // eslint-disable-next-line fp/no-unused-expression
         writeStream.on('finish', () => resolve(size));
-        // eslint-disable-next-line fp/no-unused-expression
         writeStream.on('error', reject);
-        // eslint-disable-next-line fp/no-unused-expression
         readStream.pipe(writeStream);
-        // eslint-disable-next-line fp/no-unused-expression
         readStream.resume();
       }),
     catch: toError,
