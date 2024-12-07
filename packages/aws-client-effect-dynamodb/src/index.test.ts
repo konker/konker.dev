@@ -1,7 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as dynamodbLib from '@aws-sdk/lib-dynamodb';
+import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 import { defaultDynamoDBDocumentClientDeps } from './lib/client';
@@ -28,7 +28,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.GetCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -56,7 +56,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.PutCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -84,7 +84,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.UpdateCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -112,7 +112,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.DeleteCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -140,7 +140,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.QueryCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -168,7 +168,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.ScanCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -196,7 +196,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.BatchGetCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -224,7 +224,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.BatchWriteCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -252,7 +252,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.TransactGetCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -280,7 +280,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.TransactWriteCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -311,7 +311,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.ExecuteStatementCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -355,7 +355,7 @@ describe('aws-client-effect-dynamodb', () => {
       });
     });
 
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.ExecuteTransactionCommand).rejects('BOOM!');
 
       const command = P.pipe(
@@ -408,7 +408,7 @@ describe('aws-client-effect-dynamodb', () => {
     });
 
     // FIXME: skipped?
-    xit('should fail as expected', async () => {
+    it.skip('should fail as expected', async () => {
       ddbMock.on(dynamodbLib.BatchExecuteStatementCommand).rejects('BOOM!');
 
       const command = P.pipe(

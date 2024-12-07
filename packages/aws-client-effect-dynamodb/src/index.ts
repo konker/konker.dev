@@ -1,12 +1,11 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as dynamodbDocClient from '@aws-sdk/lib-dynamodb';
 import type { Command, HandlerOptions, HttpHandlerOptions } from '@aws-sdk/types';
+import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
 
-import { DynamoDBDocumentClientDeps } from './lib/client';
-import type { DynamoDbError } from './lib/error';
-import { toDynamoDbError } from './lib/error';
+import { DynamoDBDocumentClientDeps } from './lib/client.js';
+import type { DynamoDbError } from './lib/error.js';
+import { toDynamoDbError } from './lib/error.js';
 
 // --------------------------------------------------------------------------
 export type DynamoDBEchoParams<I> = { _Params: I };

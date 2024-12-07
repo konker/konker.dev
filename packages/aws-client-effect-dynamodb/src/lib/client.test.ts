@@ -1,7 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as dynamodb from '@aws-sdk/client-dynamodb';
 import * as dynamodbDocClient from '@aws-sdk/lib-dynamodb';
+import * as P from '@konker.dev/effect-ts-prelude';
+import { describe, expect, test } from 'vitest';
 
 import * as unit from './client';
 import { DynamoDBDocumentClientDeps, DynamoDBDocumentClientFactoryDeps } from './client';

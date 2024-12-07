@@ -1,12 +1,10 @@
-//------------------------------------------------------
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as dynamodb from '@aws-sdk/client-dynamodb';
 import * as dynamodbDocClient from '@aws-sdk/lib-dynamodb';
 import type { Client } from '@aws-sdk/types';
+import * as P from '@konker.dev/effect-ts-prelude';
 
-import type { DynamoDbError } from './error';
-import { toDynamoDbError } from './error';
+import type { DynamoDbError } from './error.js';
+import { toDynamoDbError } from './error.js';
 
 //------------------------------------------------------
 export type DynamoDBClientFactory = (config: dynamodb.DynamoDBClientConfig) => dynamodb.DynamoDBClient;

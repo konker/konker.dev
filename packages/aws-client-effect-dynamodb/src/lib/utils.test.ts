@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+import { describe, expect, it } from 'vitest';
+
 import * as unit from './utils';
 
 describe('utils', () => {
