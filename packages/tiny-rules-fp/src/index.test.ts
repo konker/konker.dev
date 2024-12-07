@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { TestContext } from 'effect';
+import { describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 
@@ -33,7 +33,7 @@ const TEST_RULESET_2 = P.pipe(
 
 describe('tiny-rules-fp', () => {
   describe('createRuleSet', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = unit.createRuleSet(TEST_FACTS);
       expect(result).toStrictEqual({
         facts: TEST_FACTS,
@@ -43,7 +43,7 @@ describe('tiny-rules-fp', () => {
   });
 
   describe('setFacts', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = unit.setFacts(TEST_RULESET_1, { isFooValid: false, isBarEven: false, isBaz: false });
       expect(result).toStrictEqual({
         facts: { isFooValid: false, isBarEven: false, isBaz: false },
@@ -53,14 +53,14 @@ describe('tiny-rules-fp', () => {
   });
 
   describe('setFact', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = unit.setFact('isFooValid', false)(TEST_FACTS);
       expect(result).toStrictEqual({ isFooValid: false, isBarEven: false, isBaz: false });
     });
   });
 
   describe('addRuleFunc', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = unit.addRuleFunc(
         'isFooValid',
         (c: TestContext, _f: TestFacts) => c.foo === 'VALID',
@@ -72,7 +72,7 @@ describe('tiny-rules-fp', () => {
   });
 
   describe('addRuleFuncEffect', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = unit.addRuleFuncEffect(
         'isFooValid',
         (c: TestContext, _f: TestFacts) => P.Effect.succeed(c.foo === 'VALID'),
@@ -84,7 +84,7 @@ describe('tiny-rules-fp', () => {
   });
 
   describe('sequence', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = P.pipe(
         TEST_RULESET_1,
         unit.sequence([
@@ -99,7 +99,7 @@ describe('tiny-rules-fp', () => {
   });
 
   describe('decide', () => {
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = P.Effect.runSync(
         unit.decide<never, TestContext, never, TestFacts>({ foo: 'VALID', bar: 16 })(TEST_RULESET_2)
       );
@@ -110,7 +110,7 @@ describe('tiny-rules-fp', () => {
       });
     });
 
-    test('should be work as expected', () => {
+    it('should be work as expected', () => {
       const result = P.Effect.runSync(
         unit.decide<never, TestContext, never, TestFacts>({ foo: 'NOT VALID', bar: 15 })(TEST_RULESET_2)
       );

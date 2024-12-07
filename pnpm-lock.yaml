@@ -1605,6 +1605,9 @@ importers:
         specifier: ^3.11.2
         version: 3.11.3
     devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.17.1
+        version: 0.17.1
       '@effect/language-service':
         specifier: ^0.1.0
         version: 0.1.0
@@ -1623,6 +1626,9 @@ importers:
       '@typescript-eslint/typescript-estree':
         specifier: ^7.18.0
         version: 7.18.0(typescript@5.7.2)
+      '@vitest/coverage-istanbul':
+        specifier: ^2.1.8
+        version: 2.1.8(vitest@2.1.8(@types/node@20.17.9))
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -1680,6 +1686,9 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.8(@types/node@20.17.9)
 
   packages/tiny-treecrawler-fp:
     dependencies:
@@ -13857,7 +13866,7 @@ snapshots:
       is-glob: 4.0.3
       stable-hash: 0.0.4
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.17.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
