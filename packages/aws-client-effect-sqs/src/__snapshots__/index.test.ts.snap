@@ -1,11 +1,11 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`aws-client-effect-sqs ChangeMessageVisibilityCommand should fail as expected: {"_tag":"SqsError"} 1`] = `"{"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","ReceiptHandle":"test-receipt-handle","VisibilityTimeout":123},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-sqs > ChangeMessageVisibilityCommand > should fail as expected > {"_tag":"SqsError"} 1`] = `[(FiberFailure) Error: {"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","ReceiptHandle":"test-receipt-handle","VisibilityTimeout":123},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-sqs DeleteMessageBatchCommand should fail as expected: {"_tag":"SqsError"} 1`] = `"{"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","Entries":[{"Id":"test-id-1","ReceiptHandle":"test-receipt-handle-1"}]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-sqs > DeleteMessageBatchCommand > should fail as expected > {"_tag":"SqsError"} 1`] = `[(FiberFailure) Error: {"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","Entries":[{"Id":"test-id-1","ReceiptHandle":"test-receipt-handle-1"}]},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-sqs DeleteMessageCommand should fail as expected: {"_tag":"SqsError"} 1`] = `"{"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","ReceiptHandle":"test-receipt-handle"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-sqs > DeleteMessageCommand > should fail as expected > {"_tag":"SqsError"} 1`] = `[(FiberFailure) Error: {"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","ReceiptHandle":"test-receipt-handle"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-sqs ReceiveMessageCommand should fail as expected: {"_tag":"SqsError"} 1`] = `"{"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","VisibilityTimeout":123},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-sqs > ReceiveMessageCommand > should fail as expected > {"_tag":"SqsError"} 1`] = `[(FiberFailure) Error: {"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","VisibilityTimeout":123},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;
 
-exports[`aws-client-effect-sqs SendMessageCommand should fail as expected: {"_tag":"SqsError"} 1`] = `"{"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","MessageBody":"test-message"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}"`;
+exports[`aws-client-effect-sqs > SendMessageCommand > should fail as expected > {"_tag":"SqsError"} 1`] = `[(FiberFailure) Error: {"_tag":"SqsError","_Params":{"QueueUrl":"https://test-queue-url","MessageBody":"test-message"},"message":"","cause":{"$metadata":{"httpStatusCode":404}}}]`;

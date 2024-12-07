@@ -1,14 +1,13 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { SQSClient } from '@aws-sdk/client-sqs';
 import * as sqsClient from '@aws-sdk/client-sqs';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
+import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
 
-import type { SqsError } from './lib/error';
-import { toSqsError } from './lib/error';
+import type { SqsError } from './lib/error.js';
+import { toSqsError } from './lib/error.js';
 
-export { TAG as SQS_ERROR_TAG } from './lib/error';
+export { TAG as SQS_ERROR_TAG } from './lib/error.js';
 
 export type SQSClientFactory = (config: sqsClient.SQSClientConfig) => sqsClient.SQSClient;
 export const defaultSQSClientFactory: SQSClientFactory = (config: sqsClient.SQSClientConfig) =>
