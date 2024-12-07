@@ -1,5 +1,6 @@
 import * as momento from '@gomomento/sdk';
 import * as P from '@konker.dev/effect-ts-prelude';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
 import { MomentoClientDeps } from './index';

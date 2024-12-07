@@ -2,6 +2,7 @@
 import * as momento from '@gomomento/sdk';
 import * as P from '@konker.dev/effect-ts-prelude';
 import { TextEncoder } from 'util';
+import { vi } from 'vitest';
 
 import type { MomentoClientConfigProps, MomentoClientFactory } from '../index.js';
 import { DEFAULT_MOMENTO_CLIENT_CONFIG_PROPS, MomentoClientDeps, MomentoClientFactoryDeps } from '../index.js';
@@ -19,7 +20,7 @@ export const TEXT_ENCODER = new TextEncoder();
 export const MockMomentoClient = (__cache: any = {}) =>
   ({
     __cache,
-    get: jest.fn(async (cacheName: string, key: string) => {
+    get: vi.fn(async (cacheName: string, key: string) => {
       // eslint-disable-next-line fp/no-throw
       if (key === EXCEPTION_KEY) throw new Error('GET KABOOM!');
       return key === ERROR_KEY
@@ -28,14 +29,14 @@ export const MockMomentoClient = (__cache: any = {}) =>
           ? new momento.CacheGet.Miss()
           : new momento.CacheGet.Hit(TEXT_ENCODER.encode(__cache[`${cacheName}_${key}`]));
     }),
-    set: jest.fn(async (cacheName: string, key: string, value: string, _options: any) => {
+    set: vi.fn(async (cacheName: string, key: string, value: string, _options: any) => {
       // eslint-disable-next-line fp/no-throw
       if (key === EXCEPTION_KEY) throw new Error('SET KABOOM!');
       if (key === ERROR_KEY) return new momento.CacheSet.Error(new momento.UnknownError('SET BOOM!'));
       __cache[`${cacheName}_${key}`] = value;
       return new momento.CacheSet.Success();
     }),
-    delete: jest.fn(async (cacheName: string, key: string) => {
+    delete: vi.fn(async (cacheName: string, key: string) => {
       // eslint-disable-next-line fp/no-throw
       if (key === EXCEPTION_KEY) throw new Error('DEL KABOOM!');
       if (key === ERROR_KEY) return new momento.CacheDelete.Error(new momento.UnknownError('DEL BOOM!'));
