@@ -1,5 +1,5 @@
-/* eslint-disable fp/no-let */
 import * as P from '@konker.dev/effect-ts-prelude';
+import { describe, expect, it } from 'vitest';
 
 import { FileType } from '../index';
 import type { S3UrlData } from './s3-uri-utils';

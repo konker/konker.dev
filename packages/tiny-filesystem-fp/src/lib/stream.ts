@@ -42,7 +42,7 @@ export function waitForStreamPipe(readStream: Readable, writeStream: Writable): 
         // eslint-disable-next-line fp/no-let
         let size = 0;
         // eslint-disable-next-line fp/no-unused-expression,fp/no-nil
-        readStream.on('data', (data) => {
+        readStream.on('data', (data: string) => {
           // eslint-disable-next-line fp/no-mutation
           size = size + data.length;
         });

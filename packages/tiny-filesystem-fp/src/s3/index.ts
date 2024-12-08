@@ -6,18 +6,19 @@ import type { S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
 import * as S from '@konker.dev/aws-client-effect-s3';
 import { S3ClientDeps, S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
 import { UploadObjectEffect, UploadObjectWriteStreamEffect } from '@konker.dev/aws-client-effect-s3/dist/extra';
+import type { S3Error } from '@konker.dev/aws-client-effect-s3/dist/lib/error';
 import * as P from '@konker.dev/effect-ts-prelude';
 import path from 'path';
 
-import type { Path, Ref, TinyFileSystem } from '../index';
-import { FileType } from '../index';
-import type { TinyFileSystemError } from '../lib/error';
-import { toTinyFileSystemError } from '../lib/error';
-import { readlineInterfaceFromReadStream, readStreamToBuffer } from '../lib/stream';
-import type { S3IoUrl, S3UrlData } from './s3-uri-utils';
-import * as s3Utils from './s3-uri-utils';
-import { s3UrlDataIsDirectory, s3UrlDataIsFile } from './s3-uri-utils';
-import { s3ObjectIsReadable } from './utils';
+import type { Path, Ref, TinyFileSystem } from '../index.js';
+import { FileType } from '../index.js';
+import type { TinyFileSystemError } from '../lib/error.js';
+import { toTinyFileSystemError } from '../lib/error.js';
+import { readlineInterfaceFromReadStream, readStreamToBuffer } from '../lib/stream.js';
+import type { S3IoUrl, S3UrlData } from './s3-uri-utils.js';
+import * as s3Utils from './s3-uri-utils.js';
+import { s3UrlDataIsDirectory, s3UrlDataIsFile } from './s3-uri-utils.js';
+import { s3ObjectIsReadable } from './utils.js';
 
 const getFileReadStream =
   (s3Client: S3Client) =>
@@ -80,11 +81,11 @@ const listFiles =
       return (
         list
           // Drop any bad keys
-          .filter((item) => item[key])
+          .filter((item: Record<string, string>) => item[key])
           .map(
             // Extract the last part of the path relative to the prefix
             // eslint-disable-next-line fp/no-mutating-methods
-            (item) => relative(parsed.Path, item[key]).split(path.posix.sep).shift() as string
+            (item: Record<string, string>) => relative(parsed.Path, item[key]!).split(path.posix.sep).shift() as string
           )
           .filter((item) => item !== '')
           .map(
@@ -140,9 +141,18 @@ const exists =
         })
       ),
       P.Effect.map((_) => true),
-      P.Effect.catchTag(S.S3_ERROR_TAG, (resp) =>
-        (resp as any).cause?.['$metadata']?.httpStatusCode === 404 ? P.Effect.succeed(false) : P.Effect.fail(resp)
-      ),
+      P.Effect.catchTag(S.S3_ERROR_TAG, (resp: S3Error) => {
+        const cause = resp.cause;
+        // eslint-disable-next-line fp/no-nil
+        const metadata = !!cause && typeof cause === 'object' && '$metadata' in cause ? cause['$metadata'] : undefined;
+        const httpStatusCode =
+          !!metadata && typeof metadata === 'object' && 'httpStatusCode' in metadata
+            ? metadata.httpStatusCode
+            : // eslint-disable-next-line fp/no-nil
+              undefined;
+
+        return httpStatusCode === 404 ? P.Effect.succeed(false) : P.Effect.fail(resp);
+      }),
       P.Effect.mapError(toTinyFileSystemError),
       P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );

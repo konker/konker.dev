@@ -1,4 +1,5 @@
 import { Readable } from 'stream';
+import { describe, expect, it } from 'vitest';
 
 import * as unit from './utils';
 

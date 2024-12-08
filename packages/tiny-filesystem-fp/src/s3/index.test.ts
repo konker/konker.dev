@@ -1,7 +1,13 @@
-/* eslint-disable fp/no-let,fp/no-mutation */
 import { Readable } from 'node:stream';
 
-import { S3Client } from '@aws-sdk/client-s3';
+import {
+  type DeleteObjectCommandInput,
+  type GetObjectCommandInput,
+  type HeadObjectCommandInput,
+  type ListObjectsV2CommandInput,
+  type PutObjectCommandInput,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import * as S from '@konker.dev/aws-client-effect-s3';
 import { S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
 import * as SE from '@konker.dev/aws-client-effect-s3/dist/extra';
@@ -11,6 +17,7 @@ import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
 import readline from 'readline';
 import { PassThrough, Writable } from 'stream';
+import { beforeAll, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import type { TinyFileSystem } from '../index';
 import { FileType } from '../index';
@@ -18,14 +25,14 @@ import { arrayBufferToString, stringToUint8Array } from '../lib/array';
 import * as unit from './index';
 
 describe('S3TinyFileSystem', () => {
-  let s3ListObjectsMock: jest.SpyInstance;
+  let s3ListObjectsMock: MockInstance;
   let s3TinyFileSystem: TinyFileSystem;
 
   beforeAll(async () => {
     mockClient(S3Client);
 
-    s3ListObjectsMock = jest.spyOn(S, 'ListObjectsV2CommandEffect');
-    s3ListObjectsMock.mockImplementation((params) => {
+    s3ListObjectsMock = vi.spyOn(S, 'ListObjectsV2CommandEffect');
+    s3ListObjectsMock.mockImplementation((params: ListObjectsV2CommandInput) => {
       if (params.Prefix === 'bar/baz/') {
         return P.Effect.succeed({
           $metadata: {},
@@ -71,14 +78,14 @@ describe('S3TinyFileSystem', () => {
   });
 
   describe('read streams', () => {
-    let s3GetObjectReadStreamMock: jest.SpyInstance;
+    let s3GetObjectReadStreamMock: MockInstance;
     beforeAll(async () => {
-      s3GetObjectReadStreamMock = jest.spyOn(S, 'GetObjectCommandEffect');
-      s3GetObjectReadStreamMock.mockImplementation((params) => {
-        if (params.Key.includes('exists')) {
+      s3GetObjectReadStreamMock = vi.spyOn(S, 'GetObjectCommandEffect');
+      s3GetObjectReadStreamMock.mockImplementation((params: GetObjectCommandInput) => {
+        if (params.Key?.includes('exists')) {
           return P.Effect.succeed({ Body: new PassThrough() });
         }
-        if (params.Key.includes('non-stream')) {
+        if (params.Key?.includes('non-stream')) {
           return P.Effect.succeed({ Body: 'test-file-data' });
         }
         return P.Effect.fail(new Error('GeneralError'));
@@ -146,11 +153,11 @@ describe('S3TinyFileSystem', () => {
   });
 
   describe('getFileWriteStream', () => {
-    let s3GetObjectWriteStreamMock: jest.SpyInstance;
+    let s3GetObjectWriteStreamMock: MockInstance;
     beforeAll(async () => {
-      s3GetObjectWriteStreamMock = jest.spyOn(SE, 'UploadObjectWriteStreamEffect');
-      s3GetObjectWriteStreamMock.mockImplementation((params) => {
-        if (params.Key.includes('exists')) {
+      s3GetObjectWriteStreamMock = vi.spyOn(SE, 'UploadObjectWriteStreamEffect');
+      s3GetObjectWriteStreamMock.mockImplementation((params: PutObjectCommandInput) => {
+        if (params.Key?.includes('exists')) {
           return P.Effect.succeed(new PromiseDependentWritableStream());
         }
         return P.Effect.fail(new Error('GeneralError'));
@@ -208,17 +215,17 @@ describe('S3TinyFileSystem', () => {
   });
 
   describe('exists', () => {
-    let s3HeadObjectMock: jest.SpyInstance;
+    let s3HeadObjectMock: MockInstance;
     beforeAll(async () => {
-      s3HeadObjectMock = jest.spyOn(S, 'HeadObjectCommandEffect');
-      s3HeadObjectMock.mockImplementation((params) => {
-        if (params.Key.includes('exists')) {
+      s3HeadObjectMock = vi.spyOn(S, 'HeadObjectCommandEffect');
+      s3HeadObjectMock.mockImplementation((params: HeadObjectCommandInput) => {
+        if (params.Key?.includes('exists')) {
           return P.Effect.succeed(true);
         }
-        if (params.Key.includes('does-not-exist')) {
+        if (params.Key?.includes('does-not-exist')) {
           return P.Effect.fail(toS3Error(params)({ $metadata: { httpStatusCode: 404 }, code: 'NotFound' }));
         }
-        if (params.Key.includes('no-metadata')) {
+        if (params.Key?.includes('no-metadata')) {
           return P.Effect.fail(toS3Error(params)({ code: 'Boom' }));
         }
         return P.Effect.fail(toS3Error(params)({ $metadata: { httpStatusCode: 500 }, code: 'GeneralError' }));
@@ -266,14 +273,14 @@ describe('S3TinyFileSystem', () => {
   });
 
   describe('readFile', () => {
-    let s3GetObjectMock: jest.SpyInstance;
+    let s3GetObjectMock: MockInstance;
     beforeAll(async () => {
-      s3GetObjectMock = jest.spyOn(S, 'GetObjectCommandEffect');
-      s3GetObjectMock.mockImplementation((params) => {
-        if (params.Key.includes('exists')) {
+      s3GetObjectMock = vi.spyOn(S, 'GetObjectCommandEffect');
+      s3GetObjectMock.mockImplementation((params: GetObjectCommandInput) => {
+        if (params.Key?.includes('exists')) {
           return P.Effect.succeed({ Body: Readable.from('test-file-data'), _Params: params });
         }
-        if (params.Key.includes('non-stream')) {
+        if (params.Key?.includes('non-stream')) {
           return P.Effect.succeed({ Body: 'test-file-data', _Params: params });
         }
         return P.Effect.fail(toS3Error(Error('GeneralError')));
@@ -308,19 +315,19 @@ describe('S3TinyFileSystem', () => {
   });
 
   describe('write objects', () => {
-    let s3PutObjectMock: jest.SpyInstance;
-    let s3UploadObjectMock: jest.SpyInstance;
+    let s3PutObjectMock: MockInstance;
+    let s3UploadObjectMock: MockInstance;
     beforeAll(async () => {
-      s3PutObjectMock = jest.spyOn(S, 'PutObjectCommandEffect');
-      s3PutObjectMock.mockImplementation((params) => {
-        if (params.Key.includes('error')) {
+      s3PutObjectMock = vi.spyOn(S, 'PutObjectCommandEffect');
+      s3PutObjectMock.mockImplementation((params: PutObjectCommandInput) => {
+        if (params.Key?.includes('error')) {
           return P.Effect.fail(new Error('GeneralError'));
         }
         return P.Effect.succeed(P.Effect.void);
       });
-      s3UploadObjectMock = jest.spyOn(SE, 'UploadObjectEffect');
-      s3UploadObjectMock.mockImplementation((params) => {
-        if (params.Key.includes('error')) {
+      s3UploadObjectMock = vi.spyOn(SE, 'UploadObjectEffect');
+      s3UploadObjectMock.mockImplementation((params: PutObjectCommandInput) => {
+        if (params.Key?.includes('error')) {
           return P.Effect.fail(new Error('GeneralError'));
         }
         return P.Effect.succeed(P.Effect.void);
@@ -401,11 +408,11 @@ describe('S3TinyFileSystem', () => {
   });
 
   describe('delete objects', () => {
-    let s3DeleteObjectMock: jest.SpyInstance;
+    let s3DeleteObjectMock: MockInstance;
     beforeAll(async () => {
-      s3DeleteObjectMock = jest.spyOn(S, 'DeleteObjectCommandEffect');
-      s3DeleteObjectMock.mockImplementation((params) => {
-        if (params.Key.includes('error')) {
+      s3DeleteObjectMock = vi.spyOn(S, 'DeleteObjectCommandEffect');
+      s3DeleteObjectMock.mockImplementation((params: DeleteObjectCommandInput) => {
+        if (params.Key?.includes('error')) {
           return P.Effect.fail(new Error('GeneralError'));
         }
         return P.Effect.succeed(P.Effect.void);

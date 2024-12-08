@@ -1,9 +1,9 @@
-/* eslint-disable fp/no-let,fp/no-mutation */
 import * as P from '@konker.dev/effect-ts-prelude';
 import fg from 'fast-glob';
 import fs from 'fs';
 import readline from 'readline';
 import { PassThrough, Readable, Writable } from 'stream';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import type { DirectoryPath } from '../index';
 import { FileType } from '../index';
@@ -12,9 +12,9 @@ import { NodeTinyFileSystem as unit } from './index';
 
 describe('NodeTinyFileSystem', () => {
   describe('getFileReadStream', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs, 'createReadStream').mockReturnValue(new Readable() as any);
+      stub1 = vi.spyOn(fs, 'createReadStream').mockReturnValue(new Readable() as any);
     });
     afterEach(() => {
       stub1.mockClear();
@@ -24,15 +24,15 @@ describe('NodeTinyFileSystem', () => {
       const data = await P.Effect.runPromise(unit.getFileReadStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
       expect(data).toBeInstanceOf(Readable);
     });
   });
 
   describe('getFileLineReadStream', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs, 'createReadStream').mockReturnValue(new PassThrough() as any);
+      stub1 = vi.spyOn(fs, 'createReadStream').mockReturnValue(new PassThrough() as any);
     });
     afterEach(() => {
       stub1.mockClear();
@@ -42,15 +42,15 @@ describe('NodeTinyFileSystem', () => {
       const data = await P.Effect.runPromise(unit.getFileLineReadStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
       expect(data).toBeInstanceOf(readline.Interface);
     });
   });
 
   describe('getFileWriteStream', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs, 'createWriteStream').mockReturnValue(new PassThrough() as any);
+      stub1 = vi.spyOn(fs, 'createWriteStream').mockReturnValue(new PassThrough() as any);
     });
     afterEach(() => {
       stub1.mockClear();
@@ -60,16 +60,16 @@ describe('NodeTinyFileSystem', () => {
       const data = await P.Effect.runPromise(unit.getFileWriteStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
-      expect(stub1.mock.calls[0][1]).toStrictEqual({ flags: 'w' });
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[1]).toStrictEqual({ flags: 'w' });
       expect(data).toBeInstanceOf(Writable);
     });
   });
 
   describe('getFileAppendWriteStream', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs, 'createWriteStream').mockReturnValue(new PassThrough() as any);
+      stub1 = vi.spyOn(fs, 'createWriteStream').mockReturnValue(new PassThrough() as any);
     });
     afterEach(() => {
       stub1.mockClear();
@@ -79,16 +79,16 @@ describe('NodeTinyFileSystem', () => {
       const data = await P.Effect.runPromise(unit.getFileAppendWriteStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
-      expect(stub1.mock.calls[0][1]).toStrictEqual({ flags: 'a' });
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[1]).toStrictEqual({ flags: 'a' });
       expect(data).toBeInstanceOf(Writable);
     });
   });
 
   describe('listFiles', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs.promises, 'readdir').mockReturnValue(['test-file.txt'] as any);
+      stub1 = vi.spyOn(fs.promises, 'readdir').mockReturnValue(['test-file.txt'] as any);
     });
     afterEach(() => {
       stub1.mockClear();
@@ -114,9 +114,9 @@ describe('NodeTinyFileSystem', () => {
   });
 
   describe('glob', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fg, 'async').mockReturnValue(['/foo/bar/test-file.txt'] as any);
+      stub1 = vi.spyOn(fg, 'async').mockReturnValue(['/foo/bar/test-file.txt'] as any);
     });
     afterEach(() => {
       stub1.mockClear();
@@ -130,13 +130,13 @@ describe('NodeTinyFileSystem', () => {
   });
 
   describe('exists', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     afterEach(() => {
       stub1.mockClear();
     });
 
     it('should function correctly', async () => {
-      stub1 = jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
       const data = await P.Effect.runPromise(unit.exists('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -144,7 +144,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      stub1 = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+      stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
       const data = await P.Effect.runPromise(unit.exists('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -153,13 +153,13 @@ describe('NodeTinyFileSystem', () => {
   });
 
   describe('getFileType', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     afterEach(() => {
       stub1.mockClear();
     });
 
     it('should function correctly', async () => {
-      stub1 = jest.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => true, isDirectory: () => false } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => true, isDirectory: () => false } as any);
       const data = await P.Effect.runPromise(unit.getFileType('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -167,7 +167,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      stub1 = jest.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => true } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => true } as any);
       const data = await P.Effect.runPromise(unit.getFileType('./foo'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -175,9 +175,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      stub1 = jest
-        .spyOn(fs.promises, 'lstat')
-        .mockReturnValue({ isFile: () => false, isDirectory: () => false } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => false } as any);
       const data = await P.Effect.runPromise(unit.getFileType('.'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -186,10 +184,10 @@ describe('NodeTinyFileSystem', () => {
   });
 
   describe('createDirectory', () => {
-    let stub1: jest.SpyInstance;
-    let stub2: jest.SpyInstance;
+    let stub1: MockInstance;
+    let stub2: MockInstance;
     beforeEach(() => {
-      stub2 = jest.spyOn(fs.promises, 'mkdir').mockResolvedValue('ok');
+      stub2 = vi.spyOn(fs.promises, 'mkdir').mockResolvedValue('ok');
     });
     afterEach(() => {
       stub1.mockClear();
@@ -197,16 +195,16 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly, directory does not exist', async () => {
-      stub1 = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+      stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
       await P.Effect.runPromise(unit.createDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(1);
-      expect(stub2.mock.calls[0][0]).toBe('/foo/baz');
+      expect(stub2.mock.calls[0]?.[0]).toBe('/foo/baz');
     });
 
     it('should function correctly, directory exists', async () => {
-      stub1 = jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
       await P.Effect.runPromise(unit.createDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -215,10 +213,10 @@ describe('NodeTinyFileSystem', () => {
   });
 
   describe('removeDirectory', () => {
-    let stub1: jest.SpyInstance;
-    let stub2: jest.SpyInstance;
+    let stub1: MockInstance;
+    let stub2: MockInstance;
     beforeEach(() => {
-      stub2 = jest.spyOn(fs.promises, 'rm').mockResolvedValue();
+      stub2 = vi.spyOn(fs.promises, 'rm').mockResolvedValue();
     });
     afterEach(() => {
       stub1.mockClear();
@@ -226,7 +224,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly, directory does not exist', async () => {
-      stub1 = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+      stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
       await P.Effect.runPromise(unit.removeDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -234,19 +232,19 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly, directory exists', async () => {
-      stub1 = jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
       await P.Effect.runPromise(unit.removeDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(1);
-      expect(stub2.mock.calls[0][0]).toBe('/foo/baz');
+      expect(stub2.mock.calls[0]?.[0]).toBe('/foo/baz');
     });
   });
 
   describe('readFile', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs.promises, 'readFile').mockResolvedValue(Buffer.from('some test text'));
+      stub1 = vi.spyOn(fs.promises, 'readFile').mockResolvedValue(Buffer.from('some test text'));
     });
     afterEach(() => {
       stub1.mockClear();
@@ -256,15 +254,15 @@ describe('NodeTinyFileSystem', () => {
       const data = await P.Effect.runPromise(unit.readFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
       expect(arrayBufferToString(data)).toBe('some test text');
     });
   });
 
   describe('writeFile', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs.promises, 'writeFile').mockResolvedValue();
+      stub1 = vi.spyOn(fs.promises, 'writeFile').mockResolvedValue();
     });
     afterEach(() => {
       stub1.mockClear();
@@ -274,23 +272,23 @@ describe('NodeTinyFileSystem', () => {
       await P.Effect.runPromise(unit.writeFile('/foo/bar.txt', 'some test text'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
-      expect(stub1.mock.calls[0][1]).toStrictEqual(Buffer.from('some test text'));
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[1]).toStrictEqual(Buffer.from('some test text'));
     });
 
     it('should function correctly', async () => {
       await P.Effect.runPromise(unit.writeFile('/foo/bar.txt', stringToUint8Array('some test text')));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
-      expect(stub1.mock.calls[0][1]).toStrictEqual(Buffer.from('some test text'));
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[1]).toStrictEqual(Buffer.from('some test text'));
     });
   });
 
   describe('deleteFile', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     beforeEach(() => {
-      stub1 = jest.spyOn(fs.promises, 'unlink').mockResolvedValue();
+      stub1 = vi.spyOn(fs.promises, 'unlink').mockResolvedValue();
     });
     afterEach(() => {
       stub1.mockClear();
@@ -300,7 +298,7 @@ describe('NodeTinyFileSystem', () => {
       await P.Effect.runPromise(unit.deleteFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
-      expect(stub1.mock.calls[0][0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
     });
   });
 
@@ -320,43 +318,35 @@ describe('NodeTinyFileSystem', () => {
   });
 
   describe('dirName', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     afterEach(() => {
       stub1.mockClear();
     });
 
     it('should function correctly', async () => {
-      stub1 = jest
-        .spyOn(fs.promises, 'lstat')
-        .mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
       await expect(P.Effect.runPromise(unit.dirName('foo/bar/baz.json'))).resolves.toEqual('foo/bar');
     });
 
     it('should function correctly', async () => {
-      stub1 = jest
-        .spyOn(fs.promises, 'lstat')
-        .mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
       await expect(P.Effect.runPromise(unit.dirName('foo/bar'))).resolves.toEqual('foo');
     });
   });
 
   describe('fileName', () => {
-    let stub1: jest.SpyInstance;
+    let stub1: MockInstance;
     afterEach(() => {
       stub1.mockClear();
     });
 
     it('should function correctly', async () => {
-      stub1 = jest
-        .spyOn(fs.promises, 'lstat')
-        .mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
       await expect(P.Effect.runPromise(unit.fileName('foo/bar/baz.json'))).resolves.toEqual('baz.json');
     });
 
     it('should function correctly', async () => {
-      stub1 = jest
-        .spyOn(fs.promises, 'lstat')
-        .mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
+      stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
       await expect(P.Effect.runPromise(unit.fileName('foo/bar'))).rejects.toThrow('TinyFileSystemError');
     });
   });

@@ -1,14 +1,8 @@
+import { describe, expect, it } from 'vitest';
+
 import * as unit from './index';
 
 describe('index', () => {
-  describe('exports', () => {
-    it('should work as expected', () => {
-      expect(unit.MemFsTinyFileSystem).toBeDefined();
-      expect(unit.NodeTinyFileSystem).toBeDefined();
-      expect(unit.S3TinyFileSystem).toBeDefined();
-    });
-  });
-
   describe('fileTypeIsDirectory', () => {
     it('should work as expected', () => {
       expect(unit.fileTypeIsDirectory(unit.FileType.Directory)).toEqual(true);

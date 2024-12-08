@@ -3,7 +3,7 @@ import type { Readable, Writable } from 'node:stream';
 
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import type { TinyFileSystemError } from './lib/error';
+import type { TinyFileSystemError } from './lib/error.js';
 
 export enum FileType {
   Directory = 'Directory',
@@ -182,8 +182,8 @@ export type TinyFileSystemAppendable<T extends TinyFileSystem = TinyFileSystem> 
 export type TinyFileSystemWithGlob<T extends TinyFileSystem = TinyFileSystem> = T & {
   readonly glob: (dirPath: string) => P.Effect.Effect<Array<Ref>, TinyFileSystemError>;
 };
-
-export { MemFsTinyFileSystem } from './memfs';
-export { NodeTinyFileSystem } from './node';
-export { S3TinyFileSystem } from './s3';
-export * from './lib/error';
+//
+// export { MemFsTinyFileSystem } from './memfs/index.js';
+// export { NodeTinyFileSystem } from './node/index.js';
+// export { S3TinyFileSystem } from './s3/index.js';
+// export * from './lib/error.js';

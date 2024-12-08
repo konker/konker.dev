@@ -5,13 +5,13 @@ import type { Readable, Writable } from 'node:stream';
 
 import * as P from '@konker.dev/effect-ts-prelude';
 import * as fg from 'fast-glob';
-import { fs, vol } from 'memfs';
+import { type DirectoryJSON, fs, vol } from 'memfs';
 
-import type { DirectoryPath, FileName, Path, Ref, TinyFileSystemAppendable, TinyFileSystemWithGlob } from '../index';
-import { FileType, fileTypeIsFile } from '../index';
-import { stringToUint8Array } from '../lib/array';
-import type { TinyFileSystemError } from '../lib/error';
-import { toTinyFileSystemError } from '../lib/error';
+import type { DirectoryPath, FileName, Path, Ref, TinyFileSystemAppendable, TinyFileSystemWithGlob } from '../index.js';
+import { FileType, fileTypeIsFile } from '../index.js';
+import { stringToUint8Array } from '../lib/array.js';
+import type { TinyFileSystemError } from '../lib/error.js';
+import { toTinyFileSystemError } from '../lib/error.js';
 
 function getFileReadStream(filePath: string): P.Effect.Effect<Readable, TinyFileSystemError> {
   return P.Effect.tryPromise({ try: async () => fs.createReadStream(filePath), catch: toTinyFileSystemError });
@@ -171,7 +171,10 @@ function isAbsolute(fileOrDirPath: string): boolean {
   return path.isAbsolute(fileOrDirPath);
 }
 
-export function MemFsTinyFileSystem(fsState: any = {}, cwd = '/'): TinyFileSystemAppendable<TinyFileSystemWithGlob> {
+export function MemFsTinyFileSystem(
+  fsState: DirectoryJSON = {},
+  cwd = '/'
+): TinyFileSystemAppendable<TinyFileSystemWithGlob> {
   // eslint-disable-next-line fp/no-unused-expression
   vol.fromJSON(fsState, cwd);
 

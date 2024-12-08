@@ -7,10 +7,10 @@ import type { Readable, Writable } from 'node:stream';
 import * as P from '@konker.dev/effect-ts-prelude';
 import * as fg from 'fast-glob';
 
-import type { DirectoryPath, FileName, Path, Ref, TinyFileSystemAppendable, TinyFileSystemWithGlob } from '../index';
-import { FileType, fileTypeIsFile } from '../index';
-import type { TinyFileSystemError } from '../lib/error';
-import { toTinyFileSystemError } from '../lib/error';
+import type { DirectoryPath, FileName, Path, Ref, TinyFileSystemAppendable, TinyFileSystemWithGlob } from '../index.js';
+import { FileType, fileTypeIsFile } from '../index.js';
+import type { TinyFileSystemError } from '../lib/error.js';
+import { toTinyFileSystemError } from '../lib/error.js';
 
 function getFileReadStream(filePath: string): P.Effect.Effect<Readable, TinyFileSystemError> {
   return P.Effect.tryPromise({ try: async () => fs.createReadStream(filePath), catch: toTinyFileSystemError });
