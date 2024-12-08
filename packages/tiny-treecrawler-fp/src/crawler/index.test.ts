@@ -1,14 +1,15 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
 import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
 import { TreeCrawlerDataType } from '../index';
 import * as unit from './index';
 
 describe('crawler', () => {
-  const mockDirectoryListener = jest.fn().mockImplementation(() => P.Effect.void);
-  const mockFileListener = jest.fn().mockImplementation(() => P.Effect.void);
+  const mockDirectoryListener = vi.fn().mockImplementation(() => P.Effect.void);
+  const mockFileListener = vi.fn().mockImplementation(() => P.Effect.void);
 
   describe('notifyDirectoryEvent', () => {
     afterEach(() => {

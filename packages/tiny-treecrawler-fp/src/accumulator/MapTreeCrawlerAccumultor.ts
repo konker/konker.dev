@@ -11,8 +11,10 @@ export const MapTreeCrawlerAccumulator = <T>(
 
   const rep = {
     push: (eventType: TreeCrawlerEvent, eventData?: TreeCrawlerData) => {
-      // eslint-disable-next-line fp/no-mutating-methods,fp/no-this,fp/no-unused-expression,fp/no-mutation
-      if (eventData) acc = [...acc, fn(eventType, eventData)];
+      if (eventData) {
+        // eslint-disable-next-line fp/no-mutation
+        acc = [...acc, fn(eventType, eventData)];
+      }
       return rep;
     },
     data: () => P.Effect.succeed(acc),

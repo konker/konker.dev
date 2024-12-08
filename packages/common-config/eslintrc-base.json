@@ -93,6 +93,7 @@
         "fp/no-nil": "off",
         "fp/no-let": "off",
         "fp/no-mutation": "off",
+        "fp/no-mutating-methods": "off",
         "fp/no-throw": "off"
       }
     },

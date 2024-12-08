@@ -1,8 +1,8 @@
 import type * as P from '@konker.dev/effect-ts-prelude';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
-import type { DirectoryData, FileData } from '../index';
-import type { TinyTreeCrawlerError } from '../lib/error';
+import type { DirectoryData, FileData } from '../index.js';
+import type { TinyTreeCrawlerError } from '../lib/error.js';
 
 export type TreeCrawlerFileHandler = (
   tfs: TinyFileSystem,

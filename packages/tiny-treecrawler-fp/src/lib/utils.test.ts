@@ -1,10 +1,10 @@
-/* eslint-disable fp/no-mutation,fp/no-let */
 import * as P from '@konker.dev/effect-ts-prelude';
 import type { Ref } from '@konker.dev/tiny-filesystem-fp';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { TreeCrawlerDataType } from '../index';
-import * as memFs1Fixture from '../test/fixtures/memfs-1.json';
+import memFs1Fixture from '../test/fixtures/memfs-1.json';
 import * as unit from './utils';
 
 describe('utils', () => {

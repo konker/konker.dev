@@ -12,7 +12,7 @@ import { TrueFileFilter } from '../filter/file/true-file-filter';
 import { DefaultTreeCrawlerDirectoryHandler } from '../handler/directory/default-directory-handler';
 import { DefaultTreeCrawlerFileHandler } from '../handler/file/default-file-handler';
 import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
-import * as memFs1Fixture from '../test/fixtures/memfs-1.json';
+import memFs1Fixture from '../test/fixtures/memfs-1.json';
 
 (async function main() {
   const prg = P.pipe(

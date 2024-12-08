@@ -11,8 +11,10 @@ export const DefaultTreeCrawlerAccumulator = (): TreeCrawlerAccumulator<Array<De
 
   const rep = {
     push: (eventType: TreeCrawlerEvent, eventData?: TreeCrawlerData) => {
-      // eslint-disable-next-line fp/no-mutating-methods,fp/no-this,fp/no-unused-expression,fp/no-mutation
-      if (eventData) acc = [...acc, [eventType, eventData]];
+      if (eventData) {
+        // eslint-disable-next-line fp/no-mutation
+        acc = [...acc, [eventType, eventData]];
+      }
       return rep;
     },
     data: () => P.Effect.succeed(acc),

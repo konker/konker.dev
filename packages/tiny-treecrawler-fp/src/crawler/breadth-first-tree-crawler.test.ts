@@ -1,8 +1,8 @@
-/* eslint-disable fp/no-mutation,fp/no-let */
 import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
 import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { FalseDirectoryFilter } from '../filter/directory/false-directory-filter';
 import { TrueDirectoryFilter } from '../filter/directory/true-directory-filter';
@@ -11,7 +11,7 @@ import { TrueFileFilter } from '../filter/file/true-file-filter';
 import { DefaultTreeCrawlerDirectoryHandler } from '../handler/directory/default-directory-handler';
 import { DefaultTreeCrawlerFileHandler } from '../handler/file/default-file-handler';
 import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
-import * as memFs1Fixture from '../test/fixtures/memfs-1.json';
+import memFs1Fixture from '../test/fixtures/memfs-1.json';
 import * as unit from './breadth-first-tree-crawler';
 
 describe('breadth-first-tree-crawler', () => {
@@ -22,7 +22,7 @@ describe('breadth-first-tree-crawler', () => {
   });
 
   it('should work as expected', async () => {
-    const mockListener = jest.fn().mockImplementation(() => P.Effect.void);
+    const mockListener = vi.fn().mockImplementation(() => P.Effect.void);
 
     await P.Effect.runPromise(
       P.pipe(
@@ -60,7 +60,7 @@ describe('breadth-first-tree-crawler', () => {
   });
 
   it('should work as expected', async () => {
-    const mockListener = jest.fn().mockImplementation(() => P.Effect.void);
+    const mockListener = vi.fn().mockImplementation(() => P.Effect.void);
 
     await P.Effect.runPromise(
       P.pipe(

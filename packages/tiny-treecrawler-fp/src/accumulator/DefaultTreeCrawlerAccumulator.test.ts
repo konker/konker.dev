@@ -1,6 +1,6 @@
-/* eslint-disable fp/no-mutating-methods */
 import * as P from '@konker.dev/effect-ts-prelude';
 import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
+import { describe, expect, it } from 'vitest';
 
 import { TreeCrawlerDataType, TreeCrawlerEvent } from '../index';
 import * as unit from './DefaultTreeCrawlerAccumultor';
@@ -16,6 +16,7 @@ describe('accumulator', () => {
         path: '/tmp/foo/a.txt',
         data: stringToUint8Array('A'),
       });
+      accumulator.push(TreeCrawlerEvent.File);
 
       expect(accumulator.data()).toStrictEqual(
         P.Effect.succeed([

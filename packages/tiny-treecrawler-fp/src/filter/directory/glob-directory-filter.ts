@@ -1,6 +1,6 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
-import { toTinyFileSystemError } from '@konker.dev/tiny-filesystem-fp';
+import { toTinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/dist/lib/error';
 import micromatch from 'micromatch';
 
 import { toTinyTreeCrawlerError } from '../../lib/error';

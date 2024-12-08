@@ -1,7 +1,7 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 
-import type { TinyTreeCrawlerError } from '../lib/error';
+import type { TinyTreeCrawlerError } from '../lib/error.js';
 
 export type TreeCrawlerDirectoryFilter<T extends TinyFileSystem = TinyFileSystem> = (
   tfs: T,
