@@ -1,5 +1,4 @@
 import * as P from '@konker.dev/effect-ts-prelude';
-
 import * as M from '@konker.dev/momento-cache-client-effect';
 
 import type { Cache } from '../Cache';

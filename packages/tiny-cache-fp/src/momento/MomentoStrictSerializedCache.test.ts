@@ -24,7 +24,7 @@ describe('MomentoStrictSerializedCache', () => {
   const cache = unit.MomentoStrictSerializedCache(MomentoStringCache, TEST_SCHEMA_STRING);
   let momentoClient: momento.CacheClient;
   let deps: MomentoClientDeps;
-  let oldEnv: any;
+  let oldEnv: NodeJS.ProcessEnv;
 
   beforeAll(() => {
     oldEnv = process.env;

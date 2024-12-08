@@ -13,7 +13,7 @@ describe('MomentoStringCacheJson', () => {
   const cache = unit.MomentoStringCacheJson();
   let momentoClient: momento.CacheClient;
   let deps: MomentoClientDeps;
-  let oldEnv: any;
+  let oldEnv: NodeJS.ProcessEnv;
 
   beforeAll(() => {
     oldEnv = process.env;
