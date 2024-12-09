@@ -1,7 +1,8 @@
 /* eslint-disable fp/no-unused-expression,fp/no-let,fp/no-nil */
 import type { Readable } from 'node:stream';
 
-import * as P from '@konker.dev/effect-ts-prelude';
+import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import * as Effect from 'effect/Effect';
 
 import type { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
 
@@ -11,8 +12,8 @@ import type { PromiseDependentWritableStream } from './PromiseDependentWritableS
 export function waitForPromiseDependentWritableStreamPipe(
   readStream: Readable,
   writeStream: PromiseDependentWritableStream
-): P.Effect.Effect<number, Error> {
-  return P.Effect.tryPromise({
+): Effect.Effect<number, Error> {
+  return Effect.tryPromise({
     try: () =>
       new Promise((resolve, reject) => {
         let size = 0;
@@ -26,6 +27,6 @@ export function waitForPromiseDependentWritableStreamPipe(
         if (writeStream.promise) writeStream.promise.then(() => resolve(size)).catch(reject);
         else reject(Error('waitForPromiseDependentWritableStreamPipe called without a stream promise'));
       }),
-    catch: P.toError,
+    catch: toError,
   });
 }

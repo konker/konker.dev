@@ -3,7 +3,8 @@ import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type { RequestPresigningArguments } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { S3EchoParams } from './index';
 import { S3ClientDeps } from './index';
@@ -14,11 +15,11 @@ import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableSt
 export function GetSignedUrlEffect(
   params: s3Client.GetObjectCommandInput,
   options?: RequestPresigningArguments
-): P.Effect.Effect<{ readonly result: string } & S3EchoParams<s3Client.GetObjectCommandInput>, S3Error, S3ClientDeps> {
-  return P.pipe(
+): Effect.Effect<{ readonly result: string } & S3EchoParams<s3Client.GetObjectCommandInput>, S3Error, S3ClientDeps> {
+  return pipe(
     S3ClientDeps,
-    P.Effect.flatMap((deps) =>
-      P.Effect.tryPromise({
+    Effect.flatMap((deps) =>
+      Effect.tryPromise({
         try: async () => {
           const cmd = new GetObjectCommand(params);
           const result = await getSignedUrl(deps.s3Client, cmd, options);
@@ -33,11 +34,11 @@ export function GetSignedUrlEffect(
 export function UploadObjectEffect(
   params: s3Client.PutObjectCommandInput,
   data: Buffer | string
-): P.Effect.Effect<void, S3Error, S3ClientDeps> {
-  return P.pipe(
+): Effect.Effect<void, S3Error, S3ClientDeps> {
+  return pipe(
     S3ClientDeps,
-    P.Effect.flatMap((deps) =>
-      P.Effect.tryPromise({
+    Effect.flatMap((deps) =>
+      Effect.tryPromise({
         // eslint-disable-next-line fp/no-nil
         try: async () => {
           const buf = data instanceof Buffer ? data : Buffer.from(data);
@@ -63,11 +64,11 @@ export function UploadObjectEffect(
 
 export function UploadObjectWriteStreamEffect(
   params: s3Client.PutObjectCommandInput
-): P.Effect.Effect<PromiseDependentWritableStream, S3Error, S3ClientDeps> {
-  return P.pipe(
+): Effect.Effect<PromiseDependentWritableStream, S3Error, S3ClientDeps> {
+  return pipe(
     S3ClientDeps,
-    P.Effect.flatMap((deps) =>
-      P.Effect.tryPromise({
+    Effect.flatMap((deps) =>
+      Effect.tryPromise({
         try: async () => {
           const promiseDependentWritableStream = new PromiseDependentWritableStream();
           const upload = new Upload({

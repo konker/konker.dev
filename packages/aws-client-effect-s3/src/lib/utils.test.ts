@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream';
 
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
@@ -16,7 +16,7 @@ describe('stream utils', () => {
         writeStream.on('finish', resolve);
       });
 
-      const data = await P.Effect.runPromise(unit.waitForPromiseDependentWritableStreamPipe(readStream, writeStream));
+      const data = await Effect.runPromise(unit.waitForPromiseDependentWritableStreamPipe(readStream, writeStream));
       expect(data).toBe(6);
     });
 
@@ -29,7 +29,7 @@ describe('stream utils', () => {
       });
 
       await expect(
-        P.Effect.runPromise(unit.waitForPromiseDependentWritableStreamPipe(readStream, writeStream))
+        Effect.runPromise(unit.waitForPromiseDependentWritableStreamPipe(readStream, writeStream))
       ).rejects.toThrow();
     });
 
@@ -38,7 +38,7 @@ describe('stream utils', () => {
       const writeStream = new PromiseDependentWritableStream();
 
       await expect(
-        P.Effect.runPromise(unit.waitForPromiseDependentWritableStreamPipe(readStream, writeStream))
+        Effect.runPromise(unit.waitForPromiseDependentWritableStreamPipe(readStream, writeStream))
       ).rejects.toThrow('waitForPromiseDependentWritableStreamPipe called without a stream promise');
     });
   });

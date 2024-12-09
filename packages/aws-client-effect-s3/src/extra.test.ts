@@ -2,7 +2,8 @@ import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import * as s3Client from '@aws-sdk/client-s3';
 import * as awsStorage from '@aws-sdk/lib-storage';
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as unit from './extra';
@@ -33,8 +34,8 @@ describe('aws-client-effect-s3/extra', () => {
       vi.spyOn(s3RequestPresigner, 'getSignedUrl').mockResolvedValue('https://signedurl.example.com/');
 
       const params: GetObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
-      const command = P.pipe(unit.GetSignedUrlEffect(params), P.Effect.provideService(S3ClientDeps, deps));
-      const actual = await P.Effect.runPromise(command);
+      const command = pipe(unit.GetSignedUrlEffect(params), Effect.provideService(S3ClientDeps, deps));
+      const actual = await Effect.runPromise(command);
       const expected = { result: 'https://signedurl.example.com/', _Params: params };
 
       expect(actual).toStrictEqual(expected);
@@ -47,8 +48,8 @@ describe('aws-client-effect-s3/extra', () => {
       const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const data = Buffer.from('test-data');
-      const command = P.pipe(unit.UploadObjectEffect(params, data), P.Effect.provideService(S3ClientDeps, deps));
-      await P.Effect.runPromise(command);
+      const command = pipe(unit.UploadObjectEffect(params, data), Effect.provideService(S3ClientDeps, deps));
+      await Effect.runPromise(command);
 
       expect(uploadSpy).toHaveBeenCalledTimes(1);
       expect(uploadSpy.mock.calls[0]?.[0]).toStrictEqual({
@@ -69,8 +70,8 @@ describe('aws-client-effect-s3/extra', () => {
       const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const data = 'test-data';
-      const command = P.pipe(unit.UploadObjectEffect(params, data), P.Effect.provideService(S3ClientDeps, deps));
-      await P.Effect.runPromise(command);
+      const command = pipe(unit.UploadObjectEffect(params, data), Effect.provideService(S3ClientDeps, deps));
+      await Effect.runPromise(command);
 
       expect(uploadSpy).toHaveBeenCalledTimes(1);
       expect(uploadSpy.mock.calls[0]?.[0]).toStrictEqual({
@@ -92,8 +93,8 @@ describe('aws-client-effect-s3/extra', () => {
       const mockUpload = { done: vi.fn() } as any;
       const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
-      const command = P.pipe(unit.UploadObjectWriteStreamEffect(params), P.Effect.provideService(S3ClientDeps, deps));
-      const actual = await P.Effect.runPromise(command);
+      const command = pipe(unit.UploadObjectWriteStreamEffect(params), Effect.provideService(S3ClientDeps, deps));
+      const actual = await Effect.runPromise(command);
 
       expect(actual).toBeInstanceOf(PromiseDependentWritableStream);
       expect(uploadSpy).toHaveBeenCalledTimes(1);

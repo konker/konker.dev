@@ -1,8 +1,9 @@
 import type { S3Client } from '@aws-sdk/client-s3';
 import * as s3Client from '@aws-sdk/client-s3';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import { Context, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { S3Error } from './lib/error.js';
 import { toS3Error } from './lib/error.js';
@@ -16,9 +17,9 @@ export const defaultS3ClientFactory: S3ClientFactory = (config: s3Client.S3Clien
 export type S3ClientFactoryDeps = {
   readonly s3ClientFactory: S3ClientFactory;
 };
-export const S3ClientFactoryDeps = P.Context.GenericTag<S3ClientFactoryDeps>('@s3-client-fp/S3ClientFactoryDeps');
+export const S3ClientFactoryDeps = Context.GenericTag<S3ClientFactoryDeps>('@s3-client-fp/S3ClientFactoryDeps');
 
-export const defaultS3ClientFactoryDeps = P.Effect.provideService(
+export const defaultS3ClientFactoryDeps = Effect.provideService(
   S3ClientFactoryDeps,
   S3ClientFactoryDeps.of({
     s3ClientFactory: defaultS3ClientFactory,
@@ -29,10 +30,10 @@ export const defaultS3ClientFactoryDeps = P.Effect.provideService(
 export type S3ClientDeps = {
   readonly s3Client: S3Client;
 };
-export const S3ClientDeps = P.Context.GenericTag<S3ClientDeps>('s3-client-fp/S3ClientDeps');
+export const S3ClientDeps = Context.GenericTag<S3ClientDeps>('s3-client-fp/S3ClientDeps');
 
 export const defaultS3ClientDeps = (config: s3Client.S3ClientConfig) =>
-  P.Effect.provideService(
+  Effect.provideService(
     S3ClientDeps,
     S3ClientDeps.of({
       s3Client: defaultS3ClientFactory(config),
@@ -53,15 +54,12 @@ export function FabricateCommandEffect<I extends s3Client.ServiceInputTypes, O e
     O,
     SmithyResolvedConfiguration<HttpHandlerOptions>
   >
-): (
-  params: I,
-  options?: HttpHandlerOptions | undefined
-) => P.Effect.Effect<O & S3EchoParams<I>, S3Error, S3ClientDeps> {
+): (params: I, options?: HttpHandlerOptions | undefined) => Effect.Effect<O & S3EchoParams<I>, S3Error, S3ClientDeps> {
   return function (params, options) {
-    return P.pipe(
+    return pipe(
       S3ClientDeps,
-      P.Effect.flatMap((deps) =>
-        P.Effect.tryPromise({
+      Effect.flatMap((deps) =>
+        Effect.tryPromise({
           try: async () => {
             const cmd = new cmdCtor(params);
             const result = await deps.s3Client.send(cmd, options);

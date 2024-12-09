@@ -271,9 +271,9 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.705.0
         version: 3.705.0
-      '@konker.dev/effect-ts-prelude':
+      '@konker.dev/tiny-error-fp':
         specifier: workspace:*
-        version: link:../effect-ts-prelude
+        version: link:../tiny-error-fp
       effect:
         specifier: ^3.11.2
         version: 3.11.3
