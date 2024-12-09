@@ -1183,15 +1183,9 @@ importers:
 
   packages/tiny-cache-fp:
     dependencies:
-      '@effect/schema':
-        specifier: ^0.68.27
-        version: 0.68.27(effect@3.11.3)
       '@gomomento/sdk':
         specifier: ^1.95.0
         version: 1.102.0
-      '@konker.dev/effect-ts-prelude':
-        specifier: workspace:*
-        version: link:../effect-ts-prelude
       '@konker.dev/momento-cache-client-effect':
         specifier: workspace:*
         version: link:../momento-cache-client-effect

@@ -1,13 +1,14 @@
 import crypto from 'node:crypto';
 
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { CacheError } from '../error';
 import { toCacheError } from '../error';
 import type { CacheKeyResolver } from './index';
 
-export const md5String = (s: string): P.Effect.Effect<string, CacheError> =>
-  P.Effect.try({
+export const md5String = (s: string): Effect.Effect<string, CacheError> =>
+  Effect.try({
     try: () => crypto.createHash('md5').update(s).digest('hex'),
     catch: toCacheError,
   });
@@ -15,4 +16,4 @@ export const md5String = (s: string): P.Effect.Effect<string, CacheError> =>
 export const JsonHashCacheKeyResolver =
   <I>(): CacheKeyResolver<I> =>
   (i: I) =>
-    P.pipe(i, P.Schema.encode(P.Schema.parseJson()), P.Effect.mapError(toCacheError), P.Effect.flatMap(md5String));
+    pipe(i, Schema.encode(Schema.parseJson()), Effect.mapError(toCacheError), Effect.flatMap(md5String));

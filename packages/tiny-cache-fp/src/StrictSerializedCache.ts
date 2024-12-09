@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { Option, pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Cache } from './Cache.js';
 import type { CacheError } from './lib/error.js';
@@ -7,28 +8,24 @@ import { toCacheError } from './lib/error.js';
 export const CACHE_KIND_STRICT_SERIALIZED_CACHE = 'StrictSerializedCache' as const;
 
 const setVal =
-  <V, C, R>(cache: Cache<C, R>, s: P.Schema.Schema<V, C>) =>
-  (key: string, value: V, ttlSecs?: number): P.Effect.Effect<void, CacheError, R> =>
-    P.pipe(
+  <V, C, R>(cache: Cache<C, R>, s: Schema.Schema<V, C>) =>
+  (key: string, value: V, ttlSecs?: number): Effect.Effect<void, CacheError, R> =>
+    pipe(
       value,
-      P.Schema.encode(s),
-      P.Effect.mapError(toCacheError),
-      P.Effect.flatMap((checked) => cache.setVal(key, checked, ttlSecs))
+      Schema.encode(s),
+      Effect.mapError(toCacheError),
+      Effect.flatMap((checked) => cache.setVal(key, checked, ttlSecs))
     );
 
 const getVal =
-  <V, C, R>(cache: Cache<C, R>, s: P.Schema.Schema<V, C>) =>
-  (key: string): P.Effect.Effect<P.Option.Option<V>, CacheError, R> => {
-    return P.pipe(
-      cache.getVal(key),
-      P.Effect.map(P.Option.flatMap(P.Schema.decodeOption(s))),
-      P.Effect.mapError(toCacheError)
-    );
+  <V, C, R>(cache: Cache<C, R>, s: Schema.Schema<V, C>) =>
+  (key: string): Effect.Effect<Option.Option<V>, CacheError, R> => {
+    return pipe(cache.getVal(key), Effect.map(Option.flatMap(Schema.decodeOption(s))), Effect.mapError(toCacheError));
   };
 
 const delVal =
   <C, R>(cache: Cache<C, R>) =>
-  (key: string): P.Effect.Effect<void, CacheError, R> =>
+  (key: string): Effect.Effect<void, CacheError, R> =>
     cache.delVal(key);
 
 export type StrictSerializedCache<V, R> = Omit<Cache<V, R>, '_kind'> & {
@@ -37,7 +34,7 @@ export type StrictSerializedCache<V, R> = Omit<Cache<V, R>, '_kind'> & {
 
 export const StrictSerializedCache = <V, C, R>(
   cache: Cache<C, R>,
-  schema: P.Schema.Schema<V, C>
+  schema: Schema.Schema<V, C>
 ): StrictSerializedCache<V, R> => ({
   _kind: CACHE_KIND_STRICT_SERIALIZED_CACHE,
 

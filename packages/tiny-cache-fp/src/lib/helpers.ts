@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { Option, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { CacheType } from '../index';
 import type { CacheError } from './error';
@@ -9,14 +10,14 @@ import { toCacheError } from './error';
  */
 export const chainGetVal =
   <V, R>(cache: CacheType<V, R>) =>
-  (key: string): P.Effect.Effect<V, CacheError, R> =>
-    P.pipe(
+  (key: string): Effect.Effect<V, CacheError, R> =>
+    pipe(
       cache.getVal(key),
-      P.Effect.flatMap((val: P.Option.Option<V>) =>
+      Effect.flatMap((val: Option.Option<V>) =>
         // eslint-disable-next-line fp/no-nil
-        P.Option.isSome(val) ? P.Effect.succeed(val.value) : P.Effect.fail(undefined)
+        Option.isSome(val) ? Effect.succeed(val.value) : Effect.fail(undefined)
       ),
-      P.Effect.mapError(toCacheError)
+      Effect.mapError(toCacheError)
     );
 
 /**
@@ -27,9 +28,9 @@ export const chainSetVal = <V, R>(
   key: string,
   value: V,
   ttl?: number
-): P.Effect.Effect<V, CacheError, R> =>
-  P.pipe(
+): Effect.Effect<V, CacheError, R> =>
+  pipe(
     cache.setVal(key, value, ttl),
-    P.Effect.map(() => value),
-    P.Effect.mapError(toCacheError)
+    Effect.map(() => value),
+    Effect.mapError(toCacheError)
   );

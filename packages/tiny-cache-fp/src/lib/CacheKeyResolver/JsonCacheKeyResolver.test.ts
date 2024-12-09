@@ -1,16 +1,17 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './JsonCacheKeyResolver';
 
 describe('JsonCacheKeyResolver', () => {
   it('should work as expected with string input', () => {
-    const actual = P.pipe('test-input', unit.JsonCacheKeyResolver());
-    expect(P.Effect.runSync(actual)).toEqual('"test-input"');
+    const actual = pipe('test-input', unit.JsonCacheKeyResolver());
+    expect(Effect.runSync(actual)).toEqual('"test-input"');
   });
 
   it('should work as expected with an object input', () => {
-    const actual = P.pipe({ foo: 'abc', bar: 123 }, unit.JsonCacheKeyResolver());
-    expect(P.Effect.runSync(actual)).toEqual('{"foo":"abc","bar":123}');
+    const actual = pipe({ foo: 'abc', bar: 123 }, unit.JsonCacheKeyResolver());
+    expect(Effect.runSync(actual)).toEqual('{"foo":"abc","bar":123}');
   });
 });

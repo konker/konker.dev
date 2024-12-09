@@ -1,5 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
+import { Option, pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Cache } from '../Cache';
 import { CACHE_KIND_CACHE } from '../Cache';
@@ -11,18 +12,18 @@ export const TAG = 'MomentoStringCacheJson';
 
 const setVal =
   (cache: MomentoStringCache) =>
-  (key: string, value: unknown, ttlSecs?: number): P.Effect.Effect<void, CacheError, MomentoClientDeps> =>
-    P.pipe(
+  (key: string, value: unknown, ttlSecs?: number): Effect.Effect<void, CacheError, MomentoClientDeps> =>
+    pipe(
       value,
-      P.Schema.encode(P.Schema.parseJson()),
-      P.Effect.flatMap((encoded) => cache.setVal(key, encoded, ttlSecs)),
-      P.Effect.mapError(toCacheError)
+      Schema.encode(Schema.parseJson()),
+      Effect.flatMap((encoded) => cache.setVal(key, encoded, ttlSecs)),
+      Effect.mapError(toCacheError)
     );
 
 const getVal =
   (cache: MomentoStringCache) =>
-  (key: string): P.Effect.Effect<P.Option.Option<unknown>, CacheError, MomentoClientDeps> =>
-    P.pipe(cache.getVal(key), P.Effect.map(P.Option.flatMap(P.Schema.decodeOption(P.Schema.parseJson()))));
+  (key: string): Effect.Effect<Option.Option<unknown>, CacheError, MomentoClientDeps> =>
+    pipe(cache.getVal(key), Effect.map(Option.flatMap(Schema.decodeOption(Schema.parseJson()))));
 
 export const MomentoStringCacheJson = (): Cache<unknown, MomentoClientDeps> => {
   const cache = MomentoStringCache;

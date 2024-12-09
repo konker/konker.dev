@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Cache } from '../Cache';
@@ -17,12 +17,12 @@ describe('helpers', () => {
     });
 
     it('should work as expected', async () => {
-      await P.Effect.runPromise(cache.setVal(TEST_KEY, TEST_VALUE));
+      await Effect.runPromise(cache.setVal(TEST_KEY, TEST_VALUE));
       const actual1 = unit.chainGetVal(cache)(TEST_KEY);
       const actual2 = unit.chainGetVal(cache)('DOES_NOT_EXIST_KEY');
 
-      await expect(P.Effect.runPromise(actual1)).resolves.toStrictEqual(TEST_VALUE);
-      await expect(P.Effect.runPromise(actual2)).rejects.toThrow();
+      await expect(Effect.runPromise(actual1)).resolves.toStrictEqual(TEST_VALUE);
+      await expect(Effect.runPromise(actual2)).rejects.toThrow();
     });
   });
 
@@ -36,7 +36,7 @@ describe('helpers', () => {
     it('should work as expected', async () => {
       const actual = unit.chainSetVal(cache, TEST_KEY, TEST_VALUE);
 
-      await expect(P.Effect.runPromise(actual)).resolves.toStrictEqual(TEST_VALUE);
+      await expect(Effect.runPromise(actual)).resolves.toStrictEqual(TEST_VALUE);
     });
   });
 });

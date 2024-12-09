@@ -1,8 +1,8 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 
 import type { CacheKeyResolver } from './index';
 
 export const DefaultCacheKeyResolver =
   <I>(): CacheKeyResolver<I> =>
   (i: I) =>
-    P.Effect.succeed(String(i));
+    Effect.succeed(String(i));

@@ -1,4 +1,5 @@
-import type * as P from '@konker.dev/effect-ts-prelude';
+import type { Option } from 'effect';
+import type * as Effect from 'effect/Effect';
 
 import type { CacheError } from './lib/error.js';
 
@@ -8,11 +9,11 @@ export type Cache<C, R> = {
   readonly _kind: typeof CACHE_KIND_CACHE;
 
   // Write a cache entry with the given key and value
-  readonly setVal: (key: string, value: C, ttlSecs?: number) => P.Effect.Effect<void, CacheError, R>;
+  readonly setVal: (key: string, value: C, ttlSecs?: number) => Effect.Effect<void, CacheError, R>;
 
   // Get a cache entry with the given key
-  readonly getVal: (key: string) => P.Effect.Effect<P.Option.Option<C>, CacheError, R>;
+  readonly getVal: (key: string) => Effect.Effect<Option.Option<C>, CacheError, R>;
 
   // Delete a cache entry with the given key
-  readonly delVal: (key: string) => P.Effect.Effect<void, CacheError, R>;
+  readonly delVal: (key: string) => Effect.Effect<void, CacheError, R>;
 };
