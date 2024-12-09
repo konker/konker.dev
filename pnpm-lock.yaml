@@ -1289,9 +1289,9 @@ importers:
 
   packages/tiny-error-fp:
     dependencies:
-      '@konker.dev/effect-ts-prelude':
-        specifier: workspace:^
-        version: link:../effect-ts-prelude
+      effect:
+        specifier: ^3.11.3
+        version: 3.11.3
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.17.1

@@ -1,5 +1,5 @@
 /* eslint-disable fp/no-class,fp/no-unused-expression,fp/no-mutation,fp/no-this,fp/no-nil */
-import * as P from '@konker.dev/effect-ts-prelude';
+import { Either, identity, pipe, Schema } from 'effect';
 
 import {
   TINY_ERROR_DEFAULT_CODE_TAG,
@@ -115,10 +115,10 @@ export const toTinyError =
     return ctor(
       name,
       message ??
-        P.pipe(
+        pipe(
           x,
-          P.Schema.encodeEither(P.Schema.parseJson()),
-          P.Either.match({ onLeft: TINY_ERROR_UNKNOWN_STRING, onRight: P.identity })
+          Schema.encodeEither(Schema.parseJson()),
+          Either.match({ onLeft: TINY_ERROR_UNKNOWN_STRING, onRight: identity })
         ),
       statusCode,
       codeTag,

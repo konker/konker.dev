@@ -23,7 +23,7 @@
     "!dist/**/*.test.*"
   ],
   "dependencies": {
-    "@konker.dev/effect-ts-prelude": "workspace:^"
+    "effect": "^3.11.3"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",
