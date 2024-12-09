@@ -23,8 +23,6 @@
   ],
   "main": "dist/index.js",
   "dependencies": {
-    "@effect/schema": "^0.68.27",
-    "@konker.dev/effect-ts-prelude": "workspace:*",
     "@konker.dev/tiny-error-fp": "workspace:*",
     "effect": "^3.11.2"
   },
