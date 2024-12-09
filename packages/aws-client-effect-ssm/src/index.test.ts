@@ -8,8 +8,9 @@ import type {
 } from '@aws-sdk/client-ssm';
 import * as ssmClient from '@aws-sdk/client-ssm';
 import { SSMClient } from '@aws-sdk/client-ssm';
-import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
@@ -45,12 +46,12 @@ describe('aws-client-effect-ssm', () => {
   // ------------------------------------------------------------------------
   describe('defaultSSMClientFactoryDeps', () => {
     it('should work as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.SSMClientFactoryDeps,
-        P.Effect.map((deps) => deps.ssmClientFactory),
+        Effect.map((deps) => deps.ssmClientFactory),
         unit.defaultSSMClientFactoryDeps
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
       expect(actual).toBeInstanceOf(Function);
     });
   });
@@ -58,12 +59,12 @@ describe('aws-client-effect-ssm', () => {
   // ------------------------------------------------------------------------
   describe('defaultSSMClientDeps', () => {
     it('should work as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.SSMClientDeps,
-        P.Effect.map((deps) => deps.ssmClient),
+        Effect.map((deps) => deps.ssmClient),
         unit.defaultSSMClientDeps({})
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
       expect(actual).toBeInstanceOf(SSMClient);
     });
   });
@@ -81,8 +82,8 @@ describe('aws-client-effect-ssm', () => {
         Name: 'test-param-name',
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(unit.DeleteParameterCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.DeleteParameterCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(ssmMock.calls().length).toEqual(1);
     });
 
@@ -92,8 +93,8 @@ describe('aws-client-effect-ssm', () => {
       const params: DeleteParameterCommandInput = {
         Name: 'test-param-name',
       };
-      const command = P.pipe(unit.DeleteParameterCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.DeleteParameterCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(ssmMock.calls().length).toEqual(1);
     });
   });
@@ -111,8 +112,8 @@ describe('aws-client-effect-ssm', () => {
         Names: ['test-param-name-1', 'test-param-name-2'],
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(unit.DeleteParametersCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.DeleteParametersCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(ssmMock.calls().length).toEqual(1);
     });
 
@@ -122,8 +123,8 @@ describe('aws-client-effect-ssm', () => {
       const params: DeleteParametersCommandInput = {
         Names: ['test-param-name-1', 'test-param-name-2'],
       };
-      const command = P.pipe(unit.DeleteParametersCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.DeleteParametersCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(ssmMock.calls().length).toEqual(1);
     });
   });
@@ -148,8 +149,8 @@ describe('aws-client-effect-ssm', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(unit.GetParameterCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.GetParameterCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(ssmMock.calls().length).toEqual(1);
     });
 
@@ -159,8 +160,8 @@ describe('aws-client-effect-ssm', () => {
       const params: GetParameterCommandInput = {
         Name: 'test-param-name',
       };
-      const command = P.pipe(unit.GetParameterCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.GetParameterCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(ssmMock.calls().length).toEqual(1);
     });
   });
@@ -189,11 +190,8 @@ describe('aws-client-effect-ssm', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(
-        unit.GetParametersByPathCommandEffect(params),
-        P.Effect.provideService(SSMClientDeps, deps)
-      );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.GetParametersByPathCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(ssmMock.calls().length).toEqual(1);
     });
 
@@ -201,11 +199,8 @@ describe('aws-client-effect-ssm', () => {
       ssmMock.on(ssmClient.GetParametersByPathCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: GetParametersByPathCommandInput = { Path: '/foo/bar' };
-      const command = P.pipe(
-        unit.GetParametersByPathCommandEffect(params),
-        P.Effect.provideService(SSMClientDeps, deps)
-      );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.GetParametersByPathCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(ssmMock.calls().length).toEqual(1);
     });
   });
@@ -236,8 +231,8 @@ describe('aws-client-effect-ssm', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(unit.GetParametersCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.GetParametersCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(ssmMock.calls().length).toEqual(1);
     });
 
@@ -245,8 +240,8 @@ describe('aws-client-effect-ssm', () => {
       ssmMock.on(ssmClient.GetParametersCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: GetParametersCommandInput = { Names: ['test-param-name-1', 'test-param-name-2'] };
-      const command = P.pipe(unit.GetParametersCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.GetParametersCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(ssmMock.calls().length).toEqual(1);
     });
   });
@@ -268,8 +263,8 @@ describe('aws-client-effect-ssm', () => {
         Value: 'test-value-2',
       };
       const expected = { $metadata: { httpStatusCode: 201 }, _Params: params };
-      const command = P.pipe(unit.PutParameterCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.PutParameterCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(ssmMock.calls().length).toEqual(1);
     });
 
@@ -281,8 +276,8 @@ describe('aws-client-effect-ssm', () => {
         Type: 'String',
         Value: 'test-value-2',
       };
-      const command = P.pipe(unit.PutParameterCommandEffect(params), P.Effect.provideService(SSMClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.PutParameterCommandEffect(params), Effect.provideService(SSMClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(ssmMock.calls().length).toEqual(1);
     });
   });

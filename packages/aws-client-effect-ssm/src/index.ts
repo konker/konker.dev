@@ -1,8 +1,9 @@
 import type { SSMClient } from '@aws-sdk/client-ssm';
 import * as ssmClient from '@aws-sdk/client-ssm';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import { Context, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { SsmError } from './lib/error.js';
 import { toSsmError } from './lib/error.js';
@@ -16,11 +17,11 @@ export const defaultSSMClientFactory: SSMClientFactory = (config: ssmClient.SSMC
 export type SSMClientFactoryDeps = {
   readonly ssmClientFactory: SSMClientFactory;
 };
-export const SSMClientFactoryDeps = P.Context.GenericTag<SSMClientFactoryDeps>(
+export const SSMClientFactoryDeps = Context.GenericTag<SSMClientFactoryDeps>(
   '@aws-client-effect-ssm/SSMClientFactoryDeps'
 );
 
-export const defaultSSMClientFactoryDeps = P.Effect.provideService(
+export const defaultSSMClientFactoryDeps = Effect.provideService(
   SSMClientFactoryDeps,
   SSMClientFactoryDeps.of({
     ssmClientFactory: defaultSSMClientFactory,
@@ -31,10 +32,10 @@ export const defaultSSMClientFactoryDeps = P.Effect.provideService(
 export type SSMClientDeps = {
   readonly ssmClient: SSMClient;
 };
-export const SSMClientDeps = P.Context.GenericTag<SSMClientDeps>('aws-client-effect-ssm/SSMClientDeps');
+export const SSMClientDeps = Context.GenericTag<SSMClientDeps>('aws-client-effect-ssm/SSMClientDeps');
 
 export const defaultSSMClientDeps = (config: ssmClient.SSMClientConfig) =>
-  P.Effect.provideService(
+  Effect.provideService(
     SSMClientDeps,
     SSMClientDeps.of({
       ssmClient: defaultSSMClientFactory(config),
@@ -58,12 +59,12 @@ export function FabricateCommandEffect<I extends ssmClient.ServiceInputTypes, O 
 ): (
   params: I,
   options?: HttpHandlerOptions | undefined
-) => P.Effect.Effect<O & SSMEchoParams<I>, SsmError, SSMClientDeps> {
+) => Effect.Effect<O & SSMEchoParams<I>, SsmError, SSMClientDeps> {
   return function (params, options) {
-    return P.pipe(
+    return pipe(
       SSMClientDeps,
-      P.Effect.flatMap((deps) =>
-        P.Effect.tryPromise({
+      Effect.flatMap((deps) =>
+        Effect.tryPromise({
           try: async () => {
             const cmd = new cmdCtor(params);
             const result = await deps.ssmClient.send(cmd, options);
