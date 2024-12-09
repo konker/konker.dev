@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import type * as jwt from 'jsonwebtoken';
 
 // --------------------------------------------------------------------------
@@ -23,20 +23,18 @@ export function JwtUserContext(verified: boolean, jwtPayload?: JwtPayloadSubIss)
 }
 
 // --------------------------------------------------------------------------
-export function checkJwtPayloadIssSub(
-  payload: jwt.JwtPayload | string | null
-): P.Effect.Effect<JwtPayloadSubIss, Error> {
+export function checkJwtPayloadIssSub(payload: jwt.JwtPayload | string | null): Effect.Effect<JwtPayloadSubIss, Error> {
   if (!payload) {
-    return P.Effect.fail(new Error('Invalid token payload: null'));
+    return Effect.fail(new Error('Invalid token payload: null'));
   }
   if (typeof payload === 'string') {
-    return P.Effect.fail(new Error('Invalid token payload: string'));
+    return Effect.fail(new Error('Invalid token payload: string'));
   }
   const sub = payload.sub;
   const iss = payload.iss;
   if (!sub || !iss) {
-    return P.Effect.fail(new Error('Invalid token payload: missing iss or sub'));
+    return Effect.fail(new Error('Invalid token payload: missing iss or sub'));
   }
 
-  return P.Effect.succeed({ ...payload, sub, iss });
+  return Effect.succeed({ ...payload, sub, iss });
 }

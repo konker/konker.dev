@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -44,14 +44,14 @@ describe('jwt/rsa', () => {
   describe('jwtSignTokenRsa', () => {
     it('should sign a token', () => {
       const actual = unit.jwtSignTokenRsa(TEST_JWT_PAYLOAD, TEST_SIGNING_CONFIG);
-      expect(P.Effect.runSync(actual)).toBe(TEST_TOKEN_RSA);
+      expect(Effect.runSync(actual)).toBe(TEST_TOKEN_RSA);
     });
   });
 
   describe('jwtVerifyTokenRsa', () => {
     it('should verify a valid token', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: true, userId: TEST_JWT_SUB, ...TEST_SIGNED_PAYLOAD });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: true, userId: TEST_JWT_SUB, ...TEST_SIGNED_PAYLOAD });
     });
 
     it('should return an error if the token is invalid, wrong key', () => {
@@ -59,32 +59,32 @@ describe('jwt/rsa', () => {
         TEST_TOKEN_RSA,
         Object.assign({}, TEST_VERIFICATION_CONFIG, { rsaPublicKey: TEST_RSA_KEY_PUBLIC_OTHER })
       );
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, expired', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_EXPIRED, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, wrong issuer', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_OTHER_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, missing issuer', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_MISSING_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, missing subject', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_MISSING_SUBJECT, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, string payload', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_STRING_PAYLOAD, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
   });
 });

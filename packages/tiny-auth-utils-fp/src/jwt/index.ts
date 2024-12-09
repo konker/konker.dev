@@ -1,4 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import * as jwt from 'jsonwebtoken';
 
 import type { JwtPayloadSubIss } from './common.js';
@@ -16,46 +18,46 @@ export type JwtVerificationConfig = {
 };
 
 // --------------------------------------------------------------------------
-export function jwtDecodeToken(token: string): P.Effect.Effect<jwt.JwtPayload, Error> {
-  return P.pipe(
-    P.Effect.try({
+export function jwtDecodeToken(token: string): Effect.Effect<jwt.JwtPayload, Error> {
+  return pipe(
+    Effect.try({
       try: () => jwt.decode(token),
-      catch: P.toError,
+      catch: toError,
     }),
-    P.Effect.flatMap((decoded) =>
+    Effect.flatMap((decoded) =>
       !decoded || typeof decoded === 'string'
-        ? P.Effect.fail(new Error('Invalid token payload'))
-        : P.Effect.succeed(decoded)
+        ? Effect.fail(new Error('Invalid token payload'))
+        : Effect.succeed(decoded)
     )
   );
 }
 
 // --------------------------------------------------------------------------
-export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): P.Effect.Effect<string, Error> {
-  return P.Effect.try({
+export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): Effect.Effect<string, Error> {
+  return Effect.try({
     try: () =>
       jwt.sign(payload, config.signingSecret, {
         issuer: config.issuer,
         expiresIn: config.maxTtlSec,
       }),
-    catch: P.toError,
+    catch: toError,
   });
 }
 
 // --------------------------------------------------------------------------
-export function jwtVerifyToken(token: string, config: JwtVerificationConfig): P.Effect.Effect<JwtUserContext> {
-  return P.pipe(
-    P.Effect.try({
+export function jwtVerifyToken(token: string, config: JwtVerificationConfig): Effect.Effect<JwtUserContext> {
+  return pipe(
+    Effect.try({
       try: () =>
         jwt.verify(token, config.signingSecret, {
           issuer: config.issuer,
           // [FIXME: make this configurable?]
           // maxAge: config.maxTtlSec,
         }),
-      catch: P.toError,
+      catch: toError,
     }),
-    P.Effect.flatMap(checkJwtPayloadIssSub),
-    P.Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
-    P.Effect.orElse(() => P.Effect.succeed(JwtUserContext(false)))
+    Effect.flatMap(checkJwtPayloadIssSub),
+    Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
+    Effect.orElse(() => Effect.succeed(JwtUserContext(false)))
   );
 }

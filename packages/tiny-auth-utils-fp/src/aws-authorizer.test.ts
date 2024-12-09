@@ -1,5 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { APIGatewayAuthorizerResult } from 'aws-lambda';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './aws-authorizer';
@@ -44,14 +44,14 @@ describe('aws-authorizer', () => {
       const actual = unit.transformLambdaAuthorizerArn(
         'arn:aws:execute-api:eu-north-1:898403669204:caidu80ct6/$default/GET/users/a0000000-a000-4000-a000-a00000000000/widgets'
       );
-      expect(P.Effect.runSync(actual)).toEqual('arn:aws:execute-api:eu-north-1:898403669204:caidu80ct6/$default/*');
+      expect(Effect.runSync(actual)).toEqual('arn:aws:execute-api:eu-north-1:898403669204:caidu80ct6/$default/*');
     });
 
     it('should behave as expected with bad input', () => {
       const actual = unit.transformLambdaAuthorizerArn(
         'FOO:aws:execute-api:eu-west-1:111111111111:h656j4cxjf/test/GET/'
       );
-      expect(() => P.Effect.runSync(actual)).toThrow('Invalid arn');
+      expect(() => Effect.runSync(actual)).toThrow('Invalid arn');
     });
   });
 

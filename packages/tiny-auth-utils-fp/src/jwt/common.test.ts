@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import * as jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -40,26 +40,26 @@ describe('jwt/common', () => {
   describe('checkJwtPayloadIssSub', () => {
     it('should verify a valid token', () => {
       const actual = unit.checkJwtPayloadIssSub(jwt.decode(TEST_TOKEN));
-      expect(P.Effect.runSync(actual)).toStrictEqual(TEST_SIGNED_PAYLOAD);
+      expect(Effect.runSync(actual)).toStrictEqual(TEST_SIGNED_PAYLOAD);
     });
 
     it('should return an error if the token is invalid, missing issuer', () => {
       const actual = unit.checkJwtPayloadIssSub(jwt.decode(TEST_TOKEN_MISSING_ISSUER));
-      expect(() => P.Effect.runSync(actual)).toThrow('Invalid token payload: missing iss or sub');
+      expect(() => Effect.runSync(actual)).toThrow('Invalid token payload: missing iss or sub');
     });
 
     it('should return an error if the token is invalid, missing subject', () => {
       const actual = unit.checkJwtPayloadIssSub(jwt.decode(TEST_TOKEN_MISSING_SUBJECT));
-      expect(() => P.Effect.runSync(actual)).toThrow('missing iss or sub');
+      expect(() => Effect.runSync(actual)).toThrow('missing iss or sub');
     });
 
     it('should return an error if the token is invalid, string payload', () => {
       const actual = unit.checkJwtPayloadIssSub(jwt.decode(TEST_TOKEN_STRING_PAYLOAD));
-      expect(() => P.Effect.runSync(actual)).toThrow('Invalid token payload: string');
+      expect(() => Effect.runSync(actual)).toThrow('Invalid token payload: string');
     });
     it('should return an error if the token is invalid, null', () => {
       const actual = unit.checkJwtPayloadIssSub(jwt.decode('banana'));
-      expect(() => P.Effect.runSync(actual)).toThrow('Invalid token payload: null');
+      expect(() => Effect.runSync(actual)).toThrow('Invalid token payload: null');
     });
   });
 });

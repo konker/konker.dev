@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './basic-auth';
@@ -60,7 +60,7 @@ describe('basic-auth', () => {
   describe('basicAuthDecodeHeaderValue', () => {
     it('should work as expected with valid input', () => {
       const actual = unit.basicAuthDecodeHeaderValue('Zm9vOmJhcg==');
-      expect(P.Effect.runSync(actual)).toStrictEqual({
+      expect(Effect.runSync(actual)).toStrictEqual({
         username: 'foo',
         password: 'bar',
       });
@@ -68,17 +68,17 @@ describe('basic-auth', () => {
 
     it('should fail as expected with undefined input', () => {
       const actual = unit.basicAuthDecodeHeaderValue(undefined);
-      expect(() => P.Effect.runSync(actual)).toThrow();
+      expect(() => Effect.runSync(actual)).toThrow();
     });
 
     it('should fail as expected with invalid base64 input', () => {
       const actual = unit.basicAuthDecodeHeaderValue('===');
-      expect(() => P.Effect.runSync(actual)).toThrow();
+      expect(() => Effect.runSync(actual)).toThrow();
     });
 
     it('should fail as expected with invalid base64 input', () => {
       const actual = unit.basicAuthDecodeHeaderValue('bm9jb2xvbg==');
-      expect(() => P.Effect.runSync(actual)).toThrow('Invalid basic auth payload');
+      expect(() => Effect.runSync(actual)).toThrow('Invalid basic auth payload');
     });
   });
 
@@ -89,7 +89,7 @@ describe('basic-auth', () => {
         password: 'secret1',
       });
       expect(actual).toStrictEqual(
-        P.Effect.succeed({
+        Effect.succeed({
           verified: true,
           userId: 'user0',
         })
@@ -102,7 +102,7 @@ describe('basic-auth', () => {
         password: 'secret1',
       });
       expect(actual).toStrictEqual(
-        P.Effect.succeed({
+        Effect.succeed({
           verified: true,
         })
       );
@@ -114,7 +114,7 @@ describe('basic-auth', () => {
         password: 'bad-secret',
       });
       expect(actual).toStrictEqual(
-        P.Effect.succeed({
+        Effect.succeed({
           verified: false,
         })
       );
@@ -125,7 +125,7 @@ describe('basic-auth', () => {
         username: 'not-user0',
         password: 'secret0',
       });
-      expect(actual).toStrictEqual(P.Effect.succeed({ verified: false }));
+      expect(actual).toStrictEqual(Effect.succeed({ verified: false }));
     });
   });
 });

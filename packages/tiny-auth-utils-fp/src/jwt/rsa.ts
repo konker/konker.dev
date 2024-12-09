@@ -1,4 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import * as jwt from 'jsonwebtoken';
 
 import type { JwtPayloadSubIss } from './common.js';
@@ -17,22 +19,22 @@ export type JwtVerificationConfigRsa = {
 };
 
 // --------------------------------------------------------------------------
-export function jwtSignTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): P.Effect.Effect<string, Error> {
-  return P.Effect.try({
+export function jwtSignTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): Effect.Effect<string, Error> {
+  return Effect.try({
     try: () =>
       jwt.sign(payload, config.rsaPrivateKey, {
         issuer: config.issuer,
         expiresIn: config.maxTtlSec,
         algorithm: 'RS256',
       }),
-    catch: P.toError,
+    catch: toError,
   });
 }
 
 // --------------------------------------------------------------------------
-export function jwtVerifyTokenRsa(token: string, config: JwtVerificationConfigRsa): P.Effect.Effect<JwtUserContext> {
-  return P.pipe(
-    P.Effect.try({
+export function jwtVerifyTokenRsa(token: string, config: JwtVerificationConfigRsa): Effect.Effect<JwtUserContext> {
+  return pipe(
+    Effect.try({
       try: () =>
         jwt.verify(token, config.rsaPublicKey, {
           issuer: config.issuer,
@@ -40,10 +42,10 @@ export function jwtVerifyTokenRsa(token: string, config: JwtVerificationConfigRs
           // [FIXME: make this configurable?]
           // maxAge: config.maxTtlSec,
         }),
-      catch: P.toError,
+      catch: toError,
     }),
-    P.Effect.flatMap(checkJwtPayloadIssSub),
-    P.Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
-    P.Effect.orElse(() => P.Effect.succeed(JwtUserContext(false)))
+    Effect.flatMap(checkJwtPayloadIssSub),
+    Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
+    Effect.orElse(() => Effect.succeed(JwtUserContext(false)))
   );
 }

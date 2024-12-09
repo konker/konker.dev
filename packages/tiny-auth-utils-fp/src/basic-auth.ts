@@ -1,5 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe, Schema } from 'effect';
 import type { NonEmptyArray } from 'effect/Array';
+import * as Effect from 'effect/Effect';
 
 // --------------------------------------------------------------------------
 export const BASIC_AUTH_WILDCARD_USERNAME = '*';
@@ -41,19 +42,19 @@ export const basicAuthCredentialMatch = (basicAuth: BasicAuthCredentials) => (va
 // --------------------------------------------------------------------------
 export function basicAuthDecodeHeaderValue(
   basicAuthHeaderValue: string | undefined
-): P.Effect.Effect<BasicAuthCredentials, Error> {
-  return P.pipe(
+): Effect.Effect<BasicAuthCredentials, Error> {
+  return pipe(
     basicAuthHeaderValue,
-    P.Schema.decodeUnknown(P.Schema.StringFromBase64),
-    P.Effect.flatMap((decoded) => {
+    Schema.decodeUnknown(Schema.StringFromBase64),
+    Effect.flatMap((decoded) => {
       const parts = decoded.split(':');
-      return P.Effect.if(parts.length === 2, {
+      return Effect.if(parts.length === 2, {
         onTrue: () =>
-          P.Effect.succeed({
+          Effect.succeed({
             username: parts[0]!,
             password: parts[1]!,
           }),
-        onFalse: () => P.Effect.fail(new Error('Invalid basic auth payload')),
+        onFalse: () => Effect.fail(new Error('Invalid basic auth payload')),
       });
     })
   );
@@ -62,9 +63,9 @@ export function basicAuthDecodeHeaderValue(
 // --------------------------------------------------------------------------
 export const basicAuthVerifyCredentials =
   (valid: ValidBasicAuthCredentialSet) =>
-  (basicAuth: BasicAuthCredentials): P.Effect.Effect<BasicAuthUserContext> => {
-    return P.Effect.if(valid.some(basicAuthCredentialMatch(basicAuth)), {
-      onTrue: () => P.Effect.succeed(BasicAuthUserContext(true, basicAuth.username)),
-      onFalse: () => P.Effect.succeed(BasicAuthUserContext(false)),
+  (basicAuth: BasicAuthCredentials): Effect.Effect<BasicAuthUserContext> => {
+    return Effect.if(valid.some(basicAuthCredentialMatch(basicAuth)), {
+      onTrue: () => Effect.succeed(BasicAuthUserContext(true, basicAuth.username)),
+      onFalse: () => Effect.succeed(BasicAuthUserContext(false)),
     });
   };

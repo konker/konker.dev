@@ -28,8 +28,6 @@
     "jsonwebtoken": "^9.0.2"
   },
   "dependencies": {
-    "@effect/schema": "^0.72.4",
-    "@konker.dev/effect-ts-prelude": "workspace:*",
     "@konker.dev/tiny-error-fp": "workspace:*",
     "effect": "^3.11.2"
   },

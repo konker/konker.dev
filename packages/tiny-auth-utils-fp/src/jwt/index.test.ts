@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -39,26 +39,26 @@ describe('jwt', () => {
   describe('jwtDecodeToken', () => {
     it('should decode a token', () => {
       const actual = unit.jwtDecodeToken(TEST_TOKEN);
-      expect(P.Effect.runSync(actual)).toStrictEqual(TEST_SIGNED_PAYLOAD);
+      expect(Effect.runSync(actual)).toStrictEqual(TEST_SIGNED_PAYLOAD);
     });
 
     it('should fail to decode a token with a string payload', () => {
       const actual = unit.jwtDecodeToken(TEST_TOKEN_STRING_PAYLOAD);
-      expect(() => P.Effect.runSync(actual)).toThrow('Invalid token payload');
+      expect(() => Effect.runSync(actual)).toThrow('Invalid token payload');
     });
   });
 
   describe('jwtSignToken', () => {
     it('should sign a token', () => {
       const actual = unit.jwtSignToken(TEST_JWT_PAYLOAD, TEST_SIGNING_CONFIG);
-      expect(P.Effect.runSync(actual)).toBe(TEST_TOKEN);
+      expect(Effect.runSync(actual)).toBe(TEST_TOKEN);
     });
   });
 
   describe('jwtVerifyToken', () => {
     it('should verify a valid token', () => {
       const actual = unit.jwtVerifyToken(TEST_TOKEN, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({
+      expect(Effect.runSync(actual)).toStrictEqual({
         userId: 'test-sub',
         verified: true,
         ...TEST_SIGNED_PAYLOAD,
@@ -70,32 +70,32 @@ describe('jwt', () => {
         TEST_TOKEN,
         Object.assign({}, TEST_VERIFICATION_CONFIG, { signingSecret: 'wrong' })
       );
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, expired', () => {
       const actual = unit.jwtVerifyToken(TEST_TOKEN_EXPIRED, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, wrong issuer', () => {
       const actual = unit.jwtVerifyToken(TEST_TOKEN_OTHER_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, missing issuer', () => {
       const actual = unit.jwtVerifyToken(TEST_TOKEN_MISSING_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, missing subject', () => {
       const actual = unit.jwtVerifyToken(TEST_TOKEN_MISSING_SUBJECT, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
 
     it('should return an error if the token is invalid, string payload', () => {
       const actual = unit.jwtVerifyToken(TEST_TOKEN_STRING_PAYLOAD, TEST_VERIFICATION_CONFIG);
-      expect(P.Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
     });
   });
 });

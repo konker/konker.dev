@@ -1095,12 +1095,6 @@ importers:
 
   packages/tiny-auth-utils-fp:
     dependencies:
-      '@effect/schema':
-        specifier: ^0.72.4
-        version: 0.72.4(effect@3.11.3)
-      '@konker.dev/effect-ts-prelude':
-        specifier: workspace:*
-        version: link:../effect-ts-prelude
       '@konker.dev/tiny-error-fp':
         specifier: workspace:*
         version: link:../tiny-error-fp
