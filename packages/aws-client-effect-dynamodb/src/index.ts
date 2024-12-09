@@ -1,7 +1,8 @@
 import * as dynamodbDocClient from '@aws-sdk/lib-dynamodb';
 import type { Command, HandlerOptions, HttpHandlerOptions } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import { DynamoDBDocumentClientDeps } from './lib/client.js';
 import type { DynamoDbError } from './lib/error.js';
@@ -27,12 +28,12 @@ export function FabricateCommandEffect<
 ): (
   params: I,
   options?: HttpHandlerOptions | undefined
-) => P.Effect.Effect<O & DynamoDBEchoParams<I>, DynamoDbError, DynamoDBDocumentClientDeps> {
+) => Effect.Effect<O & DynamoDBEchoParams<I>, DynamoDbError, DynamoDBDocumentClientDeps> {
   return function (params, options) {
-    return P.pipe(
+    return pipe(
       DynamoDBDocumentClientDeps,
-      P.Effect.flatMap((deps) =>
-        P.Effect.tryPromise({
+      Effect.flatMap((deps) =>
+        Effect.tryPromise({
           try: async () => {
             const cmd = new cmdCtor(params);
             const result = await deps.dynamoDBDocumentClient.send(cmd, options);

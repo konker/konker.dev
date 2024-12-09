@@ -1,6 +1,7 @@
 import * as dynamodb from '@aws-sdk/client-dynamodb';
 import * as dynamodbDocClient from '@aws-sdk/lib-dynamodb';
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { describe, expect, test } from 'vitest';
 
 import * as unit from './client';
@@ -22,38 +23,35 @@ describe('aws-client-effect-dynamodb/lib/client', () => {
 
   describe('Deps', () => {
     test('defaultDynamoDBClientFactoryDeps works as expected', async () => {
-      const actualUnwrapped = P.pipe(
+      const actualUnwrapped = pipe(
         unit.DynamoDBClientFactoryDeps,
-        P.Effect.map((deps) => deps.dynamoDBClientFactory({})),
+        Effect.map((deps) => deps.dynamoDBClientFactory({})),
         unit.defaultDynamoDBClientFactoryDeps
       );
 
-      expect(P.Effect.runSync(actualUnwrapped)).toBeInstanceOf(dynamodb.DynamoDBClient);
+      expect(Effect.runSync(actualUnwrapped)).toBeInstanceOf(dynamodb.DynamoDBClient);
     });
 
     test('defaultDynamoDBDocumentClientFactoryDeps works as expected', async () => {
       const defaultClientHandle = unit.defaultDynamoDBClientFactory({});
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.DynamoDBDocumentClientFactoryDeps,
-        P.Effect.map((deps) => [
-          deps.dynamoDBClientFactory({}),
-          deps.dynamoDBDocumentClientFactory(defaultClientHandle),
-        ]),
+        Effect.map((deps) => [deps.dynamoDBClientFactory({}), deps.dynamoDBDocumentClientFactory(defaultClientHandle)]),
         unit.defaultDynamoDBDocumentClientFactoryDeps
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
 
       expect(actual[0]).toBeInstanceOf(dynamodb.DynamoDBClient);
       expect(actual[1]).toBeInstanceOf(dynamodbDocClient.DynamoDBDocumentClient);
     });
 
     test('defaultDynamoDBDocumentClientDeps works as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.DynamoDBDocumentClientDeps,
-        P.Effect.map((deps) => [deps.dynamoDBClient, deps.dynamoDBDocumentClient]),
+        Effect.map((deps) => [deps.dynamoDBClient, deps.dynamoDBDocumentClient]),
         unit.defaultDynamoDBDocumentClientDeps({})
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
 
       expect(actual[0]).toBeInstanceOf(dynamodb.DynamoDBClient);
       expect(actual[1]).toBeInstanceOf(dynamodbDocClient.DynamoDBDocumentClient);
@@ -62,32 +60,32 @@ describe('aws-client-effect-dynamodb/lib/client', () => {
 
   describe('Helpers', () => {
     test('createDynamoDBDocumentClientDeps works as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         DynamoDBDocumentClientFactoryDeps,
-        P.Effect.flatMap((factoryDeps) => P.pipe(factoryDeps, unit.createDynamoDBDocumentClientDeps({}))),
-        P.Effect.flatMap((deps) =>
-          P.pipe(
+        Effect.flatMap((factoryDeps) => pipe(factoryDeps, unit.createDynamoDBDocumentClientDeps({}))),
+        Effect.flatMap((deps) =>
+          pipe(
             DynamoDBDocumentClientDeps,
-            P.Effect.map((unwrappedDeps) => [unwrappedDeps.dynamoDBClient, unwrappedDeps.dynamoDBDocumentClient]),
-            P.Effect.provideService(DynamoDBDocumentClientDeps, deps)
+            Effect.map((unwrappedDeps) => [unwrappedDeps.dynamoDBClient, unwrappedDeps.dynamoDBDocumentClient]),
+            Effect.provideService(DynamoDBDocumentClientDeps, deps)
           )
         ),
         unit.defaultDynamoDBDocumentClientFactoryDeps
       );
-      const actual = await P.Effect.runPromise(actualEffect);
+      const actual = await Effect.runPromise(actualEffect);
 
       expect(actual[0]).toBeInstanceOf(dynamodb.DynamoDBClient);
       expect(actual[1]).toBeInstanceOf(dynamodbDocClient.DynamoDBDocumentClient);
     });
 
     test('cleanupDynamoDBDocumentClientDeps works as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         DynamoDBDocumentClientDeps,
-        P.Effect.flatMap((deps) => unit.cleanupDynamoDBDocumentClientDeps(deps)()),
+        Effect.flatMap((deps) => unit.cleanupDynamoDBDocumentClientDeps(deps)()),
         unit.defaultDynamoDBDocumentClientDeps({})
       );
 
-      await expect(P.Effect.runPromise(actualEffect)).resolves.toBeUndefined();
+      await expect(Effect.runPromise(actualEffect)).resolves.toBeUndefined();
     });
   });
 });
