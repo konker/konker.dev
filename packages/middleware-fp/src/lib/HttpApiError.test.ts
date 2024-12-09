@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import * as unit from './HttpApiError';
 
 describe('error/ApiError', () => {

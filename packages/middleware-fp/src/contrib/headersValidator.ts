@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 import type { RequestHeaders } from '../lib/http';
@@ -14,22 +15,22 @@ export type WithValidatedHeaders<V> = {
 };
 
 export const middleware =
-  <V0, V1>(schema: P.Schema.Schema<V0, V1>) =>
+  <V0, V1>(schema: Schema.Schema<V0, V1>) =>
   <I, O, E, R>(
     wrapped: Handler<I & WithValidatedHeaders<V0>, O, E, R>
   ): Handler<I & WithPossibleInputHeaders, O, E | MiddlewareError, R> =>
   (i: I & WithPossibleInputHeaders) =>
-    P.pipe(
-      P.Effect.succeed(i),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap((i) =>
-        P.pipe(i.headers, P.Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
+    pipe(
+      Effect.succeed(i),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap((i) =>
+        pipe(i.headers, Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
       ),
-      P.Effect.mapError((e) => toMiddlewareError(e)),
-      P.Effect.map((validatedHeaders: V0) => ({
+      Effect.mapError((e) => toMiddlewareError(e)),
+      Effect.map((validatedHeaders: V0) => ({
         ...i,
         headers: validatedHeaders,
         validatorRawHeaders: i.headers,
       })),
-      P.Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped)
     );

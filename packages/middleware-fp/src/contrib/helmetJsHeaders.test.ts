@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { describe, expect, it } from 'vitest';
 
 import { http200CoreIn } from '../test/test-common';
 import * as unit from './helmetJsHeaders';
@@ -11,8 +12,8 @@ const TEST_IN: In = { headers: { FOO: 'foo_value' } };
 describe('middleware/helmet-js-headers', () => {
   describe('middleware', () => {
     it('should work as expected with default params', async () => {
-      const egHandler = P.pipe(http200CoreIn, unit.middleware());
-      const result = P.pipe(egHandler(TEST_IN), P.Effect.runPromise);
+      const egHandler = pipe(http200CoreIn, unit.middleware());
+      const result = pipe(egHandler(TEST_IN), Effect.runPromise);
       await expect(result).resolves.toMatchObject({
         headers: {
           'Cross-Origin-Embedder-Policy': 'require-corp',

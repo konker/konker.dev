@@ -1,6 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { Context, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../../index';
 import { HttpApiError } from '../../lib/HttpApiError';
@@ -13,7 +13,7 @@ export type HeaderSignatureAuthorizerDeps = {
   readonly secret: string;
   readonly signatureHeaderName: string;
 };
-export const HeaderSignatureAuthorizerDeps = P.Context.GenericTag<HeaderSignatureAuthorizerDeps>(
+export const HeaderSignatureAuthorizerDeps = Context.GenericTag<HeaderSignatureAuthorizerDeps>(
   'HeaderSignatureAuthorizerDeps'
 );
 
@@ -24,17 +24,17 @@ export const middleware =
     wrapped: Handler<I, O, E, R>
   ): Handler<I, O, E | HttpApiError, R | HeaderSignatureAuthorizerDeps> =>
   (i: I) => {
-    return P.pipe(
+    return pipe(
       HeaderSignatureAuthorizerDeps,
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap(({ secret, signatureHeaderName }) =>
-        P.Effect.if(validateHeaderSignature(i.headers[signatureHeaderName]!, i.body, secret), {
-          onTrue: () => P.Effect.succeed(i),
-          onFalse: () => P.Effect.fail(HttpApiError('UnauthorizedError', 'Invalid signature', 401)),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap(({ secret, signatureHeaderName }) =>
+        Effect.if(validateHeaderSignature(i.headers[signatureHeaderName]!, i.body, secret), {
+          onTrue: () => Effect.succeed(i),
+          onFalse: () => Effect.fail(HttpApiError('UnauthorizedError', 'Invalid signature', 401)),
         })
       ),
-      P.Effect.tapError((_) => P.Effect.logError(`UnauthorizedError: Invalid signature: ${i.body}`)),
-      P.Effect.flatMap(wrapped),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tapError((_) => Effect.logError(`UnauthorizedError: Invalid signature: ${i.body}`)),
+      Effect.flatMap(wrapped),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );
   };

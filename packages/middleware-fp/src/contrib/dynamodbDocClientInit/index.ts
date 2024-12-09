@@ -1,5 +1,3 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 import {
   cleanupDynamoDBDocumentClientDeps,
@@ -7,6 +5,8 @@ import {
   DynamoDBDocumentClientDeps,
   DynamoDBDocumentClientFactoryDeps,
 } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../../index';
 import type { MiddlewareError } from '../../lib/MiddlewareError';
@@ -22,20 +22,20 @@ export const middleware =
     wrapped: Handler<I, O, E, R | DynamoDBDocumentClientDeps>
   ): Handler<I, O, E | MiddlewareError, Adapted<R>> =>
   (i: I) =>
-    P.pipe(
-      P.Effect.Do,
-      P.Effect.bind('factoryDeps', () => DynamoDBDocumentClientFactoryDeps),
-      P.Effect.bind('dynamoDbDocumentClientDeps', ({ factoryDeps }) =>
-        P.pipe(factoryDeps, createDynamoDBDocumentClientDeps(config), P.Effect.mapError(toMiddlewareError))
+    pipe(
+      Effect.Do,
+      Effect.bind('factoryDeps', () => DynamoDBDocumentClientFactoryDeps),
+      Effect.bind('dynamoDbDocumentClientDeps', ({ factoryDeps }) =>
+        pipe(factoryDeps, createDynamoDBDocumentClientDeps(config), Effect.mapError(toMiddlewareError))
       ),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap(({ dynamoDbDocumentClientDeps }) =>
-        P.pipe(
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap(({ dynamoDbDocumentClientDeps }) =>
+        pipe(
           wrapped(i),
-          P.Effect.provideService(DynamoDBDocumentClientDeps, dynamoDbDocumentClientDeps),
-          P.Effect.tap(cleanupDynamoDBDocumentClientDeps(dynamoDbDocumentClientDeps)),
-          P.Effect.mapError(toMiddlewareError)
+          Effect.provideService(DynamoDBDocumentClientDeps, dynamoDbDocumentClientDeps),
+          Effect.tap(cleanupDynamoDBDocumentClientDeps(dynamoDbDocumentClientDeps)),
+          Effect.mapError(toMiddlewareError)
         )
       ),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );

@@ -1,8 +1,8 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import { basicAuthDecodeHeaderValue } from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
 import { extractBasicAuthHeaderValue } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
@@ -20,17 +20,17 @@ export const middleware =
     wrapped: Handler<I & WithUserId, O, E, R>
   ): Handler<I & WithNormalizedInputHeaders, O, E | MiddlewareError, R> =>
   (i: I & WithNormalizedInputHeaders) => {
-    return P.pipe(
-      P.Effect.Do,
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers['authorization'])),
-      P.Effect.bind('decoded', ({ authToken }) => basicAuthDecodeHeaderValue(authToken)),
-      P.Effect.map(({ decoded }) => ({
+    return pipe(
+      Effect.Do,
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers['authorization'])),
+      Effect.bind('decoded', ({ authToken }) => basicAuthDecodeHeaderValue(authToken)),
+      Effect.map(({ decoded }) => ({
         ...i,
         userId: decoded.username,
       })),
-      P.Effect.mapError(toMiddlewareError),
-      P.Effect.flatMap(wrapped),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
+      Effect.mapError(toMiddlewareError),
+      Effect.flatMap(wrapped),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );
   };

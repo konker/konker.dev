@@ -1,9 +1,14 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import { http200CoreIn } from '../test/test-common';
 import * as unit from './pathTokenAuthorizer';
+
+// https://stackoverflow.com/a/72885576/203284
+// https://github.com/vitest-dev/vitest/issues/6099
+vi.mock('effect/Effect', { spy: true });
 
 export const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 export const INCORRECT_TEST_PATH_TOKEN_VALUE = 'wrong-token-value';
@@ -14,7 +19,7 @@ export const PATH_TOKEN_AUTHORIZER_TEST_DEPS: unit.PathTokenAuthorizerDeps = uni
   pathParamName: 'pathToken',
 });
 
-export const mockPathTokenAuthorizerDeps = P.Effect.provideService(
+export const mockPathTokenAuthorizerDeps = Effect.provideService(
   unit.PathTokenAuthorizerDeps,
   PATH_TOKEN_AUTHORIZER_TEST_DEPS
 );
@@ -39,8 +44,8 @@ const TEST_IN_2: APIGatewayProxyEventV2 = {
   },
 } as unknown as APIGatewayProxyEventV2;
 
-describe('middleware/path-token-authorizer', () => {
-  let errorSpy: jest.SpyInstance;
+describe('middleware/path-token-authorizer KONK90', () => {
+  let errorSpy: MockInstance;
   let oldEnv: NodeJS.ProcessEnv;
 
   beforeEach(() => {
@@ -49,17 +54,17 @@ describe('middleware/path-token-authorizer', () => {
       [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
     };
 
-    jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
-    errorSpy = jest.spyOn(P.Effect, 'logError').mockReturnValue(P.Effect.succeed(undefined));
+    vi.spyOn(Effect, 'logDebug').mockReturnValue(Effect.succeed(undefined));
+    errorSpy = vi.spyOn(Effect, 'logError').mockReturnValue(Effect.succeed(undefined));
   });
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     process.env = oldEnv;
   });
 
-  test('it should work as expected in an success case', async () => {
-    const egHandler = P.pipe(http200CoreIn, unit.middleware());
-    const result = await P.pipe(egHandler(TEST_IN_1), mockPathTokenAuthorizerDeps, P.Effect.runPromise);
+  it('should work as expected in an success case', async () => {
+    const egHandler = pipe(http200CoreIn, unit.middleware());
+    const result = await pipe(egHandler(TEST_IN_1), mockPathTokenAuthorizerDeps, Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
@@ -72,11 +77,11 @@ describe('middleware/path-token-authorizer', () => {
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
-  test('it should work as expected in an error case', async () => {
-    const egHandler = P.pipe(http200CoreIn, unit.middleware());
-    const result = P.pipe(egHandler(TEST_IN_2), mockPathTokenAuthorizerDeps, P.Effect.runPromise);
+  it('should work as expected in an error case', async () => {
+    const egHandler = pipe(http200CoreIn, unit.middleware());
+    const result = pipe(egHandler(TEST_IN_2), mockPathTokenAuthorizerDeps, Effect.runPromise);
 
-    await expect(() => result).rejects.toThrow('Invalid token');
+    await expect(result).rejects.toThrow('Invalid token');
     expect(errorSpy).toHaveBeenCalledTimes(1);
   });
 });

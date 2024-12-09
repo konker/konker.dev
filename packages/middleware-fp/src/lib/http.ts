@@ -1,56 +1,57 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { Schema } from 'effect';
+import * as Effect from 'effect/Effect';
 
-export const UNKNOWN_STRING_EFFECT = <E, R>(): P.Effect.Effect<string, E, R> => P.Effect.succeed('UNKNOWN');
+export const UNKNOWN_STRING_EFFECT = <E, R>(): Effect.Effect<string, E, R> => Effect.succeed('UNKNOWN');
 
-export const WithBody = P.Schema.Struct({
-  body: P.Schema.Unknown,
+export const WithBody = Schema.Struct({
+  body: Schema.Unknown,
 });
-export type WithBody = P.Schema.Schema.Type<typeof WithBody>;
+export type WithBody = Schema.Schema.Type<typeof WithBody>;
 
-export const RequestHeaders = P.Schema.Record({
-  key: P.Schema.String,
-  value: P.Schema.Union(P.Schema.String, P.Schema.Undefined),
+export const RequestHeaders = Schema.Record({
+  key: Schema.String,
+  value: Schema.Union(Schema.String, Schema.Undefined),
 });
-export type RequestHeaders = P.Schema.Schema.Type<typeof RequestHeaders>;
+export type RequestHeaders = Schema.Schema.Type<typeof RequestHeaders>;
 
-export const OptionalRequestHeaders = P.Schema.Union(RequestHeaders, P.Schema.Undefined);
-export type OptionalRequestHeaders = P.Schema.Schema.Type<typeof OptionalRequestHeaders>;
+export const OptionalRequestHeaders = Schema.Union(RequestHeaders, Schema.Undefined);
+export type OptionalRequestHeaders = Schema.Schema.Type<typeof OptionalRequestHeaders>;
 
-export const ResponseHeaders = P.Schema.Record({
-  key: P.Schema.String,
-  value: P.Schema.Union(P.Schema.String, P.Schema.Number, P.Schema.Boolean),
+export const ResponseHeaders = Schema.Record({
+  key: Schema.String,
+  value: Schema.Union(Schema.String, Schema.Number, Schema.Boolean),
 });
-export type ResponseHeaders = P.Schema.Schema.Type<typeof ResponseHeaders>;
+export type ResponseHeaders = Schema.Schema.Type<typeof ResponseHeaders>;
 
-export const OptionalResponseHeaders = P.Schema.Union(ResponseHeaders, P.Schema.Undefined);
-export type OptionalResponseHeaders = P.Schema.Schema.Type<typeof OptionalResponseHeaders>;
+export const OptionalResponseHeaders = Schema.Union(ResponseHeaders, Schema.Undefined);
+export type OptionalResponseHeaders = Schema.Schema.Type<typeof OptionalResponseHeaders>;
 
 // --------------------------------------------------------------------------
-export const BaseResponse = P.Schema.partial(
-  P.Schema.Struct({
-    statusCode: P.Schema.Number,
+export const BaseResponse = Schema.partial(
+  Schema.Struct({
+    statusCode: Schema.Number,
     headers: ResponseHeaders,
-    isBase64Encoded: P.Schema.Union(P.Schema.Boolean, P.Schema.Undefined),
-    body: P.Schema.Unknown,
+    isBase64Encoded: Schema.Union(Schema.Boolean, Schema.Undefined),
+    body: Schema.Unknown,
   })
 );
-export type BaseResponse = P.Schema.Schema.Type<typeof BaseResponse>;
+export type BaseResponse = Schema.Schema.Type<typeof BaseResponse>;
 
 // --------------------------------------------------------------------------
-export const BaseSimpleAuthResponse = P.Schema.Struct({
-  isAuthorized: P.Schema.Boolean,
+export const BaseSimpleAuthResponse = Schema.Struct({
+  isAuthorized: Schema.Boolean,
 });
-export type BaseSimpleAuthResponse = P.Schema.Schema.Type<typeof BaseSimpleAuthResponse>;
+export type BaseSimpleAuthResponse = Schema.Schema.Type<typeof BaseSimpleAuthResponse>;
 
-export function BaseSimpleAuthResponseWithContext<T>(T: P.Schema.Schema<T>) {
-  return P.Schema.extend(
+export function BaseSimpleAuthResponseWithContext<T>(T: Schema.Schema<T>) {
+  return Schema.extend(
     BaseSimpleAuthResponse,
-    P.Schema.Struct({
+    Schema.Struct({
       context: T,
     })
   );
 }
-export type BaseSimpleAuthResponseWithContext<T> = P.Schema.Schema.Type<
+export type BaseSimpleAuthResponseWithContext<T> = Schema.Schema.Type<
   ReturnType<typeof BaseSimpleAuthResponseWithContext<T>>
 >;
 

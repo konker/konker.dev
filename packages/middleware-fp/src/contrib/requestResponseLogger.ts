@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 
@@ -8,12 +9,12 @@ export const middleware =
   () =>
   <I, O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E, R> =>
   (i: I) => {
-    return P.pipe(
-      P.Effect.succeed(i),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.tap((i) => P.Effect.logInfo(`[${TAG}] REQUEST`, i)),
-      P.Effect.flatMap(wrapped),
-      P.Effect.tap((o) => P.Effect.logInfo(`[${TAG}] RESPONSE`, o)),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
+    return pipe(
+      Effect.succeed(i),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.tap((i) => Effect.logInfo(`[${TAG}] REQUEST`, i)),
+      Effect.flatMap(wrapped),
+      Effect.tap((o) => Effect.logInfo(`[${TAG}] RESPONSE`, o)),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );
   };

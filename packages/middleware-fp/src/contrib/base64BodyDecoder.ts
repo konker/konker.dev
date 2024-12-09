@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
@@ -12,14 +13,14 @@ export const middleware =
   () =>
   <I, O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I & WithBase64Body, O, E | MiddlewareError, R> =>
   (i: I & WithBase64Body) =>
-    P.pipe(
-      P.Effect.succeed(i),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap((i) =>
-        P.Effect.try({
+    pipe(
+      Effect.succeed(i),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap((i) =>
+        Effect.try({
           try: () => (i.isBase64Encoded ? { ...i, body: Buffer.from(i.body ?? '', 'base64').toString('utf-8') } : i),
           catch: toMiddlewareError,
         })
       ),
-      P.Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped)
     );

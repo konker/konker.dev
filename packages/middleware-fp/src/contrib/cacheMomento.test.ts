@@ -1,8 +1,9 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
 import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as common from '../test/test-common';
 import { TestDeps } from '../test/test-common';
@@ -25,33 +26,33 @@ describe('middleware/cache-momento', () => {
   });
   beforeEach(() => {
     TEST_DEPS = {
-      makeMomentoClient: () => P.Effect.succeed(MockMomentoClient()),
+      makeMomentoClient: () => Effect.succeed(MockMomentoClient()),
     };
   });
   afterAll(() => {
     process.env = oldEnv;
   });
 
-  const cacheKeyResolver = <I>(_: I) => P.Effect.succeed('CACHE_KEY');
-  const coreSpy = jest.spyOn(common, 'echoCoreInDeps');
+  const cacheKeyResolver = <I>(_: I) => Effect.succeed('CACHE_KEY');
+  const coreSpy = vi.spyOn(common, 'echoCoreInDeps');
   // const stack = unit.middleware(cacheKeyResolver, cache)(common.echoCoreIn);
-  const stack = P.pipe(
+  const stack = pipe(
     common.echoCoreInDeps(common.TestDeps),
     unit.middleware<In, common.TestDeps, any>(cacheKeyResolver, cache)
   );
 
-  test('it should work as expected', async () => {
-    const result1 = await P.pipe(
+  it('should work as expected', async () => {
+    const result1 = await pipe(
       stack(TEST_IN),
-      P.Effect.provideService(TestDeps, {}),
-      P.Effect.provideService(MomentoClientDeps, TEST_DEPS),
-      P.Effect.runPromise
+      Effect.provideService(TestDeps, {}),
+      Effect.provideService(MomentoClientDeps, TEST_DEPS),
+      Effect.runPromise
     );
-    const result2 = await P.pipe(
+    const result2 = await pipe(
       stack(TEST_IN),
-      P.Effect.provideService(TestDeps, {}),
-      P.Effect.provideService(MomentoClientDeps, TEST_DEPS),
-      P.Effect.runPromise
+      Effect.provideService(TestDeps, {}),
+      Effect.provideService(MomentoClientDeps, TEST_DEPS),
+      Effect.runPromise
     );
     expect(result1).toStrictEqual({ foo: 'foo' });
     expect(result2).toStrictEqual(result1);

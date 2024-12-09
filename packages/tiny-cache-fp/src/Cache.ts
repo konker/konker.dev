@@ -1,6 +1,6 @@
 import type * as P from '@konker.dev/effect-ts-prelude';
 
-import type { CacheError } from './lib/error';
+import type { CacheError } from './lib/error.js';
 
 export const CACHE_KIND_CACHE = 'Cache' as const;
 

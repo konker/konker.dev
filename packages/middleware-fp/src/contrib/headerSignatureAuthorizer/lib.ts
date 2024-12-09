@@ -1,6 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import { sha256HmacHex } from '@konker.dev/tiny-utils-fp/dist/hash';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { HttpApiError } from '../../lib/HttpApiError';
 import { toHttpApiError } from '../../lib/HttpApiError';
@@ -9,10 +9,10 @@ export function validateHeaderSignature(
   signature: string,
   requestRawBody: unknown,
   secret: string
-): P.Effect.Effect<boolean, HttpApiError> {
-  return P.pipe(
+): Effect.Effect<boolean, HttpApiError> {
+  return pipe(
     sha256HmacHex(String(requestRawBody), secret),
-    P.Effect.flatMap((calculatedHmac) => P.Effect.succeed(calculatedHmac === signature)),
-    P.Effect.mapError(toHttpApiError)
+    Effect.flatMap((calculatedHmac) => Effect.succeed(calculatedHmac === signature)),
+    Effect.mapError(toHttpApiError)
   );
 }

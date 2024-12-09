@@ -1,19 +1,20 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import {
   DynamoDBDocumentClientDeps,
   DynamoDBDocumentClientFactoryDeps,
 } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { describe, expect, it, vi } from 'vitest';
 
 import { echoCoreInDeps } from '../../test/test-common';
 import * as unit from './index';
 
 export type In = { foo: 'foo' };
 
-const clientDestroyMock = jest.fn();
-const docClientDestroyMock = jest.fn();
-const clientFactoryMock = jest.fn().mockReturnValue({ destroy: clientDestroyMock });
-const docClientFactoryMock = jest.fn().mockReturnValue({ destroy: docClientDestroyMock });
+const clientDestroyMock = vi.fn();
+const docClientDestroyMock = vi.fn();
+const clientFactoryMock = vi.fn().mockReturnValue({ destroy: clientDestroyMock });
+const docClientFactoryMock = vi.fn().mockReturnValue({ destroy: docClientDestroyMock });
 
 const TEST_IN: In = { foo: 'foo' };
 const TEST_DEPS: DynamoDBDocumentClientFactoryDeps = DynamoDBDocumentClientFactoryDeps.of({
@@ -23,12 +24,12 @@ const TEST_DEPS: DynamoDBDocumentClientFactoryDeps = DynamoDBDocumentClientFacto
 
 describe('middleware/dynamodb-doc-client-init', () => {
   it('should work as expected', async () => {
-    const egHandler = P.pipe(echoCoreInDeps(DynamoDBDocumentClientDeps), unit.middleware({}));
+    const egHandler = pipe(echoCoreInDeps(DynamoDBDocumentClientDeps), unit.middleware({}));
 
-    const result = await P.pipe(
+    const result = await pipe(
       egHandler(TEST_IN),
-      P.Effect.provideService(DynamoDBDocumentClientFactoryDeps, TEST_DEPS),
-      P.Effect.runPromise
+      Effect.provideService(DynamoDBDocumentClientFactoryDeps, TEST_DEPS),
+      Effect.runPromise
     );
 
     //[FIXME: is this correct? should core depend on DynamoDBDocumentClientDeps?]

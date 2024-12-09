@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/konkerdotdev/momento-cache-client-effect"
+    "url": "https://github.com/konker.dev/packages/momento-cache-client-effect"
   },
   "main": "dist/index.js",
   "files": [

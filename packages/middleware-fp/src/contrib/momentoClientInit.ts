@@ -1,7 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { MomentoClientConfigProps } from '@konker.dev/momento-cache-client-effect';
 import { MomentoClientDeps, MomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 
@@ -14,17 +14,17 @@ export const middleware =
   (config: MomentoClientConfigProps) =>
   <I, O, E, R>(wrapped: Handler<I, O, E, R | MomentoClientDeps>): Handler<I, O, E, Adapted<R>> =>
   (i: I) =>
-    P.pipe(
+    pipe(
       MomentoClientFactoryDeps,
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap((deps) =>
-        P.pipe(
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap((deps) =>
+        pipe(
           wrapped(i),
-          P.Effect.provideService(
+          Effect.provideService(
             MomentoClientDeps,
             MomentoClientDeps.of({ makeMomentoClient: deps.momentoClientFactory(config) })
           )
         )
       ),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );

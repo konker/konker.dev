@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 import type { MiddlewareError } from '../lib/MiddlewareError';
@@ -10,22 +11,20 @@ export type WithBody = { body?: unknown };
 export type WithValidatedBody<V> = { body: V; validatorRawBody: unknown };
 
 export const middleware =
-  <V0, V1>(schema: P.Schema.Schema<V0, V1>) =>
+  <V0, V1>(schema: Schema.Schema<V0, V1>) =>
   <I, O, E, R>(
     wrapped: Handler<I & WithValidatedBody<V0>, O, E, R>
   ): Handler<I & WithBody, O, E | MiddlewareError, R> =>
   (i: I & WithBody) =>
-    P.pipe(
-      P.Effect.succeed(i),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap((i) =>
-        P.pipe(i.body, P.Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
-      ),
-      P.Effect.mapError((e) => toMiddlewareError(e)),
-      P.Effect.map((validatedBody: V0) => ({
+    pipe(
+      Effect.succeed(i),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap((i) => pipe(i.body, Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))),
+      Effect.mapError((e) => toMiddlewareError(e)),
+      Effect.map((validatedBody: V0) => ({
         ...i,
         body: validatedBody,
         validatorRawBody: i.body,
       })),
-      P.Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped)
     );

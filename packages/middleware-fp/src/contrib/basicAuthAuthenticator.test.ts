@@ -1,10 +1,15 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import { echoCoreIn } from '../test/test-common';
 import * as unit from './basicAuthAuthenticator';
 import type { WithNormalizedInputHeaders } from './headersNormalizer/types';
+
+// https://stackoverflow.com/a/72885576/203284
+// https://github.com/vitest-dev/vitest/issues/6099
+vi.mock('effect/Effect', { spy: true });
 
 export const BASIC_AUTH_AUTHENTICATOR_TEST_DEPS: unit.BasicAuthAuthenticatorDeps = unit.BasicAuthAuthenticatorDeps.of({
   validBasicAuthCredentialSet: [
@@ -15,7 +20,7 @@ export const BASIC_AUTH_AUTHENTICATOR_TEST_DEPS: unit.BasicAuthAuthenticatorDeps
   ],
 });
 
-export const mockBasicAuthAuthenticatorDeps = P.Effect.provideService(
+export const mockBasicAuthAuthenticatorDeps = Effect.provideService(
   unit.BasicAuthAuthenticatorDeps,
   BASIC_AUTH_AUTHENTICATOR_TEST_DEPS
 );
@@ -43,19 +48,19 @@ const TEST_IN_2 = {
 } as unknown as APIGatewayProxyEventV2 & WithNormalizedInputHeaders;
 
 describe('middleware/basic-auth-authenticator', () => {
-  let errorSpy: jest.SpyInstance;
+  let errorSpy: MockInstance;
 
   beforeEach(() => {
-    jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
-    errorSpy = jest.spyOn(P.Effect, 'logError').mockReturnValue(P.Effect.succeed(undefined));
+    vi.spyOn(Effect, 'logDebug').mockReturnValue(Effect.succeed(undefined));
+    errorSpy = vi.spyOn(Effect, 'logError').mockReturnValue(Effect.succeed(undefined));
   });
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
-  test('it should work as expected in an success case', async () => {
-    const egHandler = P.pipe(echoCoreIn, unit.middleware());
-    const result = await P.pipe(egHandler(TEST_IN_1), mockBasicAuthAuthenticatorDeps, P.Effect.runPromise);
+  it('should work as expected in an success case', async () => {
+    const egHandler = pipe(echoCoreIn, unit.middleware());
+    const result = await pipe(egHandler(TEST_IN_1), mockBasicAuthAuthenticatorDeps, Effect.runPromise);
 
     expect(result).toStrictEqual({
       headers: {
@@ -68,11 +73,11 @@ describe('middleware/basic-auth-authenticator', () => {
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
-  test('it should work as expected in an error case', async () => {
-    const egHandler = P.pipe(echoCoreIn, unit.middleware());
-    const result = P.pipe(egHandler(TEST_IN_2), mockBasicAuthAuthenticatorDeps, P.Effect.runPromise);
+  it('should work as expected in an error case', async () => {
+    const egHandler = pipe(echoCoreIn, unit.middleware());
+    const result = pipe(egHandler(TEST_IN_2), mockBasicAuthAuthenticatorDeps, Effect.runPromise);
 
-    await expect(() => result).rejects.toThrow('Invalid basic auth credentials');
+    await expect(result).rejects.toThrow('Invalid basic auth credentials');
     expect(errorSpy).toHaveBeenCalledTimes(1);
   });
 });

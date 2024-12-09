@@ -1,12 +1,17 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import type { Handler } from '../index';
 import type { BaseResponse } from '../lib/http';
 import { HttpApiError } from '../lib/HttpApiError';
 import { TestDeps } from '../test/test-common';
 import * as unit from './awsApiGatewayProcessor';
+
+// https://stackoverflow.com/a/72885576/203284
+// https://github.com/vitest-dev/vitest/issues/6099
+vi.mock('effect/Effect', { spy: true });
 
 const TEST_IN: APIGatewayProxyEventV2 = {
   headers: {},
@@ -38,27 +43,27 @@ const TEST_OUT_3 = HttpApiError('SomeError', 'Some Error Message', 409);
 export const testCoreL =
   (out: any): Handler<APIGatewayProxyEventV2, BaseResponse, Error, unknown> =>
   (_: APIGatewayProxyEventV2) =>
-    P.Effect.fail(out);
+    Effect.fail(out);
 
 export const testCoreR =
   (out: any): Handler<APIGatewayProxyEventV2, BaseResponse, Error, unknown> =>
   (_: APIGatewayProxyEventV2) =>
-    P.Effect.succeed(out);
+    Effect.succeed(out);
 
 describe('middleware/aws-api-gateway-processor', () => {
-  let errorSpy: jest.SpyInstance;
+  let errorSpy: MockInstance;
 
   beforeEach(() => {
-    jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
-    errorSpy = jest.spyOn(P.Effect, 'logError').mockReturnValue(P.Effect.succeed(undefined));
+    vi.spyOn(Effect, 'logDebug').mockReturnValue(Effect.succeed(undefined));
+    errorSpy = vi.spyOn(Effect, 'logError').mockReturnValue(Effect.succeed(undefined));
   });
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
-  test('it should work as expected in an success case', async () => {
-    const stack = P.pipe(testCoreR(TEST_OUT_1), unit.middleware());
-    const result = await P.pipe(stack(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+  it('should work as expected in an success case', async () => {
+    const stack = pipe(testCoreR(TEST_OUT_1), unit.middleware());
+    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
@@ -71,9 +76,9 @@ describe('middleware/aws-api-gateway-processor', () => {
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
-  test('it should work as expected in an success case with string body', async () => {
-    const stack = P.pipe(testCoreR(TEST_OUT_2), unit.middleware());
-    const result = await P.pipe(stack(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+  it('should work as expected in an success case with string body', async () => {
+    const stack = pipe(testCoreR(TEST_OUT_2), unit.middleware());
+    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
@@ -86,9 +91,9 @@ describe('middleware/aws-api-gateway-processor', () => {
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
-  test('it should work as expected in an error case', async () => {
-    const stack = P.pipe(testCoreL(TEST_OUT_3), unit.middleware());
-    const result = await P.pipe(stack(TEST_IN), P.Effect.provideService(TestDeps, TEST_DEPS), P.Effect.runPromise);
+  it('should work as expected in an error case', async () => {
+    const stack = pipe(testCoreL(TEST_OUT_3), unit.middleware());
+    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 409,

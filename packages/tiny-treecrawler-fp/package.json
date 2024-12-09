@@ -29,7 +29,6 @@
     "@konker.dev/tiny-error-fp": "workspace:*",
     "@konker.dev/tiny-event-fp": "workspace:*",
     "@konker.dev/tiny-filesystem-fp": "workspace:*",
-    "dist-types": "link:@smithy/smithy-client/dist-types",
     "effect": "^3.11.2"
   },
   "peerDependencies": {

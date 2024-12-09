@@ -10,14 +10,9 @@ import { S3ClientDeps } from './index';
 import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableStream';
 
 // https://stackoverflow.com/a/72885576/203284
-vi.mock('@aws-sdk/s3-request-presigner', async () => ({
-  __esModule: true,
-  ...(await vi.importActual('@aws-sdk/s3-request-presigner')),
-}));
-vi.mock('@aws-sdk/lib-storage', async () => ({
-  __esModule: true,
-  ...(await vi.importActual('@aws-sdk/lib-storage')),
-}));
+// https://github.com/vitest-dev/vitest/issues/6099
+vi.mock('@aws-sdk/s3-request-presigner', { spy: true });
+vi.mock('@aws-sdk/lib-storage', { spy: true });
 
 describe('aws-client-effect-s3/extra', () => {
   let deps: S3ClientDeps;

@@ -1,8 +1,8 @@
 import * as P from '@konker.dev/effect-ts-prelude';
 
-import type { Cache } from './Cache';
-import type { CacheError } from './lib/error';
-import { toCacheError } from './lib/error';
+import type { Cache } from './Cache.js';
+import type { CacheError } from './lib/error.js';
+import { toCacheError } from './lib/error.js';
 
 export const CACHE_KIND_STRICT_SERIALIZED_CACHE = 'StrictSerializedCache' as const;
 

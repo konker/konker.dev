@@ -1,19 +1,21 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import * as Either from 'effect/Either';
+import { describe, expect, it } from 'vitest';
 
 import * as unit from './http';
 
 describe('lib/http', () => {
   describe('UNKNOWN_STRING_EFFECT', () => {
     it('should work as expected', () => {
-      expect(P.Effect.runSync(unit.UNKNOWN_STRING_EFFECT())).toStrictEqual('UNKNOWN');
+      expect(Effect.runSync(unit.UNKNOWN_STRING_EFFECT())).toStrictEqual('UNKNOWN');
     });
   });
 
   describe('ResponseHeaders', () => {
     it('should work as expected', () => {
-      expect(P.pipe({ 'content-type': 'text/plain' }, P.Schema.decode(unit.ResponseHeaders))).toStrictEqual(
-        P.Either.right({
+      expect(pipe({ 'content-type': 'text/plain' }, Schema.decode(unit.ResponseHeaders))).toStrictEqual(
+        Either.right({
           'content-type': 'text/plain',
         })
       );
@@ -22,24 +24,24 @@ describe('lib/http', () => {
 
   describe('OptionalResponseHeaders', () => {
     it('should work as expected', () => {
-      expect(P.pipe({ 'content-type': 'text/plain' }, P.Schema.decode(unit.OptionalResponseHeaders))).toStrictEqual(
-        P.Either.right({
+      expect(pipe({ 'content-type': 'text/plain' }, Schema.decode(unit.OptionalResponseHeaders))).toStrictEqual(
+        Either.right({
           'content-type': 'text/plain',
         })
       );
-      expect(P.pipe(undefined, P.Schema.decode(unit.OptionalResponseHeaders))).toStrictEqual(P.Either.right(undefined));
+      expect(pipe(undefined, Schema.decode(unit.OptionalResponseHeaders))).toStrictEqual(Either.right(undefined));
     });
   });
 
   describe('BaseResponse', () => {
     it('should work as expected', () => {
       expect(
-        P.pipe(
+        pipe(
           { statusCode: 200, headers: { 'content-type': 'text/plain' }, isBase64Encoded: false, body: 'abc' },
-          P.Schema.decode(unit.BaseResponse)
+          Schema.decode(unit.BaseResponse)
         )
       ).toStrictEqual(
-        P.Either.right({
+        Either.right({
           statusCode: 200,
           headers: { 'content-type': 'text/plain' },
           isBase64Encoded: false,
@@ -51,22 +53,22 @@ describe('lib/http', () => {
 
   describe('BaseSimpleAuthResponse', () => {
     it('should work as expected', () => {
-      expect(P.pipe({ isAuthorized: false }, P.Schema.decode(unit.BaseSimpleAuthResponse))).toStrictEqual(
-        P.Either.right({ isAuthorized: false })
+      expect(pipe({ isAuthorized: false }, Schema.decode(unit.BaseSimpleAuthResponse))).toStrictEqual(
+        Either.right({ isAuthorized: false })
       );
     });
   });
 
   describe('BaseSimpleAuthResponseWithContext', () => {
-    const TEST_CONTEXT = P.Schema.Struct({ userId: P.Schema.String });
+    const TEST_CONTEXT = Schema.Struct({ userId: Schema.String });
 
     it('should work as expected', () => {
       expect(
-        P.pipe(
+        pipe(
           { isAuthorized: false, context: { userId: 'abc' } },
-          P.Schema.decode(unit.BaseSimpleAuthResponseWithContext(TEST_CONTEXT))
+          Schema.decode(unit.BaseSimpleAuthResponseWithContext(TEST_CONTEXT))
         )
-      ).toStrictEqual(P.Either.right({ isAuthorized: false, context: { userId: 'abc' } }));
+      ).toStrictEqual(Either.right({ isAuthorized: false, context: { userId: 'abc' } }));
     });
   });
 

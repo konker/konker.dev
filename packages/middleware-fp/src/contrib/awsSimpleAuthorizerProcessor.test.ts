@@ -1,10 +1,16 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
+import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
 import type { APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import type { Handler } from '../index';
 import type { BaseSimpleAuthResponse } from '../lib/http';
 import * as unit from './awsSimpleAuthorizerProcessor';
+
+// https://stackoverflow.com/a/72885576/203284
+// https://github.com/vitest-dev/vitest/issues/6099
+vi.mock('effect/Effect', { spy: true });
 
 const TEST_IN: APIGatewayRequestAuthorizerEventV2 = {
   headers: {},
@@ -17,17 +23,17 @@ const TEST_OUT_1 = {
   bar: 123,
 };
 
-const TEST_OUT_2 = P.toError('Some Error Message');
+const TEST_OUT_2 = toError('Some Error Message');
 
 export const testCoreL =
   (e: Error): Handler<APIGatewayRequestAuthorizerEventV2, BaseSimpleAuthResponse, Error, never> =>
   (_: APIGatewayRequestAuthorizerEventV2) =>
-    P.Effect.fail(e);
+    Effect.fail(e);
 
 export const testCoreRA =
   (out: any): Handler<APIGatewayRequestAuthorizerEventV2, BaseSimpleAuthResponse, Error, never> =>
   (_: APIGatewayRequestAuthorizerEventV2) =>
-    P.Effect.succeed({
+    Effect.succeed({
       ...out,
       isAuthorized: true,
     });
@@ -35,41 +41,41 @@ export const testCoreRA =
 export const testCoreRD =
   (out: any): Handler<APIGatewayRequestAuthorizerEventV2, BaseSimpleAuthResponse, Error, never> =>
   (_: APIGatewayRequestAuthorizerEventV2) =>
-    P.Effect.succeed({
+    Effect.succeed({
       ...out,
       isAuthorized: false,
     });
 
 describe('middleware/aws-simple-authorizer-processor', () => {
-  let errorSpy: jest.SpyInstance;
+  let errorSpy: MockInstance;
 
   beforeEach(() => {
-    jest.spyOn(P.Effect, 'logDebug').mockReturnValue(P.Effect.succeed(undefined));
-    errorSpy = jest.spyOn(P.Effect, 'logError').mockReturnValue(P.Effect.succeed(undefined));
+    vi.spyOn(Effect, 'logDebug').mockReturnValue(Effect.succeed(undefined));
+    errorSpy = vi.spyOn(Effect, 'logError').mockReturnValue(Effect.succeed(undefined));
   });
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
-  test('it should work as expected in an success case (Allow)', async () => {
-    const stack = P.pipe(testCoreRA(TEST_OUT_1), unit.middleware());
-    const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
+  it('should work as expected in an success case (Allow)', async () => {
+    const stack = pipe(testCoreRA(TEST_OUT_1), unit.middleware());
+    const result = await pipe(stack(TEST_IN), Effect.runPromise);
 
     expect(result).toStrictEqual({ isAuthorized: true });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
-  test('it should work as expected in an success case (Deny)', async () => {
-    const stack = P.pipe(testCoreRD(TEST_OUT_1), unit.middleware());
-    const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
+  it('should work as expected in an success case (Deny)', async () => {
+    const stack = pipe(testCoreRD(TEST_OUT_1), unit.middleware());
+    const result = await pipe(stack(TEST_IN), Effect.runPromise);
 
     expect(result).toStrictEqual({ isAuthorized: false });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
-  test('it should work as expected in an error case', async () => {
-    const stack = P.pipe(testCoreL(TEST_OUT_2), unit.middleware());
-    const result = await P.pipe(stack(TEST_IN), P.Effect.runPromise);
+  it('should work as expected in an error case', async () => {
+    const stack = pipe(testCoreL(TEST_OUT_2), unit.middleware());
+    const result = await pipe(stack(TEST_IN), Effect.runPromise);
 
     expect(result).toStrictEqual({ isAuthorized: false });
     expect(errorSpy).toHaveBeenCalledTimes(1);

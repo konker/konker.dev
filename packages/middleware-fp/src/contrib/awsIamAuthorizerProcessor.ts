@@ -1,7 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import { generateLambdaAuthResultDeny } from '@konker.dev/tiny-auth-utils-fp/dist/aws-authorizer';
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../index';
 
@@ -16,19 +16,19 @@ export const middleware =
     wrapped: Handler<I, O, E, R>
   ): Handler<I, APIGatewayAuthorizerResult, never, R> =>
   (i: I) => {
-    return P.pipe(
-      P.Effect.succeed(i),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] IN`)),
-      P.Effect.flatMap(wrapped),
-      P.Effect.tap(P.Effect.logDebug(`[${TAG}] OUT`)),
-      P.Effect.matchEffect({
+    return pipe(
+      Effect.succeed(i),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap(wrapped),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.matchEffect({
         onFailure: (e) =>
-          P.pipe(
-            P.Effect.succeed(e),
-            P.Effect.tap(P.Effect.logError('Internal server error', e)),
-            P.Effect.map((_) => generateLambdaAuthResultDeny(ANON_PRINCIPAL_ID, DEFAULT_ROUTE_ARN))
+          pipe(
+            Effect.succeed(e),
+            Effect.tap(Effect.logError('Internal server error', e)),
+            Effect.map((_) => generateLambdaAuthResultDeny(ANON_PRINCIPAL_ID, DEFAULT_ROUTE_ARN))
           ),
-        onSuccess: (o: O) => P.Effect.succeed(o),
+        onSuccess: (o: O) => Effect.succeed(o),
       })
     );
   };

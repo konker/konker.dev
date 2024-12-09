@@ -1,21 +1,23 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import * as M from '../../contrib';
-import { CORRECT_TEST_PATH_TOKEN_VALUE, TEST_SECRET_TOKEN_ENV_NAME } from '../../contrib/pathTokenAuthorizer.test';
 import event from '../fixtures/APIGatewayRequestAuthorizerEventV2-1.json';
 
-const Env = P.Schema.Struct({
-  MOMENTO_AUTH_TOKEN: P.Schema.String,
-});
-type Env = P.Schema.Schema.Type<typeof Env>;
+const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
+const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
 
-const Headers = P.Schema.Struct({
-  header1: P.Schema.String,
+const Env = Schema.Struct({
+  MOMENTO_AUTH_TOKEN: Schema.String,
 });
-type Headers = P.Schema.Schema.Type<typeof Headers>;
+type Env = Schema.Schema.Type<typeof Env>;
+
+const Headers = Schema.Struct({
+  header1: Schema.String,
+});
+type Headers = Schema.Schema.Type<typeof Headers>;
 
 type CoreEvent = APIGatewayRequestAuthorizerEventV2 &
   M.envValidator.WithValidatedEnv<Env> &
@@ -36,11 +38,11 @@ describe('auth test 2', () => {
   });
 
   it('should work as expected', async () => {
-    function echoCore(_i: CoreEvent): P.Effect.Effect<APIGatewayAuthorizerResult, Error, never> {
-      return P.Effect.fail(new Error('BOOM!'));
+    function echoCore(_i: CoreEvent): Effect.Effect<APIGatewayAuthorizerResult, Error, never> {
+      return Effect.fail(new Error('BOOM!'));
     }
 
-    const stack = P.pipe(
+    const stack = pipe(
       echoCore,
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
@@ -51,7 +53,7 @@ describe('auth test 2', () => {
 
     const actual1 = stack(event as APIGatewayRequestAuthorizerEventV2);
 
-    await expect(P.Effect.runPromise(actual1)).resolves.toStrictEqual({
+    await expect(Effect.runPromise(actual1)).resolves.toStrictEqual({
       context: {
         principalId: 'anon',
       },

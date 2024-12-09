@@ -1,21 +1,23 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import * as M from '../../contrib';
-import { CORRECT_TEST_PATH_TOKEN_VALUE, TEST_SECRET_TOKEN_ENV_NAME } from '../../contrib/pathTokenAuthorizer.test';
 import type { BaseResponse } from '../../lib/http';
 
-const Env = P.Schema.Struct({
-  MOMENTO_AUTH_TOKEN: P.Schema.String,
-});
-type Env = P.Schema.Schema.Type<typeof Env>;
+const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
+const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
 
-const Headers = P.Schema.Struct({
-  'content-type': P.Schema.String,
+const Env = Schema.Struct({
+  MOMENTO_AUTH_TOKEN: Schema.String,
 });
-type Headers = P.Schema.Schema.Type<typeof Headers>;
+type Env = Schema.Schema.Type<typeof Env>;
+
+const Headers = Schema.Struct({
+  'content-type': Schema.String,
+});
+type Headers = Schema.Schema.Type<typeof Headers>;
 
 type CoreEvent = APIGatewayProxyEventV2 &
   M.envValidator.WithValidatedEnv<Env> &
@@ -36,8 +38,8 @@ describe('basic test 1', () => {
   });
 
   it('should work as expected', async () => {
-    function echoCore(i: CoreEvent): P.Effect.Effect<BaseResponse, never, never> {
-      return P.Effect.succeed({
+    function echoCore(i: CoreEvent): Effect.Effect<BaseResponse, never, never> {
+      return Effect.succeed({
         statusCode: 200,
         headers: { 'content-type': 'application/json; charset=UTF-8' },
         multiValueHeaders: {},
@@ -49,7 +51,7 @@ describe('basic test 1', () => {
       });
     }
 
-    const stack = P.pipe(
+    const stack = pipe(
       echoCore,
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
@@ -78,7 +80,7 @@ describe('basic test 1', () => {
       // stageVariables?: {},
     });
 
-    await expect(P.Effect.runPromise(actual1)).resolves.toStrictEqual({
+    await expect(Effect.runPromise(actual1)).resolves.toStrictEqual({
       body: '{"foo":"TEST_MOMENTO_AUTH_TOKEN","h":"APPLICATION/JSON; CHARSET=UTF-8"}',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',

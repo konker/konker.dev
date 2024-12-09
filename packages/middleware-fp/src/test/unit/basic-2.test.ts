@@ -1,25 +1,38 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import * as P from '@konker.dev/effect-ts-prelude';
-
+import { type JwtVerificationConfigRsa, TEST_RSA_KEY_PUBLIC } from '@konker.dev/tiny-auth-utils-fp';
 import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
 import { TEST_TOKEN_RSA } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens-rsa';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import * as M from '../../contrib';
-import { mockJwtAuthenticatorRsaDeps } from '../../contrib/jwtAuthenticatorRsa.test';
-import { CORRECT_TEST_PATH_TOKEN_VALUE, TEST_SECRET_TOKEN_ENV_NAME } from '../../contrib/pathTokenAuthorizer.test';
+import * as unit from '../../contrib/jwtAuthenticatorRsa';
 import type { BaseResponse } from '../../lib/http';
 
-const Env = P.Schema.Struct({
-  MOMENTO_AUTH_TOKEN: P.Schema.String,
-});
-type Env = P.Schema.Schema.Type<typeof Env>;
+const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
+const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
 
-const Headers = P.Schema.Struct({
-  'content-type': P.Schema.String,
-  authorization: P.Schema.String,
+export const JWT_AUTHENTICATOR_RSA_TEST_DEPS: JwtVerificationConfigRsa = unit.JwtAuthenticatorRsaDeps.of({
+  rsaPublicKey: TEST_RSA_KEY_PUBLIC,
+  issuer: 'test-iss',
 });
-type Headers = P.Schema.Schema.Type<typeof Headers>;
+
+export const mockJwtAuthenticatorRsaDeps = Effect.provideService(
+  unit.JwtAuthenticatorRsaDeps,
+  JWT_AUTHENTICATOR_RSA_TEST_DEPS
+);
+
+const Env = Schema.Struct({
+  MOMENTO_AUTH_TOKEN: Schema.String,
+});
+type Env = Schema.Schema.Type<typeof Env>;
+
+const Headers = Schema.Struct({
+  'content-type': Schema.String,
+  authorization: Schema.String,
+});
+type Headers = Schema.Schema.Type<typeof Headers>;
 
 type CoreEvent = APIGatewayProxyEventV2 &
   M.jwtAuthenticatorRsa.WithUserId &
@@ -35,16 +48,16 @@ describe('basic test 2', () => {
       MOMENTO_AUTH_TOKEN: 'TEST_MOMENTO_AUTH_TOKEN',
       [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
     };
-    jest.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
+    vi.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
   });
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     process.env = oldEnv;
   });
 
   it('should work as expected', async () => {
-    function echoCore(i: CoreEvent): P.Effect.Effect<BaseResponse, never, never> {
-      return P.Effect.succeed({
+    function echoCore(i: CoreEvent): Effect.Effect<BaseResponse, never, never> {
+      return Effect.succeed({
         statusCode: 200,
         headers: { 'content-type': 'application/json; charset=UTF-8' },
         multiValueHeaders: {},
@@ -57,7 +70,7 @@ describe('basic test 2', () => {
       });
     }
 
-    const stack = P.pipe(
+    const stack = pipe(
       echoCore,
       M.jwtAuthenticatorRsa.middleware(),
       M.headersValidator.middleware(Headers),
@@ -90,7 +103,7 @@ describe('basic test 2', () => {
       // stageVariables?: {},
     });
 
-    await expect(P.Effect.runPromise(P.pipe(actual1, mockJwtAuthenticatorRsaDeps))).resolves.toStrictEqual({
+    await expect(Effect.runPromise(pipe(actual1, mockJwtAuthenticatorRsaDeps))).resolves.toStrictEqual({
       body: '{"foo":"TEST_MOMENTO_AUTH_TOKEN","h":"APPLICATION/JSON; CHARSET=UTF-8","u":"test-sub"}',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',

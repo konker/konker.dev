@@ -1,53 +1,74 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import * as P from '@konker.dev/effect-ts-prelude';
-
 import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
-import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
+import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp';
+import {
+  TEST_JWT_ISS,
+  TEST_JWT_NOW_MS,
+  TEST_JWT_SIGNING_SECRET,
+} from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
 import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
 import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { pipe, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import * as M from '../../contrib';
-import { mockJwtAuthenticatorDeps } from '../../contrib/jwtAuthenticator.test';
-import {
-  CORRECT_TEST_PATH_TOKEN_VALUE,
-  mockPathTokenAuthorizerDeps,
-  TEST_SECRET_TOKEN_ENV_NAME,
-} from '../../contrib/pathTokenAuthorizer.test';
+import * as unit from '../../contrib/jwtAuthenticator';
+import { PathTokenAuthorizerDeps } from '../../contrib/pathTokenAuthorizer';
 import type { BaseResponse } from '../../lib/http';
 
-const Body = P.Schema.Struct({
-  foo: P.Schema.String,
-  bar: P.Schema.Number,
-  baz: P.Schema.Boolean,
-});
-type Body = P.Schema.Schema.Type<typeof Body>;
+export const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
+export const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
 
-const Env = P.Schema.Struct({
-  MOMENTO_AUTH_TOKEN: P.Schema.String,
+export const JWT_AUTHENTICATOR_TEST_DEPS: JwtVerificationConfig = unit.JwtAuthenticatorDeps.of({
+  signingSecret: TEST_JWT_SIGNING_SECRET,
+  issuer: TEST_JWT_ISS,
 });
-type Env = P.Schema.Schema.Type<typeof Env>;
 
-const Headers = P.Schema.Struct({
-  'content-type': P.Schema.String,
-  authorization: P.Schema.String,
-});
-type Headers = P.Schema.Schema.Type<typeof Headers>;
+export const mockJwtAuthenticatorDeps = Effect.provideService(unit.JwtAuthenticatorDeps, JWT_AUTHENTICATOR_TEST_DEPS);
 
-const PathParams = P.Schema.Struct({
-  id: P.Schema.String,
-  pathToken: P.Schema.String,
+export const PATH_TOKEN_AUTHORIZER_TEST_DEPS: PathTokenAuthorizerDeps = PathTokenAuthorizerDeps.of({
+  secretTokenEnvName: TEST_SECRET_TOKEN_ENV_NAME,
+  pathParamName: 'pathToken',
 });
-type PathParams = P.Schema.Schema.Type<typeof PathParams>;
 
-const QueryParams = P.Schema.Struct({
-  q: P.Schema.String,
+export const mockPathTokenAuthorizerDeps = Effect.provideService(
+  PathTokenAuthorizerDeps,
+  PATH_TOKEN_AUTHORIZER_TEST_DEPS
+);
+
+const Body = Schema.Struct({
+  foo: Schema.String,
+  bar: Schema.Number,
+  baz: Schema.Boolean,
 });
-type QueryParams = P.Schema.Schema.Type<typeof QueryParams>;
+type Body = Schema.Schema.Type<typeof Body>;
+
+const Env = Schema.Struct({
+  MOMENTO_AUTH_TOKEN: Schema.String,
+});
+type Env = Schema.Schema.Type<typeof Env>;
+
+const Headers = Schema.Struct({
+  'content-type': Schema.String,
+  authorization: Schema.String,
+});
+type Headers = Schema.Schema.Type<typeof Headers>;
+
+const PathParams = Schema.Struct({
+  id: Schema.String,
+  pathToken: Schema.String,
+});
+type PathParams = Schema.Schema.Type<typeof PathParams>;
+
+const QueryParams = Schema.Struct({
+  q: Schema.String,
+});
+type QueryParams = Schema.Schema.Type<typeof QueryParams>;
 
 describe('kitchen sink', () => {
   let oldEnv: NodeJS.ProcessEnv;
@@ -59,12 +80,12 @@ describe('kitchen sink', () => {
       MOMENTO_AUTH_TOKEN: 'TEST_MOMENTO_AUTH_TOKEN',
       [TEST_SECRET_TOKEN_ENV_NAME]: CORRECT_TEST_PATH_TOKEN_VALUE,
     };
-    jest.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
+    vi.spyOn(Date, 'now').mockReturnValue(TEST_JWT_NOW_MS);
 
     __cache = {};
   });
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     process.env = oldEnv;
   });
 
@@ -76,8 +97,8 @@ describe('kitchen sink', () => {
         M.queryStringValidator.WithValidatedQueryStringParameters<QueryParams> &
         M.headersValidator.WithValidatedHeaders<Headers> &
         M.jwtAuthenticator.WithUserId
-    ): P.Effect.Effect<BaseResponse, never, DynamoDBDocumentClientDeps | MomentoClientDeps> {
-      return P.Effect.succeed({
+    ): Effect.Effect<BaseResponse, never, DynamoDBDocumentClientDeps | MomentoClientDeps> {
+      return Effect.succeed({
         statusCode: 200,
         headers: { 'content-type': 'application/json; charset=UTF-8' },
         multiValueHeaders: {},
@@ -94,7 +115,7 @@ describe('kitchen sink', () => {
       });
     }
 
-    const stack = P.pipe(
+    const stack = pipe(
       echoCore,
       M.dynamodbDocClientInit.middleware({ region: 'eu-west-1' }),
       M.bodyValidator.middleware(Body),
@@ -141,8 +162,8 @@ describe('kitchen sink', () => {
     });
 
     await expect(
-      P.Effect.runPromise(
-        P.pipe(
+      Effect.runPromise(
+        pipe(
           actual1,
           defaultDynamoDBDocumentClientFactoryDeps,
           mockMomentoClientFactoryDeps(__cache),
