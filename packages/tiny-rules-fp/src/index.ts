@@ -1,11 +1,12 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 //---------------------------------------------------------------------------
 // Types
 export type Fact = boolean;
 export type Facts = Record<string, Fact>;
 
-export type Rule<R, C, E, F extends Facts> = (context: C, facts: F) => P.Effect.Effect<F, E, R>;
+export type Rule<R, C, E, F extends Facts> = (context: C, facts: F) => Effect.Effect<F, E, R>;
 
 export type RuleSet<R, C, E, F extends Facts> = {
   readonly facts: F;
@@ -16,7 +17,7 @@ export type RuleSetTransform<R, C, E, F extends Facts> = (ruleSet: RuleSet<R, C,
 
 export type RuleFunc<C, F extends Facts> = (context: C, facts: F) => boolean;
 
-export type RuleFuncEffect<R, C, E, F extends Facts> = (context: C, facts: F) => P.Effect.Effect<boolean, E, R>;
+export type RuleFuncEffect<R, C, E, F extends Facts> = (context: C, facts: F) => Effect.Effect<boolean, E, R>;
 
 //---------------------------------------------------------------------------
 // Fact functions
@@ -49,10 +50,7 @@ export const addRuleFunc = <R, C, E, F extends Facts>(
   _note = ''
 ): RuleSetTransform<R, C, E, F> => {
   const rule = (context: C, facts: F) =>
-    P.pipe(
-      P.Effect.succeed(facts),
-      P.Effect.map(P.pipe(ruleFunc(context, facts), (value) => setFact(factName, value)))
-    );
+    pipe(Effect.succeed(facts), Effect.map(pipe(ruleFunc(context, facts), (value) => setFact(factName, value))));
   return addRule<R, C, E, F>(rule);
 };
 
@@ -62,9 +60,9 @@ export const addRuleFuncEffect = <R, C, E, F extends Facts>(
   _note = ''
 ): RuleSetTransform<R, C, E, F> => {
   const rule = (context: C, facts: F) =>
-    P.pipe(
+    pipe(
       ruleFuncEffect(context, facts),
-      P.Effect.map((value) => P.pipe(facts, setFact(factName, value)))
+      Effect.map((value) => pipe(facts, setFact(factName, value)))
     );
 
   return addRule(rule);
@@ -80,8 +78,8 @@ export const sequence =
 // Execution function
 export const decide =
   <R, C, E, F extends Facts>(context: C) =>
-  (ruleSet: RuleSet<R, C, E, F>): P.Effect.Effect<F, E, R> =>
-    P.pipe(
+  (ruleSet: RuleSet<R, C, E, F>): Effect.Effect<F, E, R> =>
+    pipe(
       ruleSet.rules,
-      P.Effect.reduce(ruleSet.facts, (facts, rule) => rule(context, facts))
+      Effect.reduce(ruleSet.facts, (facts, rule) => rule(context, facts))
     );

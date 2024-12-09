@@ -1550,12 +1550,6 @@ importers:
 
   packages/tiny-rules-fp:
     dependencies:
-      '@effect/schema':
-        specifier: ^0.68.27
-        version: 0.68.27(effect@3.11.3)
-      '@konker.dev/effect-ts-prelude':
-        specifier: workspace:*
-        version: link:../effect-ts-prelude
       effect:
         specifier: ^3.11.2
         version: 3.11.3
