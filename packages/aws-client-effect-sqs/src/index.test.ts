@@ -7,8 +7,9 @@ import type {
 } from '@aws-sdk/client-sqs';
 import * as sqsClient from '@aws-sdk/client-sqs';
 import { SQSClient } from '@aws-sdk/client-sqs';
-import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
@@ -56,11 +57,11 @@ describe('aws-client-effect-sqs', () => {
         VisibilityTimeout: 123,
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(
+      const command = pipe(
         unit.ChangeMessageVisibilityCommandEffect(params),
-        P.Effect.provideService(SQSClientDeps, deps)
+        Effect.provideService(SQSClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(sqsMock.calls().length).toEqual(1);
     });
 
@@ -72,11 +73,11 @@ describe('aws-client-effect-sqs', () => {
         ReceiptHandle: 'test-receipt-handle',
         VisibilityTimeout: 123,
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.ChangeMessageVisibilityCommandEffect(params),
-        P.Effect.provideService(SQSClientDeps, deps)
+        Effect.provideService(SQSClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(sqsMock.calls().length).toEqual(1);
     });
   });
@@ -95,8 +96,8 @@ describe('aws-client-effect-sqs', () => {
         ReceiptHandle: 'test-receipt-handle',
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(unit.DeleteMessageCommandEffect(params), P.Effect.provideService(SQSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.DeleteMessageCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(sqsMock.calls().length).toEqual(1);
     });
 
@@ -107,8 +108,8 @@ describe('aws-client-effect-sqs', () => {
         QueueUrl: 'https://test-queue-url',
         ReceiptHandle: 'test-receipt-handle',
       };
-      const command = P.pipe(unit.DeleteMessageCommandEffect(params), P.Effect.provideService(SQSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.DeleteMessageCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(sqsMock.calls().length).toEqual(1);
     });
   });
@@ -127,11 +128,8 @@ describe('aws-client-effect-sqs', () => {
         Entries: [{ Id: 'test-id-1', ReceiptHandle: 'test-receipt-handle-1' }],
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(
-        unit.DeleteMessageBatchCommandEffect(params),
-        P.Effect.provideService(SQSClientDeps, deps)
-      );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.DeleteMessageBatchCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(sqsMock.calls().length).toEqual(1);
     });
 
@@ -142,11 +140,8 @@ describe('aws-client-effect-sqs', () => {
         QueueUrl: 'https://test-queue-url',
         Entries: [{ Id: 'test-id-1', ReceiptHandle: 'test-receipt-handle-1' }],
       };
-      const command = P.pipe(
-        unit.DeleteMessageBatchCommandEffect(params),
-        P.Effect.provideService(SQSClientDeps, deps)
-      );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.DeleteMessageBatchCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(sqsMock.calls().length).toEqual(1);
     });
   });
@@ -168,8 +163,8 @@ describe('aws-client-effect-sqs', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(unit.ReceiveMessageCommandEffect(params), P.Effect.provideService(SQSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.ReceiveMessageCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(sqsMock.calls().length).toEqual(1);
     });
 
@@ -177,8 +172,8 @@ describe('aws-client-effect-sqs', () => {
       sqsMock.on(sqsClient.ReceiveMessageCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: ReceiveMessageCommandInput = { QueueUrl: 'https://test-queue-url', VisibilityTimeout: 123 };
-      const command = P.pipe(unit.ReceiveMessageCommandEffect(params), P.Effect.provideService(SQSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.ReceiveMessageCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(sqsMock.calls().length).toEqual(1);
     });
   });
@@ -194,8 +189,8 @@ describe('aws-client-effect-sqs', () => {
 
       const params: SendMessageCommandInput = { QueueUrl: 'https://test-queue-url', MessageBody: 'test-message' };
       const expected = { MessageId: 'test-message-id', _Params: params };
-      const command = P.pipe(unit.SendMessageCommandEffect(params), P.Effect.provideService(SQSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.SendMessageCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(sqsMock.calls().length).toEqual(1);
     });
 
@@ -203,8 +198,8 @@ describe('aws-client-effect-sqs', () => {
       sqsMock.on(sqsClient.SendMessageCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: SendMessageCommandInput = { QueueUrl: 'https://test-queue-url', MessageBody: 'test-message' };
-      const command = P.pipe(unit.SendMessageCommandEffect(params), P.Effect.provideService(SQSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.SendMessageCommandEffect(params), Effect.provideService(SQSClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(sqsMock.calls().length).toEqual(1);
     });
   });

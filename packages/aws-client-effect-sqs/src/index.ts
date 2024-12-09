@@ -1,8 +1,9 @@
 import type { SQSClient } from '@aws-sdk/client-sqs';
 import * as sqsClient from '@aws-sdk/client-sqs';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import { Context, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { SqsError } from './lib/error.js';
 import { toSqsError } from './lib/error.js';
@@ -16,11 +17,11 @@ export const defaultSQSClientFactory: SQSClientFactory = (config: sqsClient.SQSC
 export type SQSClientFactoryDeps = {
   readonly sqsClientFactory: SQSClientFactory;
 };
-export const SQSClientFactoryDeps = P.Context.GenericTag<SQSClientFactoryDeps>(
+export const SQSClientFactoryDeps = Context.GenericTag<SQSClientFactoryDeps>(
   '@aws-client-effect-sqs/SQSClientFactoryDeps'
 );
 
-export const defaultSQSClientFactoryDeps = P.Effect.provideService(
+export const defaultSQSClientFactoryDeps = Effect.provideService(
   SQSClientFactoryDeps,
   SQSClientFactoryDeps.of({
     sqsClientFactory: defaultSQSClientFactory,
@@ -31,7 +32,7 @@ export const defaultSQSClientFactoryDeps = P.Effect.provideService(
 export type SQSClientDeps = {
   readonly sqsClient: SQSClient;
 };
-export const SQSClientDeps = P.Context.GenericTag<SQSClientDeps>('aws-client-effect-sqs/SQSClientDeps');
+export const SQSClientDeps = Context.GenericTag<SQSClientDeps>('aws-client-effect-sqs/SQSClientDeps');
 
 export type SQSEchoParams<I> = { _Params: I };
 
@@ -50,12 +51,12 @@ export function FabricateCommandEffect<I extends sqsClient.ServiceInputTypes, O 
 ): (
   params: I,
   options?: HttpHandlerOptions | undefined
-) => P.Effect.Effect<O & SQSEchoParams<I>, SqsError, SQSClientDeps> {
+) => Effect.Effect<O & SQSEchoParams<I>, SqsError, SQSClientDeps> {
   return function (params, options) {
-    return P.pipe(
+    return pipe(
       SQSClientDeps,
-      P.Effect.flatMap((deps) =>
-        P.Effect.tryPromise({
+      Effect.flatMap((deps) =>
+        Effect.tryPromise({
           try: async () => {
             const cmd = new cmdCtor(params);
             const result = await deps.sqsClient.send(cmd, options);
