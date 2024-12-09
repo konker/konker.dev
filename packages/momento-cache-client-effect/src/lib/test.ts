@@ -1,6 +1,6 @@
 /* eslint-disable fp/no-mutation,fp/no-nil,@typescript-eslint/naming-convention */
 import * as momento from '@gomomento/sdk';
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { TextEncoder } from 'util';
 import { vi } from 'vitest';
 
@@ -49,7 +49,7 @@ export const MockMomentoClient = (__cache: any = {}) =>
 export const mockMomentoClientEffect =
   (__cache: any = {}) =>
   () =>
-    P.Effect.succeed(MockMomentoClient(__cache));
+    Effect.succeed(MockMomentoClient(__cache));
 
 export const mockMomentoClientFactory =
   (__cache: any = {}): MomentoClientFactory =>
@@ -58,7 +58,7 @@ export const mockMomentoClientFactory =
   };
 
 export const mockMomentoClientFactoryDeps = (__cache: any = {}) =>
-  P.Effect.provideService(
+  Effect.provideService(
     MomentoClientFactoryDeps,
     MomentoClientFactoryDeps.of({
       momentoClientProps: DEFAULT_MOMENTO_CLIENT_CONFIG_PROPS,
@@ -67,7 +67,7 @@ export const mockMomentoClientFactoryDeps = (__cache: any = {}) =>
   );
 
 export const mockMomentoClientDeps = (__cache: any = {}) =>
-  P.Effect.provideService(
+  Effect.provideService(
     MomentoClientDeps,
     MomentoClientDeps.of({
       makeMomentoClient: mockMomentoClientEffect(__cache),

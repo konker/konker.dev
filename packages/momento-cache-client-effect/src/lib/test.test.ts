@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './test';
@@ -82,7 +82,7 @@ describe('lib/test', () => {
     it('should work as expected', async () => {
       const actual = unit.mockMomentoClientFactoryDeps();
       expect(actual).toBeDefined();
-      expect(actual(P.Effect.succeed(true))).toBeDefined();
+      expect(actual(Effect.succeed(true))).toBeDefined();
     });
   });
 
@@ -90,7 +90,7 @@ describe('lib/test', () => {
     it('should work as expected', async () => {
       const actual = unit.mockMomentoClientDeps();
       expect(actual).toBeDefined();
-      expect(actual(P.Effect.succeed(true))).toBeDefined();
+      expect(actual(Effect.succeed(true))).toBeDefined();
     });
   });
 });

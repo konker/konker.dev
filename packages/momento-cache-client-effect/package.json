@@ -28,9 +28,7 @@
     "@aws-sdk/client-s3": "^3.705.0",
     "@aws-sdk/lib-storage": "^3.705.0",
     "@aws-sdk/s3-request-presigner": "^3.705.0",
-    "@effect/schema": "^0.68.27",
     "@gomomento/sdk": "^1.102.0",
-    "@konker.dev/effect-ts-prelude": "workspace:*",
     "@konker.dev/tiny-error-fp": "workspace:*",
     "effect": "^3.11.2",
     "vitest": "^2.1.8"
