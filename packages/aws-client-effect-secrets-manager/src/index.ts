@@ -1,8 +1,9 @@
 import type { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import * as secretsManagerClient from '@aws-sdk/client-secrets-manager';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import { Context, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { SecretsManagerError } from './lib/error.js';
 import { toSecretsManagerError } from './lib/error.js';
@@ -19,11 +20,11 @@ export const defaultSecretsManagerClientFactory: SecretsManagerClientFactory = (
 export type SecretsManagerClientFactoryDeps = {
   readonly secretsManagerClientFactory: SecretsManagerClientFactory;
 };
-export const SecretsManagerClientFactoryDeps = P.Context.GenericTag<SecretsManagerClientFactoryDeps>(
+export const SecretsManagerClientFactoryDeps = Context.GenericTag<SecretsManagerClientFactoryDeps>(
   '@aws-client-effect-secretsManager/SecretsManagerClientFactoryDeps'
 );
 
-export const defaultSecretsManagerClientFactoryDeps = P.Effect.provideService(
+export const defaultSecretsManagerClientFactoryDeps = Effect.provideService(
   SecretsManagerClientFactoryDeps,
   SecretsManagerClientFactoryDeps.of({
     secretsManagerClientFactory: defaultSecretsManagerClientFactory,
@@ -34,12 +35,12 @@ export const defaultSecretsManagerClientFactoryDeps = P.Effect.provideService(
 export type SecretsManagerClientDeps = {
   readonly secretsManagerClient: SecretsManagerClient;
 };
-export const SecretsManagerClientDeps = P.Context.GenericTag<SecretsManagerClientDeps>(
+export const SecretsManagerClientDeps = Context.GenericTag<SecretsManagerClientDeps>(
   'aws-client-effect-secretsManager/SecretsManagerClientDeps'
 );
 
 export const defaultSecretsManagerClientDeps = (config: secretsManagerClient.SecretsManagerClientConfig) =>
-  P.Effect.provideService(
+  Effect.provideService(
     SecretsManagerClientDeps,
     SecretsManagerClientDeps.of({
       secretsManagerClient: defaultSecretsManagerClientFactory(config),
@@ -66,12 +67,12 @@ export function FabricateCommandEffect<
 ): (
   params: I,
   options?: HttpHandlerOptions | undefined
-) => P.Effect.Effect<O & SecretsManagerEchoParams<I>, SecretsManagerError, SecretsManagerClientDeps> {
+) => Effect.Effect<O & SecretsManagerEchoParams<I>, SecretsManagerError, SecretsManagerClientDeps> {
   return function (params, options) {
-    return P.pipe(
+    return pipe(
       SecretsManagerClientDeps,
-      P.Effect.flatMap((deps) =>
-        P.Effect.tryPromise({
+      Effect.flatMap((deps) =>
+        Effect.tryPromise({
           try: async () => {
             const cmd = new cmdCtor(params);
             const result = await deps.secretsManagerClient.send(cmd, options);

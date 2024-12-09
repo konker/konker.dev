@@ -8,8 +8,9 @@ import type {
 } from '@aws-sdk/client-secrets-manager';
 import * as secretsManagerClient from '@aws-sdk/client-secrets-manager';
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
-import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
@@ -45,12 +46,12 @@ describe('aws-client-effect-secrets-manager', () => {
   // ------------------------------------------------------------------------
   describe('defaultSecretsManagerClientFactoryDeps', () => {
     it('should work as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.SecretsManagerClientFactoryDeps,
-        P.Effect.map((deps) => deps.secretsManagerClientFactory),
+        Effect.map((deps) => deps.secretsManagerClientFactory),
         unit.defaultSecretsManagerClientFactoryDeps
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
       expect(actual).toBeInstanceOf(Function);
     });
   });
@@ -58,12 +59,12 @@ describe('aws-client-effect-secrets-manager', () => {
   // ------------------------------------------------------------------------
   describe('defaultSecretsManagerClientDeps', () => {
     it('should work as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.SecretsManagerClientDeps,
-        P.Effect.map((deps) => deps.secretsManagerClient),
+        Effect.map((deps) => deps.secretsManagerClient),
         unit.defaultSecretsManagerClientDeps({})
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
       expect(actual).toBeInstanceOf(SecretsManagerClient);
     });
   });
@@ -94,11 +95,11 @@ describe('aws-client-effect-secrets-manager', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.BatchGetSecretValueCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
 
@@ -110,11 +111,11 @@ describe('aws-client-effect-secrets-manager', () => {
       const params: BatchGetSecretValueCommandInput = {
         SecretIdList: ['secret-id-1', 'secret-id-2'],
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.BatchGetSecretValueCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
   });
@@ -133,11 +134,11 @@ describe('aws-client-effect-secrets-manager', () => {
         SecretString: 'secret-2',
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(
+      const command = pipe(
         unit.CreateSecretCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
 
@@ -148,11 +149,11 @@ describe('aws-client-effect-secrets-manager', () => {
         Name: 'secret-2',
         SecretString: 'secret-2',
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.CreateSecretCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
   });
@@ -170,11 +171,11 @@ describe('aws-client-effect-secrets-manager', () => {
         SecretId: 'secret-1',
       };
       const expected = { $metadata: { httpStatusCode: 200 }, _Params: params };
-      const command = P.pipe(
+      const command = pipe(
         unit.DeleteSecretCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
 
@@ -184,11 +185,11 @@ describe('aws-client-effect-secrets-manager', () => {
       const params: DeleteSecretCommandInput = {
         SecretId: 'secret-1',
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.DeleteSecretCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
   });
@@ -211,11 +212,11 @@ describe('aws-client-effect-secrets-manager', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.GetSecretValueCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
 
@@ -223,11 +224,11 @@ describe('aws-client-effect-secrets-manager', () => {
       secretsManagerMock.on(secretsManagerClient.GetSecretValueCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: GetSecretValueCommandInput = { SecretId: 'secret-1' };
-      const command = P.pipe(
+      const command = pipe(
         unit.GetSecretValueCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
   });
@@ -250,11 +251,11 @@ describe('aws-client-effect-secrets-manager', () => {
         $metadata: { httpStatusCode: 200 },
         _Params: params,
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.ListSecretsCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
 
@@ -262,11 +263,11 @@ describe('aws-client-effect-secrets-manager', () => {
       secretsManagerMock.on(secretsManagerClient.ListSecretsCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: ListSecretsCommandInput = { MaxResults: 10 };
-      const command = P.pipe(
+      const command = pipe(
         unit.ListSecretsCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
   });
@@ -292,11 +293,11 @@ describe('aws-client-effect-secrets-manager', () => {
         $metadata: { httpStatusCode: 201 },
         _Params: params,
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.PutSecretValueCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
 
@@ -307,11 +308,11 @@ describe('aws-client-effect-secrets-manager', () => {
         SecretId: 'secret-1',
         SecretString: 'new-secret-1',
       };
-      const command = P.pipe(
+      const command = pipe(
         unit.PutSecretValueCommandEffect(params),
-        P.Effect.provideService(SecretsManagerClientDeps, deps)
+        Effect.provideService(SecretsManagerClientDeps, deps)
       );
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(secretsManagerMock.calls().length).toEqual(1);
     });
   });
