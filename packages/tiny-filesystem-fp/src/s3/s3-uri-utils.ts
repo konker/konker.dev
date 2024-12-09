@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { URL } from 'node:url';
 
-import * as P from '@konker.dev/effect-ts-prelude';
+import { Either, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { DirectoryPath, FileName, IoUrl } from '../index';
 import { FileType } from '../index';
@@ -72,25 +73,25 @@ export function createS3Url(bucket: string, dirPath?: string, part?: string): S3
  *
  * @param {string} s3url
  */
-export function parseS3Url(s3url: string): P.Effect.Effect<S3UrlData, TinyFileSystemError> {
-  return P.pipe(
-    P.Effect.try(() => new URL(s3url)),
-    P.Effect.filterOrFail(
+export function parseS3Url(s3url: string): Effect.Effect<S3UrlData, TinyFileSystemError> {
+  return pipe(
+    Effect.try(() => new URL(s3url)),
+    Effect.filterOrFail(
       (parsed) => parsed.protocol === S3_PROTOCOL,
       () => toTinyFileSystemError(`[s3-uri-utils] Incorrect protocol, expected ${S3_PROTOCOL}: ${s3url}`)
     ),
-    P.Effect.filterOrFail(
+    Effect.filterOrFail(
       (parsed) => !!parsed.host,
       () => toTinyFileSystemError(`[s3-uri-utils] Could not determine bucket name: ${s3url}`)
     ),
-    P.Effect.filterOrFail(
+    Effect.filterOrFail(
       (parsed) => parsed.host === parsed.host.toLowerCase(),
       () =>
         toTinyFileSystemError(
           `[s3-uri-utils] S3 URLs must have a lower case bucket component (note that S3 itself is case sensitive): ${s3url}`
         )
     ),
-    P.Effect.flatMap((parsed) => {
+    Effect.flatMap((parsed) => {
       // FIXME: disabled lint
       const host = parsed.host;
       // eslint-disable-next-line fp/no-mutation,fp/no-let
@@ -119,7 +120,7 @@ export function parseS3Url(s3url: string): P.Effect.Effect<S3UrlData, TinyFileSy
       const pathComponent = s3Unescape(parts.join(path.posix.sep));
       const fullPathComponent = fileComponent ? path.posix.join(pathComponent!, fileComponent) : pathComponent;
 
-      return P.Effect.succeed({
+      return Effect.succeed({
         Bucket: host,
         Path: pathComponent as DirectoryPath,
         File: fileComponent as FileName,
@@ -127,7 +128,7 @@ export function parseS3Url(s3url: string): P.Effect.Effect<S3UrlData, TinyFileSy
         FullPath: fullPathComponent,
       });
     }),
-    P.Effect.mapError(toTinyFileSystemError)
+    Effect.mapError(toTinyFileSystemError)
   );
 }
 
@@ -137,9 +138,9 @@ export function parseS3Url(s3url: string): P.Effect.Effect<S3UrlData, TinyFileSy
  * @param s3url
  */
 export function isS3Url(s3url: string): boolean {
-  return P.pipe(
-    P.Either.try(() => new URL(s3url)),
-    P.Either.match({
+  return pipe(
+    Either.try(() => new URL(s3url)),
+    Either.match({
       onLeft: () => false,
       onRight: (parsed) =>
         parsed.protocol === S3_PROTOCOL && !!parsed.host && parsed.host === parsed.host.toLowerCase(),

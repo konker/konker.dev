@@ -1,8 +1,8 @@
 import type { Readable, Writable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
 
-import * as P from '@konker.dev/effect-ts-prelude';
-import { toError } from '@konker.dev/effect-ts-prelude';
+import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import * as Effect from 'effect/Effect';
 import readline from 'readline';
 
 import { stringToUint8Array } from './array';
@@ -13,8 +13,8 @@ import { toTinyFileSystemError } from './error';
  * Consume a readStream
  * @param readStream
  */
-export function readStreamToBuffer(readStream: Readable | ReadableStream): P.Effect.Effect<Uint8Array, Error> {
-  return P.Effect.tryPromise({
+export function readStreamToBuffer(readStream: Readable | ReadableStream): Effect.Effect<Uint8Array, Error> {
+  return Effect.tryPromise({
     try: async () => {
       const chunks: Array<Uint8Array> = [];
       // FIXME: disabled lint
@@ -34,8 +34,8 @@ export function readStreamToBuffer(readStream: Readable | ReadableStream): P.Eff
 /**
  * Wait for a readable stream to fully pipe to a write-stream
  */
-export function waitForStreamPipe(readStream: Readable, writeStream: Writable): P.Effect.Effect<number, Error> {
-  return P.Effect.tryPromise({
+export function waitForStreamPipe(readStream: Readable, writeStream: Writable): Effect.Effect<number, Error> {
+  return Effect.tryPromise({
     try: () =>
       // eslint-disable-next-line fp/no-nil
       new Promise((resolve, reject) => {
@@ -63,8 +63,8 @@ export function waitForStreamPipe(readStream: Readable, writeStream: Writable): 
 
 export function readlineInterfaceFromReadStream(
   readStream: Readable
-): P.Effect.Effect<readline.Interface, TinyFileSystemError> {
-  return P.Effect.tryPromise({
+): Effect.Effect<readline.Interface, TinyFileSystemError> {
+  return Effect.tryPromise({
     try: async () =>
       readline.createInterface({
         input: readStream,

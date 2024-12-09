@@ -1402,15 +1402,12 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.650.0
         version: 3.705.0
-      '@effect/schema':
-        specifier: ^0.72.4
-        version: 0.72.4(effect@3.11.3)
       '@konker.dev/aws-client-effect-s3':
         specifier: workspace:*
         version: link:../aws-client-effect-s3
-      '@konker.dev/effect-ts-prelude':
+      '@konker.dev/tiny-error-fp':
         specifier: workspace:*
-        version: link:../effect-ts-prelude
+        version: link:../tiny-error-fp
       effect:
         specifier: ^3.11.2
         version: 3.11.3

@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { fs } from 'memfs';
 import readline from 'readline';
 import { PassThrough, Readable, Writable } from 'stream';
@@ -34,7 +34,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileReadStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileReadStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -52,7 +52,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileLineReadStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileLineReadStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -70,7 +70,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileWriteStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileWriteStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -89,7 +89,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileAppendWriteStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileAppendWriteStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -108,19 +108,19 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(testMemFsTinyFileSystem.listFiles('./foo/bar'));
+      const files = await Effect.runPromise(testMemFsTinyFileSystem.listFiles('./foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files[0]).toBe('foo/bar/test-file.txt');
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(testMemFsTinyFileSystem.listFiles('foo/bar'));
+      const files = await Effect.runPromise(testMemFsTinyFileSystem.listFiles('foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files[0]).toBe('foo/bar/test-file.txt');
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(testMemFsTinyFileSystem.listFiles('/foo/bar'));
+      const files = await Effect.runPromise(testMemFsTinyFileSystem.listFiles('/foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files[0]).toBe('/foo/bar/test-file.txt');
     });
@@ -128,12 +128,12 @@ describe('MemFsTinyFileSystem', () => {
 
   describe('glob', () => {
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(testMemFsTinyFileSystem.glob('/tmp/**/*.txt'));
+      const files = await Effect.runPromise(testMemFsTinyFileSystem.glob('/tmp/**/*.txt'));
       expect(files).toStrictEqual(['/tmp/foo/a.txt', '/tmp/foo/b.txt', '/tmp/foo/bar/e.txt']);
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(testMemFsTinyFileSystem.glob('/tmp/**/*'));
+      const files = await Effect.runPromise(testMemFsTinyFileSystem.glob('/tmp/**/*'));
       expect(files).toStrictEqual([
         '/tmp/foo/a.txt',
         '/tmp/foo/b.txt',
@@ -145,7 +145,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(testMemFsTinyFileSystem.glob('/tmp/foo/*.txt'));
+      const files = await Effect.runPromise(testMemFsTinyFileSystem.glob('/tmp/foo/*.txt'));
       expect(files).toStrictEqual(['/tmp/foo/a.txt', '/tmp/foo/b.txt']);
     });
   });
@@ -158,7 +158,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.exists('./foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.exists('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(true);
@@ -166,7 +166,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.exists('./foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.exists('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(false);
@@ -181,7 +181,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => true, isDirectory: () => false } as any);
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileType('./foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileType('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(FileType.File);
@@ -189,7 +189,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => true } as any);
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileType('./foo'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileType('./foo'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(FileType.Directory);
@@ -197,7 +197,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => false } as any);
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.getFileType('.'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.getFileType('.'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(FileType.Other);
@@ -217,7 +217,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly, directory does not exist', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      await P.Effect.runPromise(testMemFsTinyFileSystem.createDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(testMemFsTinyFileSystem.createDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(1);
@@ -226,7 +226,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly, directory exists', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      await P.Effect.runPromise(testMemFsTinyFileSystem.createDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(testMemFsTinyFileSystem.createDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(0);
@@ -246,7 +246,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly, directory does not exist', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      await P.Effect.runPromise(testMemFsTinyFileSystem.removeDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(testMemFsTinyFileSystem.removeDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(0);
@@ -254,7 +254,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly, directory exists', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      await P.Effect.runPromise(testMemFsTinyFileSystem.removeDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(testMemFsTinyFileSystem.removeDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(1);
@@ -270,7 +270,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'readFile').mockResolvedValue(Buffer.from('some test text'));
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.readFile('/foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.readFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -279,7 +279,7 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'readFile').mockResolvedValue('some test text');
-      const data = await P.Effect.runPromise(testMemFsTinyFileSystem.readFile('/foo/bar.txt'));
+      const data = await Effect.runPromise(testMemFsTinyFileSystem.readFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -297,7 +297,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      await P.Effect.runPromise(testMemFsTinyFileSystem.writeFile('/foo/bar.txt', 'some test text'));
+      await Effect.runPromise(testMemFsTinyFileSystem.writeFile('/foo/bar.txt', 'some test text'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -305,9 +305,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      await P.Effect.runPromise(
-        testMemFsTinyFileSystem.writeFile('/foo/bar.txt', stringToUint8Array('some test text'))
-      );
+      await Effect.runPromise(testMemFsTinyFileSystem.writeFile('/foo/bar.txt', stringToUint8Array('some test text')));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -325,7 +323,7 @@ describe('MemFsTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      await P.Effect.runPromise(testMemFsTinyFileSystem.deleteFile('/foo/bar.txt'));
+      await Effect.runPromise(testMemFsTinyFileSystem.deleteFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -334,10 +332,10 @@ describe('MemFsTinyFileSystem', () => {
 
   describe('joinPath', () => {
     it('should function correctly', async () => {
-      expect(P.Effect.runSync(testMemFsTinyFileSystem.joinPath('foo', 'bar', 'baz.json'))).toEqual('foo/bar/baz.json');
-      expect(P.Effect.runSync(testMemFsTinyFileSystem.joinPath('foo/bar', 'baz.json'))).toEqual('foo/bar/baz.json');
-      expect(P.Effect.runSync(testMemFsTinyFileSystem.joinPath('/foo', 'baz.json'))).toEqual('/foo/baz.json');
-      expect(P.Effect.runSync(testMemFsTinyFileSystem.joinPath('/', 'baz.json'))).toEqual('/baz.json');
+      expect(Effect.runSync(testMemFsTinyFileSystem.joinPath('foo', 'bar', 'baz.json'))).toEqual('foo/bar/baz.json');
+      expect(Effect.runSync(testMemFsTinyFileSystem.joinPath('foo/bar', 'baz.json'))).toEqual('foo/bar/baz.json');
+      expect(Effect.runSync(testMemFsTinyFileSystem.joinPath('/foo', 'baz.json'))).toEqual('/foo/baz.json');
+      expect(Effect.runSync(testMemFsTinyFileSystem.joinPath('/', 'baz.json'))).toEqual('/baz.json');
     });
   });
 
@@ -355,14 +353,12 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
-      await expect(P.Effect.runPromise(testMemFsTinyFileSystem.dirName('foo/bar/baz.json'))).resolves.toEqual(
-        'foo/bar'
-      );
+      await expect(Effect.runPromise(testMemFsTinyFileSystem.dirName('foo/bar/baz.json'))).resolves.toEqual('foo/bar');
     });
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
-      await expect(P.Effect.runPromise(testMemFsTinyFileSystem.dirName('foo/bar'))).resolves.toEqual('foo');
+      await expect(Effect.runPromise(testMemFsTinyFileSystem.dirName('foo/bar'))).resolves.toEqual('foo');
     });
   });
 
@@ -374,14 +370,14 @@ describe('MemFsTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
-      await expect(P.Effect.runPromise(testMemFsTinyFileSystem.fileName('foo/bar/baz.json'))).resolves.toEqual(
+      await expect(Effect.runPromise(testMemFsTinyFileSystem.fileName('foo/bar/baz.json'))).resolves.toEqual(
         'baz.json'
       );
     });
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
-      await expect(P.Effect.runPromise(testMemFsTinyFileSystem.fileName('foo/bar'))).rejects.toThrow(
+      await expect(Effect.runPromise(testMemFsTinyFileSystem.fileName('foo/bar'))).rejects.toThrow(
         'TinyFileSystemError'
       );
     });

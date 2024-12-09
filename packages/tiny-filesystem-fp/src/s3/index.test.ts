@@ -13,8 +13,9 @@ import { S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
 import * as SE from '@konker.dev/aws-client-effect-s3/dist/extra';
 import { toS3Error } from '@konker.dev/aws-client-effect-s3/dist/lib/error';
 import { PromiseDependentWritableStream } from '@konker.dev/aws-client-effect-s3/dist/lib/PromiseDependentWritableStream';
-import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import readline from 'readline';
 import { PassThrough, Writable } from 'stream';
 import { beforeAll, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
@@ -34,14 +35,14 @@ describe('S3TinyFileSystem', () => {
     s3ListObjectsMock = vi.spyOn(S, 'ListObjectsV2CommandEffect');
     s3ListObjectsMock.mockImplementation((params: ListObjectsV2CommandInput) => {
       if (params.Prefix === 'bar/baz/') {
-        return P.Effect.succeed({
+        return Effect.succeed({
           $metadata: {},
           IsTruncated: false,
           Contents: [{ Key: 'bar/baz/test-file0.txt' }],
         });
       }
       if (params.Prefix === 'bar/') {
-        return P.Effect.succeed({
+        return Effect.succeed({
           $metadata: {},
           IsTruncated: false,
           Contents: [{ Key: 'bar/test-file1.txt' }],
@@ -49,14 +50,14 @@ describe('S3TinyFileSystem', () => {
         });
       }
       if (params.Prefix === 'bartruncated/') {
-        return P.Effect.succeed({
+        return Effect.succeed({
           $metadata: {},
           IsTruncated: true,
           Contents: [{ Key: 'bartruncated/test-file2.txt' }],
           CommonPrefixes: [{ Prefix: 'bartruncated/' }],
         });
       }
-      return P.Effect.succeed({
+      return Effect.succeed({
         $metadata: {},
         IsTruncated: false,
         Contents: [],
@@ -64,10 +65,10 @@ describe('S3TinyFileSystem', () => {
       });
     });
 
-    s3TinyFileSystem = await P.Effect.runPromise(
-      P.pipe(
+    s3TinyFileSystem = await Effect.runPromise(
+      pipe(
         unit.S3TinyFileSystem({}),
-        P.Effect.provideService(
+        Effect.provideService(
           S3ClientFactoryDeps,
           S3ClientFactoryDeps.of({
             s3ClientFactory: (config) => new S3Client(config),
@@ -83,12 +84,12 @@ describe('S3TinyFileSystem', () => {
       s3GetObjectReadStreamMock = vi.spyOn(S, 'GetObjectCommandEffect');
       s3GetObjectReadStreamMock.mockImplementation((params: GetObjectCommandInput) => {
         if (params.Key?.includes('exists')) {
-          return P.Effect.succeed({ Body: new PassThrough() });
+          return Effect.succeed({ Body: new PassThrough() });
         }
         if (params.Key?.includes('non-stream')) {
-          return P.Effect.succeed({ Body: 'test-file-data' });
+          return Effect.succeed({ Body: 'test-file-data' });
         }
-        return P.Effect.fail(new Error('GeneralError'));
+        return Effect.fail(new Error('GeneralError'));
       });
     });
 
@@ -98,27 +99,27 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        const result = await P.Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar/exists.txt'));
+        const result = await Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar/exists.txt'));
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(1);
         expect(result).toBeInstanceOf(Readable);
       });
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar/bad.txt'))
+          Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar/bad.txt'))
         ).rejects.toThrow();
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar/non-stream.txt'))
+          Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar/non-stream.txt'))
         ).rejects.toThrow();
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
-        await expect(P.Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar'))).rejects.toThrow();
+        await expect(Effect.runPromise(s3TinyFileSystem.getFileReadStream('s3://foobucket/bar'))).rejects.toThrow();
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(0);
       });
     });
@@ -129,24 +130,20 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        const result = await P.Effect.runPromise(
-          s3TinyFileSystem.getFileLineReadStream('s3://foobucket/bar/exists.txt')
-        );
+        const result = await Effect.runPromise(s3TinyFileSystem.getFileLineReadStream('s3://foobucket/bar/exists.txt'));
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(1);
         expect(result).toBeInstanceOf(readline.Interface);
       });
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.getFileLineReadStream('s3://foobucket/bar/bad.txt'))
+          Effect.runPromise(s3TinyFileSystem.getFileLineReadStream('s3://foobucket/bar/bad.txt'))
         ).rejects.toThrow();
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
-        await expect(
-          P.Effect.runPromise(s3TinyFileSystem.getFileLineReadStream('s3://foobucket/bar'))
-        ).rejects.toThrow();
+        await expect(Effect.runPromise(s3TinyFileSystem.getFileLineReadStream('s3://foobucket/bar'))).rejects.toThrow();
         expect(s3GetObjectReadStreamMock).toHaveBeenCalledTimes(0);
       });
     });
@@ -158,9 +155,9 @@ describe('S3TinyFileSystem', () => {
       s3GetObjectWriteStreamMock = vi.spyOn(SE, 'UploadObjectWriteStreamEffect');
       s3GetObjectWriteStreamMock.mockImplementation((params: PutObjectCommandInput) => {
         if (params.Key?.includes('exists')) {
-          return P.Effect.succeed(new PromiseDependentWritableStream());
+          return Effect.succeed(new PromiseDependentWritableStream());
         }
-        return P.Effect.fail(new Error('GeneralError'));
+        return Effect.fail(new Error('GeneralError'));
       });
     });
     beforeEach(() => {
@@ -168,7 +165,7 @@ describe('S3TinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const result = await P.Effect.runPromise(s3TinyFileSystem.getFileWriteStream('s3://foobucket/bar/exists.txt'));
+      const result = await Effect.runPromise(s3TinyFileSystem.getFileWriteStream('s3://foobucket/bar/exists.txt'));
 
       expect(s3GetObjectWriteStreamMock).toHaveBeenCalledTimes(1);
       expect(result).toBeInstanceOf(Writable);
@@ -177,13 +174,13 @@ describe('S3TinyFileSystem', () => {
 
     it('should fail correctly', async () => {
       await expect(
-        P.Effect.runPromise(s3TinyFileSystem.getFileWriteStream('s3://foobucket/bar/bad.txt'))
+        Effect.runPromise(s3TinyFileSystem.getFileWriteStream('s3://foobucket/bar/bad.txt'))
       ).rejects.toThrow();
       expect(s3GetObjectWriteStreamMock).toHaveBeenCalledTimes(1);
     });
 
     it('should fail correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.getFileWriteStream('s3://foobucket/bar'))).rejects.toThrow();
+      await expect(Effect.runPromise(s3TinyFileSystem.getFileWriteStream('s3://foobucket/bar'))).rejects.toThrow();
       expect(s3GetObjectWriteStreamMock).toHaveBeenCalledTimes(0);
     });
   });
@@ -194,20 +191,20 @@ describe('S3TinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const result = await P.Effect.runPromise(s3TinyFileSystem.listFiles('s3://foobucket/bar'));
+      const result = await Effect.runPromise(s3TinyFileSystem.listFiles('s3://foobucket/bar'));
       expect(s3ListObjectsMock).toHaveBeenCalledTimes(1);
       expect(result).toStrictEqual(['s3://foobucket/bar/baz', 's3://foobucket/bar/test-file1.txt']);
     });
 
     it('should fail correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.listFiles('s3://foobucket/bar/file.csv'))).rejects.toThrow(
+      await expect(Effect.runPromise(s3TinyFileSystem.listFiles('s3://foobucket/bar/file.csv'))).rejects.toThrow(
         'Cannot list files with a non-directory url'
       );
       expect(s3ListObjectsMock).toHaveBeenCalledTimes(0);
     });
 
     it('should fail correctly when result is truncated', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.listFiles('s3://foobucket/bartruncated'))).rejects.toThrow(
+      await expect(Effect.runPromise(s3TinyFileSystem.listFiles('s3://foobucket/bartruncated'))).rejects.toThrow(
         'Error: listing is truncated'
       );
       expect(s3ListObjectsMock).toHaveBeenCalledTimes(1);
@@ -220,15 +217,15 @@ describe('S3TinyFileSystem', () => {
       s3HeadObjectMock = vi.spyOn(S, 'HeadObjectCommandEffect');
       s3HeadObjectMock.mockImplementation((params: HeadObjectCommandInput) => {
         if (params.Key?.includes('exists')) {
-          return P.Effect.succeed(true);
+          return Effect.succeed(true);
         }
         if (params.Key?.includes('does-not-exist')) {
-          return P.Effect.fail(toS3Error(params)({ $metadata: { httpStatusCode: 404 }, code: 'NotFound' }));
+          return Effect.fail(toS3Error(params)({ $metadata: { httpStatusCode: 404 }, code: 'NotFound' }));
         }
         if (params.Key?.includes('no-metadata')) {
-          return P.Effect.fail(toS3Error(params)({ code: 'Boom' }));
+          return Effect.fail(toS3Error(params)({ code: 'Boom' }));
         }
-        return P.Effect.fail(toS3Error(params)({ $metadata: { httpStatusCode: 500 }, code: 'GeneralError' }));
+        return Effect.fail(toS3Error(params)({ $metadata: { httpStatusCode: 500 }, code: 'GeneralError' }));
       });
     });
     beforeEach(() => {
@@ -236,37 +233,35 @@ describe('S3TinyFileSystem', () => {
     });
 
     it('should function correctly when file exists', async () => {
-      const result = await P.Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/exists.txt'));
+      const result = await Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/exists.txt'));
       await expect(result).toEqual(true);
       expect(s3HeadObjectMock).toHaveBeenCalledTimes(1);
     });
 
     it('should function correctly when files does not exist', async () => {
       await expect(
-        P.Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/does-not-exist.txt'))
+        Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/does-not-exist.txt'))
       ).resolves.toEqual(false);
       expect(s3HeadObjectMock).toHaveBeenCalledTimes(1);
     });
 
     it('should function correctly when metadata is missing', async () => {
-      await expect(
-        P.Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/no-metadata.txt'))
-      ).rejects.toThrow();
+      await expect(Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/no-metadata.txt'))).rejects.toThrow();
       expect(s3HeadObjectMock).toHaveBeenCalledTimes(1);
     });
 
     it('should function correctly when a general error is thrown', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/error.txt'))).rejects.toThrow();
+      await expect(Effect.runPromise(s3TinyFileSystem.exists('s3://foobucket/foo/error.txt'))).rejects.toThrow();
       expect(s3HeadObjectMock).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('getFileType', () => {
     it('should function correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.getFileType('s3://foobucket/foo/bar.txt'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.getFileType('s3://foobucket/foo/bar.txt'))).resolves.toBe(
         FileType.File
       );
-      await expect(P.Effect.runPromise(s3TinyFileSystem.getFileType('s3://foobucket/foo/bar/baz'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.getFileType('s3://foobucket/foo/bar/baz'))).resolves.toBe(
         FileType.Directory
       );
     });
@@ -278,12 +273,12 @@ describe('S3TinyFileSystem', () => {
       s3GetObjectMock = vi.spyOn(S, 'GetObjectCommandEffect');
       s3GetObjectMock.mockImplementation((params: GetObjectCommandInput) => {
         if (params.Key?.includes('exists')) {
-          return P.Effect.succeed({ Body: Readable.from('test-file-data'), _Params: params });
+          return Effect.succeed({ Body: Readable.from('test-file-data'), _Params: params });
         }
         if (params.Key?.includes('non-stream')) {
-          return P.Effect.succeed({ Body: 'test-file-data', _Params: params });
+          return Effect.succeed({ Body: 'test-file-data', _Params: params });
         }
-        return P.Effect.fail(toS3Error(Error('GeneralError')));
+        return Effect.fail(toS3Error(Error('GeneralError')));
       });
     });
     beforeEach(() => {
@@ -291,25 +286,23 @@ describe('S3TinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const result = await P.Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar/exists.txt'));
+      const result = await Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar/exists.txt'));
       expect(s3GetObjectMock).toHaveBeenCalledTimes(1);
       expect(arrayBufferToString(result)).toBe('test-file-data');
     });
 
     it('should fail correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar/bad.txt'))).rejects.toThrow();
+      await expect(Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar/bad.txt'))).rejects.toThrow();
       expect(s3GetObjectMock).toHaveBeenCalledTimes(1);
     });
 
     it('should fail correctly', async () => {
-      await expect(
-        P.Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar/non-stream.txt'))
-      ).rejects.toThrow();
+      await expect(Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar/non-stream.txt'))).rejects.toThrow();
       expect(s3GetObjectMock).toHaveBeenCalledTimes(1);
     });
 
     it('should fail correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar'))).rejects.toThrow();
+      await expect(Effect.runPromise(s3TinyFileSystem.readFile('s3://foobucket/bar'))).rejects.toThrow();
       expect(s3GetObjectMock).toHaveBeenCalledTimes(0);
     });
   });
@@ -321,16 +314,16 @@ describe('S3TinyFileSystem', () => {
       s3PutObjectMock = vi.spyOn(S, 'PutObjectCommandEffect');
       s3PutObjectMock.mockImplementation((params: PutObjectCommandInput) => {
         if (params.Key?.includes('error')) {
-          return P.Effect.fail(new Error('GeneralError'));
+          return Effect.fail(new Error('GeneralError'));
         }
-        return P.Effect.succeed(P.Effect.void);
+        return Effect.succeed(Effect.void);
       });
       s3UploadObjectMock = vi.spyOn(SE, 'UploadObjectEffect');
       s3UploadObjectMock.mockImplementation((params: PutObjectCommandInput) => {
         if (params.Key?.includes('error')) {
-          return P.Effect.fail(new Error('GeneralError'));
+          return Effect.fail(new Error('GeneralError'));
         }
-        return P.Effect.succeed(P.Effect.void);
+        return Effect.succeed(Effect.void);
       });
     });
 
@@ -341,7 +334,7 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        await P.Effect.runPromise(s3TinyFileSystem.writeFile('s3://foobucket/bar/qux.txt', 'wham-bam-thank-you-sam'));
+        await Effect.runPromise(s3TinyFileSystem.writeFile('s3://foobucket/bar/qux.txt', 'wham-bam-thank-you-sam'));
         expect(s3UploadObjectMock).toHaveBeenCalledTimes(1);
         expect(s3UploadObjectMock?.mock?.calls?.[0]?.[0]).toStrictEqual({
           Bucket: 'foobucket',
@@ -351,7 +344,7 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        await P.Effect.runPromise(
+        await Effect.runPromise(
           s3TinyFileSystem.writeFile('s3://foobucket/bar/qux.txt', stringToUint8Array('wham-bam-thank-you-sam'))
         );
         expect(s3UploadObjectMock).toHaveBeenCalledTimes(1);
@@ -364,14 +357,14 @@ describe('S3TinyFileSystem', () => {
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.writeFile('s3://foobucket/bar/error.txt', 'wham-bam-thank-you-sam'))
+          Effect.runPromise(s3TinyFileSystem.writeFile('s3://foobucket/bar/error.txt', 'wham-bam-thank-you-sam'))
         ).rejects.toThrow();
         expect(s3UploadObjectMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.writeFile('s3://foobucket/bar', 'wham-bam-thank-you-sam'))
+          Effect.runPromise(s3TinyFileSystem.writeFile('s3://foobucket/bar', 'wham-bam-thank-you-sam'))
         ).rejects.toThrow();
         expect(s3UploadObjectMock).toHaveBeenCalledTimes(0);
       });
@@ -383,7 +376,7 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        await P.Effect.runPromise(s3TinyFileSystem.createDirectory('s3://foobucket/bar/'));
+        await Effect.runPromise(s3TinyFileSystem.createDirectory('s3://foobucket/bar/'));
         expect(s3PutObjectMock).toHaveBeenCalledTimes(1);
         expect(s3PutObjectMock?.mock?.calls?.[0]?.[0]).toStrictEqual({
           Bucket: 'foobucket',
@@ -394,13 +387,13 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should fail correctly', async () => {
-        await expect(P.Effect.runPromise(s3TinyFileSystem.createDirectory('s3://foobucket/error'))).rejects.toThrow();
+        await expect(Effect.runPromise(s3TinyFileSystem.createDirectory('s3://foobucket/error'))).rejects.toThrow();
         expect(s3PutObjectMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.createDirectory('s3://foobucket/bar/qux.txt'))
+          Effect.runPromise(s3TinyFileSystem.createDirectory('s3://foobucket/bar/qux.txt'))
         ).rejects.toThrow();
         expect(s3PutObjectMock).toHaveBeenCalledTimes(0);
       });
@@ -413,9 +406,9 @@ describe('S3TinyFileSystem', () => {
       s3DeleteObjectMock = vi.spyOn(S, 'DeleteObjectCommandEffect');
       s3DeleteObjectMock.mockImplementation((params: DeleteObjectCommandInput) => {
         if (params.Key?.includes('error')) {
-          return P.Effect.fail(new Error('GeneralError'));
+          return Effect.fail(new Error('GeneralError'));
         }
-        return P.Effect.succeed(P.Effect.void);
+        return Effect.succeed(Effect.void);
       });
     });
 
@@ -425,7 +418,7 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        await P.Effect.runPromise(s3TinyFileSystem.deleteFile('s3://foobucket/bar/baz.txt'));
+        await Effect.runPromise(s3TinyFileSystem.deleteFile('s3://foobucket/bar/baz.txt'));
 
         expect(s3DeleteObjectMock).toHaveBeenCalledTimes(1);
         expect(s3DeleteObjectMock?.mock?.calls?.[0]?.[0]).toStrictEqual({
@@ -435,12 +428,12 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should fail correctly', async () => {
-        await expect(P.Effect.runPromise(s3TinyFileSystem.deleteFile('s3://foobucket/error.txt'))).rejects.toThrow();
+        await expect(Effect.runPromise(s3TinyFileSystem.deleteFile('s3://foobucket/error.txt'))).rejects.toThrow();
         expect(s3DeleteObjectMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
-        await expect(P.Effect.runPromise(s3TinyFileSystem.deleteFile('s3://foobucket/bar/'))).rejects.toThrow();
+        await expect(Effect.runPromise(s3TinyFileSystem.deleteFile('s3://foobucket/bar/'))).rejects.toThrow();
         expect(s3DeleteObjectMock).toHaveBeenCalledTimes(0);
       });
     });
@@ -452,7 +445,7 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should function correctly', async () => {
-        await P.Effect.runPromise(s3TinyFileSystem.removeDirectory('s3://foobucket/bar'));
+        await Effect.runPromise(s3TinyFileSystem.removeDirectory('s3://foobucket/bar'));
 
         expect(s3ListObjectsMock).toHaveBeenCalledTimes(2);
         expect(s3DeleteObjectMock).toHaveBeenCalledTimes(4);
@@ -475,13 +468,13 @@ describe('S3TinyFileSystem', () => {
       });
 
       it('should fail correctly', async () => {
-        await expect(P.Effect.runPromise(s3TinyFileSystem.removeDirectory('s3://foobucket/error'))).rejects.toThrow();
+        await expect(Effect.runPromise(s3TinyFileSystem.removeDirectory('s3://foobucket/error'))).rejects.toThrow();
         expect(s3DeleteObjectMock).toHaveBeenCalledTimes(1);
       });
 
       it('should fail correctly', async () => {
         await expect(
-          P.Effect.runPromise(s3TinyFileSystem.removeDirectory('s3://foobucket/bar/qux.txt'))
+          Effect.runPromise(s3TinyFileSystem.removeDirectory('s3://foobucket/bar/qux.txt'))
         ).rejects.toThrow();
         expect(s3DeleteObjectMock).toHaveBeenCalledTimes(0);
       });
@@ -490,10 +483,10 @@ describe('S3TinyFileSystem', () => {
 
   describe('dirName', () => {
     it('should function correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.dirName('s3://foobucket/wat/bar/baz.json'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.dirName('s3://foobucket/wat/bar/baz.json'))).resolves.toBe(
         's3://foobucket/wat/bar/'
       );
-      await expect(P.Effect.runPromise(s3TinyFileSystem.dirName('s3://foobucket/wat/bar/'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.dirName('s3://foobucket/wat/bar/'))).resolves.toBe(
         's3://foobucket/wat/bar/'
       );
     });
@@ -501,12 +494,12 @@ describe('S3TinyFileSystem', () => {
 
   describe('fileName', () => {
     it('should function correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.fileName('s3://foobucket/wat/bar/baz.json'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.fileName('s3://foobucket/wat/bar/baz.json'))).resolves.toBe(
         'baz.json'
       );
     });
     it('should function correctly', async () => {
-      await expect(P.Effect.runPromise(s3TinyFileSystem.fileName('s3://foobucket/wat/bar/'))).rejects.toThrow(
+      await expect(Effect.runPromise(s3TinyFileSystem.fileName('s3://foobucket/wat/bar/'))).rejects.toThrow(
         'TinyFileSystemError'
       );
     });
@@ -514,20 +507,20 @@ describe('S3TinyFileSystem', () => {
 
   describe('joinPath', () => {
     it('should function correctly', async () => {
-      await expect(
-        P.Effect.runPromise(s3TinyFileSystem.joinPath('s3://foobucket/wat', 'bar', 'baz.json'))
-      ).resolves.toBe('s3://foobucket/wat/bar/baz.json');
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath('foo', 'bar', 'baz.json'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('s3://foobucket/wat', 'bar', 'baz.json'))).resolves.toBe(
+        's3://foobucket/wat/bar/baz.json'
+      );
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('foo', 'bar', 'baz.json'))).resolves.toBe(
         'foo/bar/baz.json'
       );
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath('foo/bar', 'baz.json'))).resolves.toBe(
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('foo/bar', 'baz.json'))).resolves.toBe(
         'foo/bar/baz.json'
       );
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath('/foo', 'baz.json'))).resolves.toBe('/foo/baz.json');
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath('/', 'baz.json'))).resolves.toBe('/baz.json');
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath('', 'baz.json'))).resolves.toBe('baz.json');
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath('', 'bar', 'baz.json'))).resolves.toBe('bar/baz.json');
-      await expect(P.Effect.runPromise(s3TinyFileSystem.joinPath())).resolves.toBe('');
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('/foo', 'baz.json'))).resolves.toBe('/foo/baz.json');
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('/', 'baz.json'))).resolves.toBe('/baz.json');
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('', 'baz.json'))).resolves.toBe('baz.json');
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath('', 'bar', 'baz.json'))).resolves.toBe('bar/baz.json');
+      await expect(Effect.runPromise(s3TinyFileSystem.joinPath())).resolves.toBe('');
     });
   });
 

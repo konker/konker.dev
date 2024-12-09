@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import fg from 'fast-glob';
 import fs from 'fs';
 import readline from 'readline';
@@ -21,7 +21,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(unit.getFileReadStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(unit.getFileReadStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -39,7 +39,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(unit.getFileLineReadStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(unit.getFileLineReadStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -57,7 +57,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(unit.getFileWriteStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(unit.getFileWriteStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -76,7 +76,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(unit.getFileAppendWriteStream('/foo/bar.txt'));
+      const data = await Effect.runPromise(unit.getFileAppendWriteStream('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -95,19 +95,19 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(unit.listFiles('./foo/bar'));
+      const files = await Effect.runPromise(unit.listFiles('./foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files[0]).toBe('foo/bar/test-file.txt');
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(unit.listFiles('foo/bar'));
+      const files = await Effect.runPromise(unit.listFiles('foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files[0]).toBe('foo/bar/test-file.txt');
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(unit.listFiles('/foo/bar'));
+      const files = await Effect.runPromise(unit.listFiles('/foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files[0]).toBe('/foo/bar/test-file.txt');
     });
@@ -123,7 +123,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const files = await P.Effect.runPromise(unit.glob('./foo/bar'));
+      const files = await Effect.runPromise(unit.glob('./foo/bar'));
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(files).toStrictEqual(['/foo/bar/test-file.txt']);
     });
@@ -137,7 +137,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      const data = await P.Effect.runPromise(unit.exists('./foo/bar.txt'));
+      const data = await Effect.runPromise(unit.exists('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(true);
@@ -145,7 +145,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      const data = await P.Effect.runPromise(unit.exists('./foo/bar.txt'));
+      const data = await Effect.runPromise(unit.exists('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(false);
@@ -160,7 +160,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => true, isDirectory: () => false } as any);
-      const data = await P.Effect.runPromise(unit.getFileType('./foo/bar.txt'));
+      const data = await Effect.runPromise(unit.getFileType('./foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(FileType.File);
@@ -168,7 +168,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => true } as any);
-      const data = await P.Effect.runPromise(unit.getFileType('./foo'));
+      const data = await Effect.runPromise(unit.getFileType('./foo'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(FileType.Directory);
@@ -176,7 +176,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockReturnValue({ isFile: () => false, isDirectory: () => false } as any);
-      const data = await P.Effect.runPromise(unit.getFileType('.'));
+      const data = await Effect.runPromise(unit.getFileType('.'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(data).toBe(FileType.Other);
@@ -196,7 +196,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly, directory does not exist', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      await P.Effect.runPromise(unit.createDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(unit.createDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(1);
@@ -205,7 +205,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly, directory exists', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      await P.Effect.runPromise(unit.createDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(unit.createDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(0);
@@ -225,7 +225,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly, directory does not exist', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      await P.Effect.runPromise(unit.removeDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(unit.removeDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(0);
@@ -233,7 +233,7 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly, directory exists', async () => {
       stub1 = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      await P.Effect.runPromise(unit.removeDirectory('/foo/baz' as DirectoryPath));
+      await Effect.runPromise(unit.removeDirectory('/foo/baz' as DirectoryPath));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub2).toHaveBeenCalledTimes(1);
@@ -251,7 +251,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      const data = await P.Effect.runPromise(unit.readFile('/foo/bar.txt'));
+      const data = await Effect.runPromise(unit.readFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -269,7 +269,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      await P.Effect.runPromise(unit.writeFile('/foo/bar.txt', 'some test text'));
+      await Effect.runPromise(unit.writeFile('/foo/bar.txt', 'some test text'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -277,7 +277,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      await P.Effect.runPromise(unit.writeFile('/foo/bar.txt', stringToUint8Array('some test text')));
+      await Effect.runPromise(unit.writeFile('/foo/bar.txt', stringToUint8Array('some test text')));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -295,7 +295,7 @@ describe('NodeTinyFileSystem', () => {
     });
 
     it('should function correctly', async () => {
-      await P.Effect.runPromise(unit.deleteFile('/foo/bar.txt'));
+      await Effect.runPromise(unit.deleteFile('/foo/bar.txt'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
@@ -304,10 +304,10 @@ describe('NodeTinyFileSystem', () => {
 
   describe('joinPath', () => {
     it('should function correctly', async () => {
-      expect(P.Effect.runSync(unit.joinPath('foo', 'bar', 'baz.json'))).toEqual('foo/bar/baz.json');
-      expect(P.Effect.runSync(unit.joinPath('foo/bar', 'baz.json'))).toEqual('foo/bar/baz.json');
-      expect(P.Effect.runSync(unit.joinPath('/foo', 'baz.json'))).toEqual('/foo/baz.json');
-      expect(P.Effect.runSync(unit.joinPath('/', 'baz.json'))).toEqual('/baz.json');
+      expect(Effect.runSync(unit.joinPath('foo', 'bar', 'baz.json'))).toEqual('foo/bar/baz.json');
+      expect(Effect.runSync(unit.joinPath('foo/bar', 'baz.json'))).toEqual('foo/bar/baz.json');
+      expect(Effect.runSync(unit.joinPath('/foo', 'baz.json'))).toEqual('/foo/baz.json');
+      expect(Effect.runSync(unit.joinPath('/', 'baz.json'))).toEqual('/baz.json');
     });
   });
 
@@ -325,12 +325,12 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
-      await expect(P.Effect.runPromise(unit.dirName('foo/bar/baz.json'))).resolves.toEqual('foo/bar');
+      await expect(Effect.runPromise(unit.dirName('foo/bar/baz.json'))).resolves.toEqual('foo/bar');
     });
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
-      await expect(P.Effect.runPromise(unit.dirName('foo/bar'))).resolves.toEqual('foo');
+      await expect(Effect.runPromise(unit.dirName('foo/bar'))).resolves.toEqual('foo');
     });
   });
 
@@ -342,12 +342,12 @@ describe('NodeTinyFileSystem', () => {
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => true, isDirectory: () => false } as any);
-      await expect(P.Effect.runPromise(unit.fileName('foo/bar/baz.json'))).resolves.toEqual('baz.json');
+      await expect(Effect.runPromise(unit.fileName('foo/bar/baz.json'))).resolves.toEqual('baz.json');
     });
 
     it('should function correctly', async () => {
       stub1 = vi.spyOn(fs.promises, 'lstat').mockResolvedValue({ isFile: () => false, isDirectory: () => true } as any);
-      await expect(P.Effect.runPromise(unit.fileName('foo/bar'))).rejects.toThrow('TinyFileSystemError');
+      await expect(Effect.runPromise(unit.fileName('foo/bar'))).rejects.toThrow('TinyFileSystemError');
     });
   });
 

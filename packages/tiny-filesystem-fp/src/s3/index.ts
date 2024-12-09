@@ -7,7 +7,8 @@ import * as S from '@konker.dev/aws-client-effect-s3';
 import { S3ClientDeps, S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
 import { UploadObjectEffect, UploadObjectWriteStreamEffect } from '@konker.dev/aws-client-effect-s3/dist/extra';
 import type { S3Error } from '@konker.dev/aws-client-effect-s3/dist/lib/error';
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import path from 'path';
 
 import type { Path, Ref, TinyFileSystem } from '../index.js';
@@ -22,60 +23,60 @@ import { s3ObjectIsReadable } from './utils.js';
 
 const getFileReadStream =
   (s3Client: S3Client) =>
-  (filePath: string): P.Effect.Effect<Readable, TinyFileSystemError> => {
-    return P.pipe(
+  (filePath: string): Effect.Effect<Readable, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(filePath),
-      P.Effect.filterOrFail(s3UrlDataIsFile, () =>
+      Effect.filterOrFail(s3UrlDataIsFile, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot read a file with a non-file url')
       ),
-      P.Effect.flatMap((parsed) =>
+      Effect.flatMap((parsed) =>
         S.GetObjectCommandEffect({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
-      P.Effect.filterOrFail(s3ObjectIsReadable, () =>
+      Effect.filterOrFail(s3ObjectIsReadable, () =>
         toTinyFileSystemError('[S3TinyFileSystem] getFileReadStream: Body is not a Readable')
       ),
-      P.Effect.map((s3File) => s3File.Body as Readable),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.map((s3File) => s3File.Body as Readable),
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const getFileLineReadStream =
   (s3Client: S3Client) =>
-  (filePath: string): P.Effect.Effect<readline.Interface, TinyFileSystemError> => {
-    return P.pipe(
+  (filePath: string): Effect.Effect<readline.Interface, TinyFileSystemError> => {
+    return pipe(
       filePath,
       getFileReadStream(s3Client),
-      P.Effect.flatMap(readlineInterfaceFromReadStream),
-      P.Effect.mapError(toTinyFileSystemError)
+      Effect.flatMap(readlineInterfaceFromReadStream),
+      Effect.mapError(toTinyFileSystemError)
     );
   };
 
 const getFileWriteStream =
   (s3Client: S3Client) =>
-  (filePath: string): P.Effect.Effect<Writable, TinyFileSystemError> => {
-    return P.pipe(
+  (filePath: string): Effect.Effect<Writable, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(filePath),
-      P.Effect.filterOrFail(s3UrlDataIsFile, () =>
+      Effect.filterOrFail(s3UrlDataIsFile, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot write to a file with a non-file url')
       ),
-      P.Effect.flatMap((parsed) =>
+      Effect.flatMap((parsed) =>
         UploadObjectWriteStreamEffect({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const listFiles =
   (s3Client: S3Client) =>
-  (dirPath: string): P.Effect.Effect<Array<S3IoUrl>, TinyFileSystemError> => {
+  (dirPath: string): Effect.Effect<Array<S3IoUrl>, TinyFileSystemError> => {
     function _processListing(parsed: S3UrlData, list: Array<any> | undefined, key: string): Array<S3IoUrl> {
       if (!list) return [];
       return (
@@ -95,20 +96,20 @@ const listFiles =
       );
     }
 
-    return P.pipe(
+    return pipe(
       s3Utils.parseS3Url(dirPath),
-      P.Effect.filterOrFail(s3UrlDataIsDirectory, () =>
+      Effect.filterOrFail(s3UrlDataIsDirectory, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot list files with a non-directory url')
       ),
-      P.Effect.flatMap((parsed) =>
-        P.pipe(
+      Effect.flatMap((parsed) =>
+        pipe(
           S.ListObjectsV2CommandEffect({
             Bucket: parsed.Bucket,
             Delimiter: '/',
             Prefix: parsed.Path,
           }),
-          P.Effect.flatMap((allFiles) =>
-            P.Effect.tryPromise({
+          Effect.flatMap((allFiles) =>
+            Effect.tryPromise({
               try: async () => {
                 if (allFiles.IsTruncated) {
                   // eslint-disable-next-line fp/no-throw
@@ -122,8 +123,8 @@ const listFiles =
               catch: toTinyFileSystemError,
             })
           ),
-          P.Effect.mapError(toTinyFileSystemError),
-          P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+          Effect.mapError(toTinyFileSystemError),
+          Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
         )
       )
     );
@@ -131,17 +132,17 @@ const listFiles =
 
 const exists =
   (s3Client: S3Client) =>
-  (fileOrDirPath: string): P.Effect.Effect<boolean, TinyFileSystemError> => {
-    return P.pipe(
+  (fileOrDirPath: string): Effect.Effect<boolean, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(fileOrDirPath),
-      P.Effect.flatMap((parsed: S3UrlData) =>
+      Effect.flatMap((parsed: S3UrlData) =>
         S.HeadObjectCommandEffect({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
-      P.Effect.map((_) => true),
-      P.Effect.catchTag(S.S3_ERROR_TAG, (resp: S3Error) => {
+      Effect.map((_) => true),
+      Effect.catchTag(S.S3_ERROR_TAG, (resp: S3Error) => {
         const cause = resp.cause;
         // eslint-disable-next-line fp/no-nil
         const metadata = !!cause && typeof cause === 'object' && '$metadata' in cause ? cause['$metadata'] : undefined;
@@ -151,57 +152,57 @@ const exists =
             : // eslint-disable-next-line fp/no-nil
               undefined;
 
-        return httpStatusCode === 404 ? P.Effect.succeed(false) : P.Effect.fail(resp);
+        return httpStatusCode === 404 ? Effect.succeed(false) : Effect.fail(resp);
       }),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const getFileType =
   (_s3Client: S3Client) =>
-  (filePath: string): P.Effect.Effect<FileType, TinyFileSystemError> => {
-    return P.pipe(
+  (filePath: string): Effect.Effect<FileType, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(filePath),
-      P.Effect.map((parsed) => parsed.Type)
+      Effect.map((parsed) => parsed.Type)
     );
   };
 
 const readFile =
   (s3Client: S3Client) =>
-  (s3url: string): P.Effect.Effect<Uint8Array, TinyFileSystemError> => {
-    return P.pipe(
+  (s3url: string): Effect.Effect<Uint8Array, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(s3url),
-      P.Effect.filterOrFail(s3UrlDataIsFile, () =>
+      Effect.filterOrFail(s3UrlDataIsFile, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot read a file with a directory url')
       ),
-      P.Effect.flatMap((parsed) =>
+      Effect.flatMap((parsed) =>
         S.GetObjectCommandEffect({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
-      P.Effect.filterOrFail(s3ObjectIsReadable, (resp) =>
+      Effect.filterOrFail(s3ObjectIsReadable, (resp) =>
         toTinyFileSystemError(
           `[S3TinyFileSystem] S3 object does not have a readable stream Body: ${JSON.stringify(resp)}`
         )
       ),
-      P.Effect.flatMap((resp) => readStreamToBuffer(resp.Body as Readable)),
-      P.Effect.map((buffer) => new Uint8Array(buffer)),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.flatMap((resp) => readStreamToBuffer(resp.Body as Readable)),
+      Effect.map((buffer) => new Uint8Array(buffer)),
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const writeFile =
   (s3Client: S3Client) =>
-  (s3url: string, data: ArrayBuffer | string): P.Effect.Effect<void, TinyFileSystemError> => {
-    return P.pipe(
+  (s3url: string, data: ArrayBuffer | string): Effect.Effect<void, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(s3url),
-      P.Effect.filterOrFail(s3UrlDataIsFile, () =>
+      Effect.filterOrFail(s3UrlDataIsFile, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot write a file with a directory url')
       ),
-      P.Effect.flatMap((parsed) =>
+      Effect.flatMap((parsed) =>
         UploadObjectEffect(
           {
             Bucket: parsed.Bucket,
@@ -210,76 +211,76 @@ const writeFile =
           typeof data === 'string' ? Buffer.from(data) : Buffer.from(data)
         )
       ),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const deleteFile =
   (s3Client: S3Client) =>
-  (filePath: string): P.Effect.Effect<void, TinyFileSystemError> => {
-    return P.pipe(
+  (filePath: string): Effect.Effect<void, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(filePath),
-      P.Effect.filterOrFail(s3UrlDataIsFile, () =>
+      Effect.filterOrFail(s3UrlDataIsFile, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot delete a file with a directory url')
       ),
-      P.Effect.flatMap((parsed) =>
+      Effect.flatMap((parsed) =>
         S.DeleteObjectCommandEffect({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const createDirectory =
   (s3Client: S3Client) =>
-  (dirPath: string): P.Effect.Effect<void, TinyFileSystemError> => {
-    return P.pipe(
+  (dirPath: string): Effect.Effect<void, TinyFileSystemError> => {
+    return pipe(
       s3Utils.parseS3Url(dirPath),
-      P.Effect.filterOrFail(s3UrlDataIsDirectory, () =>
+      Effect.filterOrFail(s3UrlDataIsDirectory, () =>
         toTinyFileSystemError('[S3TinyFileSystem] Cannot create a directory with a non-directory url')
       ),
-      P.Effect.flatMap((parsed) =>
+      Effect.flatMap((parsed) =>
         S.PutObjectCommandEffect({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
           ContentLength: 0,
         })
       ),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 const removeDirectory =
   (s3Client: S3Client) =>
-  (dirPath: string): P.Effect.Effect<void, TinyFileSystemError> => {
-    function _purgeItem(s3ItemUrl: S3IoUrl): P.Effect.Effect<void, TinyFileSystemError> {
-      return P.pipe(
+  (dirPath: string): Effect.Effect<void, TinyFileSystemError> => {
+    function _purgeItem(s3ItemUrl: S3IoUrl): Effect.Effect<void, TinyFileSystemError> {
+      return pipe(
         s3ItemUrl,
         getFileType(s3Client),
-        P.Effect.flatMap((fileType) =>
+        Effect.flatMap((fileType) =>
           fileType === FileType.Directory ? removeDirectory(s3Client)(s3ItemUrl) : deleteFile(s3Client)(s3ItemUrl)
         )
       );
     }
 
-    return P.pipe(
+    return pipe(
       // Remove contents of the directory
       dirPath,
       listFiles(s3Client),
-      P.Effect.map((dirContent) => dirContent.map((i) => _purgeItem(i))),
-      P.Effect.flatMap(P.Effect.all),
+      Effect.map((dirContent) => dirContent.map((i) => _purgeItem(i))),
+      Effect.flatMap(Effect.all),
 
       // Remove the directory itself.
       // No need to check if is a Directory url, as listFiles will have already failed
-      P.Effect.flatMap((_void) =>
-        P.pipe(
+      Effect.flatMap((_void) =>
+        pipe(
           s3Utils.parseS3Url(dirPath),
-          P.Effect.flatMap((parsed) =>
+          Effect.flatMap((parsed) =>
             S.DeleteObjectCommandEffect({
               Bucket: parsed.Bucket,
               Key: parsed.FullPath,
@@ -287,40 +288,38 @@ const removeDirectory =
           )
         )
       ),
-      P.Effect.mapError(toTinyFileSystemError),
-      P.Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError),
+      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
     );
   };
 
 // eslint-disable-next-line fp/no-rest-parameters
-function joinPath(...parts: Array<string>): P.Effect.Effect<Ref, TinyFileSystemError> {
-  if (parts[0] === undefined) return P.Effect.succeed('' as Path);
+function joinPath(...parts: Array<string>): Effect.Effect<Ref, TinyFileSystemError> {
+  if (parts[0] === undefined) return Effect.succeed('' as Path);
 
   return parts[0].startsWith(s3Utils.S3_PROTOCOL)
-    ? P.pipe(
+    ? pipe(
         s3Utils.parseS3Url(parts[0]),
-        P.Effect.map((parsed) =>
-          s3Utils.createS3Url(parsed.Bucket, path.posix.join(parsed.FullPath, ...parts.slice(1)))
-        )
+        Effect.map((parsed) => s3Utils.createS3Url(parsed.Bucket, path.posix.join(parsed.FullPath, ...parts.slice(1))))
       )
-    : P.Effect.succeed(path.posix.join(...parts) as Path);
+    : Effect.succeed(path.posix.join(...parts) as Path);
 }
 
 function relative(from: string, to: string): Ref {
   return path.posix.relative(from, to) as S3IoUrl;
 }
 
-function dirName(filePath: string): P.Effect.Effect<Ref, TinyFileSystemError> {
-  return P.pipe(
+function dirName(filePath: string): Effect.Effect<Ref, TinyFileSystemError> {
+  return pipe(
     s3Utils.parseS3Url(filePath),
-    P.Effect.map((parsed) => s3Utils.createS3Url(parsed.Bucket, parsed.Path))
+    Effect.map((parsed) => s3Utils.createS3Url(parsed.Bucket, parsed.Path))
   );
 }
 
-function fileName(filePath: string): P.Effect.Effect<Ref, TinyFileSystemError> {
-  return P.pipe(
+function fileName(filePath: string): Effect.Effect<Ref, TinyFileSystemError> {
+  return pipe(
     s3Utils.parseS3Url(filePath),
-    P.Effect.flatMap((parsed) => P.pipe(parsed.File, P.Effect.fromNullable, P.Effect.mapError(toTinyFileSystemError)))
+    Effect.flatMap((parsed) => pipe(parsed.File, Effect.fromNullable, Effect.mapError(toTinyFileSystemError)))
   );
 }
 
@@ -336,10 +335,10 @@ function isAbsolute(fileOrDirPath: string): boolean {
   return fileOrDirPath.startsWith(s3Utils.S3_PROTOCOL);
 }
 
-export const S3TinyFileSystem = (config: S3ClientConfig): P.Effect.Effect<TinyFileSystem, never, S3ClientFactoryDeps> =>
-  P.pipe(
+export const S3TinyFileSystem = (config: S3ClientConfig): Effect.Effect<TinyFileSystem, never, S3ClientFactoryDeps> =>
+  pipe(
     S3ClientFactoryDeps,
-    P.Effect.map((deps) => {
+    Effect.map((deps) => {
       const s3Client: S3Client = deps.s3ClientFactory(config);
 
       return {

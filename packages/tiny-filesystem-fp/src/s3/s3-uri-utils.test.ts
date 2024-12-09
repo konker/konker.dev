@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { FileType } from '../index';
@@ -115,17 +115,15 @@ describe('S3 URI Utils', () => {
 
   describe('parseS3Url', () => {
     it('should function correctly', async () => {
-      await expect(P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/qux.csv'))).resolves.toStrictEqual(
-        {
-          Bucket: 'foobucket',
-          Path: 'bar/baz/',
-          File: 'qux.csv',
-          Type: FileType.File,
-          FullPath: 'bar/baz/qux.csv',
-        }
-      );
+      await expect(Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/qux.csv'))).resolves.toStrictEqual({
+        Bucket: 'foobucket',
+        Path: 'bar/baz/',
+        File: 'qux.csv',
+        Type: FileType.File,
+        FullPath: 'bar/baz/qux.csv',
+      });
       await expect(
-        P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/qux+space.csv'))
+        Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/qux+space.csv'))
       ).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: 'bar/baz/',
@@ -134,7 +132,7 @@ describe('S3 URI Utils', () => {
         FullPath: 'bar/baz/qux space.csv',
       });
       await expect(
-        P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/qux%2Bspace.csv'))
+        Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/qux%2Bspace.csv'))
       ).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: 'bar/baz/',
@@ -142,35 +140,35 @@ describe('S3 URI Utils', () => {
         Type: FileType.File,
         FullPath: 'bar/baz/qux+space.csv',
       });
-      await expect(P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/'))).resolves.toStrictEqual({
+      await expect(Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz/'))).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: 'bar/baz/',
         File: undefined,
         Type: FileType.Directory,
         FullPath: 'bar/baz/',
       });
-      await expect(P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz'))).resolves.toStrictEqual({
+      await expect(Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/baz'))).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: 'bar/baz/',
         File: undefined,
         Type: FileType.Directory,
         FullPath: 'bar/baz/',
       });
-      await expect(P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/'))).resolves.toStrictEqual({
+      await expect(Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/bar/'))).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: 'bar/',
         File: undefined,
         Type: FileType.Directory,
         FullPath: 'bar/',
       });
-      await expect(P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/'))).resolves.toStrictEqual({
+      await expect(Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket/'))).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: '',
         File: undefined,
         Type: FileType.Directory,
         FullPath: '',
       });
-      await expect(P.Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket'))).resolves.toStrictEqual({
+      await expect(Effect.runPromise(s3UriUtils.parseS3Url('s3://foobucket'))).resolves.toStrictEqual({
         Bucket: 'foobucket',
         Path: '',
         File: undefined,
@@ -180,16 +178,16 @@ describe('S3 URI Utils', () => {
     });
 
     it('should fail correctly', async () => {
-      await expect(() =>
-        P.Effect.runPromise(s3UriUtils.parseS3Url('http://foobucket/bar/baz/qux.csv'))
-      ).rejects.toThrow('[s3-uri-utils] Incorrect protocol');
-      await expect(() => P.Effect.runPromise(s3UriUtils.parseS3Url('s3://FooBucket/bar/baz/qux.csv'))).rejects.toThrow(
+      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url('http://foobucket/bar/baz/qux.csv'))).rejects.toThrow(
+        '[s3-uri-utils] Incorrect protocol'
+      );
+      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url('s3://FooBucket/bar/baz/qux.csv'))).rejects.toThrow(
         's3-uri-utils] S3 URLs must have a lower case bucket component'
       );
-      await expect(() => P.Effect.runPromise(s3UriUtils.parseS3Url('s3://'))).rejects.toThrow(
+      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url('s3://'))).rejects.toThrow(
         '[s3-uri-utils] Could not determine bucket name'
       );
-      await expect(() => P.Effect.runPromise(s3UriUtils.parseS3Url(''))).rejects.toThrow('ERR_INVALID_URL');
+      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url(''))).rejects.toThrow('ERR_INVALID_URL');
     });
   });
 });
