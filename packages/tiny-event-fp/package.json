@@ -23,8 +23,6 @@
     "!dist/**/*.test.*"
   ],
   "dependencies": {
-    "@effect/schema": "^0.68.27",
-    "@konker.dev/effect-ts-prelude": "workspace:*",
     "effect": "^3.11.2"
   },
   "devDependencies": {

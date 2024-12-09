@@ -1,4 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it, vi } from 'vitest';
 
 import * as unit from './index';
@@ -10,34 +11,34 @@ describe('TinyEvent', () => {
   type EventType = typeof EventTypeFoo | typeof EventTypeBar | typeof EventTypeBaz;
 
   it('should work as expected', async () => {
-    const lFoo1 = vi.fn((_t: EventType, _d?: string) => P.Effect.void);
-    const lFoo2 = vi.fn((_t: EventType, _d?: string) => P.Effect.void);
-    const l2 = vi.fn((_t: EventType, _d?: string) => P.Effect.void);
-    const l3 = vi.fn((_t: EventType, _d?: string) => P.Effect.void);
+    const lFoo1 = vi.fn((_t: EventType, _d?: string) => Effect.void);
+    const lFoo2 = vi.fn((_t: EventType, _d?: string) => Effect.void);
+    const l2 = vi.fn((_t: EventType, _d?: string) => Effect.void);
+    const l3 = vi.fn((_t: EventType, _d?: string) => Effect.void);
 
-    const prog = P.pipe(
+    const prog = pipe(
       unit.createTinyEventDispatcher<EventType, string>(),
-      P.Effect.flatMap(unit.removeListener<EventType, string>(EventTypeFoo, lFoo1)),
-      P.Effect.flatMap(unit.addListener<EventType, string>(EventTypeFoo, lFoo1)),
-      P.Effect.flatMap(unit.addListener<EventType, string>(EventTypeFoo, lFoo2)),
-      P.Effect.flatMap(unit.addListener<EventType, string>(EventTypeBar, l2)),
-      P.Effect.flatMap(unit.addStarListener<EventType, string>(l3)),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 1')),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 1')),
-      P.Effect.flatMap(unit.removeListener<EventType, string>(EventTypeFoo, lFoo1)),
-      P.Effect.flatMap(unit.removeListener<EventType, string>(EventTypeFoo, lFoo2)),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 2')),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 2')),
-      P.Effect.flatMap(unit.removeStarListener<EventType, string>(l3)),
-      P.Effect.flatMap(unit.removeStarListener<EventType, string>(l3)),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 3')),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 3')),
-      P.Effect.flatMap(unit.removeAllListeners<EventType, string>()),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 4')),
-      P.Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 4'))
+      Effect.flatMap(unit.removeListener<EventType, string>(EventTypeFoo, lFoo1)),
+      Effect.flatMap(unit.addListener<EventType, string>(EventTypeFoo, lFoo1)),
+      Effect.flatMap(unit.addListener<EventType, string>(EventTypeFoo, lFoo2)),
+      Effect.flatMap(unit.addListener<EventType, string>(EventTypeBar, l2)),
+      Effect.flatMap(unit.addStarListener<EventType, string>(l3)),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 1')),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 1')),
+      Effect.flatMap(unit.removeListener<EventType, string>(EventTypeFoo, lFoo1)),
+      Effect.flatMap(unit.removeListener<EventType, string>(EventTypeFoo, lFoo2)),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 2')),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 2')),
+      Effect.flatMap(unit.removeStarListener<EventType, string>(l3)),
+      Effect.flatMap(unit.removeStarListener<EventType, string>(l3)),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 3')),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 3')),
+      Effect.flatMap(unit.removeAllListeners<EventType, string>()),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 4')),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 4'))
     );
 
-    const result = await P.Effect.runPromise(prog);
+    const result = await Effect.runPromise(prog);
     expect(result).toHaveProperty('listeners');
     expect(lFoo1).toHaveBeenCalledTimes(1);
     expect(lFoo1.mock.calls[0]).toEqual([EventTypeFoo, 'Hello Foo 1']);
