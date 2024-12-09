@@ -153,9 +153,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -247,9 +244,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -353,9 +347,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -456,9 +447,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -559,9 +547,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -662,9 +647,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -765,9 +747,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -865,9 +844,6 @@ importers:
       gulp:
         specifier: ^4.0.2
         version: 4.0.2
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -983,9 +959,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1101,9 +1074,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1201,9 +1171,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1298,9 +1265,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1380,9 +1344,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1468,9 +1429,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1574,9 +1532,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1662,9 +1617,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1786,9 +1738,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -1877,9 +1826,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^1.6.0
         version: 1.6.0(eslint@8.57.1)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       leasot:
         specifier: ^13.3.0
         version: 13.3.0
@@ -5838,16 +5784,6 @@ packages:
   human-signals@8.0.0:
     resolution: {integrity: sha512-/1/GPCpDUCCYwlERiYjxoczfP0zfvZMU/OWgQPMya9AbAE24vseigFdhAMObpc8Q4lc/kjutPfUddDYyAmejnA==}
     engines: {node: '>=18.18.0'}
-
-  husky@8.0.3:
-    resolution: {integrity: sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==}
-    engines: {node: '>=14'}
-    hasBin: true
-
-  husky@9.1.7:
-    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
-    engines: {node: '>=18'}
-    hasBin: true
 
   hyperdyperid@1.2.0:
     resolution: {integrity: sha512-Y93lCzHYgGWdrJ66yIktxiaGULYc6oGiABxhcO5AufBeOyoIdZF7bIfLaOrbM0iGIOXQQgxxRrFEnb+Y6w1n4A==}
@@ -14903,10 +14839,6 @@ snapshots:
   human-signals@5.0.0: {}
 
   human-signals@8.0.0: {}
-
-  husky@8.0.3: {}
-
-  husky@9.1.7: {}
 
   hyperdyperid@1.2.0: {}
 
