@@ -462,12 +462,6 @@ importers:
       '@aws-sdk/client-sns':
         specifier: ^3.699.0
         version: 3.699.0
-      '@effect/schema':
-        specifier: ^0.68.27
-        version: 0.68.27(effect@3.11.3)
-      '@konker.dev/effect-ts-prelude':
-        specifier: workspace:*
-        version: link:../effect-ts-prelude
       '@konker.dev/tiny-error-fp':
         specifier: workspace:*
         version: link:../tiny-error-fp

@@ -1,8 +1,9 @@
 import type { SNSClient } from '@aws-sdk/client-sns';
 import * as snsClient from '@aws-sdk/client-sns';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import { Context, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { SnsError } from './lib/error.js';
 import { toSnsError } from './lib/error.js';
@@ -17,11 +18,11 @@ export const defaultSNSClientFactory: SNSClientFactory = (config: snsClient.SNSC
 export type SNSClientFactoryDeps = {
   readonly snsClientFactory: SNSClientFactory;
 };
-export const SNSClientFactoryDeps = P.Context.GenericTag<SNSClientFactoryDeps>(
+export const SNSClientFactoryDeps = Context.GenericTag<SNSClientFactoryDeps>(
   '@aws-client-client-sns/SNSClientFactoryDeps'
 );
 
-export const defaultSNSClientFactoryDeps = P.Effect.provideService(
+export const defaultSNSClientFactoryDeps = Effect.provideService(
   SNSClientFactoryDeps,
   SNSClientFactoryDeps.of({
     snsClientFactory: defaultSNSClientFactory,
@@ -32,10 +33,10 @@ export const defaultSNSClientFactoryDeps = P.Effect.provideService(
 export type SNSClientDeps = {
   readonly snsClient: SNSClient;
 };
-export const SNSClientDeps = P.Context.GenericTag<SNSClientDeps>('aws-client-effect-sns/SNSClientDeps');
+export const SNSClientDeps = Context.GenericTag<SNSClientDeps>('aws-client-effect-sns/SNSClientDeps');
 
 export const defaultSNSClientDeps = (config: snsClient.SNSClientConfig) =>
-  P.Effect.provideService(
+  Effect.provideService(
     SNSClientDeps,
     SNSClientDeps.of({
       snsClient: defaultSNSClientFactory(config),
@@ -59,12 +60,12 @@ export function FabricateCommandEffect<I extends snsClient.ServiceInputTypes, O 
 ): (
   params: I,
   options?: HttpHandlerOptions | undefined
-) => P.Effect.Effect<O & SNSEchoParams<I>, SnsError, SNSClientDeps> {
+) => Effect.Effect<O & SNSEchoParams<I>, SnsError, SNSClientDeps> {
   return function (params, options) {
-    return P.pipe(
+    return pipe(
       SNSClientDeps,
-      P.Effect.flatMap((deps) =>
-        P.Effect.tryPromise({
+      Effect.flatMap((deps) =>
+        Effect.tryPromise({
           try: async () => {
             const cmd = new cmdCtor(params);
             const result = await deps.snsClient.send(cmd, options);

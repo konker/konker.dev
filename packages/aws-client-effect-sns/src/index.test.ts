@@ -1,8 +1,9 @@
 import type { PublishCommandInput } from '@aws-sdk/client-sns';
 import * as snsClient from '@aws-sdk/client-sns';
 import { SNSClient } from '@aws-sdk/client-sns';
-import * as P from '@konker.dev/effect-ts-prelude';
 import { mockClient } from 'aws-sdk-client-mock';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import * as unit from './index';
@@ -38,12 +39,12 @@ describe('aws-client-effect-sns', () => {
   // ------------------------------------------------------------------------
   describe('defaultSNSClientFactoryDeps', () => {
     it('should work as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.SNSClientFactoryDeps,
-        P.Effect.map((deps) => deps.snsClientFactory),
+        Effect.map((deps) => deps.snsClientFactory),
         unit.defaultSNSClientFactoryDeps
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
       expect(actual).toBeInstanceOf(Function);
     });
   });
@@ -51,12 +52,12 @@ describe('aws-client-effect-sns', () => {
   // ------------------------------------------------------------------------
   describe('defaultSNSClientDeps', () => {
     it('should work as expected', async () => {
-      const actualEffect = P.pipe(
+      const actualEffect = pipe(
         unit.SNSClientDeps,
-        P.Effect.map((deps) => deps.snsClient),
+        Effect.map((deps) => deps.snsClient),
         unit.defaultSNSClientDeps({})
       );
-      const actual = P.Effect.runSync(actualEffect);
+      const actual = Effect.runSync(actualEffect);
       expect(actual).toBeInstanceOf(SNSClient);
     });
   });
@@ -72,8 +73,8 @@ describe('aws-client-effect-sns', () => {
 
       const params: PublishCommandInput = { TopicArn: 'test-topic-arn', Message: 'test-message' };
       const expected = { MessageId: 'test-message-id', _Params: params };
-      const command = P.pipe(unit.PublishCommandEffect(params), P.Effect.provideService(SNSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).resolves.toStrictEqual(expected);
+      const command = pipe(unit.PublishCommandEffect(params), Effect.provideService(SNSClientDeps, deps));
+      await expect(Effect.runPromise(command)).resolves.toStrictEqual(expected);
       expect(snsMock.calls().length).toEqual(1);
     });
 
@@ -81,8 +82,8 @@ describe('aws-client-effect-sns', () => {
       snsMock.on(snsClient.PublishCommand).rejects({ $metadata: { httpStatusCode: 404 } });
 
       const params: PublishCommandInput = { TopicArn: 'test-topic-arn', Message: 'test-message' };
-      const command = P.pipe(unit.PublishCommandEffect(params), P.Effect.provideService(SNSClientDeps, deps));
-      await expect(P.Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
+      const command = pipe(unit.PublishCommandEffect(params), Effect.provideService(SNSClientDeps, deps));
+      await expect(Effect.runPromise(command)).rejects.toThrowErrorMatchingSnapshot(JSON.stringify({ _tag: TAG }));
       expect(snsMock.calls().length).toEqual(1);
     });
   });
