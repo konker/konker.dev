@@ -1,5 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import memFs1Fixture from '../test/fixtures/memfs-1.json';
@@ -19,8 +20,8 @@ describe('filter', () => {
 
   describe('sequenceFileFilters', () => {
     it('should work as expected', async () => {
-      const actual = await P.Effect.runPromise(
-        P.pipe([ExtensionFileFilter(['.txt']), TrueFileFilter], unit.sequenceFileFilters)(
+      const actual = await Effect.runPromise(
+        pipe([ExtensionFileFilter(['.txt']), TrueFileFilter], unit.sequenceFileFilters)(
           memFsTinyFileSystem,
           '/',
           'foo',
@@ -32,8 +33,8 @@ describe('filter', () => {
     });
 
     it('should work as expected', async () => {
-      const actual = await P.Effect.runPromise(
-        P.pipe([ExtensionFileFilter(['.txt']), FalseFileFilter], unit.sequenceFileFilters)(
+      const actual = await Effect.runPromise(
+        pipe([ExtensionFileFilter(['.txt']), FalseFileFilter], unit.sequenceFileFilters)(
           memFsTinyFileSystem,
           '/',
           'foo',
@@ -45,14 +46,8 @@ describe('filter', () => {
     });
 
     it('should work as expected', async () => {
-      const actual = await P.Effect.runPromise(
-        P.pipe([FalseFileFilter, FalseFileFilter], unit.sequenceFileFilters)(
-          memFsTinyFileSystem,
-          '/',
-          'foo',
-          'a.json',
-          1
-        )
+      const actual = await Effect.runPromise(
+        pipe([FalseFileFilter, FalseFileFilter], unit.sequenceFileFilters)(memFsTinyFileSystem, '/', 'foo', 'a.json', 1)
       );
       expect(actual).toStrictEqual(false);
     });
@@ -60,8 +55,8 @@ describe('filter', () => {
 
   describe('sequenceDirectoryFilters', () => {
     it('should work as expected', async () => {
-      const actual = await P.Effect.runPromise(
-        P.pipe(
+      const actual = await Effect.runPromise(
+        pipe(
           unit.sequenceDirectoryFilters([TrueDirectoryFilter, FalseDirectoryFilter])(
             memFsTinyFileSystem,
             '/',
@@ -75,8 +70,8 @@ describe('filter', () => {
     });
 
     it('should work as expected', async () => {
-      const actual = await P.Effect.runPromise(
-        P.pipe(
+      const actual = await Effect.runPromise(
+        pipe(
           unit.sequenceDirectoryFilters([TrueDirectoryFilter, TrueDirectoryFilter])(
             memFsTinyFileSystem,
             '/',

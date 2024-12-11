@@ -1,7 +1,8 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
 import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { FalseDirectoryFilter } from '../filter/directory/false-directory-filter';
@@ -22,14 +23,14 @@ describe('breadth-first-tree-crawler', () => {
   });
 
   it('should work as expected', async () => {
-    const mockListener = vi.fn().mockImplementation(() => P.Effect.void);
+    const mockListener = vi.fn().mockImplementation(() => Effect.void);
 
-    await P.Effect.runPromise(
-      P.pipe(
+    await Effect.runPromise(
+      pipe(
         E.createTinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>(),
-        P.Effect.flatMap(E.addStarListener(mockListener)),
-        P.Effect.flatMap((events) =>
-          P.pipe(
+        Effect.flatMap(E.addStarListener(mockListener)),
+        Effect.flatMap((events) =>
+          pipe(
             '/tmp/foo',
             unit.BreadthFirstTreeCrawler(
               memFsTinyFileSystem,
@@ -60,14 +61,14 @@ describe('breadth-first-tree-crawler', () => {
   });
 
   it('should work as expected', async () => {
-    const mockListener = vi.fn().mockImplementation(() => P.Effect.void);
+    const mockListener = vi.fn().mockImplementation(() => Effect.void);
 
-    await P.Effect.runPromise(
-      P.pipe(
+    await Effect.runPromise(
+      pipe(
         E.createTinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>(),
-        P.Effect.flatMap(E.addStarListener(mockListener)),
-        P.Effect.flatMap((events) =>
-          P.pipe(
+        Effect.flatMap(E.addStarListener(mockListener)),
+        Effect.flatMap((events) =>
+          pipe(
             '/tmp/foo',
             unit.BreadthFirstTreeCrawler(
               memFsTinyFileSystem,

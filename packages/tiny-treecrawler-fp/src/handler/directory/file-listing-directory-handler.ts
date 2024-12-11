@@ -1,5 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
+import { Option, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { DirectoryData } from '../../index';
 import { TreeCrawlerDataType } from '../../index';
@@ -10,9 +11,9 @@ export const FileListingTreeCrawlerDirectoryHandler = (
   tfs: TinyFileSystem,
   path: string,
   level: number
-): P.Effect.Effect<P.Option.Option<DirectoryData>, TinyTreeCrawlerError> =>
-  P.pipe(
+): Effect.Effect<Option.Option<DirectoryData>, TinyTreeCrawlerError> =>
+  pipe(
     tfs.listFiles(path),
-    P.Effect.mapError(toTinyTreeCrawlerError),
-    P.Effect.map((files) => P.Option.some({ _tag: TreeCrawlerDataType.Directory, level, path, data: files }))
+    Effect.mapError(toTinyTreeCrawlerError),
+    Effect.map((files) => Option.some({ _tag: TreeCrawlerDataType.Directory, level, path, data: files }))
   );

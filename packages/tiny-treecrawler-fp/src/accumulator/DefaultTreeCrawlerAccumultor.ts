@@ -1,4 +1,4 @@
-import * as P from '@konker.dev/effect-ts-prelude';
+import * as Effect from 'effect/Effect';
 
 import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
 import type { TreeCrawlerAccumulator } from './index';
@@ -17,7 +17,7 @@ export const DefaultTreeCrawlerAccumulator = (): TreeCrawlerAccumulator<Array<De
       }
       return rep;
     },
-    data: () => P.Effect.succeed(acc),
+    data: () => Effect.succeed(acc),
   };
 
   return rep;

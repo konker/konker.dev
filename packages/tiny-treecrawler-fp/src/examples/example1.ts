@@ -1,7 +1,8 @@
 /* eslint-disable fp/no-mutating-methods,fp/no-unused-expression */
-import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { Console, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import { DefaultTreeCrawlerAccumulator } from '../accumulator/DefaultTreeCrawlerAccumultor';
 import { BreadthFirstTreeCrawler } from '../crawler/breadth-first-tree-crawler';
@@ -15,23 +16,23 @@ import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
 import memFs1Fixture from '../test/fixtures/memfs-1.json';
 
 (async function main() {
-  const prg = P.pipe(
-    P.Effect.Do,
-    P.Effect.bind('accumulator', () => P.Effect.succeed(DefaultTreeCrawlerAccumulator())),
-    P.Effect.bind('events', ({ accumulator }) =>
-      P.pipe(
+  const prg = pipe(
+    Effect.Do,
+    Effect.bind('accumulator', () => Effect.succeed(DefaultTreeCrawlerAccumulator())),
+    Effect.bind('events', ({ accumulator }) =>
+      pipe(
         E.createTinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>(),
-        P.Effect.flatMap(
+        Effect.flatMap(
           E.addStarListener((_eventType: TreeCrawlerEvent, eventData?: TreeCrawlerData) => {
             accumulator.push(_eventType, eventData);
-            return P.Effect.void;
+            return Effect.void;
           })
         )
       )
     ),
-    P.Effect.bind('tfs', () => P.Effect.succeed(MemFsTinyFileSystem(memFs1Fixture, '/tmp'))),
-    P.Effect.bind('data', ({ accumulator, events, tfs }) =>
-      P.pipe(
+    Effect.bind('tfs', () => Effect.succeed(MemFsTinyFileSystem(memFs1Fixture, '/tmp'))),
+    Effect.bind('data', ({ accumulator, events, tfs }) =>
+      pipe(
         '/tmp/foo',
         BreadthFirstTreeCrawler(
           tfs,
@@ -39,11 +40,11 @@ import memFs1Fixture from '../test/fixtures/memfs-1.json';
           [sequenceFileFilters([TrueFileFilter, ExtensionFileFilter(['.txt', '.json', '.csv'])]), TrueDirectoryFilter],
           [DefaultTreeCrawlerFileHandler, DefaultTreeCrawlerDirectoryHandler]
         ),
-        P.Effect.flatMap(() => accumulator.data())
+        Effect.flatMap(() => accumulator.data())
       )
     ),
-    P.Effect.tap(({ data }) => P.Console.log(data))
+    Effect.tap(({ data }) => Console.log(data))
   );
 
-  return P.Effect.runPromise(prg);
+  return Effect.runPromise(prg);
 })().catch(console.error);

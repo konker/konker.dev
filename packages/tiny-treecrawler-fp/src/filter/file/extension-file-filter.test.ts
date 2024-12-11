@@ -1,5 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import memFs1Fixture from '../../test/fixtures/memfs-1.json';
@@ -14,13 +14,13 @@ describe('extension-file-filter', () => {
 
   it('should work as expected', () => {
     expect(unit.ExtensionFileFilter(['.txt'])(memFsTinyFileSystem, '/tmp', 'foo', 'a.txt', 1)).toStrictEqual(
-      P.Effect.succeed(true)
+      Effect.succeed(true)
     );
     expect(unit.ExtensionFileFilter(['.csv'])(memFsTinyFileSystem, '/tmp', 'foo', 'a.txt', 1)).toStrictEqual(
-      P.Effect.succeed(false)
+      Effect.succeed(false)
     );
     expect(unit.ExtensionFileFilter([])(memFsTinyFileSystem, '/tmp', 'foo', 'a.txt', 1)).toStrictEqual(
-      P.Effect.succeed(false)
+      Effect.succeed(false)
     );
   });
 });

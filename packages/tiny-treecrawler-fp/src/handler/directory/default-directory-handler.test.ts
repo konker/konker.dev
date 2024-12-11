@@ -1,5 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { Option } from 'effect';
+import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { TreeCrawlerDataType } from '../../index';
@@ -15,7 +16,7 @@ describe('default-directory-handler', () => {
 
   it('should work as expected', () => {
     expect(unit.DefaultTreeCrawlerDirectoryHandler(memFsTinyFileSystem, '/foo', 1)).toStrictEqual(
-      P.Effect.succeed(P.Option.some({ _tag: TreeCrawlerDataType.Directory, level: 1, path: '/foo' }))
+      Effect.succeed(Option.some({ _tag: TreeCrawlerDataType.Directory, level: 1, path: '/foo' }))
     );
   });
 });

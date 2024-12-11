@@ -1590,12 +1590,6 @@ importers:
       '@aws-sdk/types':
         specifier: ^3.511.0
         version: 3.696.0
-      '@effect/schema':
-        specifier: ^0.68.27
-        version: 0.68.27(effect@3.11.3)
-      '@konker.dev/effect-ts-prelude':
-        specifier: workspace:*
-        version: link:../effect-ts-prelude
       '@konker.dev/tiny-error-fp':
         specifier: workspace:*
         version: link:../tiny-error-fp
@@ -2271,11 +2265,6 @@ packages:
 
   '@effect/language-service@0.1.0':
     resolution: {integrity: sha512-BnlM8LlaqCAYgdRfxlbR7gXGh/FD1scL1fPgNVJEPoOM08od1jtJz+iKhwfaud8TPnnhZR+TED2h5ynjanLeCQ==}
-
-  '@effect/schema@0.68.27':
-    resolution: {integrity: sha512-/rmIb+4QaQTecdTfeYSZtNikIV+BeIbYDl/hpgBTaS96en7pKNW5hcygFQhdocjKguIL7Y/be+oUrVafWV60ew==}
-    peerDependencies:
-      effect: ^3.5.7
 
   '@effect/schema@0.72.4':
     resolution: {integrity: sha512-DCAOuLmfFf18ci/LeFaweN1uaYbgmbPwSFALHhS/Hj3seB4BPneGzZnNwBnI7kZ8NXFDhei7uuhXLvDjMCwphQ==}
@@ -10274,11 +10263,6 @@ snapshots:
 
   '@effect/language-service@0.1.0': {}
 
-  '@effect/schema@0.68.27(effect@3.11.3)':
-    dependencies:
-      effect: 3.11.3
-      fast-check: 3.23.1
-
   '@effect/schema@0.72.4(effect@3.11.3)':
     dependencies:
       effect: 3.11.3
@@ -13630,7 +13614,7 @@ snapshots:
       is-glob: 4.0.3
       stable-hash: 0.0.4
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.17.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 

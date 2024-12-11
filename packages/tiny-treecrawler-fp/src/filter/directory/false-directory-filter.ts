@@ -1,5 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
+import * as Effect from 'effect/Effect';
 
 import type { TreeCrawlerDirectoryFilter } from '../index';
 
@@ -9,4 +9,4 @@ export const FalseDirectoryFilter: TreeCrawlerDirectoryFilter = (
   _dirPath: string,
   _dirName: string,
   _level: number
-) => P.Effect.succeed(false);
+) => Effect.succeed(false);

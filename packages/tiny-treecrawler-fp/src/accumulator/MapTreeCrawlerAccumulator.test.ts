@@ -1,5 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
+import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { TreeCrawlerDataType, TreeCrawlerEvent } from '../index';
@@ -18,7 +18,7 @@ describe('accumulator', () => {
       });
       accumulator.push(TreeCrawlerEvent.File);
 
-      expect(accumulator.data()).toStrictEqual(P.Effect.succeed(['FOO_Directory', 'FOO_File']));
+      expect(accumulator.data()).toStrictEqual(Effect.succeed(['FOO_Directory', 'FOO_File']));
     });
   });
 });

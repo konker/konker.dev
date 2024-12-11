@@ -1,5 +1,6 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
+import { Option, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import { type DirectoryData, type FileData, type TreeCrawlerData, TreeCrawlerEvent } from '../index';
 import type { TinyTreeCrawlerError } from '../lib/error';
@@ -7,28 +8,28 @@ import { toTinyTreeCrawlerError } from '../lib/error';
 
 export function notifyDirectoryEvent(
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
-  directoryData: P.Option.Option<DirectoryData>
-): P.Effect.Effect<void, TinyTreeCrawlerError> {
-  return P.pipe(
+  directoryData: Option.Option<DirectoryData>
+): Effect.Effect<void, TinyTreeCrawlerError> {
+  return pipe(
     directoryData,
-    P.Option.match({
+    Option.match({
       onSome: (directoryData) =>
-        P.pipe(events, E.notify(TreeCrawlerEvent.Directory, directoryData), P.Effect.mapError(toTinyTreeCrawlerError)),
-      onNone: () => P.Effect.void,
+        pipe(events, E.notify(TreeCrawlerEvent.Directory, directoryData), Effect.mapError(toTinyTreeCrawlerError)),
+      onNone: () => Effect.void,
     })
   );
 }
 
 export function notifyFileEvent(
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
-  fileData: P.Option.Option<FileData>
-): P.Effect.Effect<void, TinyTreeCrawlerError> {
-  return P.pipe(
+  fileData: Option.Option<FileData>
+): Effect.Effect<void, TinyTreeCrawlerError> {
+  return pipe(
     fileData,
-    P.Option.match({
+    Option.match({
       onSome: (fileData) =>
-        P.pipe(events, E.notify(TreeCrawlerEvent.File, fileData), P.Effect.mapError(toTinyTreeCrawlerError)),
-      onNone: () => P.Effect.void,
+        pipe(events, E.notify(TreeCrawlerEvent.File, fileData), Effect.mapError(toTinyTreeCrawlerError)),
+      onNone: () => Effect.void,
     })
   );
 }

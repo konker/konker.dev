@@ -1,6 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import type { FileType, Ref, TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
 import type { TinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/dist/lib/error';
+import { pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 
 import type { DirectoryData, FileData, TreeCrawlerData } from '../index';
 import { TreeCrawlerDataType } from '../index';
@@ -18,16 +19,16 @@ export function isDirectoryData(data: TreeCrawlerData): data is DirectoryData {
 
 export const sortListingByFileType =
   (tfs: TinyFileSystem, directoriesFirst: boolean) =>
-  (listing: Array<Ref>): P.Effect.Effect<Array<{ childPath: Ref; fileType: FileType }>, TinyFileSystemError> =>
-    P.pipe(
+  (listing: Array<Ref>): Effect.Effect<Array<{ childPath: Ref; fileType: FileType }>, TinyFileSystemError> =>
+    pipe(
       listing.map((childPath: Ref) =>
-        P.pipe(
+        pipe(
           tfs.getFileType(childPath),
-          P.Effect.map((fileType) => ({ fileType, childPath }))
+          Effect.map((fileType) => ({ fileType, childPath }))
         )
       ),
-      P.Effect.all,
-      P.Effect.map((listingAndTypes) =>
+      Effect.all,
+      Effect.map((listingAndTypes) =>
         // eslint-disable-next-line fp/no-mutating-methods
         [...listingAndTypes].sort((a, b) =>
           directoriesFirst ? a.fileType.localeCompare(b.fileType) : b.fileType.localeCompare(a.fileType)

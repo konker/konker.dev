@@ -1,6 +1,7 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import * as E from '@konker.dev/tiny-event-fp';
 import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
+import { Option, pipe } from 'effect';
+import * as Effect from 'effect/Effect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
@@ -8,28 +9,28 @@ import { TreeCrawlerDataType } from '../index';
 import * as unit from './index';
 
 describe('crawler', () => {
-  const mockDirectoryListener = vi.fn().mockImplementation(() => P.Effect.void);
-  const mockFileListener = vi.fn().mockImplementation(() => P.Effect.void);
+  const mockDirectoryListener = vi.fn().mockImplementation(() => Effect.void);
+  const mockFileListener = vi.fn().mockImplementation(() => Effect.void);
 
   describe('notifyDirectoryEvent', () => {
     afterEach(() => {
       mockDirectoryListener.mockReset();
     });
 
-    const events = P.pipe(
+    const events = pipe(
       E.createTinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>(),
-      P.Effect.flatMap(E.addStarListener(mockDirectoryListener))
+      Effect.flatMap(E.addStarListener(mockDirectoryListener))
     );
 
     it('should work as expected', async () => {
-      await P.Effect.runPromise(
-        P.pipe(
+      await Effect.runPromise(
+        pipe(
           events,
-          P.Effect.flatMap((events) =>
-            P.pipe(
+          Effect.flatMap((events) =>
+            pipe(
               unit.notifyDirectoryEvent(
                 events,
-                P.Option.some({ _tag: TreeCrawlerDataType.Directory, level: 0, path: '/tmp/foo' })
+                Option.some({ _tag: TreeCrawlerDataType.Directory, level: 0, path: '/tmp/foo' })
               )
             )
           )
@@ -43,10 +44,10 @@ describe('crawler', () => {
     });
 
     it('should work as expected', async () => {
-      await P.Effect.runPromise(
-        P.pipe(
+      await Effect.runPromise(
+        pipe(
           events,
-          P.Effect.flatMap((events) => P.pipe(unit.notifyDirectoryEvent(events, P.Option.none())))
+          Effect.flatMap((events) => pipe(unit.notifyDirectoryEvent(events, Option.none())))
         )
       );
 
@@ -59,20 +60,20 @@ describe('crawler', () => {
       mockFileListener.mockReset();
     });
 
-    const events = P.pipe(
+    const events = pipe(
       E.createTinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>(),
-      P.Effect.flatMap(E.addStarListener(mockFileListener))
+      Effect.flatMap(E.addStarListener(mockFileListener))
     );
 
     it('should work as expected', async () => {
-      await P.Effect.runPromise(
-        P.pipe(
+      await Effect.runPromise(
+        pipe(
           events,
-          P.Effect.flatMap((events) =>
-            P.pipe(
+          Effect.flatMap((events) =>
+            pipe(
               unit.notifyFileEvent(
                 events,
-                P.Option.some({
+                Option.some({
                   _tag: TreeCrawlerDataType.File,
                   level: 0,
                   path: '/tmp/foo/a.txt',
@@ -91,10 +92,10 @@ describe('crawler', () => {
     });
 
     it('should work as expected', async () => {
-      await P.Effect.runPromise(
-        P.pipe(
+      await Effect.runPromise(
+        pipe(
           events,
-          P.Effect.flatMap((events) => P.pipe(unit.notifyFileEvent(events, P.Option.none())))
+          Effect.flatMap((events) => pipe(unit.notifyFileEvent(events, Option.none())))
         )
       );
 

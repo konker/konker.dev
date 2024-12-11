@@ -24,8 +24,6 @@
     "!dist/**/*.test.*"
   ],
   "dependencies": {
-    "@effect/schema": "^0.68.27",
-    "@konker.dev/effect-ts-prelude": "workspace:*",
     "@konker.dev/tiny-error-fp": "workspace:*",
     "@konker.dev/tiny-event-fp": "workspace:*",
     "@konker.dev/tiny-filesystem-fp": "workspace:*",

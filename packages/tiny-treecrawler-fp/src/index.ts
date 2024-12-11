@@ -1,6 +1,6 @@
-import type * as P from '@konker.dev/effect-ts-prelude';
 import type * as E from '@konker.dev/tiny-event-fp';
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
+import type * as Effect from 'effect/Effect';
 
 import type { TreeCrawlerDirectoryFilter, TreeCrawlerFileFilter } from './filter/index.js';
 import type { TreeCrawlerDirectoryHandler, TreeCrawlerFileHandler } from './handler/index.js';
@@ -56,4 +56,4 @@ export type TreeCrawler<T extends TinyFileSystem = TinyFileSystem> = (
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,
   filters: TreeCrawlerFilters,
   handlers: TreeCrawlerHandlers
-) => (dirPath: string, rootPath?: string, level?: number) => P.Effect.Effect<void, TinyTreeCrawlerError>;
+) => (dirPath: string, rootPath?: string, level?: number) => Effect.Effect<void, TinyTreeCrawlerError>;

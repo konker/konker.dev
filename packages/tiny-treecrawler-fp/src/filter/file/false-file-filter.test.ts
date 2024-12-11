@@ -1,5 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import memFs1Fixture from '../../test/fixtures/memfs-1.json';
@@ -13,6 +13,6 @@ describe('false-directory-filter', () => {
   });
 
   it('should work as expected', () => {
-    expect(unit.FalseFileFilter(memFsTinyFileSystem, '/', 'foo', 'a.txt', 1)).toStrictEqual(P.Effect.succeed(false));
+    expect(unit.FalseFileFilter(memFsTinyFileSystem, '/', 'foo', 'a.txt', 1)).toStrictEqual(Effect.succeed(false));
   });
 });

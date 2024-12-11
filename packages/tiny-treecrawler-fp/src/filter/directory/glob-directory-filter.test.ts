@@ -1,5 +1,5 @@
-import * as P from '@konker.dev/effect-ts-prelude';
 import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import memFs1Fixture from '../../test/fixtures/memfs-1.json';
@@ -14,25 +14,25 @@ describe('glob-directory-filter', () => {
 
   it('should work as expected', () => {
     expect(
-      P.Effect.runSync(unit.GlobDirectoryFilter('/tmp/foo')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
+      Effect.runSync(unit.GlobDirectoryFilter('/tmp/foo')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
     ).toStrictEqual(true);
     expect(
-      P.Effect.runSync(unit.GlobDirectoryFilter('/tmp/*')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
+      Effect.runSync(unit.GlobDirectoryFilter('/tmp/*')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
     ).toStrictEqual(true);
     expect(
-      P.Effect.runSync(unit.GlobDirectoryFilter('**/*')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
+      Effect.runSync(unit.GlobDirectoryFilter('**/*')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
     ).toStrictEqual(true);
-    expect(
-      P.Effect.runSync(unit.GlobDirectoryFilter('**')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
-    ).toStrictEqual(true);
-    expect(P.Effect.runSync(unit.GlobDirectoryFilter('*')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))).toStrictEqual(
+    expect(Effect.runSync(unit.GlobDirectoryFilter('**')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))).toStrictEqual(
+      true
+    );
+    expect(Effect.runSync(unit.GlobDirectoryFilter('*')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))).toStrictEqual(
+      false
+    );
+    expect(Effect.runSync(unit.GlobDirectoryFilter('foo')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))).toStrictEqual(
       false
     );
     expect(
-      P.Effect.runSync(unit.GlobDirectoryFilter('foo')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
-    ).toStrictEqual(false);
-    expect(
-      P.Effect.runSync(unit.GlobDirectoryFilter('**/bar')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
+      Effect.runSync(unit.GlobDirectoryFilter('**/bar')(memFsTinyFileSystem, '/tmp', 'foo', 'foo', 1))
     ).toStrictEqual(false);
   });
 });
