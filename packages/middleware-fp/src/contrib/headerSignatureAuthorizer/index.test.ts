@@ -1,4 +1,4 @@
-import * as hashUtils from '@konker.dev/tiny-utils-fp/dist/hash';
+import * as hashUtils from '@konker.dev/tiny-utils-fp/hash';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';

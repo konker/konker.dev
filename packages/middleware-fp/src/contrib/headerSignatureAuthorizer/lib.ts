@@ -1,4 +1,4 @@
-import { sha256HmacHex } from '@konker.dev/tiny-utils-fp/dist/hash';
+import { sha256HmacHex } from '@konker.dev/tiny-utils-fp/hash';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
