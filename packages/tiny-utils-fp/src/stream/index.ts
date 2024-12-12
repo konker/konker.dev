@@ -2,7 +2,7 @@
 import type { Readable, Writable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
 
-import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import { toError } from '@konker.dev/tiny-error-fp/lib';
 import * as Effect from 'effect/Effect';
 
 import { stringToUint8Array } from '../array';

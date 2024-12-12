@@ -1,6 +1,6 @@
 # @konker.dev/tiny-error-fp
 
-A configurable error for projects based on [Effect-TS](https://www.effect.website/)
+A configurable error for Typescript projects based on [Effect-TS](https://www.effect.website/)
 
 ![License](https://img.shields.io/github/license/konkerdotdev/tiny-error-fp)
 [![NPM Version](https://img.shields.io/npm/v/%40konker.dev%2Ftiny-error-fp)](https://www.npmjs.com/package/@konker.dev/tiny-error-fp)

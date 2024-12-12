@@ -4,6 +4,9 @@
     "clean": {
       "dependsOn": ["^clean"]
     },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
     "test": {
       "dependsOn": ["^test"]
     },

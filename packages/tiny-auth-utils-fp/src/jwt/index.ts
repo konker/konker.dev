@@ -1,4 +1,4 @@
-import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import { toError } from '@konker.dev/tiny-error-fp/lib';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import * as jwt from 'jsonwebtoken';

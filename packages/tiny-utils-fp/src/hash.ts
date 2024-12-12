@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import { toError } from '@konker.dev/tiny-error-fp/lib';
 import * as Effect from 'effect/Effect';
 
 export const md5Hex = (s: string): Effect.Effect<string, Error> =>

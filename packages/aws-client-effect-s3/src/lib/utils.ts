@@ -1,7 +1,7 @@
 /* eslint-disable fp/no-unused-expression,fp/no-let,fp/no-nil */
 import type { Readable } from 'node:stream';
 
-import { toError } from '@konker.dev/tiny-error-fp/dist/lib';
+import { toError } from '@konker.dev/tiny-error-fp/lib';
 import * as Effect from 'effect/Effect';
 
 import type { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
