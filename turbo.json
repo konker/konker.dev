@@ -10,11 +10,17 @@
     "test": {
       "dependsOn": ["^test"]
     },
-    "ci": {
-      "dependsOn": ["^ci"]
+    "lint-check": {
+      "dependsOn": ["^lint-check"]
     },
     "build": {
       "dependsOn": ["^build"]
+    },
+    "ci": {
+      "dependsOn": ["^ci"]
+    },
+    "cd": {
+      "dependsOn": ["^cd"]
     },
     "dev": {
       "persistent": true,

@@ -20,8 +20,9 @@
     "clean": "turbo run clean",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "lint": "turbo run lint",
+    "lint-check": "turbo run lint-check",
     "build": "turbo run build",
-    "ci": "turbo run ci"
+    "ci": "turbo run ci",
+    "cd": "turbo run cd"
   }
 }

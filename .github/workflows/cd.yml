@@ -1,23 +1,27 @@
-name: CI
+name: CD
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - 'main'
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
 
 jobs:
-  ci:
+  cd:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    name: CI
+    name: CD
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -28,7 +32,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Checks
-        run: pnpm run ci
+        run: pnpm run ci --affected
+
+      - name: Deploy to Registry
+        run: pnpm run cd --affected
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1

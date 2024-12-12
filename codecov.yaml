@@ -1,0 +1,102 @@
+# See: https://docs.codecov.com/docs/flags#advanced-bespoke-flag-management
+
+# Setting coverage targets per flag
+coverage:
+  status:
+    project:
+      default:
+        target: 100%
+
+# Add Flags to your `layout` configuration to show up in the PR comment
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: true
+  require_head: true
+  branches:
+    - "main"
+
+# New root YAML section = `flags:`
+# This is where you would define every flag from your
+# uploader, and update when new Flags added
+flags:
+  aws-client-effect-dynamodb:
+    paths:
+      - "packages/aws-client-effect-dynamodb/**"
+    carryforward: true
+
+  aws-client-effect-s3:
+    paths:
+      - "packages/aws-client-effect-s3/**"
+    carryforward: true
+
+  aws-client-effect-secrets-manager:
+    paths:
+      - "packages/aws-client-effect-secrets-manager/**"
+    carryforward: true
+
+  aws-client-effect-sns:
+    paths:
+      - "packages/aws-client-effect-sns/**"
+    carryforward: true
+
+  aws-client-effect-sqs:
+    paths:
+      - "packages/aws-client-effect-sqs/**"
+    carryforward: true
+
+  aws-client-effect-ssm:
+    paths:
+      - "packages/aws-client-effect-ssm/**"
+    carryforward: true
+
+  middleware-fp:
+    paths:
+      - "packages/middleware-fp/**"
+    carryforward: true
+
+  momento-cache-client-effect:
+    paths:
+      - "packages/momento-cache-client-effect/**"
+    carryforward: true
+
+  tiny-auth-utils-fp:
+    paths:
+      - "packages/tiny-auth-utils-fp/**"
+    carryforward: true
+
+  tiny-cache-fp:
+    paths:
+      - "packages/tiny-cache-fp/**"
+    carryforward: true
+
+  tiny-error-fp:
+    paths:
+      - "packages/tiny-error-fp/**"
+    carryforward: true
+
+  tiny-event-fp:
+    paths:
+      - "packages/tiny-event-fp/**"
+    carryforward: true
+
+  tiny-filesystem-fp:
+    paths:
+      - "packages/tiny-filesystem-fp/**"
+    carryforward: true
+
+  tiny-rules-fp:
+    paths:
+      - "packages/tiny-rules-fp/**"
+    carryforward: true
+
+  tiny-treecrawler-fp:
+    paths:
+      - "packages/tiny-treecrawler-fp/**"
+    carryforward: true
+
+  tiny-utils-fp:
+    paths:
+      - "packages/tiny-utils-fp/**"
+    carryforward: true
