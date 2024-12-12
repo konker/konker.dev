@@ -1,4 +1,4 @@
-name: CD konker.dev
+name: '@konker.dev/root-website / CD'
 
 on:
   workflow_dispatch:
@@ -6,16 +6,17 @@ on:
     branches:
       - 'main'
     paths:
-      - 'src/**'
-      - 'public/**'
-      - 'assets/**'
+      - 'apps/root-website/src/**'
+      - 'apps/root-website/public/**'
+      - 'apps/root-website/assets/**'
 
 env:
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID_ROOT }}
   AWS_DEFAULT_REGION: 'eu-west-1'
-  SOURCE_DIR: './www'
-  DEST_DIR: '/www'
+  CWD: './apps/root-website'
+  SOURCE_DIR: './apps/root-website/www'
+  DEST_DIR: '/apps/root-website/www'
 
 jobs:
   cd:
@@ -48,7 +49,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Build
-        run: pnpm run build
+        run: pnpm run build --filter @konker.dev/root-website
 
       - name: Sync files to S3
         run: |
