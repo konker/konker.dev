@@ -1,5 +1,5 @@
 import { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
-import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
+import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/lib/test';
 import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';

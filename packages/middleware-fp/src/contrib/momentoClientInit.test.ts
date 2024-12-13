@@ -1,5 +1,5 @@
 import { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
-import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
+import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/lib/test';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

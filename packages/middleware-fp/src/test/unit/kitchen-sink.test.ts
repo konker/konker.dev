@@ -1,7 +1,7 @@
 import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
-import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
+import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/lib/test';
 import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/jwt';
 import {
   TEST_JWT_ISS,

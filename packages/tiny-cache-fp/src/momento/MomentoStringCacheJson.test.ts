@@ -1,6 +1,6 @@
 import type * as momento from '@gomomento/sdk';
 import { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
-import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
+import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/lib/test';
 import { Option, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
