@@ -8,7 +8,7 @@
   "homepage": "https://konker.dev/",
   "keywords": [
     "node",
-    "boilerplate",
+    "rules",
     "typescript",
     "functional-programming",
     "effect-ts"
@@ -18,6 +18,13 @@
     "url": "https://github.com/konker.dev/packages/tiny-rules-fp"
   },
   "main": "dist/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist/**/*",
     "!dist/**/*.test.*"
