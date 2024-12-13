@@ -2,13 +2,13 @@ import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-d
 import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/dist/lib/test';
-import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp';
+import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/jwt';
 import {
   TEST_JWT_ISS,
   TEST_JWT_NOW_MS,
   TEST_JWT_SIGNING_SECRET,
-} from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
-import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens';
+} from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
+import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
 import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';

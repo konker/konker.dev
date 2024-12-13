@@ -1,7 +1,7 @@
-import type { JwtVerificationConfigRsa } from '@konker.dev/tiny-auth-utils-fp/dist/jwt/rsa';
-import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
-import { TEST_RSA_KEY_PUBLIC } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-rsa-keys';
-import { TEST_TOKEN_RSA } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens-rsa';
+import type { JwtVerificationConfigRsa } from '@konker.dev/tiny-auth-utils-fp/jwt/rsa';
+import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
+import { TEST_RSA_KEY_PUBLIC } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-rsa-keys';
+import { TEST_TOKEN_RSA } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens-rsa';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';

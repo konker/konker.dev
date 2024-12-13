@@ -1,4 +1,4 @@
-import { generateLambdaAuthResultDeny } from '@konker.dev/tiny-auth-utils-fp/dist/aws-authorizer';
+import { generateLambdaAuthResultDeny } from '@konker.dev/tiny-auth-utils-fp/aws-authorizer';
 import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';

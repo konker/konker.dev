@@ -1,6 +1,6 @@
-import { extractBearerToken } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
-import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/dist/jwt';
-import { jwtVerifyToken } from '@konker.dev/tiny-auth-utils-fp/dist/jwt';
+import { extractBearerToken } from '@konker.dev/tiny-auth-utils-fp/helpers';
+import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/jwt';
+import { jwtVerifyToken } from '@konker.dev/tiny-auth-utils-fp/jwt';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';

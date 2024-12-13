@@ -1,6 +1,6 @@
-import { extractBearerToken } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
-import type { JwtVerificationConfigRsa } from '@konker.dev/tiny-auth-utils-fp/dist/jwt/rsa';
-import { jwtVerifyTokenRsa } from '@konker.dev/tiny-auth-utils-fp/dist/jwt/rsa';
+import { extractBearerToken } from '@konker.dev/tiny-auth-utils-fp/helpers';
+import type { JwtVerificationConfigRsa } from '@konker.dev/tiny-auth-utils-fp/jwt/rsa';
+import { jwtVerifyTokenRsa } from '@konker.dev/tiny-auth-utils-fp/jwt/rsa';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';

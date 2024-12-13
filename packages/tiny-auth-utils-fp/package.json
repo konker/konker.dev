@@ -8,8 +8,9 @@
   "homepage": "https://konker.dev/",
   "keywords": [
     "node",
-    "cache",
-    "momento",
+    "auth",
+    "jwt",
+    "basic-auth",
     "typescript",
     "functional-programming",
     "effect-ts"
@@ -19,6 +20,49 @@
     "url": "https://github.com/konker.dev/packages/tiny-auth-utils-fp"
   },
   "main": "dist/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    "./helpers": {
+      "types": "./dist/helpers.d.ts",
+      "import": "./dist/helpers.js"
+    },
+    "./basic-auth": {
+      "types": "./dist/basic-auth.d.ts",
+      "import": "./dist/basic-auth.js"
+    },
+    "./aws-authorizer": {
+      "types": "./dist/aws-authorizer.d.ts",
+      "import": "./dist/aws-authorizer.js"
+    },
+    "./jwt": {
+      "types": "./dist/jwt/index.d.ts",
+      "import": "./dist/jwt/index.js"
+    },
+    "./jwt/rsa": {
+      "types": "./dist/jwt/rsa.d.ts",
+      "import": "./dist/jwt/rsa.js"
+    },
+    "./jwt/common": {
+      "types": "./dist/jwt/common.d.ts",
+      "import": "./dist/jwt/common.js"
+    },
+    "./test/fixtures/jwt": {
+      "types": "./dist/test/fixtures/jwt.d.ts",
+      "import": "./dist/test/fixtures/jwt.js"
+    },
+    "./test/fixtures/test-jwt-rsa-keys": {
+      "types": "./dist/test/fixtures/test-jwt-rsa-keys.d.ts",
+      "import": "./dist/test/fixtures/test-jwt-rsa-keys.js"
+    },
+    "./test/fixtures/test-jwt-tokens-rsa": {
+      "types": "./dist/test/fixtures/test-jwt-tokens-rsa.d.ts",
+      "import": "./dist/test/fixtures/test-jwt-tokens-rsa.js"
+    },
+    "./test/fixtures/test-jwt-tokens": {
+      "types": "./dist/test/fixtures/test-jwt-tokens.d.ts",
+      "import": "./dist/test/fixtures/test-jwt-tokens.js"
+    }
+  },
   "files": [
     "dist/**/*",
     "!dist/**/*.test.*"
@@ -68,7 +112,7 @@
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",
-    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
+    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",

@@ -1,6 +1,6 @@
-import type { ValidBasicAuthCredentialSet } from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
-import { basicAuthDecodeHeaderValue, basicAuthVerifyCredentials } from '@konker.dev/tiny-auth-utils-fp/dist/basic-auth';
-import { extractBasicAuthHeaderValue } from '@konker.dev/tiny-auth-utils-fp/dist/helpers';
+import type { ValidBasicAuthCredentialSet } from '@konker.dev/tiny-auth-utils-fp/basic-auth';
+import { basicAuthDecodeHeaderValue, basicAuthVerifyCredentials } from '@konker.dev/tiny-auth-utils-fp/basic-auth';
+import { extractBasicAuthHeaderValue } from '@konker.dev/tiny-auth-utils-fp/helpers';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';

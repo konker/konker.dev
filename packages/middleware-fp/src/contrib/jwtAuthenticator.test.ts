@@ -1,10 +1,10 @@
-import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/dist/jwt';
+import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/jwt';
 import {
   TEST_JWT_ISS,
   TEST_JWT_NOW_MS,
   TEST_JWT_SIGNING_SECRET,
-} from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/jwt';
-import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/dist/test/fixtures/test-jwt-tokens';
+} from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
+import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
