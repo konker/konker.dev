@@ -18,9 +18,17 @@
     "url": "https://github.com/konkerdotdev/tiny-event-fp"
   },
   "main": "dist/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist/**/*",
-    "!dist/**/*.test.*"
+    "!dist/**/*.test.*",
+    "!dist/example.*"
   ],
   "dependencies": {
     "effect": "^3.11.2"
