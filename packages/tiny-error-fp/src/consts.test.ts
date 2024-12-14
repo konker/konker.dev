@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './consts';
+import * as unit from './consts.js';
 
 describe('consts', () => {
   describe('TINY_ERROR_UNKNOWN_STRING', () => {

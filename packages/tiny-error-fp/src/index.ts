@@ -6,8 +6,8 @@ import {
   TINY_ERROR_DEFAULT_INTERNAL,
   TINY_ERROR_DEFAULT_STATUS_CODE,
   TINY_ERROR_UNKNOWN_STRING,
-} from './consts';
-import { getStackTraceString, hasErrorMessage, hasTag, isError } from './lib';
+} from './consts.js';
+import { getStackTraceString, hasErrorMessage, hasTag, isError } from './lib.js';
 
 // --------------------------------------------------------------------------
 export class TinyErrorC<T extends string> extends Error {

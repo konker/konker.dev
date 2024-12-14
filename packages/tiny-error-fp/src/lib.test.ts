@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { TinyError } from './index';
-import * as unit from './lib';
+import { TinyError } from './index.js';
+import * as unit from './lib.js';
 
 describe('lib', () => {
   describe('hasTag', () => {
