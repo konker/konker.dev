@@ -20,6 +20,7 @@
 
     /* Strictness */
     "strict": true,
+    "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "allowUnusedLabels": false,
@@ -44,6 +45,6 @@
     "declarationMap": true,
 
     /* If your code doesn't run in the DOM: */
-    "lib": ["es2022"]
+    "lib": ["es2023"]
   }
 }

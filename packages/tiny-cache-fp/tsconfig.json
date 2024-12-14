@@ -1,8 +1,9 @@
 {
-  "extends": "../common-config/tsconfig-base.json",
+  "extends": "@konker.dev/common-config/dist/configs/tsconfig-base.json",
   "include": ["./src"],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "strictNullChecks": true
   }
 }

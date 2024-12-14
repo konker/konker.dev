@@ -1,6 +1,0 @@
-{
-  "extends": ["../common-config/eslintrc-base.json"],
-  "parserOptions": {
-    "project": ["./tsconfig.json"]
-  }
-}
