@@ -4,7 +4,7 @@ import type { Readable } from 'node:stream';
 import { toError } from '@konker.dev/tiny-error-fp/lib';
 import * as Effect from 'effect/Effect';
 
-import type { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
+import type { PromiseDependentWritableStream } from './PromiseDependentWritableStream.js';
 
 /**
  * Wait for a readable stream to fully pipe to a PromiseDependentWritableStream sink

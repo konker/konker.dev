@@ -6,9 +6,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as unit from './extra';
-import { S3ClientDeps } from './index';
-import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableStream';
+import * as unit from './extra.js';
+import { S3ClientDeps } from './index.js';
+import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableStream.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

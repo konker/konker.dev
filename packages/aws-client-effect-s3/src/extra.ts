@@ -6,11 +6,11 @@ import type { RequestPresigningArguments } from '@aws-sdk/types';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { S3EchoParams } from './index';
-import { S3ClientDeps } from './index';
-import type { S3Error } from './lib/error';
-import { toS3Error } from './lib/error';
-import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableStream';
+import type { S3EchoParams } from './index.js';
+import { S3ClientDeps } from './index.js';
+import type { S3Error } from './lib/error.js';
+import { toS3Error } from './lib/error.js';
+import { PromiseDependentWritableStream } from './lib/PromiseDependentWritableStream.js';
 
 export function GetSignedUrlEffect(
   params: s3Client.GetObjectCommandInput,

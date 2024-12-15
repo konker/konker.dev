@@ -12,18 +12,16 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './index';
-import { S3ClientDeps } from './index';
-import { TAG } from './lib/error';
+import * as unit from './index.js';
+import { S3ClientDeps } from './index.js';
+import { TAG } from './lib/error.js';
 
 const s3Mock = mockClient(s3Client.S3Client);
 
 describe('aws-client-effect-s3', () => {
-  // eslint-disable-next-line fp/no-let
   let deps: unit.S3ClientDeps;
 
   beforeAll(() => {
-    // eslint-disable-next-line fp/no-mutation
     deps = unit.S3ClientDeps.of({
       s3Client: new s3Client.S3Client({}),
     });

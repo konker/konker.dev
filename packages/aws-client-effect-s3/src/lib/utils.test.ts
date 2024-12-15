@@ -3,15 +3,15 @@ import { Readable } from 'node:stream';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { PromiseDependentWritableStream } from './PromiseDependentWritableStream';
-import * as unit from './utils';
+import { PromiseDependentWritableStream } from './PromiseDependentWritableStream.js';
+import * as unit from './utils.js';
 
 describe('stream utils', () => {
   describe('waitForPromiseDependentStreamPipe', () => {
     it('should resolve as expected', async () => {
       const readStream = Readable.from('konker');
       const writeStream = new PromiseDependentWritableStream();
-      // eslint-disable-next-line fp/no-mutation
+
       writeStream.promise = new Promise((resolve) => {
         writeStream.on('finish', resolve);
       });
@@ -23,7 +23,7 @@ describe('stream utils', () => {
     it('should reject as expected', async () => {
       const readStream = Readable.from('konker');
       const writeStream = new PromiseDependentWritableStream();
-      // eslint-disable-next-line fp/no-mutation
+
       writeStream.promise = new Promise((_, reject) => {
         writeStream.on('finish', () => reject(new Error('Access Denied')));
       });
