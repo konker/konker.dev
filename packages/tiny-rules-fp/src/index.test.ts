@@ -2,7 +2,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './index';
+import * as unit from './index.js';
 
 type TestContext = {
   readonly foo: string;
