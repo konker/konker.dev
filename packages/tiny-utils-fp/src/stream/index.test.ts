@@ -3,9 +3,9 @@ import { PassThrough, Readable } from 'node:stream';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { arrayBufferToString } from '../array';
-import { BufferWriteableStream } from './BufferWriteableStream';
-import * as unit from './index';
+import { arrayBufferToString } from '../array.js';
+import { BufferWriteableStream } from './BufferWriteableStream.js';
+import * as unit from './index.js';
 
 describe('stream utils', () => {
   describe('readStreamToBuffer', () => {

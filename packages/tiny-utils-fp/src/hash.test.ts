@@ -1,7 +1,7 @@
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './hash';
+import * as unit from './hash.js';
 
 describe('index', () => {
   describe('md5Hex', () => {

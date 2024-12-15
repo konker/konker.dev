@@ -1,4 +1,4 @@
-/* eslint-disable fp/no-nil,fp/no-unused-expression,fp/no-mutation,fp/no-this,fp/no-mutating-methods,fp/no-throw,@typescript-eslint/ban-types,fp/no-class */
+/* eslint-disable fp/no-nil,fp/no-unused-expression,fp/no-mutation,fp/no-this,fp/no-mutating-methods,fp/no-class */
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { spawn } from 'node:child_process';
 import type { TransformCallback } from 'node:stream';

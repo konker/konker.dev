@@ -3,9 +3,9 @@ import { PassThrough, Readable } from 'node:stream';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { BufferWriteableStream } from './BufferWriteableStream';
-import * as unit from './ChildProcessStreamPipe';
-import { waitForWriteStreamPromise } from './index';
+import { BufferWriteableStream } from './BufferWriteableStream.js';
+import * as unit from './ChildProcessStreamPipe.js';
+import { waitForWriteStreamPromise } from './index.js';
 
 describe('ChildProcessStreamPipe', () => {
   const TEST_S = 'hoi noi broin coi' as const;

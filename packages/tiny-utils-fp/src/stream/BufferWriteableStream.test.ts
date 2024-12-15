@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './BufferWriteableStream';
+import * as unit from './BufferWriteableStream.js';
 
 describe('BufferWriteableStream', () => {
   const TEST_STRING_1 = 'hoi noi broin coi';
