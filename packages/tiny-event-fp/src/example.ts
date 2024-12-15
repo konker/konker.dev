@@ -1,7 +1,7 @@
 import { Console, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import * as E from './index';
+import * as E from './index.js';
 
 // Type for possible events
 type ExampleType = 'Start' | 'End' | 'Num';

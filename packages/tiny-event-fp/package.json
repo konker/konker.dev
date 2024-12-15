@@ -23,40 +23,39 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./example": {
+      "types": "./dist/example.d.ts",
+      "import": "./dist/example.js"
     }
   },
   "files": [
     "dist/**/*",
-    "!dist/**/*.test.*",
-    "!dist/example.*"
+    "!dist/**/*.test.*"
   ],
   "dependencies": {
     "effect": "^3.11.2"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",
-    "@effect/language-service": "^0.0.21",
-    "@types/node": "^20.17.9",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@typescript-eslint/typescript-estree": "^6.21.0",
+    "@effect/language-service": "^0.1.0",
+    "@eslint/compat": "^1.2.4",
+    "@eslint/js": "^9.17.0",
+    "@konker.dev/common-config": "workspace:*",
+    "@types/node": "^20.17.10",
     "@vitest/coverage-istanbul": "^2.1.8",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.7.0",
-    "eslint-plugin-deprecation": "^2.0.0",
+    "eslint": "^9.17.0",
     "eslint-plugin-fp": "^2.3.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^1.6.0",
     "leasot": "^13.3.0",
     "madge": "^6.1.0",
-    "prettier": "^3.4.1",
-    "ts-node": "^10.9.2",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
     "type-coverage": "^2.29.7",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
     "vitest": "^2.1.8"
   },
   "scripts": {
@@ -69,13 +68,14 @@
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
     "eslint-fix": "npx eslint --fix||true",
-    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
+    "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify packages/tiny-event-fp",
+    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run exports-check && pnpm run fixme-check",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && pnpm publish --access public"
   }
 }

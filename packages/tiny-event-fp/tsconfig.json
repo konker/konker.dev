@@ -1,11 +1,10 @@
 {
-  "extends": "../common-config/tsconfig-base.json",
+  "extends": "../common-config/configs/tsconfig-base.json",
   "include": ["./src"],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
-  },
-  "plugins": [
-    { "name": "@effect/language-service" }
-  ]
+    "outDir": "./dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  }
 }

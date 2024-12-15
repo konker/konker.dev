@@ -2,7 +2,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it, vi } from 'vitest';
 
-import * as unit from './index';
+import * as unit from './index.js';
 
 describe('TinyEvent', () => {
   const EventTypeFoo = 'Foo';
@@ -35,7 +35,8 @@ describe('TinyEvent', () => {
       Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 3')),
       Effect.flatMap(unit.removeAllListeners<EventType, string>()),
       Effect.flatMap(unit.notify<EventType, string>(EventTypeFoo, 'Hello Foo 4')),
-      Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 4'))
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeBar, 'Hello Bar 4')),
+      Effect.flatMap(unit.notify<EventType, string>(EventTypeBaz, 'Hello Baz 1'))
     );
 
     const result = await Effect.runPromise(prog);
