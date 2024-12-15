@@ -1,7 +1,7 @@
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './helpers';
+import * as unit from './helpers.js';
 
 describe('authentication/helpers', () => {
   describe('extractBearerToken', () => {

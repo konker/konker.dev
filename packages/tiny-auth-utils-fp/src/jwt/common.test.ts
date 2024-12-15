@@ -2,14 +2,14 @@ import * as Effect from 'effect/Effect';
 import * as jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { TEST_JWT_ISS, TEST_JWT_NOW_MS, TEST_JWT_SUB, TEST_SIGNED_PAYLOAD } from '../test/fixtures/jwt';
+import { TEST_JWT_ISS, TEST_JWT_NOW_MS, TEST_JWT_SUB, TEST_SIGNED_PAYLOAD } from '../test/fixtures/jwt.js';
 import {
   TEST_TOKEN,
   TEST_TOKEN_MISSING_ISSUER,
   TEST_TOKEN_MISSING_SUBJECT,
   TEST_TOKEN_STRING_PAYLOAD,
-} from '../test/fixtures/test-jwt-tokens';
-import * as unit from './common';
+} from '../test/fixtures/test-jwt-tokens.js';
+import * as unit from './common.js';
 
 describe('jwt/common', () => {
   beforeAll(() => {

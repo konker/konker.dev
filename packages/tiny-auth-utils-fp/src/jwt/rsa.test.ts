@@ -7,12 +7,12 @@ import {
   TEST_JWT_PAYLOAD,
   TEST_JWT_SUB,
   TEST_SIGNED_PAYLOAD,
-} from '../test/fixtures/jwt';
+} from '../test/fixtures/jwt.js';
 import {
   TEST_RSA_KEY_PRIVATE,
   TEST_RSA_KEY_PUBLIC,
   TEST_RSA_KEY_PUBLIC_OTHER,
-} from '../test/fixtures/test-jwt-rsa-keys';
+} from '../test/fixtures/test-jwt-rsa-keys.js';
 import {
   TEST_TOKEN_RSA,
   TEST_TOKEN_RSA_EXPIRED,
@@ -20,8 +20,8 @@ import {
   TEST_TOKEN_RSA_MISSING_SUBJECT,
   TEST_TOKEN_RSA_OTHER_ISSUER,
   TEST_TOKEN_RSA_STRING_PAYLOAD,
-} from '../test/fixtures/test-jwt-tokens-rsa';
-import * as unit from './rsa';
+} from '../test/fixtures/test-jwt-tokens-rsa.js';
+import * as unit from './rsa.js';
 
 const TEST_SIGNING_CONFIG: unit.JwtSigningConfigRsa = {
   rsaPrivateKey: TEST_RSA_KEY_PRIVATE,

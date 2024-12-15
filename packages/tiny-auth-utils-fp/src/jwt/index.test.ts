@@ -7,7 +7,7 @@ import {
   TEST_JWT_PAYLOAD,
   TEST_JWT_SIGNING_SECRET,
   TEST_SIGNED_PAYLOAD,
-} from '../test/fixtures/jwt';
+} from '../test/fixtures/jwt.js';
 import {
   TEST_TOKEN,
   TEST_TOKEN_EXPIRED,
@@ -15,8 +15,8 @@ import {
   TEST_TOKEN_MISSING_SUBJECT,
   TEST_TOKEN_OTHER_ISSUER,
   TEST_TOKEN_STRING_PAYLOAD,
-} from '../test/fixtures/test-jwt-tokens';
-import * as unit from './index';
+} from '../test/fixtures/test-jwt-tokens.js';
+import * as unit from './index.js';
 
 export const TEST_SIGNING_CONFIG: unit.JwtSigningConfig = {
   signingSecret: TEST_JWT_SIGNING_SECRET,

@@ -1,7 +1,7 @@
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './basic-auth';
+import * as unit from './basic-auth.js';
 
 describe('basic-auth', () => {
   describe('BasicAuthUserContext', () => {

@@ -2,7 +2,7 @@ import type { APIGatewayAuthorizerResult } from 'aws-lambda';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './aws-authorizer';
+import * as unit from './aws-authorizer.js';
 
 const TEST_ALLOW_RESPONSE: APIGatewayAuthorizerResult = {
   principalId: 'principalId',
