@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './utils';
+import * as unit from './utils.js';
 
 describe('utils', () => {
   describe('objectToUpdateAttributes', () => {

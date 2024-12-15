@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './consts';
+import * as unit from './consts.js';
 
 // Silly test for coverage
 describe('consts', () => {

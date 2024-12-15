@@ -4,8 +4,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './index';
-import { defaultDynamoDBDocumentClientDeps } from './lib/client';
+import * as unit from './index.js';
+import { defaultDynamoDBDocumentClientDeps } from './lib/client.js';
 
 const ddbMock = mockClient(dynamodbLib.DynamoDBDocumentClient);
 

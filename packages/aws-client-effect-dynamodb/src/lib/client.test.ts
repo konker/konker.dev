@@ -4,8 +4,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, test } from 'vitest';
 
-import * as unit from './client';
-import { DynamoDBDocumentClientDeps, DynamoDBDocumentClientFactoryDeps } from './client';
+import { DynamoDBDocumentClientDeps, DynamoDBDocumentClientFactoryDeps } from './client.js';
+import * as unit from './client.js';
 
 describe('aws-client-effect-dynamodb/lib/client', () => {
   // ------------------------------------------------------------------------
