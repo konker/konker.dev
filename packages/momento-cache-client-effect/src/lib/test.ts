@@ -1,4 +1,4 @@
-/* eslint-disable fp/no-mutation,fp/no-nil,@typescript-eslint/naming-convention */
+/* eslint-disable fp/no-mutation,fp/no-nil */
 import * as momento from '@gomomento/sdk';
 import * as Effect from 'effect/Effect';
 import { TextEncoder } from 'util';

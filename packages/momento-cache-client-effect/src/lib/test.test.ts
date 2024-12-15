@@ -1,7 +1,7 @@
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './test';
+import * as unit from './test.js';
 
 describe('lib/test', () => {
   describe('MockMomentoClient', () => {
