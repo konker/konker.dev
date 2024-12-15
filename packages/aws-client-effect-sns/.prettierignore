@@ -1,8 +1,0 @@
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
-tsconfig.json
-dist
-**/.cdk-*.out/
-**/.serverless/
-

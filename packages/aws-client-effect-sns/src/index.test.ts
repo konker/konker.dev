@@ -6,18 +6,16 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './index';
-import { SNSClientDeps } from './index';
-import { TAG } from './lib/error';
+import * as unit from './index.js';
+import { SNSClientDeps } from './index.js';
+import { TAG } from './lib/error.js';
 
 const snsMock = mockClient(snsClient.SNSClient);
 
 describe('aws-client-effect-sns', () => {
-  // eslint-disable-next-line fp/no-let
   let deps: unit.SNSClientDeps;
 
   beforeAll(() => {
-    // eslint-disable-next-line fp/no-mutation
     deps = unit.SNSClientDeps.of({
       snsClient: new snsClient.SNSClient({}),
     });
