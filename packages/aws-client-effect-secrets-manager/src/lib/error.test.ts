@@ -2,7 +2,7 @@ import type { GetSecretValueCommandInput } from '@aws-sdk/client-secrets-manager
 import { pipe } from 'effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './error';
+import * as unit from './error.js';
 
 describe('error', () => {
   it('should work as expected with an Error instance input', () => {

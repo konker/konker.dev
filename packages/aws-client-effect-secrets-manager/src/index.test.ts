@@ -13,18 +13,16 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './index';
-import { SecretsManagerClientDeps } from './index';
-import { TAG } from './lib/error';
+import * as unit from './index.js';
+import { SecretsManagerClientDeps } from './index.js';
+import { TAG } from './lib/error.js';
 
 const secretsManagerMock = mockClient(secretsManagerClient.SecretsManagerClient);
 
 describe('aws-client-effect-secrets-manager', () => {
-  // eslint-disable-next-line fp/no-let
   let deps: unit.SecretsManagerClientDeps;
 
   beforeAll(() => {
-    // eslint-disable-next-line fp/no-mutation
     deps = unit.SecretsManagerClientDeps.of({
       secretsManagerClient: new secretsManagerClient.SecretsManagerClient({}),
     });
