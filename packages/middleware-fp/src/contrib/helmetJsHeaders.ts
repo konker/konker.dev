@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import type { OptionalResponseHeaders } from '../lib/http';
+import type { Handler } from '../index.js';
+import type { OptionalResponseHeaders } from '../lib/http.js';
 
 // Based on : https://helmetjs.github.io/
 const TAG = 'helmetJsHeaders';

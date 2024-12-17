@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './HttpApiError';
+import * as unit from './HttpApiError.js';
 
 describe('error/ApiError', () => {
   const s = 'STR_ERROR';
@@ -8,7 +8,7 @@ describe('error/ApiError', () => {
   const ae: unit.HttpApiError = unit.HttpApiError('AE_NAME', 'AE_MESSAGE', 123, 'AE_CODE_TAG', e, false, 'AE_STACK');
   const aei: unit.HttpApiError = unit.HttpApiError('AE_NAME', 'AE_MESSAGE', 123, 'AE_CODE_TAG', e, true, 'AE_STACK');
   const circ: Record<string, unknown> = {};
-  circ['x'] = circ;
+  circ.x = circ;
 
   describe('HttpApiError', () => {
     it('should default as expected', () => {

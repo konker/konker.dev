@@ -3,11 +3,11 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { Handler } from '../index';
-import type { BaseResponse } from '../lib/http';
-import { HttpApiError } from '../lib/HttpApiError';
-import { TestDeps } from '../test/test-common';
-import * as unit from './awsApiGatewayProcessor';
+import type { Handler } from '../index.js';
+import type { BaseResponse } from '../lib/http.js';
+import { HttpApiError } from '../lib/HttpApiError.js';
+import { TestDeps } from '../test/test-common.js';
+import * as unit from './awsApiGatewayProcessor.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099
@@ -98,7 +98,6 @@ describe('middleware/aws-api-gateway-processor', () => {
     expect(result).toStrictEqual({
       statusCode: 409,
       headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ message: 'SomeError: Some Error Message', statusCode: 409 }),

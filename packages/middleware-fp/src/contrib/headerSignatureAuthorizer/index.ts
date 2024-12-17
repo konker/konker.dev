@@ -2,9 +2,9 @@ import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../../index';
-import { HttpApiError } from '../../lib/HttpApiError';
-import { validateHeaderSignature } from './lib';
+import type { Handler } from '../../index.js';
+import { HttpApiError } from '../../lib/HttpApiError.js';
+import { validateHeaderSignature } from './lib.js';
 
 const TAG = 'headerSignatureAuthorizer';
 

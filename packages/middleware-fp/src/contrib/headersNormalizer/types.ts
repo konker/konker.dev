@@ -1,4 +1,9 @@
-import type { OptionalRequestHeaders, OptionalResponseHeaders, RequestHeaders, ResponseHeaders } from '../../lib/http';
+import type {
+  OptionalRequestHeaders,
+  OptionalResponseHeaders,
+  RequestHeaders,
+  ResponseHeaders,
+} from '../../lib/http.js';
 
 export type WithPossibleInputHeaders = { headers?: OptionalRequestHeaders };
 export type WithPossibleOutputHeaders = { headers?: OptionalResponseHeaders };

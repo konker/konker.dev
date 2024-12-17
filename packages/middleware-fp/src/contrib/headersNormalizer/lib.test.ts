@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './lib';
+import * as unit from './lib.js';
 
 export type In = { headers: Record<string, string | undefined> };
 

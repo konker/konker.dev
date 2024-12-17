@@ -4,15 +4,15 @@ import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import type { MiddlewareError } from '../lib/MiddlewareError';
-import { toMiddlewareError } from '../lib/MiddlewareError';
-import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types';
+import type { Handler } from '../index.js';
+import type { MiddlewareError } from '../lib/MiddlewareError.js';
+import { toMiddlewareError } from '../lib/MiddlewareError.js';
+import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types.js';
 
 const TAG = 'basicAuthDecoder';
 
 // --------------------------------------------------------------------------
-export type { WithUserId } from './headersNormalizer/types';
+export type { WithUserId } from './headersNormalizer/types.js';
 
 export const middleware =
   () =>
@@ -23,7 +23,7 @@ export const middleware =
     return pipe(
       Effect.Do,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
-      Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers['authorization'])),
+      Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers.authorization)),
       Effect.bind('decoded', ({ authToken }) => basicAuthDecodeHeaderValue(authToken)),
       Effect.map(({ decoded }) => ({
         ...i,

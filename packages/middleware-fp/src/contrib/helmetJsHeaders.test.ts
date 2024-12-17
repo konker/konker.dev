@@ -2,8 +2,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { http200CoreIn } from '../test/test-common';
-import * as unit from './helmetJsHeaders';
+import { http200CoreIn } from '../test/test-common.js';
+import * as unit from './helmetJsHeaders.js';
 
 export type In = { headers: Record<string, string | undefined> };
 

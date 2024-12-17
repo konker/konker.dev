@@ -18,13 +18,160 @@
     "url": "https://github.com/konker.dev/packages/middleware-fp"
   },
   "main": "dist/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./contrib/awsApiGatewayProcessor": {
+      "types": "./dist/contrib/awsApiGatewayProcessor.d.ts",
+      "import": "./dist/contrib/awsApiGatewayProcessor.js"
+    },
+    "./contrib/awsIamAuthorizerProcessor": {
+      "types": "./dist/contrib/awsIamAuthorizerProcessor.d.ts",
+      "import": "./dist/contrib/awsIamAuthorizerProcessor.js"
+    },
+    "./contrib/awsSimpleAuthorizerProcessor": {
+      "types": "./dist/contrib/awsSimpleAuthorizerProcessor.d.ts",
+      "import": "./dist/contrib/awsSimpleAuthorizerProcessor.js"
+    },
+    "./contrib/awsSimpleAuthorizerWithContextProcessor": {
+      "types": "./dist/contrib/awsSimpleAuthorizerWithContextProcessor.d.ts",
+      "import": "./dist/contrib/awsSimpleAuthorizerWithContextProcessor.js"
+    },
+    "./contrib/base64BodyDecoder": {
+      "types": "./dist/contrib/base64BodyDecoder.d.ts",
+      "import": "./dist/contrib/base64BodyDecoder.js"
+    },
+    "./contrib/basicAuthAuthenticator": {
+      "types": "./dist/contrib/basicAuthAuthenticator.d.ts",
+      "import": "./dist/contrib/basicAuthAuthenticator.js"
+    },
+    "./contrib/basicAuthDecoder": {
+      "types": "./dist/contrib/basicAuthDecoder.d.ts",
+      "import": "./dist/contrib/basicAuthDecoder.js"
+    },
+    "./contrib/bodyValidator": {
+      "types": "./dist/contrib/bodyValidator.d.ts",
+      "import": "./dist/contrib/bodyValidator.js"
+    },
+    "./contrib/cacheInMemory": {
+      "types": "./dist/contrib/cacheInMemory.d.ts",
+      "import": "./dist/contrib/cacheInMemory.js"
+    },
+    "./contrib/cacheMomento": {
+      "types": "./dist/contrib/cacheMomento.d.ts",
+      "import": "./dist/contrib/cacheMomento.js"
+    },
+    "./contrib/dynamodbDocClientInit": {
+      "types": "./dist/contrib/dynamodbDocClientInit/index.d.ts",
+      "import": "./dist/contrib/dynamodbDocClientInit/index.js"
+    },
+    "./contrib/envValidator": {
+      "types": "./dist/contrib/envValidator.d.ts",
+      "import": "./dist/contrib/envValidator.js"
+    },
+    "./contrib/headerSignatureAuthorizer": {
+      "types": "./dist/contrib/headerSignatureAuthorizer/index.d.ts",
+      "import": "./dist/contrib/headerSignatureAuthorizer/index.js"
+    },
+    "./contrib/headerSignatureAuthorizer/lib": {
+      "types": "./dist/contrib/headerSignatureAuthorizer/lib.d.ts",
+      "import": "./dist/contrib/headerSignatureAuthorizer/lib.js"
+    },
+    "./contrib/headersNormalizer": {
+      "types": "./dist/contrib/headersNormalizer/index.d.ts",
+      "import": "./dist/contrib/headersNormalizer/index.js"
+    },
+    "./contrib/headersNormalizer/lib": {
+      "types": "./dist/contrib/headersNormalizer/lib.d.ts",
+      "import": "./dist/contrib/headersNormalizer/lib.js"
+    },
+    "./contrib/headersNormalizer/types": {
+      "types": "./dist/contrib/headersNormalizer/types.d.ts",
+      "import": "./dist/contrib/headersNormalizer/types.js"
+    },
+    "./contrib/headersValidator": {
+      "types": "./dist/contrib/headersValidator.d.ts",
+      "import": "./dist/contrib/headersValidator.js"
+    },
+    "./contrib/helmetJsHeaders": {
+      "types": "./dist/contrib/helmetJsHeaders.d.ts",
+      "import": "./dist/contrib/helmetJsHeaders.js"
+    },
+    "./contrib/identity": {
+      "types": "./dist/contrib/identity.d.ts",
+      "import": "./dist/contrib/identity.js"
+    },
+    "./contrib": {
+      "types": "./dist/contrib/index.d.ts",
+      "import": "./dist/contrib/index.js"
+    },
+    "./contrib/jsonBodyParser": {
+      "types": "./dist/contrib/jsonBodyParser.d.ts",
+      "import": "./dist/contrib/jsonBodyParser.js"
+    },
+    "./contrib/jwtAuthenticator": {
+      "types": "./dist/contrib/jwtAuthenticator.d.ts",
+      "import": "./dist/contrib/jwtAuthenticator.js"
+    },
+    "./contrib/jwtAuthenticatorRsa": {
+      "types": "./dist/contrib/jwtAuthenticatorRsa.d.ts",
+      "import": "./dist/contrib/jwtAuthenticatorRsa.js"
+    },
+    "./contrib/jwtDecoder": {
+      "types": "./dist/contrib/jwtDecoder.d.ts",
+      "import": "./dist/contrib/jwtDecoder.js"
+    },
+    "./contrib/momentoClientInit": {
+      "types": "./dist/contrib/momentoClientInit.d.ts",
+      "import": "./dist/contrib/momentoClientInit.js"
+    },
+    "./contrib/pathParametersValidator": {
+      "types": "./dist/contrib/pathParametersValidator.d.ts",
+      "import": "./dist/contrib/pathParametersValidator.js"
+    },
+    "./contrib/pathTokenAuthorizer": {
+      "types": "./dist/contrib/pathTokenAuthorizer.d.ts",
+      "import": "./dist/contrib/pathTokenAuthorizer.js"
+    },
+    "./contrib/queryStringValidator": {
+      "types": "./dist/contrib/queryStringValidator.d.ts",
+      "import": "./dist/contrib/queryStringValidator.js"
+    },
+    "./contrib/requestResponseLogger": {
+      "types": "./dist/contrib/requestResponseLogger.d.ts",
+      "import": "./dist/contrib/requestResponseLogger.js"
+    },
+    "./contrib/trivial": {
+      "types": "./dist/contrib/trivial.d.ts",
+      "import": "./dist/contrib/trivial.js"
+    },
+    "./lib/http": {
+      "types": "./dist/lib/http.d.ts",
+      "import": "./dist/lib/http.js"
+    },
+    "./lib/HttpApiError": {
+      "types": "./dist/lib/HttpApiError.d.ts",
+      "import": "./dist/lib/HttpApiError.js"
+    },
+    "./lib/MiddlewareError": {
+      "types": "./dist/lib/MiddlewareError.d.ts",
+      "import": "./dist/lib/MiddlewareError.js"
+    },
+    "./test/test-common": {
+      "types": "./dist/test/test-common.d.ts",
+      "import": "./dist/test/test-common.js"
+    }
+  },
   "files": [
     "dist/**/*",
     "!dist/**/*.test.*"
   ],
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
-    "@gomomento/sdk": "^1.95.0",
+    "@gomomento/sdk": "^1.102.0",
     "aws-lambda": "^1.0.7"
   },
   "dependencies": {
@@ -40,29 +187,33 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",
+    "@aws-sdk/client-dynamodb": "^3.637.0",
+    "@aws-sdk/types": "^3.696.0",
+    "@aws-sdk/util-stream-node": "^3.374.0",
     "@effect/language-service": "^0.0.21",
+    "@eslint/js": "^9.17.0",
+    "@gomomento/sdk": "^1.102.0",
+    "@konker.dev/common-config": "workspace:*",
+    "@smithy/smithy-client": "^2.5.1",
+    "@swc/core": "^1.10.0",
     "@types/aws-lambda": "^8.10.146",
+    "@types/micromatch": "^4.0.9",
     "@types/node": "^20.17.9",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@typescript-eslint/typescript-estree": "^6.21.0",
     "@vitest/coverage-istanbul": "^2.1.8",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.7.0",
-    "eslint-plugin-deprecation": "^2.0.0",
+    "aws-lambda": "^1.0.7",
+    "aws-sdk-client-mock": "^3.1.0",
+    "eslint": "^9.17.0",
     "eslint-plugin-fp": "^2.3.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^1.6.0",
     "leasot": "^13.3.0",
     "madge": "^6.1.0",
+    "micromatch": "^4.0.5",
     "prettier": "^3.4.2",
-    "ts-node": "^10.9.2",
     "type-coverage": "^2.29.7",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
     "vitest": "^2.1.8"
   },
   "scripts": {
@@ -74,14 +225,15 @@
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",
-    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
+    "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify packages/middleware-fp",
+    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run exports-check && pnpm run fixme-check",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && pnpm publish --access public"
   }
 }

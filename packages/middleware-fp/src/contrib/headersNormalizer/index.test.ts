@@ -2,9 +2,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import type { Handler } from '../../index';
-import { TestDeps } from '../../test/test-common';
-import * as unit from './index';
+import type { Handler } from '../../index.js';
+import { TestDeps } from '../../test/test-common.js';
+import * as unit from './index.js';
 
 export type In = { headers: Record<string, string | undefined> };
 

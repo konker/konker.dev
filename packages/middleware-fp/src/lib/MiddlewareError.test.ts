@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './MiddlewareError';
+import * as unit from './MiddlewareError.js';
 
 describe('error', () => {
   describe('toMiddlewareError', () => {

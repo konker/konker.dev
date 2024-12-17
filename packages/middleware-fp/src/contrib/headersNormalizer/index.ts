@@ -1,14 +1,14 @@
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../../index';
-import { transformInput, transformOutput } from './lib';
+import type { Handler } from '../../index.js';
+import { transformInput, transformOutput } from './lib.js';
 import type {
   WithNormalizedInputHeaders,
   WithNormalizedOutputHeaders,
   WithPossibleInputHeaders,
   WithPossibleOutputHeaders,
-} from './types';
+} from './types.js';
 
 const TAG = 'headerNormalizer';
 

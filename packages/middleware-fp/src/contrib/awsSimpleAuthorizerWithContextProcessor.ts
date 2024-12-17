@@ -3,8 +3,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import type { LazyArg } from 'effect/Function';
 
-import type { Handler } from '../index';
-import type { BaseSimpleAuthResponseWithContext } from '../lib/http';
+import type { Handler } from '../index.js';
+import type { BaseSimpleAuthResponseWithContext } from '../lib/http.js';
 
 const TAG = 'awsSimpleAuthorizerWithContextProcessor';
 

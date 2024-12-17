@@ -2,8 +2,8 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common';
-import * as unit from './queryStringValidator';
+import { echoCoreIn } from '../test/test-common.js';
+import * as unit from './queryStringValidator.js';
 
 export type In = { queryStringParameters?: any };
 

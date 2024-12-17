@@ -2,8 +2,8 @@ import type { APIGatewayRequestAuthorizerEventV2, APIGatewaySimpleAuthorizerResu
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import type { BaseSimpleAuthResponse } from '../lib/http';
+import type { Handler } from '../index.js';
+import type { BaseSimpleAuthResponse } from '../lib/http.js';
 
 const TAG = 'awsSimpleAuthorizerProcessor';
 

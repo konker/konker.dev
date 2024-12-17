@@ -56,7 +56,7 @@ export type MomentoClientFactoryDeps = {
   readonly momentoClientFactory: MomentoClientFactory;
 };
 export const MomentoClientFactoryDeps = Context.GenericTag<MomentoClientFactoryDeps>(
-  'momento-client-fp/MomentoClientFactoryDeps'
+  'momento-cache-client-effect/MomentoClientFactoryDeps'
 );
 export const defaultMomentoFactoryDeps = Effect.provideService(
   MomentoClientFactoryDeps,
@@ -70,7 +70,7 @@ export const defaultMomentoFactoryDeps = Effect.provideService(
 export type MomentoClientDeps = {
   readonly makeMomentoClient: MomentoCacheClient;
 };
-export const MomentoClientDeps = Context.GenericTag<MomentoClientDeps>('momento-client-fp/MomentoClientDeps');
+export const MomentoClientDeps = Context.GenericTag<MomentoClientDeps>('momento-cache-client-effect/MomentoClientDeps');
 
 //------------------------------------------------------
 // Set

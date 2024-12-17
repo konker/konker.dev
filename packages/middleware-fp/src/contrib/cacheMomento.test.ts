@@ -1,13 +1,13 @@
 import { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/lib/test';
-import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
+import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCacheJson';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as common from '../test/test-common';
-import { TestDeps } from '../test/test-common';
-import * as unit from './cacheMomento';
+import * as common from '../test/test-common.js';
+import { TestDeps } from '../test/test-common.js';
+import * as unit from './cacheMomento.js';
 
 export type In = { foo: 'foo' };
 

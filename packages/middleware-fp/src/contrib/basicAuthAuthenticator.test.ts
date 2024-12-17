@@ -3,9 +3,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common';
-import * as unit from './basicAuthAuthenticator';
-import type { WithNormalizedInputHeaders } from './headersNormalizer/types';
+import { echoCoreIn } from '../test/test-common.js';
+import * as unit from './basicAuthAuthenticator.js';
+import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

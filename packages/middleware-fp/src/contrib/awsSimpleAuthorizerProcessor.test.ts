@@ -4,9 +4,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { Handler } from '../index';
-import type { BaseSimpleAuthResponse } from '../lib/http';
-import * as unit from './awsSimpleAuthorizerProcessor';
+import type { Handler } from '../index.js';
+import type { BaseSimpleAuthResponse } from '../lib/http.js';
+import * as unit from './awsSimpleAuthorizerProcessor.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

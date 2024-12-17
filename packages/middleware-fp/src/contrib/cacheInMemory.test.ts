@@ -2,9 +2,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it, vi } from 'vitest';
 
-import * as common from '../test/test-common';
-import { TestDeps } from '../test/test-common';
-import * as unit from './cacheInMemory';
+import * as common from '../test/test-common.js';
+import { TestDeps } from '../test/test-common.js';
+import * as unit from './cacheInMemory.js';
 
 export type In = { foo: 'foo' };
 

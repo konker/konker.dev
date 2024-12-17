@@ -3,9 +3,9 @@ import * as Effect from 'effect/Effect';
 import type { MockInstance } from 'vitest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import type { Handler } from '../index';
-import { TestDeps } from '../test/test-common';
-import * as unit from './requestResponseLogger';
+import type { Handler } from '../index.js';
+import { TestDeps } from '../test/test-common.js';
+import * as unit from './requestResponseLogger.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

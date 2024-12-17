@@ -2,8 +2,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { echoCoreInDeps, TestDeps } from '../test/test-common';
-import * as unit from './trivial';
+import { echoCoreInDeps, TestDeps } from '../test/test-common.js';
+import * as unit from './trivial.js';
 
 export type In = { foo: 'foo' };
 const TEST_IN: In = { foo: 'foo' };

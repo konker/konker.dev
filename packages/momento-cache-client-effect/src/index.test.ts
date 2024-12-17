@@ -11,7 +11,7 @@ const TEST_KEY_1 = 'test-key-1';
 const TEST_VALUE_1 = 'test-value';
 const TEST_TTL_SECS = 123;
 
-describe('momento-client-fp', () => {
+describe('momento-cache-client-effect', () => {
   let deps: MomentoClientDeps;
 
   describe('factory', () => {

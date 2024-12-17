@@ -1,11 +1,11 @@
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import type { RequestHeaders } from '../lib/http';
-import type { MiddlewareError } from '../lib/MiddlewareError';
-import { toMiddlewareError } from '../lib/MiddlewareError';
-import type { WithPossibleInputHeaders } from './headersNormalizer/types';
+import type { Handler } from '../index.js';
+import type { RequestHeaders } from '../lib/http.js';
+import type { MiddlewareError } from '../lib/MiddlewareError.js';
+import { toMiddlewareError } from '../lib/MiddlewareError.js';
+import type { WithPossibleInputHeaders } from './headersNormalizer/types.js';
 
 const TAG = 'headersValidator';
 

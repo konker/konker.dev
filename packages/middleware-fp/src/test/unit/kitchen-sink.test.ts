@@ -1,5 +1,5 @@
-import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
-import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
+import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb/lib/client';
+import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/lib/client';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/lib/test';
 import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/jwt';
@@ -9,17 +9,17 @@ import {
   TEST_JWT_SIGNING_SECRET,
 } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
 import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens';
-import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
-import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/dist/momento/MomentoStringCacheJson';
+import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
+import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCacheJson';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import * as M from '../../contrib';
-import * as unit from '../../contrib/jwtAuthenticator';
-import { PathTokenAuthorizerDeps } from '../../contrib/pathTokenAuthorizer';
-import type { BaseResponse } from '../../lib/http';
+import * as M from '../../contrib/index.js';
+import * as unit from '../../contrib/jwtAuthenticator.js';
+import { PathTokenAuthorizerDeps } from '../../contrib/pathTokenAuthorizer.js';
+import type { BaseResponse } from '../../lib/http.js';
 
 export const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 export const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';

@@ -8,8 +8,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { Handler } from '../index';
-import * as unit from './awsIamAuthorizerProcessor';
+import type { Handler } from '../index.js';
+import * as unit from './awsIamAuthorizerProcessor.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

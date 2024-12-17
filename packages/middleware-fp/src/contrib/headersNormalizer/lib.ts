@@ -4,7 +4,7 @@ import type {
   WithNormalizedOutputHeaders,
   WithPossibleInputHeaders,
   WithPossibleOutputHeaders,
-} from './types';
+} from './types.js';
 
 const EXCEPTIONS_LIST = [
   'ALPN',

@@ -3,8 +3,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { http200CoreIn } from '../test/test-common';
-import * as unit from './pathTokenAuthorizer';
+import { http200CoreIn } from '../test/test-common.js';
+import * as unit from './pathTokenAuthorizer.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

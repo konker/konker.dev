@@ -2,8 +2,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { echoCoreInDeps, TestDeps } from '../test/test-common';
-import * as unit from './jsonBodyParser';
+import { echoCoreInDeps, TestDeps } from '../test/test-common.js';
+import * as unit from './jsonBodyParser.js';
 
 export type In = { body: string };
 const TEST_IN_1: In = { body: '{"foo":"ABC"}' };

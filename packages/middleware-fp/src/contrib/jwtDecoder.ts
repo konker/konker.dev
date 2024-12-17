@@ -4,14 +4,14 @@ import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import { HttpApiError } from '../lib/HttpApiError';
-import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types';
+import type { Handler } from '../index.js';
+import { HttpApiError } from '../lib/HttpApiError.js';
+import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types.js';
 
 const TAG = 'jwtDecoder';
 
 // --------------------------------------------------------------------------
-export type { WithUserId } from './headersNormalizer/types';
+export type { WithUserId } from './headersNormalizer/types.js';
 
 // --------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ export const middleware =
     return pipe(
       Effect.Do,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
-      Effect.bind('authToken', () => extractBearerToken(i.headers['authorization'])),
+      Effect.bind('authToken', () => extractBearerToken(i.headers.authorization)),
       Effect.bind('decoded', ({ authToken }) => jwtDecodeToken(authToken)),
       Effect.map(({ decoded }) => ({
         ...i,

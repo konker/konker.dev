@@ -17,7 +17,7 @@ import { generateExports } from './generate-exports-common.js';
   const packageJson: Record<string, unknown> = JSON.parse(
     await fs.readFile(path.join(fullProjectPath, 'package.json'), 'utf8')
   );
-  const exports: unknown = packageJson['exports'];
+  const exports: unknown = packageJson.exports;
 
   // Generate exports
   const generated = await generateExports(fullProjectPath);

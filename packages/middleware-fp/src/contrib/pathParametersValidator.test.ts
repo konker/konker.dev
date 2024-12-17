@@ -2,8 +2,8 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common';
-import * as unit from './pathParametersValidator';
+import { echoCoreIn } from '../test/test-common.js';
+import * as unit from './pathParametersValidator.js';
 
 export type In = { pathParameters?: any };
 

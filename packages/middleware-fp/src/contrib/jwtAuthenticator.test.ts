@@ -10,9 +10,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common';
-import type { WithNormalizedInputHeaders } from './headersNormalizer/types';
-import * as unit from './jwtAuthenticator';
+import { echoCoreIn } from '../test/test-common.js';
+import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
+import * as unit from './jwtAuthenticator.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099

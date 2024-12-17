@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import * as Either from 'effect/Either';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './http';
+import * as unit from './http.js';
 
 describe('lib/http', () => {
   describe('UNKNOWN_STRING_EFFECT', () => {

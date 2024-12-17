@@ -1,7 +1,7 @@
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { BaseResponse } from '../lib/http';
+import type { BaseResponse } from '../lib/http.js';
 
 export type TestDeps = any;
 export const TestDeps = Context.GenericTag<any>('Deps');

@@ -1,13 +1,13 @@
 import {
   DynamoDBDocumentClientDeps,
   DynamoDBDocumentClientFactoryDeps,
-} from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
+} from '@konker.dev/aws-client-effect-dynamodb/lib/client';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it, vi } from 'vitest';
 
-import { echoCoreInDeps } from '../../test/test-common';
-import * as unit from './index';
+import { echoCoreInDeps } from '../../test/test-common.js';
+import * as unit from './index.js';
 
 export type In = { foo: 'foo' };
 

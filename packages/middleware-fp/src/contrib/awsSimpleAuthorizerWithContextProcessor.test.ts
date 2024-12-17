@@ -4,9 +4,9 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { Handler } from '../index';
-import type { BaseSimpleAuthResponseWithContext } from '../lib/http';
-import * as unit from './awsSimpleAuthorizerWithContextProcessor';
+import type { Handler } from '../index.js';
+import type { BaseSimpleAuthResponseWithContext } from '../lib/http.js';
+import * as unit from './awsSimpleAuthorizerWithContextProcessor.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099
@@ -25,6 +25,7 @@ const TEST_OUT_1 = {
 
 const TEST_OUT_2 = toError('Some Error Message');
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TestContext = Schema.Struct({ userId: Schema.String });
 type TextContext = Schema.Schema.Type<typeof TestContext>;
 const defaultErrorContext = (): TextContext => ({ userId: 'UNKNOWN' });

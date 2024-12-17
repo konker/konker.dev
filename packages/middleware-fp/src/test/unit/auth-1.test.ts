@@ -3,9 +3,9 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import * as M from '../../contrib';
-import type { BaseSimpleAuthResponse } from '../../lib/http';
-import event from '../fixtures/APIGatewayRequestAuthorizerEventV2-1.json';
+import * as M from '../../contrib/index.js';
+import type { BaseSimpleAuthResponse } from '../../lib/http.js';
+import event from '../fixtures/APIGatewayRequestAuthorizerEventV2-1.json' with { type: 'json' };
 
 const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';

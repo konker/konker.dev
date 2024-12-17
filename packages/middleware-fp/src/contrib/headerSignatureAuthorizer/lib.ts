@@ -2,8 +2,8 @@ import { sha256HmacHex } from '@konker.dev/tiny-utils-fp/hash';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { HttpApiError } from '../../lib/HttpApiError';
-import { toHttpApiError } from '../../lib/HttpApiError';
+import type { HttpApiError } from '../../lib/HttpApiError.js';
+import { toHttpApiError } from '../../lib/HttpApiError.js';
 
 export function validateHeaderSignature(
   signature: string,

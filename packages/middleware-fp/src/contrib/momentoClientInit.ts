@@ -3,7 +3,7 @@ import { MomentoClientDeps, MomentoClientFactoryDeps } from '@konker.dev/momento
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
+import type { Handler } from '../index.js';
 
 const TAG = 'momentoClientInit';
 

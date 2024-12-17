@@ -1,7 +1,7 @@
 import { identity, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
+import type { Handler } from '../index.js';
 
 export const TAG = 'FOO';
 

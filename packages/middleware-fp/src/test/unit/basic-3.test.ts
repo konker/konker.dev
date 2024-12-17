@@ -4,8 +4,8 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import * as M from '../../contrib';
-import type { BaseResponse } from '../../lib/http';
+import * as M from '../../contrib/index.js';
+import type { BaseResponse } from '../../lib/http.js';
 
 const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';

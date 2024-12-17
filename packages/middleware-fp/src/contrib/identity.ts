@@ -1,4 +1,4 @@
-import type { Handler } from '../index';
+import type { Handler } from '../index.js';
 
 export const middleware =
   <I, O, E, R>(_params?: never) =>

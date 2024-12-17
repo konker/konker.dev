@@ -4,13 +4,13 @@ import {
   createDynamoDBDocumentClientDeps,
   DynamoDBDocumentClientDeps,
   DynamoDBDocumentClientFactoryDeps,
-} from '@konker.dev/aws-client-effect-dynamodb/dist/lib/client';
+} from '@konker.dev/aws-client-effect-dynamodb/lib/client';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../../index';
-import type { MiddlewareError } from '../../lib/MiddlewareError';
-import { toMiddlewareError } from '../../lib/MiddlewareError';
+import type { Handler } from '../../index.js';
+import type { MiddlewareError } from '../../lib/MiddlewareError.js';
+import { toMiddlewareError } from '../../lib/MiddlewareError.js';
 
 const TAG = 'dynamodbDocClientInit';
 

@@ -3,7 +3,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as unit from './lib';
+import * as unit from './lib.js';
 
 export const CORRECT_TEST_HMAC_VALUE = 'test-hmac-value';
 export const INCORRECT_TEST_HMAC_VALUE = 'wrong-hmac-value';

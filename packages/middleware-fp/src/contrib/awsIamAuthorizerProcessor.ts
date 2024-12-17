@@ -3,7 +3,7 @@ import type { APIGatewayAuthorizerResult, APIGatewayRequestAuthorizerEventV2 } f
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
+import type { Handler } from '../index.js';
 
 const TAG = 'awsIamAuthorizerProcessor';
 

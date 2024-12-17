@@ -2,10 +2,10 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResult } from 'aws-lambda';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import type { BaseResponse } from '../lib/http';
-import { UNKNOWN_STRING_EFFECT } from '../lib/http';
-import { toHttpApiError } from '../lib/HttpApiError';
+import type { Handler } from '../index.js';
+import type { BaseResponse } from '../lib/http.js';
+import { UNKNOWN_STRING_EFFECT } from '../lib/http.js';
+import { toHttpApiError } from '../lib/HttpApiError.js';
 
 const TAG = 'awsApiGatewayProcessor';
 
@@ -35,7 +35,6 @@ export const middleware =
                 Effect.map((body) => ({
                   statusCode: apiError.statusCode,
                   headers: {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
                     'Content-Type': 'application/json',
                   },
                   body,

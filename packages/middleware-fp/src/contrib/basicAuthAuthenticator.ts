@@ -5,9 +5,9 @@ import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import { HttpApiError } from '../lib/HttpApiError';
-import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types';
+import type { Handler } from '../index.js';
+import { HttpApiError } from '../lib/HttpApiError.js';
+import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types.js';
 
 const TAG = 'basicAuthAuthenticator';
 
@@ -28,7 +28,7 @@ export const middleware =
       Effect.Do,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
       Effect.bind('deps', () => BasicAuthAuthenticatorDeps),
-      Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers['authorization'])),
+      Effect.bind('authToken', () => extractBasicAuthHeaderValue(i.headers.authorization)),
       Effect.bind('decoded', ({ authToken }) => basicAuthDecodeHeaderValue(authToken)),
       Effect.bind('verification', ({ decoded, deps }) =>
         pipe(decoded, basicAuthVerifyCredentials(deps.validBasicAuthCredentialSet))

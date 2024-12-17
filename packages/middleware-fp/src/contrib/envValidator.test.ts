@@ -2,8 +2,8 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common';
-import * as unit from './envValidator';
+import { echoCoreIn } from '../test/test-common.js';
+import * as unit from './envValidator.js';
 
 export type In = { foo: 'foo' };
 

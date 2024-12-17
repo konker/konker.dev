@@ -1,13 +1,13 @@
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import type { CacheType } from '@konker.dev/tiny-cache-fp';
-import type { CacheKeyResolver } from '@konker.dev/tiny-cache-fp/dist/lib/CacheKeyResolver';
-import { chainGetVal, chainSetVal } from '@konker.dev/tiny-cache-fp/dist/lib/helpers';
+import type { CacheKeyResolver } from '@konker.dev/tiny-cache-fp/lib/CacheKeyResolver';
+import { chainGetVal, chainSetVal } from '@konker.dev/tiny-cache-fp/lib/helpers';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index';
-import type { MiddlewareError } from '../lib/MiddlewareError';
-import { toMiddlewareError } from '../lib/MiddlewareError';
+import type { Handler } from '../index.js';
+import type { MiddlewareError } from '../lib/MiddlewareError.js';
+import { toMiddlewareError } from '../lib/MiddlewareError.js';
 
 const TAG = 'cacheMomento';
 
