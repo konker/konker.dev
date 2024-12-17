@@ -13,18 +13,16 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './index';
-import { SSMClientDeps } from './index';
-import { TAG } from './lib/error';
+import * as unit from './index.js';
+import { SSMClientDeps } from './index.js';
+import { TAG } from './lib/error.js';
 
 const ssmMock = mockClient(ssmClient.SSMClient);
 
 describe('aws-client-effect-ssm', () => {
-  // eslint-disable-next-line fp/no-let
   let deps: unit.SSMClientDeps;
 
   beforeAll(() => {
-    // eslint-disable-next-line fp/no-mutation
     deps = unit.SSMClientDeps.of({
       ssmClient: new ssmClient.SSMClient({}),
     });
