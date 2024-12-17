@@ -10,9 +10,9 @@ import {
 } from '@aws-sdk/client-s3';
 import * as S from '@konker.dev/aws-client-effect-s3';
 import { S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
-import * as SE from '@konker.dev/aws-client-effect-s3/dist/extra';
-import { toS3Error } from '@konker.dev/aws-client-effect-s3/dist/lib/error';
-import { PromiseDependentWritableStream } from '@konker.dev/aws-client-effect-s3/dist/lib/PromiseDependentWritableStream';
+import * as SE from '@konker.dev/aws-client-effect-s3/extra';
+import { toS3Error } from '@konker.dev/aws-client-effect-s3/lib/error';
+import { PromiseDependentWritableStream } from '@konker.dev/aws-client-effect-s3/lib/PromiseDependentWritableStream';
 import { mockClient } from 'aws-sdk-client-mock';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
@@ -20,10 +20,10 @@ import readline from 'readline';
 import { PassThrough, Writable } from 'stream';
 import { beforeAll, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { TinyFileSystem } from '../index';
-import { FileType } from '../index';
-import { arrayBufferToString, stringToUint8Array } from '../lib/array';
-import * as unit from './index';
+import type { TinyFileSystem } from '../index.js';
+import { FileType } from '../index.js';
+import { arrayBufferToString, stringToUint8Array } from '../lib/array.js';
+import * as unit from './index.js';
 
 describe('S3TinyFileSystem', () => {
   let s3ListObjectsMock: MockInstance;

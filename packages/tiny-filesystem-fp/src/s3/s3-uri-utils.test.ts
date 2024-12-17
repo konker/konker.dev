@@ -1,9 +1,9 @@
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { FileType } from '../index';
-import type { S3UrlData } from './s3-uri-utils';
-import * as s3UriUtils from './s3-uri-utils';
+import { FileType } from '../index.js';
+import type { S3UrlData } from './s3-uri-utils.js';
+import * as s3UriUtils from './s3-uri-utils.js';
 
 describe('S3 URI Utils', () => {
   describe('helpers', () => {

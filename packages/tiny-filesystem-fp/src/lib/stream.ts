@@ -5,9 +5,9 @@ import { toError } from '@konker.dev/tiny-error-fp/lib';
 import * as Effect from 'effect/Effect';
 import readline from 'readline';
 
-import { stringToUint8Array } from './array';
-import type { TinyFileSystemError } from './error';
-import { toTinyFileSystemError } from './error';
+import { stringToUint8Array } from './array.js';
+import type { TinyFileSystemError } from './error.js';
+import { toTinyFileSystemError } from './error.js';
 
 /**
  * Consume a readStream

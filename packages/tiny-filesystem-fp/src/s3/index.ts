@@ -5,8 +5,8 @@ import type { Readable, Writable } from 'node:stream';
 import type { S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
 import * as S from '@konker.dev/aws-client-effect-s3';
 import { S3ClientDeps, S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
-import { UploadObjectEffect, UploadObjectWriteStreamEffect } from '@konker.dev/aws-client-effect-s3/dist/extra';
-import type { S3Error } from '@konker.dev/aws-client-effect-s3/dist/lib/error';
+import { UploadObjectEffect, UploadObjectWriteStreamEffect } from '@konker.dev/aws-client-effect-s3/extra';
+import type { S3Error } from '@konker.dev/aws-client-effect-s3/lib/error';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import path from 'path';
@@ -86,7 +86,7 @@ const listFiles =
           .map(
             // Extract the last part of the path relative to the prefix
             // eslint-disable-next-line fp/no-mutating-methods
-            (item: Record<string, string>) => relative(parsed.Path, item[key]!).split(path.posix.sep).shift() as string
+            (item: Record<string, string>) => relative(parsed.Path, item[key]!).split(path.posix.sep).shift()!
           )
           .filter((item) => item !== '')
           .map(
@@ -145,7 +145,7 @@ const exists =
       Effect.catchTag(S.S3_ERROR_TAG, (resp: S3Error) => {
         const cause = resp.cause;
         // eslint-disable-next-line fp/no-nil
-        const metadata = !!cause && typeof cause === 'object' && '$metadata' in cause ? cause['$metadata'] : undefined;
+        const metadata = !!cause && typeof cause === 'object' && '$metadata' in cause ? cause.$metadata : undefined;
         const httpStatusCode =
           !!metadata && typeof metadata === 'object' && 'httpStatusCode' in metadata
             ? metadata.httpStatusCode

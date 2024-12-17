@@ -4,10 +4,10 @@ import { URL } from 'node:url';
 import { Either, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { DirectoryPath, FileName, IoUrl } from '../index';
-import { FileType } from '../index';
-import type { TinyFileSystemError } from '../lib/error';
-import { toTinyFileSystemError } from '../lib/error';
+import type { DirectoryPath, FileName, IoUrl } from '../index.js';
+import { FileType } from '../index.js';
+import type { TinyFileSystemError } from '../lib/error.js';
+import { toTinyFileSystemError } from '../lib/error.js';
 
 export type S3IoUrl<S extends string = string> = IoUrl & `s3://${S}`;
 export const S3_PROTOCOL = 's3:';
@@ -45,7 +45,7 @@ export function s3Escape(s: string): string {
  * E.g. 'folder+with+space/JPEG+image%2Bpl%25us.jpeg' -> 'folder with space/JPEG image+pl%25us.jpeg'
  */
 export function s3Unescape(s: string): string {
-  return !!s ? decodeURIComponent(s.replaceAll('+', '%20')) : s;
+  return s ? decodeURIComponent(s.replaceAll('+', '%20')) : s;
 }
 
 /**
@@ -65,7 +65,7 @@ export function trimSlash(s: string): string {
  * @param [part]
  */
 export function createS3Url(bucket: string, dirPath?: string, part?: string): S3IoUrl {
-  return `${S3_PROTOCOL}//${s3Escape(path.posix.join(bucket, dirPath || '/', part || ''))}` as S3IoUrl;
+  return `${S3_PROTOCOL}//${s3Escape(path.posix.join(bucket, dirPath ?? '/', part ?? ''))}` as S3IoUrl;
 }
 
 /**
@@ -94,7 +94,7 @@ export function parseS3Url(s3url: string): Effect.Effect<S3UrlData, TinyFileSyst
     Effect.flatMap((parsed) => {
       // FIXME: disabled lint
       const host = parsed.host;
-      // eslint-disable-next-line fp/no-mutation,fp/no-let
+      // eslint-disable-next-line fp/no-let
       let pathname = parsed.pathname === '' ? path.posix.sep : parsed.pathname;
       if (pathname.endsWith(path.posix.sep)) {
         // eslint-disable-next-line fp/no-mutation
@@ -107,7 +107,7 @@ export function parseS3Url(s3url: string): Effect.Effect<S3UrlData, TinyFileSyst
 
       const parts = pathname.split(path.posix.sep);
       // eslint-disable-next-line fp/no-mutating-methods
-      const lastPart = parts.pop() as string; // even if pathname is an empty string, parts will have one element
+      const lastPart = parts.pop()!; // even if pathname is an empty string, parts will have one element
       // eslint-disable-next-line fp/no-nil
       const fileComponent = isS3File(lastPart) ? s3Unescape(lastPart) : undefined;
       if (!fileComponent) {
@@ -154,5 +154,5 @@ export function isS3Url(s3url: string): boolean {
  * @param part
  */
 export function isS3File(part: string): boolean {
-  return part.match(FILE_EXT_RE) !== null;
+  return FILE_EXT_RE.exec(part) !== null;
 }

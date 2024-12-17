@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './utils';
+import * as unit from './utils.js';
 
 describe('s3ObjectIsReadable', () => {
   it('returns true for valid S3 object response', () => {

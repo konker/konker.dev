@@ -3,8 +3,8 @@ import { PassThrough, Readable } from 'node:stream';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { arrayBufferToString } from './array';
-import * as unit from './stream';
+import { arrayBufferToString } from './array.js';
+import * as unit from './stream.js';
 
 describe('stream utils', () => {
   describe('readStreamToBuffer', () => {

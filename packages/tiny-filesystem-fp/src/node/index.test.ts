@@ -5,10 +5,10 @@ import readline from 'readline';
 import { PassThrough, Readable, Writable } from 'stream';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { DirectoryPath } from '../index';
-import { FileType } from '../index';
-import { arrayBufferToString, stringToUint8Array } from '../lib/array';
-import { NodeTinyFileSystem as unit } from './index';
+import type { DirectoryPath } from '../index.js';
+import { FileType } from '../index.js';
+import { arrayBufferToString, stringToUint8Array } from '../lib/array.js';
+import { NodeTinyFileSystem as unit } from './index.js';
 
 describe('NodeTinyFileSystem', () => {
   describe('getFileReadStream', () => {

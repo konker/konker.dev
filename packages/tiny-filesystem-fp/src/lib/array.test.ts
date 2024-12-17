@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './array';
+import * as unit from './array.js';
 
 describe('array utils', () => {
   describe('stringToUint8Array', () => {

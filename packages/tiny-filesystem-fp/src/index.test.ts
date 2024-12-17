@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './index';
+import * as unit from './index.js';
 
 describe('index', () => {
   describe('fileTypeIsDirectory', () => {
