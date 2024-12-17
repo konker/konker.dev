@@ -12,18 +12,16 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './index';
-import { SQSClientDeps } from './index';
-import { TAG } from './lib/error';
+import * as unit from './index.js';
+import { SQSClientDeps } from './index.js';
+import { TAG } from './lib/error.js';
 
 const sqsMock = mockClient(sqsClient.SQSClient);
 
 describe('aws-client-effect-sqs', () => {
-  // eslint-disable-next-line fp/no-let
   let deps: unit.SQSClientDeps;
 
   beforeAll(() => {
-    // eslint-disable-next-line fp/no-mutation
     deps = unit.SQSClientDeps.of({
       sqsClient: new sqsClient.SQSClient({}),
     });

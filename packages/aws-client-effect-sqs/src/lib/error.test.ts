@@ -2,7 +2,7 @@ import type { SendMessageCommandInput } from '@aws-sdk/client-sqs';
 import { pipe } from 'effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './error';
+import * as unit from './error.js';
 
 describe('error', () => {
   it('should work as expected with an Error instance input', () => {
