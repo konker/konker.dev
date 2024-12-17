@@ -1,7 +1,7 @@
 import * as Effect from 'effect/Effect';
 
-import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
-import type { TreeCrawlerAccumulator } from './index';
+import type { TreeCrawlerData, TreeCrawlerEvent } from '../index.js';
+import type { TreeCrawlerAccumulator } from './index.js';
 
 export type DefaultAccumulatorItem = [TreeCrawlerEvent, TreeCrawlerData];
 

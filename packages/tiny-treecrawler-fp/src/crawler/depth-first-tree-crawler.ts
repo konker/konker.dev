@@ -4,12 +4,12 @@ import { FileType } from '@konker.dev/tiny-filesystem-fp';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { TreeCrawler, TreeCrawlerData, TreeCrawlerFilters, TreeCrawlerHandlers } from '../index';
-import { DIR, FILE, TreeCrawlerEvent } from '../index';
-import type { TinyTreeCrawlerError } from '../lib/error';
-import { toTinyTreeCrawlerError } from '../lib/error';
-import { DIRECTORIES_FIRST, sortListingByFileType } from '../lib/utils';
-import { notifyDirectoryEvent, notifyFileEvent } from './index';
+import type { TreeCrawler, TreeCrawlerData, TreeCrawlerFilters, TreeCrawlerHandlers } from '../index.js';
+import { DIR, FILE, TreeCrawlerEvent } from '../index.js';
+import type { TinyTreeCrawlerError } from '../lib/error.js';
+import { toTinyTreeCrawlerError } from '../lib/error.js';
+import { DIRECTORIES_FIRST, sortListingByFileType } from '../lib/utils.js';
+import { notifyDirectoryEvent, notifyFileEvent } from './index.js';
 
 export const DepthFirstTreeCrawler: TreeCrawler = (
   tfs: TinyFileSystem,

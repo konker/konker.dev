@@ -1,11 +1,11 @@
 import type { Ref } from '@konker.dev/tiny-filesystem-fp';
-import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/memfs';
 import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { TreeCrawlerDataType } from '../index';
-import memFs1Fixture from '../test/fixtures/memfs-1.json';
-import * as unit from './utils';
+import { TreeCrawlerDataType } from '../index.js';
+import memFs1Fixture from '../test/fixtures/memfs-1.json' with { type: 'json' };
+import * as unit from './utils.js';
 
 describe('utils', () => {
   let memFsTinyFileSystem: MemFsTinyFileSystem;

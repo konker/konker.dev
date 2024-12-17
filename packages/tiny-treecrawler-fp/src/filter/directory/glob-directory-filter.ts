@@ -1,11 +1,11 @@
 import type { TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
-import { toTinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/dist/lib/error';
+import { toTinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/lib/error';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import micromatch from 'micromatch';
 
-import { toTinyTreeCrawlerError } from '../../lib/error';
-import type { TreeCrawlerDirectoryFilter } from '../index';
+import { toTinyTreeCrawlerError } from '../../lib/error.js';
+import type { TreeCrawlerDirectoryFilter } from '../index.js';
 
 export const GlobDirectoryFilter =
   (globPattern: string): TreeCrawlerDirectoryFilter =>

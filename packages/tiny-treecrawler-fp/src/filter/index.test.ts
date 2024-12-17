@@ -1,15 +1,15 @@
-import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/memfs';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import memFs1Fixture from '../test/fixtures/memfs-1.json';
-import { FalseDirectoryFilter } from './directory/false-directory-filter';
-import { TrueDirectoryFilter } from './directory/true-directory-filter';
-import { ExtensionFileFilter } from './file/extension-file-filter';
-import { FalseFileFilter } from './file/false-file-filter';
-import { TrueFileFilter } from './file/true-file-filter';
-import * as unit from './index';
+import memFs1Fixture from '../test/fixtures/memfs-1.json' with { type: 'json' };
+import { FalseDirectoryFilter } from './directory/false-directory-filter.js';
+import { TrueDirectoryFilter } from './directory/true-directory-filter.js';
+import { ExtensionFileFilter } from './file/extension-file-filter.js';
+import { FalseFileFilter } from './file/false-file-filter.js';
+import { TrueFileFilter } from './file/true-file-filter.js';
+import * as unit from './index.js';
 
 describe('filter', () => {
   let memFsTinyFileSystem: MemFsTinyFileSystem;

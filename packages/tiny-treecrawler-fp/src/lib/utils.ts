@@ -1,10 +1,10 @@
 import type { FileType, Ref, TinyFileSystem } from '@konker.dev/tiny-filesystem-fp';
-import type { TinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/dist/lib/error';
+import type { TinyFileSystemError } from '@konker.dev/tiny-filesystem-fp/lib/error';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { DirectoryData, FileData, TreeCrawlerData } from '../index';
-import { TreeCrawlerDataType } from '../index';
+import type { DirectoryData, FileData, TreeCrawlerData } from '../index.js';
+import { TreeCrawlerDataType } from '../index.js';
 
 export const DIRECTORIES_FIRST = true;
 export const FILES_FIRST = false;

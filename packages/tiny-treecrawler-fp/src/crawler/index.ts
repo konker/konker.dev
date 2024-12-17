@@ -2,9 +2,9 @@ import * as E from '@konker.dev/tiny-event-fp';
 import { Option, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import { type DirectoryData, type FileData, type TreeCrawlerData, TreeCrawlerEvent } from '../index';
-import type { TinyTreeCrawlerError } from '../lib/error';
-import { toTinyTreeCrawlerError } from '../lib/error';
+import { type DirectoryData, type FileData, type TreeCrawlerData, TreeCrawlerEvent } from '../index.js';
+import type { TinyTreeCrawlerError } from '../lib/error.js';
+import { toTinyTreeCrawlerError } from '../lib/error.js';
 
 export function notifyDirectoryEvent(
   events: E.TinyEventDispatcher<TreeCrawlerEvent, TreeCrawlerData>,

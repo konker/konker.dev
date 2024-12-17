@@ -1,19 +1,19 @@
 import * as E from '@konker.dev/tiny-event-fp';
-import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
-import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/dist/memfs';
+import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/lib/array';
+import { MemFsTinyFileSystem } from '@konker.dev/tiny-filesystem-fp/memfs';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { FalseDirectoryFilter } from '../filter/directory/false-directory-filter';
-import { TrueDirectoryFilter } from '../filter/directory/true-directory-filter';
-import { ExtensionFileFilter } from '../filter/file/extension-file-filter';
-import { TrueFileFilter } from '../filter/file/true-file-filter';
-import { DefaultTreeCrawlerDirectoryHandler } from '../handler/directory/default-directory-handler';
-import { DefaultTreeCrawlerFileHandler } from '../handler/file/default-file-handler';
-import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
-import memFs1Fixture from '../test/fixtures/memfs-1.json';
-import * as unit from './breadth-first-tree-crawler';
+import { FalseDirectoryFilter } from '../filter/directory/false-directory-filter.js';
+import { TrueDirectoryFilter } from '../filter/directory/true-directory-filter.js';
+import { ExtensionFileFilter } from '../filter/file/extension-file-filter.js';
+import { TrueFileFilter } from '../filter/file/true-file-filter.js';
+import { DefaultTreeCrawlerDirectoryHandler } from '../handler/directory/default-directory-handler.js';
+import { DefaultTreeCrawlerFileHandler } from '../handler/file/default-file-handler.js';
+import type { TreeCrawlerData, TreeCrawlerEvent } from '../index.js';
+import memFs1Fixture from '../test/fixtures/memfs-1.json' with { type: 'json' };
+import * as unit from './breadth-first-tree-crawler.js';
 
 describe('breadth-first-tree-crawler', () => {
   let memFsTinyFileSystem: MemFsTinyFileSystem;

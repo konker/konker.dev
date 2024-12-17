@@ -1,12 +1,12 @@
 import * as E from '@konker.dev/tiny-event-fp';
-import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/dist/lib/array';
+import { stringToUint8Array } from '@konker.dev/tiny-filesystem-fp/lib/array';
 import { Option, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { TreeCrawlerData, TreeCrawlerEvent } from '../index';
-import { TreeCrawlerDataType } from '../index';
-import * as unit from './index';
+import type { TreeCrawlerData, TreeCrawlerEvent } from '../index.js';
+import { TreeCrawlerDataType } from '../index.js';
+import * as unit from './index.js';
 
 describe('crawler', () => {
   const mockDirectoryListener = vi.fn().mockImplementation(() => Effect.void);
