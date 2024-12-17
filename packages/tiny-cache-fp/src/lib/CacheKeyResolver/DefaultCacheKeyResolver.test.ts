@@ -2,7 +2,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './DefaultCacheKeyResolver';
+import * as unit from './DefaultCacheKeyResolver.js';
 
 describe('DefaultCacheKeyResolver', () => {
   it('should work as expected with string input', () => {

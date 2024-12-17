@@ -1,9 +1,9 @@
 import * as Effect from 'effect/Effect';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import type { Cache } from '../Cache';
-import { InMemoryCache } from '../memory/InMemoryCache';
-import * as unit from './helpers';
+import type { Cache } from '../Cache.js';
+import { InMemoryCache } from '../memory/InMemoryCache.js';
+import * as unit from './helpers.js';
 
 const TEST_KEY = 'test-key-1';
 const TEST_VALUE = 'test-value';

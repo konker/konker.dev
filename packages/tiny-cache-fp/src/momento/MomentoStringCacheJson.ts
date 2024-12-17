@@ -2,13 +2,11 @@ import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect'
 import { Option, pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Cache } from '../Cache';
-import { CACHE_KIND_CACHE } from '../Cache';
-import type { CacheError } from '../lib/error';
-import { toCacheError } from '../lib/error';
-import { MomentoStringCache } from './MomentoStringCache';
-
-export const TAG = 'MomentoStringCacheJson';
+import type { Cache } from '../Cache.js';
+import { CACHE_KIND_CACHE } from '../Cache.js';
+import type { CacheError } from '../lib/error.js';
+import { toCacheError } from '../lib/error.js';
+import { MomentoStringCache } from './MomentoStringCache.js';
 
 const setVal =
   (cache: MomentoStringCache) =>

@@ -2,7 +2,7 @@ import { Option } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './InMemoryCache';
+import * as unit from './InMemoryCache.js';
 
 const TEST_KEY_1 = 'test-key-1';
 const TEST_VALUE_1 = 'test-value';

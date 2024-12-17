@@ -2,7 +2,7 @@ import { Option, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './InMemoryStrictSerializedCacheJson';
+import * as unit from './InMemoryStrictSerializedCacheJson.js';
 
 const TEST_KEY = 'test-key';
 const TEST_VALUE = {

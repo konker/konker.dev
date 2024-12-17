@@ -1,9 +1,9 @@
 import { Option, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { CacheType } from '../index';
-import type { CacheError } from './error';
-import { toCacheError } from './error';
+import type { CacheType } from '../index.js';
+import type { CacheError } from './error.js';
+import { toCacheError } from './error.js';
 
 /**
  * Convenience helper for getting a cache value and destructuring the Option into succeed or fail

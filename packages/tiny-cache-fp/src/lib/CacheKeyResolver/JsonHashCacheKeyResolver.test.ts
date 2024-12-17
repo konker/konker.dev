@@ -2,7 +2,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './JsonHashCacheKeyResolver';
+import * as unit from './JsonHashCacheKeyResolver.js';
 
 describe('JsonHashCacheKeyResolver', () => {
   it('should work as expected with string input', () => {

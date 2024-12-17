@@ -2,8 +2,8 @@ import { Option, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { InMemoryCache } from './InMemoryCache';
-import * as unit from './InMemoryStrictSerializedCache';
+import { InMemoryCache } from './InMemoryCache.js';
+import * as unit from './InMemoryStrictSerializedCache.js';
 
 const TEST_KEY = 'test-key';
 const TEST_VALUE = {

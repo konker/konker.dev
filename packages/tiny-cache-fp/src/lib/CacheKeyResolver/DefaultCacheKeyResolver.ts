@@ -1,6 +1,6 @@
 import * as Effect from 'effect/Effect';
 
-import type { CacheKeyResolver } from './index';
+import type { CacheKeyResolver } from './index.js';
 
 export const DefaultCacheKeyResolver =
   <I>(): CacheKeyResolver<I> =>

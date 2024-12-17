@@ -1,9 +1,10 @@
 {
-  "extends": "@konker.dev/common-config/dist/configs/tsconfig-base.json",
+  "extends": "../common-config/configs/tsconfig-base.json",
   "include": ["./src"],
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "strictNullChecks": true
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
   }
 }

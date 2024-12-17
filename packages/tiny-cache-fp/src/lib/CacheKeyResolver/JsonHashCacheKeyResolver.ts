@@ -1,11 +1,11 @@
-import crypto from 'node:crypto';
+import * as crypto from 'node:crypto';
 
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { CacheError } from '../error';
-import { toCacheError } from '../error';
-import type { CacheKeyResolver } from './index';
+import type { CacheError } from '../error.js';
+import { toCacheError } from '../error.js';
+import type { CacheKeyResolver } from './index.js';
 
 export const md5String = (s: string): Effect.Effect<string, CacheError> =>
   Effect.try({

@@ -1,6 +1,5 @@
-{
-  "printWidth": 120,
-  "singleQuote": true,
-  "trailingComma": "es5",
-  "tabWidth": 2
-}
+import basePrettierRc from '@konker.dev/common-config/configs/prettierrc-base.mjs';
+
+export default {
+  ...basePrettierRc,
+};

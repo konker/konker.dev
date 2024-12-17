@@ -5,8 +5,8 @@ import { Option, pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import * as unit from './MomentoStrictSerializedCache';
-import { MomentoStringCache } from './MomentoStringCache';
+import * as unit from './MomentoStrictSerializedCache.js';
+import { MomentoStringCache } from './MomentoStringCache.js';
 
 const TEST_KEY = 'test-key';
 const TEST_VALUE = {

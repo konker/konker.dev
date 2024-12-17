@@ -2,11 +2,9 @@
 import { Option } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Cache } from '../Cache';
-import { CACHE_KIND_CACHE } from '../Cache';
-import type { CacheError } from '../lib/error';
-
-export const TAG = 'InMemoryCache';
+import type { Cache } from '../Cache.js';
+import { CACHE_KIND_CACHE } from '../Cache.js';
+import type { CacheError } from '../lib/error.js';
 
 const setVal =
   <V>(cache: Record<string, V | undefined>) =>
@@ -31,7 +29,6 @@ const delVal =
 
 export type InMemoryCache<V> = Cache<V, never>;
 export const InMemoryCache = <V>(): InMemoryCache<V> => {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const __cache = {} as Record<string, V | undefined>;
 
   return {
