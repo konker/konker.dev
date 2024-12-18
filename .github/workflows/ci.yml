@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -27,10 +28,17 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Checks
-        run: pnpm run ci --affected
+      #      - name: TurboRepo Remote Cache Server
+      #        uses: trappar/turborepo-remote-cache-gh-action@main
+      #        with:
+      #          storage-provider: s3
+      #          storage-path: 'konkerdotdev-turborepo-cache/konker.dev'
+      #        env:
+      #          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
+      #          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Run Checks
+        env:
+          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+        run: pnpm run ci --affected
