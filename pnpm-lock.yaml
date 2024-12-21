@@ -194,8 +194,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -279,8 +279,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -358,8 +358,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -437,8 +437,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -516,8 +516,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -595,8 +595,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -761,8 +761,8 @@ importers:
         specifier: ^1.102.0
         version: 1.102.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -858,8 +858,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -928,8 +928,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/aws-lambda':
         specifier: ^8.10.146
         version: 8.10.146
@@ -1013,8 +1013,8 @@ importers:
         specifier: ^1.102.0
         version: 1.102.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@konker.dev/momento-cache-client-effect':
         specifier: workspace:*
         version: link:../momento-cache-client-effect
@@ -1080,8 +1080,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -1147,8 +1147,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -1232,8 +1232,8 @@ importers:
         specifier: workspace:*
         version: link:../aws-client-effect-s3
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@swc/core':
         specifier: ^1.10.0
         version: 1.10.1
@@ -1302,8 +1302,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -1390,8 +1390,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -1472,8 +1472,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -2672,8 +2672,8 @@ packages:
     peerDependencies:
       tslib: '2'
 
-  '@konker.dev/common-config@0.0.1':
-    resolution: {integrity: sha512-gWrgLQHe4vGF/sfcsqJ1nLB5sFssN1CJry4zElwe2y4yd3YZuw0NdjnM7X9xbiMLfT8MD6JH1h8njsb1UXke5Q==}
+  '@konker.dev/common-config@0.1.0':
+    resolution: {integrity: sha512-UMhaPr9wQshhxEUAw+1TWuOChp4kzl7Fg9E1Xr8EBNNZYrEdUpKviFM+mYBZLM0aewwrBc0AGKWrYHlPegRqPw==}
     hasBin: true
 
   '@mapbox/node-pre-gyp@1.0.11':
@@ -9948,7 +9948,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@konker.dev/common-config@0.0.1': {}
+  '@konker.dev/common-config@0.1.0': {}
 
   '@mapbox/node-pre-gyp@1.0.11':
     dependencies:
