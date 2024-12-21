@@ -990,9 +990,6 @@ importers:
 
   packages/tiny-cache-fp:
     dependencies:
-      '@konker.dev/momento-cache-client-effect':
-        specifier: workspace:*
-        version: link:../momento-cache-client-effect
       '@konker.dev/tiny-error-fp':
         specifier: workspace:*
         version: link:../tiny-error-fp
@@ -1018,6 +1015,9 @@ importers:
       '@konker.dev/common-config':
         specifier: workspace:*
         version: link:../common-config
+      '@konker.dev/momento-cache-client-effect':
+        specifier: workspace:*
+        version: link:../momento-cache-client-effect
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
