@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-filesystem-fp",
-  "version": "0.0.21",
+  "version": "0.1.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",

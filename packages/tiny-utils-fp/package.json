@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-utils-fp",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
