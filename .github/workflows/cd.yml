@@ -3,10 +3,25 @@ name: CD
 on:
   push:
     branches:
-      - 'main'
+      - "main"
+
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: "TurboRepo Filter"
+        required: false
+        type: string
+      extra_args:
+        description: "TurboRepo Extra Args"
+        required: false
+        type: string
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_FILTER_ARG: ${{ (inputs.filter == 'force' && '--force') || (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
+  TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
 jobs:
   cd:
@@ -18,15 +33,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Setup NPM Auth
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+            @konker.dev:registry=https://registry.npmjs.org/
+            //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          EOF
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: '9'
+          version: "9.6.0"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -41,19 +63,12 @@ jobs:
       #          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
 
       - name: Run Checks
-        env:
-          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-        run: pnpm run ci --affected
+        run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
 
       - name: Deploy to Registry
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
-          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-        run: pnpm run cd --affected
+        run: pnpm run cd ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

@@ -33,8 +33,8 @@
     "noUnusedParameters": true,
 
     /* If transpiling with TypeScript: */
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
 
     /* AND if you're building for a library: */

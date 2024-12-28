@@ -1456,7 +1456,7 @@ importers:
         specifier: workspace:*
         version: link:../tiny-error-fp
       effect:
-        specifier: ^3.11.2
+        specifier: ^3.11.3
         version: 3.11.8
     devDependencies:
       '@arethetypeswrong/cli':

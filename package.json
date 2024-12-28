@@ -12,6 +12,24 @@
     "url": "https://github.com/konker/konker.dev"
   },
   "packageManager": "pnpm@9.6.0",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*",
+        "src/*/index"
+      ]
+    }
+  },
+  "publishConfig": {
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/*.d.ts",
+          "dist/*/index.d.ts"
+        ]
+      }
+    }
+  },
   "devDependencies": {
     "turbo": "^2.3.3"
   },

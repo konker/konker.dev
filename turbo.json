@@ -14,7 +14,8 @@
       "dependsOn": ["^lint-check"]
     },
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     },
     "ci": {
       "dependsOn": ["^ci"]
