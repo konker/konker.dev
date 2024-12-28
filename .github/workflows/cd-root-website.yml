@@ -2,6 +2,12 @@ name: '@konker.dev/root-website / CD'
 
 on:
   workflow_dispatch:
+    inputs:
+      extra_args:
+        description: "TurboRepo Extra Args"
+        required: false
+        type: string
+
   push:
     branches:
       - 'main'
@@ -17,6 +23,8 @@ env:
   CWD: './apps/root-website'
   SOURCE_DIR: './apps/root-website/www'
   DEST_DIR: '/apps/root-website/www'
+  TURBO_FILTER_ARG: '--filter=@konker.dev/root-website'
+  TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
 jobs:
   cd:
@@ -35,21 +43,21 @@ jobs:
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: '9'
+          version: '9.6.0'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run Build
-        run: pnpm run build --filter @konker.dev/root-website
+        run: pnpm run build ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
 
       - name: Sync files to S3
         run: |

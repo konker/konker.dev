@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "main"
+    paths:
+      - 'packages/**/package.json'
 
   workflow_dispatch:
     inputs:
@@ -18,9 +20,7 @@ on:
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
-  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_FILTER_ARG: ${{ (inputs.filter == 'force' && '--force') || (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
+  TURBO_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
 jobs:
@@ -36,6 +36,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: 'pnpm'
           registry-url: "https://registry.npmjs.org/"
 
       - name: Setup NPM Auth
@@ -53,14 +54,15 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      #      - name: TurboRepo Remote Cache Server
-      #        uses: trappar/turborepo-remote-cache-gh-action@main
-      #        with:
-      #          storage-provider: s3
-      #          storage-path: 'konkerdotdev-turborepo-cache/konker.dev'
-      #        env:
-      #          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
-      #          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
+      - name: TurboRepo Remote Cache Server
+        uses: trappar/turborepo-remote-cache-gh-action@main
+        with:
+          storage-provider: s3
+          storage-path: ${{ secrets.TURBOCACHE_S3_BUCKET }}
+        env:
+          AWS_REGION: 'eu-west-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
 
       - name: Run Checks
         run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
