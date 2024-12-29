@@ -3,11 +3,16 @@ import type { CollectionEntry } from 'astro:content';
 export const MOONLIGHT_COLLECTION_NAMES = ['projects'] as const;
 export type MoonlightCollection = (typeof MOONLIGHT_COLLECTION_NAMES)[number];
 
-export type MoonlightConfig = {
-  readonly [key in MoonlightCollection]?: {
-    readonly rootPathTitle: string;
-  };
-};
+export type MoonlightConfig = Readonly<
+  Partial<
+    Record<
+      MoonlightCollection,
+      {
+        readonly rootPathTitle: string;
+      }
+    >
+  >
+>;
 
 export const MOONLIGHT_NAVIGATION_TITLE_OVERVIEW = 'Overview';
 

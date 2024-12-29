@@ -1,10 +1,9 @@
 {
-  "extends": "astro/tsconfigs/strictest",
+  "extends": "../../packages/common-config/configs/tsconfig-base.json",
+  "include": ["./src", "src/**/*.json"],
+  "exclude": ["./www", "./.astro"],
   "compilerOptions": {
-    "paths": {},
-    "esModuleInterop": true,
-  },
-  "ts-node": {
-    "esm": true,
+    "module": "ES2020",
+    "moduleResolution": "Bundler"
   }
 }

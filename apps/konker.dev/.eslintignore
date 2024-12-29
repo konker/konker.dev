@@ -1,7 +1,0 @@
-node_modules
-dist
-www
-coverage
-**/.cdk-*.out
-**/.serverless/**/*
-*.txt.ts

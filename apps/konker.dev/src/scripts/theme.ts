@@ -1,5 +1,7 @@
+/* eslint-disable fp/no-unused-expression,fp/no-mutation,fp/no-nil */
 import { DEFAULT_THEME_STORAGE_KEY, Theme } from './consts';
 
+// --------------------------------------------------------------------------
 export function themeParse(s: string | undefined | null): Theme | undefined {
   switch (s?.toLowerCase()) {
     case Theme.LIGHT:
@@ -100,5 +102,3 @@ export function themeInit(themeModeToggleNavIds: Array<string> = []): boolean {
 }
 // @ts-expect-error adding to global window object
 window.themeInit = themeInit;
-
-// --------------------------------------------------------------------------

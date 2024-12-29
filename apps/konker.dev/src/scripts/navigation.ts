@@ -1,4 +1,5 @@
-// --------------------------------------------------------------------------
+/* eslint-disable fp/no-unused-expression,fp/no-mutation,fp/no-mutating-methods,fp/no-nil,fp/no-let */
+import { NavigationPanelDirection } from './consts';
 import {
   NAVIGATION_PANEL_CLASS_CLOSED,
   NAVIGATION_PANEL_CLASS_OPENED,
@@ -6,7 +7,6 @@ import {
   NAVIGATION_PANEL_ICON_CLASS_VISIBLE,
   type NavigationPanelBreakpoint,
 } from './consts';
-import { NavigationPanelDirection } from './consts';
 
 // --------------------------------------------------------------------------
 type NavigationPanelStackEntry = {
