@@ -32,3 +32,4 @@ pnpm-debug.log*
 .vscode
 
 .turbo
+turbo-cache.env

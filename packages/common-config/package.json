@@ -64,6 +64,7 @@
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run exports-check && pnpm run fixme-check",
-    "cd": "pnpm run build && pnpm publish --access public"
+    "cd": "pnpm run build && pnpm publish --access public",
+    "local-turbo-cache": "docker run -d --env-file=turbo-cache.env -p 3333:3333 ducktors/turborepo-remote-cache"
   }
 }
