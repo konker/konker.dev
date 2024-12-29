@@ -12,7 +12,7 @@ importers:
         specifier: ^2.3.3
         version: 2.3.3
 
-  apps/root-website:
+  apps/konker.dev:
     dependencies:
       '@astrojs/check':
         specifier: ^0.5.10
