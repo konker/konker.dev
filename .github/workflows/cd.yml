@@ -20,6 +20,7 @@ on:
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
+  TURBO_TELEMETRY_DISABLED: '1'
   TURBO_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
