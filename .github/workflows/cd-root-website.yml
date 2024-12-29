@@ -1,4 +1,4 @@
-name: '@konker.dev/root-website / CD'
+name: '@konker.dev/konker.dev / CD'
 
 on:
   workflow_dispatch:
@@ -12,18 +12,18 @@ on:
     branches:
       - 'main'
     paths:
-      - 'apps/root-website/src/**'
-      - 'apps/root-website/public/**'
-      - 'apps/root-website/assets/**'
+      - '../../apps/konker.dev/src/**'
+      - '../../apps/konker.dev/public/**'
+      - '../../apps/konker.dev/assets/**'
 
 env:
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID_ROOT }}
   AWS_DEFAULT_REGION: 'eu-west-1'
-  CWD: './apps/root-website'
-  SOURCE_DIR: './apps/root-website/www'
-  DEST_DIR: '/apps/root-website/www'
-  TURBO_FILTER_ARG: '--filter=@konker.dev/root-website'
+  CWD: './apps/konker.dev'
+  SOURCE_DIR: './apps/konker.dev/www'
+  DEST_DIR: '/apps/konker.dev/www'
+  TURBO_FILTER_ARG: '--filter=@konker.dev/konker.dev'
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
 jobs:
