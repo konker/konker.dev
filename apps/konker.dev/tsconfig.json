@@ -1,8 +1,8 @@
 {
   "extends": "../../packages/common-config/configs/tsconfig-base.json",
   "include": ["./src", "src/**/*.json"],
-  "exclude": ["./www", "./.astro"],
   "compilerOptions": {
+    "rootDir": "./src",
     "module": "ES2020",
     "moduleResolution": "Bundler"
   }
