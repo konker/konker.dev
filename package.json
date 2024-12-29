@@ -31,7 +31,8 @@
     }
   },
   "devDependencies": {
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.3",
+    "turborepo-remote-cache": "^2.2.8"
   },
   "scripts": {
     "dev": "turbo run dev",
@@ -41,6 +42,8 @@
     "lint-check": "turbo run lint-check",
     "build": "turbo run build",
     "ci": "turbo run ci",
-    "cd": "turbo run cd"
+    "cd": "turbo run cd",
+    "local-ci": "TURBO_API=http://localhost:3333/ TURBO_TEAM=ci TURBO_TOKEN=ci pnpm run ci",
+    "local-cd": "TURBO_API=http://localhost:3333/ TURBO_TEAM=ci TURBO_TOKEN=ci pnpm run cd"
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable fp/no-nil,fp/no-loops,fp/no-unused-expression,fp/no-mutating-methods */
 import { MOONLIGHT_NAVIGATION_TITLE_OVERVIEW, type MoonlightCollection, type MoonlightConfig } from './config';
 import {
   moonlightGetAllIndexItems,
@@ -27,7 +28,6 @@ import { RecordKeysOf } from './utils';
 // --------------------------------------------------------------------------
 export type StaticPathIndex = {
   readonly params: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     readonly moonlight_index_slug: string;
   };
   props: MoonlightPagePropsIndex;
@@ -35,7 +35,6 @@ export type StaticPathIndex = {
 
 export type StaticPathEntry<T extends MoonlightCollection> = {
   readonly params: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     readonly moonlight_slug: string;
   };
   props: MoonlightPagePropsEntry<T>;
@@ -46,7 +45,6 @@ export const formatStaticPathIndex = <T extends MoonlightCollection>(
   collectionRootPagePath: string,
   indexItems: Array<MoonlightItem<T>>
 ): StaticPathIndex => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   params: { moonlight_index_slug: collectionRootPagePath },
   props: {
     type: MOONLIGHT_PAGE_TYPE_INDEX,
@@ -73,7 +71,6 @@ export const formatStaticPathEntry =
     const breadcrumbNavigation = navigationPathLookup[moonlightItem.path] ?? [];
 
     return {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       params: { moonlight_slug: `${moonlightItem.collectionRootPagesPath}/${moonlightItem.entry.slug}` },
       props: {
         type: MOONLIGHT_PAGE_TYPE_ENTRY,
@@ -99,7 +96,6 @@ export async function moonlightGetStaticPathsIndex(moonlightConfig: MoonlightCon
   const ret = [];
 
   for (const collectionName of RecordKeysOf(moonlightConfig)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const collectionRootPagePath = `/${collectionName}`;
     const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
     const indexItems = moonlightGetAllIndexItems(allItems);
@@ -117,7 +113,6 @@ export async function moonlightGetStaticPathsEntries(
   const ret = [];
 
   for (const collectionName of RecordKeysOf(moonlightConfig)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const collectionRootPagePath = `/${collectionName}`;
     const allItems = await moonlightGetAllItems(collectionName, collectionRootPagePath);
     const contentPaths = await Promise.all(allItems.map(formatStaticPathEntry(allItems)));

@@ -1,3 +1,4 @@
+/* eslint-disable fp/no-nil */
 import type { CollectionEntry, ContentCollectionKey } from 'astro:content';
 import { Box, Fingerprint, Home, Lightbulb, Tag, Tags } from 'lucide-astro';
 

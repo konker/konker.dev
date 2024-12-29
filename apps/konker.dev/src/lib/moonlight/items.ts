@@ -1,5 +1,7 @@
-import { getCollection } from 'astro:content';
+/* eslint-disable fp/no-mutating-methods,fp/no-unused-expression,fp/no-nil */
 import assert from 'node:assert';
+
+import { getCollection } from 'astro:content';
 
 import { isEntryDraftFilterPredicate, notEntryDraftFilterPredicate } from '../collections/helpers';
 import type { MoonlightCollection } from './config';

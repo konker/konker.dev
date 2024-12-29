@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type { MoonlightCollection } from './config';
 import { isItemIndexFilterPredicate } from './items';
 import type { DepthGroupT, HasDepthT, HasPathT, HasTextT, MoonlightItem } from './types';
