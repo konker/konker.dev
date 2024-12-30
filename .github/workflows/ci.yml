@@ -19,7 +19,7 @@ on:
 env:
   NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
   TURBO_TELEMETRY_DISABLED: '1'
-  TURBO_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
+  TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
 jobs:
@@ -55,4 +55,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
 
       - name: Run Checks
-        run: pnpm run ci ${{ env.TURBO_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
+        run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
