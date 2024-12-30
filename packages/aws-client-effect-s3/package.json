@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/aws-client-effect-s3",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -95,8 +95,8 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
+    "codecov": "npx codecov -t'$CODECOV_TOKEN' -F '@konker.dev/aws-client-effect-s3'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
-    "cd": "pnpm run build && pnpm publish --access public",
-    "codecov": "npx codecov -t'$CODECOV_TOKEN' -F '@konker.dev/aws-client-effect-s3'"
+    "cd": "pnpm run build && pnpm publish --access public && pnpm run codecov"
   }
 }
