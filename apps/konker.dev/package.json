@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "author": "Konrad Markus <mail@konker.dev>",
   "devDependencies": {
+    "@eslint/compat": "^1.2.4",
+    "@eslint/js": "^9.17.0",
     "@konker.dev/common-config": "^0.1.0",
     "@types/gulp": "^4.0.17",
     "@types/node": "^20.17.9",
@@ -13,6 +15,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^1.6.0",
+    "gulp": "^5.0.0",
     "leasot": "^13.3.0",
     "madge": "^6.1.0",
     "micromatch": "^4.0.5",
@@ -69,6 +72,6 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck && pnpm run build",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run build"
+    "ci": "pnpm run lint-check && pnpm run build && pnpm run typecheck"
   }
 }
