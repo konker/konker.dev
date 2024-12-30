@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-auth-utils-fp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -78,14 +78,15 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",
     "@effect/language-service": "^0.1.0",
-    "@types/aws-lambda": "^8.10.146",
-    "@types/jsonwebtoken": "^9.0.7",
     "@eslint/compat": "^1.2.4",
     "@eslint/js": "^9.17.0",
     "@konker.dev/common-config": "^0.1.0",
+    "@types/aws-lambda": "^8.10.146",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20.17.10",
     "@vitest/coverage-istanbul": "^2.1.8",
     "aws-lambda": "^1.0.7",
+    "codecov": "^3.8.3",
     "eslint": "^9.17.0",
     "eslint-plugin-fp": "^2.3.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -119,6 +120,7 @@
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
-    "cd": "pnpm run build && pnpm publish --access public"
+    "cd": "pnpm run build && pnpm publish --access public",
+    "codecov": "npx codecov -t'$CODECOV_TOKEN' -F '@konker.dev/tiny-auth-utils-fp'"
   }
 }

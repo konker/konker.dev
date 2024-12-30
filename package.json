@@ -1,6 +1,6 @@
 {
   "name": "konker.dev",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -43,6 +43,7 @@
     "build": "turbo run build",
     "ci": "turbo run ci",
     "cd": "turbo run cd",
+    "codecov": "turbo run codecov",
     "local-ci": "TURBO_API=http://localhost:3333/ TURBO_TEAM=ci TURBO_TOKEN=ci pnpm run ci",
     "local-cd": "TURBO_API=http://localhost:3333/ TURBO_TEAM=ci TURBO_TOKEN=ci pnpm run cd"
   }
