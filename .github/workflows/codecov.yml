@@ -13,10 +13,11 @@ on:
         type: string
 
 env:
+  NODE_AUTH_TOKEN: "${{ secrets.PRIVATE_NPM_TOKEN }}"
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
-  TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
+  TURBO_EXTRA_ARGS: ${{ inputs.extra_args || '--force' }}
 
 jobs:
   cd:
@@ -40,13 +41,6 @@ jobs:
         with:
           version: "9.6.0"
 
-      - name: Setup NPM Auth
-        run: |
-          cat << EOF > "$HOME/.npmrc"
-            @konker.dev:registry=https://registry.npmjs.org/
-            //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          EOF
-
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
@@ -60,8 +54,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Run Checks
-        run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
+      - name: Run Tests
+        run: pnpm run test ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
 
       - name: Upload to Codecov
         run: pnpm run codecov ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}

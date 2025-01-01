@@ -21,10 +21,12 @@
       "dependsOn": ["^ci"]
     },
     "cd": {
-      "dependsOn": ["^cd"]
+      "dependsOn": ["^cd"],
+      "env": ["CODECOV_TOKEN"]
     },
     "codecov": {
-      "dependsOn": ["^codecov"]
+      "dependsOn": ["^codecov"],
+      "env": ["CODECOV_TOKEN"]
     },
     "dev": {
       "persistent": true,
