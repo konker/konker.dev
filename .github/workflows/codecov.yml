@@ -1,12 +1,6 @@
-name: CD
+name: Update Codecov
 
 on:
-  push:
-    branches:
-      - "main"
-    paths:
-      - 'packages/**/package.json'
-
   workflow_dispatch:
     inputs:
       filter:
@@ -19,7 +13,6 @@ on:
         type: string
 
 env:
-  NODE_AUTH_TOKEN: "${{ secrets.PRIVATE_NPM_TOKEN }}"
   CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
@@ -29,7 +22,7 @@ jobs:
   cd:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    name: CD
+    name: Codecov
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,5 +63,5 @@ jobs:
       - name: Run Checks
         run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
 
-      - name: Deploy to Registry
-        run: pnpm run cd ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
+      - name: Upload to Codecov
+        run: pnpm run codecov ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}

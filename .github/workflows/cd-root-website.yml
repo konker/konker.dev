@@ -23,7 +23,7 @@ env:
   CWD: './apps/konker.dev'
   SOURCE_DIR: './apps/konker.dev/www'
   DEST_DIR: '/apps/konker.dev/www'
-  TURBO_TELEMETRY_DISABLED: '1'
+  TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: '--filter=@konker.dev/konker.dev'
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
