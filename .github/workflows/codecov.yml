@@ -1,0 +1,65 @@
+name: Update Codecov
+
+on:
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: "TurboRepo Filter"
+        required: false
+        type: string
+      extra_args:
+        description: "TurboRepo Extra Args"
+        required: false
+        type: string
+
+env:
+  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
+  TURBO_TELEMETRY_DISABLED: 1
+  TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
+  TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: Codecov
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "9.6.0"
+
+      - name: Setup NPM Auth
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+            @konker.dev:registry=https://registry.npmjs.org/
+            //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          EOF
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TurboRepo Remote Cache Server
+        uses: trappar/turborepo-remote-cache-gh-action@main
+        with:
+          storage-provider: s3
+          storage-path: ${{ secrets.TURBOCACHE_S3_BUCKET }}
+        env:
+          AWS_REGION: 'eu-west-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Run Checks
+        run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
+
+      - name: Upload to Codecov
+        run: pnpm run codecov ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
