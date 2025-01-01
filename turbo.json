@@ -23,6 +23,9 @@
     "cd": {
       "dependsOn": ["^cd"]
     },
+    "codecov": {
+      "dependsOn": ["^codecov"]
+    },
     "dev": {
       "persistent": true,
       "cache": false
