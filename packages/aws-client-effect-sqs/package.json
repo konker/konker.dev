@@ -81,7 +81,7 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "codecov": "npx codecov -t \"$CODECOV_TOKEN\" -F '@konker.dev/aws-client-effect-sqs'",
+    "codecov": "npx codecov -t $CODECOV_TOKEN -F '@konker.dev/aws-client-effect-sqs' --git-service github --disable=gcov",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && pnpm publish --access public && pnpm run codecov"
   }
