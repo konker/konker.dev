@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/aws-client-effect-sqs",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
