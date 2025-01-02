@@ -1,13 +1,41 @@
 #!/usr/bin/env bash
 
-cd $1 || exit
+# Check inputs
+if [[ -z "$CODECOV_TOKEN" ]]; then
+  echo "No CODECOV_TOKEN"
+  exit
+fi
 
-curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import # One-time step
-curl -Os https://cli.codecov.io/latest/linux/codecov
-curl -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM
-curl -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM.sig
-gpg --verify codecov.SHA256SUM.sig codecov.SHA256SUM
+PWD=$1
+if [[ -z "$PWD" ]]; then
+  echo "No pwd"
+  exit
+fi
+echo "PWD: $PWD"
 
-shasum -a 256 -c codecov.SHA256SUM
-chmod +x codecov
-./codecov --verbose upload-process --token $CODECOV_TOKEN --flag=$2 --git-service github
+FLAG=$2
+if [[ -z "$FLAG" ]]; then
+  echo "No flag"
+  exit
+fi
+echo "FLAG: $FLAG"
+
+# Resolve temp directory
+TMPDIR=${RUNNER_TEMP:-'/tmp'}
+echo "TMPDIR: $TMPDIR"
+
+# Download and verify the uploader tool to the temp directory
+curl --output-dir "$TMPDIR" https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import # One-time step
+curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov
+curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM
+curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM.sig
+gpg --verify "$TMPDIR/codecov.SHA256SUM.sig" "$TMPDIR/codecov.SHA256SUM"
+
+shasum -a 256 -c "$TMPDIR/codecov.SHA256SUM"
+chmod +x "$TMPDIR/codecov"
+
+# Change to code root
+cd "$PWD" || exit
+
+# Perform the upload
+"$TMPDIR/codecov" --verbose upload-process --token "$CODECOV_TOKEN" --flag "$FLAG" --git-service github
