@@ -17,7 +17,7 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
-  TURBO_EXTRA_ARGS: ${{ inputs.extra_args || '--force' }}
+  TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
 
 jobs:
   cd:
@@ -43,16 +43,6 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: TurboRepo Remote Cache Server
-        uses: trappar/turborepo-remote-cache-gh-action@main
-        with:
-          storage-provider: s3
-          storage-path: ${{ secrets.TURBOCACHE_S3_BUCKET }}
-        env:
-          AWS_REGION: 'eu-west-1'
-          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
 
       - name: Run Tests
         run: pnpm run test ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
