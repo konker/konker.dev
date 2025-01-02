@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/common-config",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -15,14 +15,16 @@
   "bin": {
     "generate-exports-common": "./dist/scripts/generate-exports-common.js",
     "generate-exports-verify": "./dist/scripts/generate-exports-verify.js",
-    "generate-exports": "./dist/scripts/generate-exports.js"
+    "generate-exports": "./dist/scripts/generate-exports.js",
+    "codecov-upload": "./dist/scripts/codecov-upload.sh"
   },
   "files": [
     "dist/**/*",
     "!dist/**/*.test.*"
   ],
   "staticFiles": [
-    "./configs/**"
+    "./configs/**",
+    "./scripts/*.sh"
   ],
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",

@@ -33,3 +33,5 @@ pnpm-debug.log*
 
 .turbo
 *.env
+
+codecov*
