@@ -4,7 +4,6 @@ General utility functions for [Node.js](https://nodejs.org/) based on [Effect-TS
 
 FIXME: test coverage for `src/stream/ChildProcessStreamPipe.ts`
 
-![License](https://img.shields.io/github/license/konkerdotdev/tiny-utils-fp)
+![License](https://img.shields.io/github/license/konker/konker.dev)
 [![NPM Version](https://img.shields.io/npm/v/%40konker.dev%2Ftiny-utils-fp)](https://www.npmjs.com/package/@konker.dev/tiny-utils-fp)
-[![CI](https://github.com/konkerdotdev/tiny-utils-fp/actions/workflows/ci.yml/badge.svg)](https://github.com/konkerdotdev/tiny-utils-fp/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/konkerdotdev/tiny-utils-fp/graph/badge.svg?token=W3BFLXCWTH)](https://codecov.io/gh/konkerdotdev/tiny-utils-fp)
+[![codecov](https://codecov.io/gh/konker/konker.dev/graph/badge.svg?token=G0CMXHW679&flag=@konker.dev/tiny-utils-fp)](https://codecov.io/gh/konker/konker.dev?flags[0]=@konker.dev/tiny-utils-fp)

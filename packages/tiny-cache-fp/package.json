@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-cache-fp",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
