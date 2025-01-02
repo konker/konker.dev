@@ -38,4 +38,4 @@ chmod +x "$TMPDIR/codecov"
 cd "$PWD" || exit
 
 # Perform the upload
-"$TMPDIR/codecov" --verbose upload-process --token "$CODECOV_TOKEN" --flag "$FLAG" --git-service github
+"$TMPDIR/codecov" upload-process --token "$CODECOV_TOKEN" --flag "$FLAG" --git-service github
