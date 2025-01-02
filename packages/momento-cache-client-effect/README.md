@@ -4,5 +4,4 @@
 
 ![License](https://img.shields.io/github/license/konkerdotdev/momento-cache-client-effect)
 [![NPM Version](https://img.shields.io/npm/v/%40konker.dev%2Fmomento-cache-client-effect)](https://www.npmjs.com/package/@konker.dev/momento-cache-client-effect)
-[![CI](https://github.com/konkerdotdev/momento-cache-client-effect/actions/workflows/ci.yml/badge.svg)](https://github.com/konkerdotdev/momento-cache-client-effect/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/konkerdotdev/momento-cache-client-effect/graph/badge.svg?token=W3BFLXCWTH)](https://codecov.io/gh/konkerdotdev/momento-cache-client-effect)
+[![codecov](https://codecov.io/gh/konker/konker.dev/graph/badge.svg?token=G0CMXHW679&flag=@konker.dev/momento-cache-client-effect)](https://codecov.io/gh/konker/konker.dev?flags[0]=@konker.dev/momento-cache-client-effect)

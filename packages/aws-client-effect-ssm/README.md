@@ -4,5 +4,4 @@
 
 ![License](https://img.shields.io/github/license/konkerdotdev/aws-client-effect-ssm)
 [![NPM Version](https://img.shields.io/npm/v/%40konker.dev%2Faws-client-effect-ssm)](https://www.npmjs.com/package/@konker.dev/aws-client-effect-ssm)
-[![CI](https://github.com/konkerdotdev/aws-client-effect-ssm/actions/workflows/ci.yml/badge.svg)](https://github.com/konkerdotdev/aws-client-effect-ssm/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/konkerdotdev/aws-client-effect-ssm/graph/badge.svg?token=W3BFLXCWTH)](https://codecov.io/gh/konkerdotdev/aws-client-effect-ssm)
+[![codecov](https://codecov.io/gh/konker/konker.dev/graph/badge.svg?token=G0CMXHW679&flag=@konker.dev/aws-client-effect-ssm)](https://codecov.io/gh/konker/konker.dev?flags[0]=@konker.dev/aws-client-effect-ssm)

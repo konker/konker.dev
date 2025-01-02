@@ -4,7 +4,7 @@ A small rules engine for [Node.js](https://nodejs.org/) based on [Effect-TS](htt
 
 ![License](https://img.shields.io/github/license/konkerdotdev/tiny-rules-fp)
 [![NPM Version](https://img.shields.io/npm/v/%40konker.dev%2Ftiny-rules-fp)](https://www.npmjs.com/package/@konker.dev/tiny-rules-fp)
-[![codecov](https://codecov.io/gh/konkerdotdev/tiny-rules-fp/graph/badge.svg?token=5CMVHDJZUY)](https://codecov.io/gh/konkerdotdev/tiny-rules-fp)
+[![codecov](https://codecov.io/gh/konker/konker.dev/graph/badge.svg?token=G0CMXHW679&flag=@konker.dev/tiny-rules-fp)](https://codecov.io/gh/konker/konker.dev?flags[0]=@konker.dev/tiny-rules-fp)
 
 ## Usage
 
