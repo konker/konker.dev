@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/middleware-fp",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
