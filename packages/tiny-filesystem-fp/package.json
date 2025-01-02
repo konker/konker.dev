@@ -81,7 +81,7 @@
     "@eslint/js": "^9.17.0",
     "@gomomento/sdk": "^1.102.0",
     "@konker.dev/aws-client-effect-s3": "workspace:*",
-    "@konker.dev/common-config": "^0.1.5",
+    "@konker.dev/common-config": "^0.1.7",
     "@swc/core": "^1.10.0",
     "@types/node": "^20.17.10",
     "@vitest/coverage-istanbul": "^2.1.8",
@@ -117,7 +117,7 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "codecov": "npx codecov -t $CODECOV_TOKEN -F '@konker.dev/tiny-filesystem-fp' --disable=gcov",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/tiny-filesystem-fp'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && pnpm publish --access public && pnpm run codecov"
   }

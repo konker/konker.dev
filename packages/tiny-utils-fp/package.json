@@ -54,7 +54,7 @@
     "@effect/language-service": "^0.1.0",
     "@eslint/compat": "^1.2.4",
     "@eslint/js": "^9.17.0",
-    "@konker.dev/common-config": "^0.1.5",
+    "@konker.dev/common-config": "^0.1.7",
     "@types/node": "^20.17.10",
     "@vitest/coverage-istanbul": "^2.1.8",
     "codecov": "^3.8.3",
@@ -89,7 +89,7 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "codecov": "npx codecov -t $CODECOV_TOKEN -F '@konker.dev/tiny-utils-fp' --disable=gcov",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/tiny-utils-fp'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && pnpm publish --access public && pnpm run codecov"
   }
