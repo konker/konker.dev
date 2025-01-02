@@ -72,3 +72,9 @@ jobs:
 
       - name: Deploy to Registry
         run: pnpm run cd ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
+
+      - name: Run Tests
+        run: pnpm run test ${{ env.TURBO_FILTER_ARG }} --force
+
+      - name: Upload to Codecov
+        run: pnpm run codecov ${{ env.TURBO_FILTER_ARG }} --force
