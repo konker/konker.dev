@@ -1,6 +1,7 @@
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
+import shield from '@kindspells/astro-shield';
 import { defineConfig } from 'astro/config';
 
 // FIXME: this does not work with CI, assumes git repo?
@@ -9,7 +10,7 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://konker.dev',
-  integrations: [tailwind({}), sitemap(), mdx()],
+  integrations: [tailwind({}), sitemap(), mdx(), shield({})],
   outDir: 'www',
   server: {
     port: 4321,
