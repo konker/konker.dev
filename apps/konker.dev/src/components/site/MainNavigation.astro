@@ -11,15 +11,15 @@ import ThemeModeToggle from './ThemeModeToggle.astro';
 
 const navLinksConfig = [
   { url: '/', title: 'Home', lookupKey: 'home' },
-  { url: '/projects/', title: 'Projects', lookupKey: 'projects' },
-  { url: '/til/', title: 'TIL', lookupKey: 'til' },
-  { url: '/tags/', title: 'Tags', lookupKey: 'tags' },
-  { url: '/about/', title: 'About', lookupKey: 'about' },
+  // { url: '/projects/', title: 'Projects', lookupKey: 'projects' },
+  // { url: '/til/', title: 'TIL', lookupKey: 'til' },
+  // { url: '/tags/', title: 'Tags', lookupKey: 'tags' },
+  // { url: '/about/', title: 'About', lookupKey: 'about' },
 ] as const;
 
 const urlPathParts = getUrlPathParts(Astro.url);
 const navLinksSelectedLookup = navLinksConfig.map(
-  (linkConfig, i) => (urlPathParts.length === 0 && i == 0) || urlPathParts[0] === linkConfig.url.replaceAll('/', '')
+  (linkConfig, i) => (urlPathParts.length === 0 && i == 0) || urlPathParts[0] === linkConfig.url.replaceAll('/', ''),
 );
 const navLinks: ReadonlyArray<LinkT> = navLinksConfig.map((linkConfig, i) => ({
   url: linkConfig.url,
@@ -64,19 +64,24 @@ const navLinks: ReadonlyArray<LinkT> = navLinksConfig.map((linkConfig, i) => ({
   .main-navigation .nav-links .nav-link {
     @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l bg-kdd md:bg-kdd-nav;
   }
+
   .main-navigation .nav-links .nav-link a.text:visited {
     @apply text-kdd-link;
   }
+
   .main-navigation .nav-links .nav-link:first-of-type {
     @apply border-t md:border-t-0;
   }
+
   .main-navigation .nav-links .nav-link:last-of-type {
     @apply md:border-r;
   }
+
   .main-navigation .nav-links .nav-link.selected,
   .main-navigation .nav-links .nav-link:hover {
     @apply bg-konker-flash-blue-dark dark:bg-konker-flash-blue-dark;
   }
+
   .main-navigation .nav-links .nav-link.selected a.text,
   .main-navigation .nav-links .nav-link:hover a.text,
   .main-navigation .nav-links .nav-link:hover a * {
