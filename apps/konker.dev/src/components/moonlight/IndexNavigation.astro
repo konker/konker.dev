@@ -16,7 +16,7 @@ const { indexEntries } = Astro.props;
     {
       indexEntries.map((x) => (
         <p>
-          <NavigationLink url={x.slug} title={x.data.title} />
+          <NavigationLink url={x.id} title={x.data.title} />
         </p>
       ))
     }

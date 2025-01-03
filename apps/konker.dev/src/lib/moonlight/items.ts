@@ -11,15 +11,15 @@ import { countSlugPathParts } from './utils';
 
 // --------------------------------------------------------------------------
 export function isItemIndexFilterPredicate<T extends MoonlightCollection>(moonlightItem: MoonlightItem<T>): boolean {
-  return countSlugPathParts(moonlightItem.entry.slug) === 1;
+  return countSlugPathParts(moonlightItem.entry.id) === 1;
 }
 
-export function isItemDraftFilterPredicate<T extends MoonlightCollection>(item: MoonlightItem<T>) {
-  return isEntryDraftFilterPredicate(item.entry);
+export function isItemDraftFilterPredicate<T extends MoonlightCollection>(moonlightItem: MoonlightItem<T>) {
+  return isEntryDraftFilterPredicate(moonlightItem.entry);
 }
 
-export function notItemDraftFilterPredicate<T extends MoonlightCollection>(item: MoonlightItem<T>) {
-  return notEntryDraftFilterPredicate(item.entry);
+export function notItemDraftFilterPredicate<T extends MoonlightCollection>(moonlightItem: MoonlightItem<T>) {
+  return notEntryDraftFilterPredicate(moonlightItem.entry);
 }
 
 // --------------------------------------------------------------------------
@@ -50,7 +50,7 @@ export async function moonlightGetAllItems<T extends MoonlightCollection>(
 
   return prunedItems
     .filter(notItemDraftFilterPredicate)
-    .toSorted((a, b) => a.entry.slug.localeCompare(b.entry.slug))
+    .toSorted((a, b) => a.entry.id.localeCompare(b.entry.id))
     .toSorted((a, b) => a.order - b.order);
 }
 
@@ -60,7 +60,7 @@ export function moonlightGetAllIndexItems<T extends MoonlightCollection>(
 ): Array<MoonlightItem<T>> {
   return allItems
     .filter(isItemIndexFilterPredicate)
-    .toSorted((a, b) => a.entry.slug.localeCompare(b.entry.slug))
+    .toSorted((a, b) => a.entry.id.localeCompare(b.entry.id))
     .toSorted((a, b) => a.indexOrder - b.indexOrder);
 }
 
@@ -69,7 +69,7 @@ export function moonlightGetIndexItem<T extends MoonlightCollection>(
 ): MoonlightItem<T> {
   const ret = subCollectionItems
     .filter(isItemIndexFilterPredicate)
-    .toSorted((a, b) => a.entry.slug.localeCompare(b.entry.slug))
+    .toSorted((a, b) => a.entry.id.localeCompare(b.entry.id))
     .toSorted((a, b) => a.indexOrder - b.indexOrder)
     .pop();
 
@@ -91,7 +91,7 @@ export function moonlightGetPrevItem<T extends MoonlightCollection>(
   allSubCollectionItems: Array<MoonlightItem<T>>,
   moonlightItem: MoonlightItem<T>
 ): MoonlightItem<T> | undefined {
-  const subCollectionItemIndex = allSubCollectionItems.findIndex((x) => x.entry.slug === moonlightItem.entry.slug);
+  const subCollectionItemIndex = allSubCollectionItems.findIndex((x) => x.entry.id === moonlightItem.entry.id);
   const ret = subCollectionItemIndex > 0 ? allSubCollectionItems[subCollectionItemIndex - 1] : undefined;
   if (!ret || ret.entry.data.navigable) {
     return ret;
@@ -105,7 +105,7 @@ export function moonlightGetNextItem<T extends MoonlightCollection>(
   allSubCollectionItems: Array<MoonlightItem<T>>,
   moonlightItem: MoonlightItem<T>
 ): MoonlightItem<T> | undefined {
-  const subCollectionItemIndex = allSubCollectionItems.findIndex((x) => x.entry.slug === moonlightItem.entry.slug);
+  const subCollectionItemIndex = allSubCollectionItems.findIndex((x) => x.entry.id === moonlightItem.entry.id);
   const ret =
     subCollectionItemIndex < allSubCollectionItems.length - 1
       ? allSubCollectionItems[subCollectionItemIndex + 1]

@@ -1,9 +1,10 @@
+import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
 
-import { MoonlightSchema } from '../lib/moonlight/schema';
+import { MoonlightSchema } from './lib/moonlight/schema';
 
 const tilCollection = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/collections/til' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -22,7 +23,7 @@ const tilCollection = defineCollection({
 });
 
 const projectsCollection = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/collections/projects' }),
   schema: MoonlightSchema,
 });
 

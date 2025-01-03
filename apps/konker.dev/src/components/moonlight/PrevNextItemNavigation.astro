@@ -9,10 +9,10 @@ interface Props {
 
 const { prevItem, nextItem } = Astro.props;
 
-const prevItemUrl = `${prevItem?.collectionRootPagesPath}/${prevItem?.entry?.slug}`;
+const prevItemUrl = `${prevItem?.collectionRootPagesPath}/${prevItem?.entry?.id}`;
 const prevItemTitle = prevItem?.entry?.data?.title;
 
-const nextItemUrl = `${nextItem?.collectionRootPagesPath}/${nextItem?.entry?.slug}`;
+const nextItemUrl = `${nextItem?.collectionRootPagesPath}/${nextItem?.entry?.id}`;
 const nextItemTitle = nextItem?.entry?.data?.title;
 ---
 
@@ -45,21 +45,27 @@ const nextItemTitle = nextItem?.entry?.data?.title;
   .prev-next-navigation .prev-next {
     @apply block relative flex-1 pt-8 pb-4 px-4 align-middle rounded-xl bg-kdd-nav mb-3 border-gray-400 dark:border-gray-500 border;
   }
+
   .prev-next-navigation .prev-next:nth-child(2) {
     @apply md:ml-6;
   }
+
   .prev-next-navigation .prev-next a {
     @apply inline-block w-full;
   }
+
   .prev-next-navigation .prev-next a:visited {
     @apply text-kdd-link;
   }
+
   .prev-next-navigation .prev-next .label {
     @apply absolute top-1;
   }
+
   .prev-next-navigation .prev-next.prev .label {
     @apply left-5;
   }
+
   .prev-next-navigation .prev-next.next .label {
     @apply right-5;
   }

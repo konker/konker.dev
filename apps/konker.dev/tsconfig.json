@@ -1,9 +1,8 @@
 {
-  "extends": "../../packages/common-config/configs/tsconfig-base.json",
-  "include": ["./src", "src/**/*.json"],
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "./**/*"],
+  "exclude": ["www/", "Gulpfile.js", "eslint.config.mjs"],
   "compilerOptions": {
-    "rootDir": "./src",
-    "module": "ES2020",
-    "moduleResolution": "Bundler"
+    "strictNullChecks": true
   }
 }

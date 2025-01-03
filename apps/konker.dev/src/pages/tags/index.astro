@@ -1,6 +1,6 @@
 ---
 import TagLinkIndexLayout from '../../layouts/tags/TagLinkIndexLayout.astro';
-import { HomeBreadcrumb } from '../../lib';
+import { HomeBreadcrumb, loadMarkdownContent } from '../../lib';
 import { TAG_COLLECTIONS } from '../../lib/collections';
 import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import { tagsGetAllCollectionTags } from '../../lib/collections/tags';
@@ -19,7 +19,7 @@ const links = tags.map((tag) => ({
 }));
 
 // --------------------------------------------------------------------------
-const content = (await Astro.glob('./index-content.md'))[0];
+const content = loadMarkdownContent(import.meta.glob('./index-content.md', { eager: true }));
 const pageTitle = content?.frontmatter.title;
 const thisBreadcrumb: LinkT = {
   title: pageTitle,

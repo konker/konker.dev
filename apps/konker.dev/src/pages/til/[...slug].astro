@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 import BlogPostLayout from '../../layouts/blog/BlogPostLayout.astro';
 import { HomeBreadcrumb } from '../../lib';
@@ -16,14 +16,14 @@ export async function getStaticPaths() {
   return entries
     .filter((e) => !e.data.draft)
     .map((entry) => ({
-      params: { slug: entry.slug },
+      params: { slug: entry.id },
       props: { entry },
     }));
 }
 
 const { entry } = Astro.props;
 const { image } = entry.data;
-const { Content, remarkPluginFrontmatter } = await entry.render();
+const { Content, remarkPluginFrontmatter } = await render(entry);
 const collection = 'til' as const;
 const indexBreadcrumb: LinkT = {
   title: 'TIL',
@@ -45,10 +45,14 @@ const sectionNavigation = collectionEntryToSectionNavigation(collection, indexBr
 ---
 
 <BlogPostLayout
-  {...entry.data}
+  pageTitle={entry.data.title}
+  title={entry.data.title}
+  pubDate={entry.data.pubDate}
+  author={entry.data.author}
+  description={entry.data.description}
+  tags={entry.data.tags}
   lastModified={remarkPluginFrontmatter.lastModified}
   image={image}
-  pageTitle={entry.data.title}
   breadcrumbs={breadcrumbs}
   sectionNavigation={sectionNavigation}
 >

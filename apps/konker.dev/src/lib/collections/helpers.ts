@@ -1,24 +1,24 @@
 /* eslint-disable fp/no-nil */
-import type { CollectionEntry, ContentCollectionKey } from 'astro:content';
+import type { CollectionEntry, CollectionKey } from 'astro:content';
 import { Box, Fingerprint, Home, Lightbulb, Tag, Tags } from 'lucide-astro';
 
 import type { LinkT, SectionNavigationT } from '../types';
 
 // --------------------------------------------------------------------------
-export function isEntryDraftFilterPredicate<T extends ContentCollectionKey>(entry: CollectionEntry<T>): boolean {
+export function isEntryDraftFilterPredicate<T extends CollectionKey>(entry: CollectionEntry<T>): boolean {
   return !!entry.data?.draft;
 }
 
-export function notEntryDraftFilterPredicate<T extends ContentCollectionKey>(entry: CollectionEntry<T>): boolean {
+export function notEntryDraftFilterPredicate<T extends CollectionKey>(entry: CollectionEntry<T>): boolean {
   return !isEntryDraftFilterPredicate(entry);
 }
 
 // --------------------------------------------------------------------------
-export function collectionEntryToUrl<T extends ContentCollectionKey>(collection: T, entry: CollectionEntry<T>): string {
-  return `/${collection}/${entry.slug}`;
+export function collectionEntryToUrl<T extends CollectionKey>(collection: T, entry: CollectionEntry<T>): string {
+  return `/${collection}/${entry.id}`;
 }
 
-export function collectionEntryToBreadcrumb<T extends ContentCollectionKey>(
+export function collectionEntryToBreadcrumb<T extends CollectionKey>(
   collection: T,
   entry: CollectionEntry<T> | undefined
 ): LinkT | undefined {
@@ -30,7 +30,7 @@ export function collectionEntryToBreadcrumb<T extends ContentCollectionKey>(
     : undefined;
 }
 
-export function collectionEntryToSectionNavigation<T extends ContentCollectionKey>(
+export function collectionEntryToSectionNavigation<T extends CollectionKey>(
   collection: T,
   indexBreadcrumb: LinkT,
   entries: Array<CollectionEntry<T>>,
@@ -39,7 +39,7 @@ export function collectionEntryToSectionNavigation<T extends ContentCollectionKe
   if (!entry) {
     return undefined;
   }
-  const entryIndex = entries.findIndex((e) => e.slug === entry.slug);
+  const entryIndex = entries.findIndex((e) => e.id === entry.id);
   const prevEntry = entryIndex > 0 ? entries[entryIndex - 1] : undefined;
   const nextEntry = entry !== -1 && entryIndex < entries.length - 1 ? entries[entryIndex + 1] : undefined;
 

@@ -29,8 +29,8 @@ const indexBreadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb]
 const breadcrumbs: ReadonlyArray<LinkT> = indexBreadcrumbs.concat(
   Astro.props.breadcrumbNavigation.map((x) => ({
     title: x.entry.data.title,
-    url: x.entry.data.navigable ? `${rootPathUrl}${x.entry.slug}` : undefined,
-  }))
+    url: x.entry.data.navigable ? `${rootPathUrl}${x.entry.id}` : undefined,
+  })),
 );
 
 const pageTitle = breadcrumbs
