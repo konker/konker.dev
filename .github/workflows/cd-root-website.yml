@@ -12,17 +12,17 @@ on:
     branches:
       - 'main'
     paths:
-      - '../../apps/konker.dev/src/**'
-      - '../../apps/konker.dev/public/**'
-      - '../../apps/konker.dev/assets/**'
+      - 'apps/konker.dev/src/**'
+      - 'apps/konker.dev/public/**'
+      - 'apps/konker.dev/assets/**'
 
 env:
-  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-  AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID_ROOT }}
+  AWS_S3_BUCKET: ${{ secrets.KONKER_DOT_DEV_AWS_S3_BUCKET }}
+  AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.KONKER_DOT_DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID }}
   AWS_DEFAULT_REGION: 'eu-west-1'
   CWD: './apps/konker.dev'
   SOURCE_DIR: './apps/konker.dev/www'
-  DEST_DIR: '/apps/konker.dev/www'
+  DEST_DIR: '/www'
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: '--filter=@konker.dev/konker.dev'
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
@@ -41,15 +41,14 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.DOMAIN_USER_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.DOMAIN_USER_AWS_ACCESS_KEY_SECRET }}
+          aws-access-key-id: ${{ secrets.KONKER_DOT_DEV_DOMAIN_USER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.KONKER_DOT_DEV_DOMAIN_USER_AWS_ACCESS_KEY_SECRET }}
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
