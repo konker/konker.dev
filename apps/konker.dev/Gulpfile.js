@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+import fs from 'node:fs';
+import path from 'node:path';
+
 import * as del from 'del';
 import { execa } from 'execa';
 import gulp from 'gulp';
 import prettier from 'gulp-prettier';
 import H from 'handlebars';
-import fs from 'node:fs';
-import path from 'node:path';
 import readFiles from 'read-vinyl-file-stream';
 import tmp from 'tmp-promise';
 import unslug from 'unslug';
@@ -112,7 +112,7 @@ export const MARKDOWN_LINK_REGEXP = /[(](\/\S+\.md)[)]/g;
 
 // --------------------------------------------------------------------------
 // Globals
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const _global_IndexSourceFileAcc = [];
 
 // --------------------------------------------------------------------------

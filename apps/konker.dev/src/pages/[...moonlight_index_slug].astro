@@ -1,6 +1,6 @@
 ---
 import SubCollectionIndexLayout from '../layouts/moonlight/SubCollectionIndexLayout.astro';
-import { HomeBreadcrumb } from '../lib';
+import { HomeBreadcrumb, loadMarkdownContent } from '../lib';
 import { itemIconLookup, itemTextClassLookup } from '../lib/collections/helpers';
 import { MOONLIGHT_CONFIG } from '../lib/moonlight/config';
 import { moonlightGetStaticPathsIndex } from '../lib/moonlight/routing';
@@ -22,7 +22,8 @@ const indexBreadcrumb: LinkT = {
   textClass: itemTextClassLookup('projects'),
 };
 const indexBreadcrumbs: ReadonlyArray<LinkT> = [HomeBreadcrumb, indexBreadcrumb];
-const content = (await Astro.glob('./projects-content.md'))[0];
+const content = loadMarkdownContent(import.meta.glob('./projects-content.md', { eager: true }));
+
 const pageTitle = content?.frontmatter.title;
 ---
 

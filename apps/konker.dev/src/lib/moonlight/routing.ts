@@ -1,4 +1,6 @@
 /* eslint-disable fp/no-nil,fp/no-loops,fp/no-unused-expression,fp/no-mutating-methods */
+import { render } from 'astro:content';
+
 import { MOONLIGHT_NAVIGATION_TITLE_OVERVIEW, type MoonlightCollection, type MoonlightConfig } from './config';
 import {
   moonlightGetAllIndexItems,
@@ -56,7 +58,7 @@ export const formatStaticPathIndex = <T extends MoonlightCollection>(
 export const formatStaticPathEntry =
   <T extends MoonlightCollection>(allItems: Array<MoonlightItem<T>>) =>
   async (moonlightItem: MoonlightItem<T>): Promise<StaticPathEntry<T>> => {
-    const { Content, headings } = await moonlightItem.entry.render();
+    const { Content, headings } = await render(moonlightItem.entry);
     const headingGroups = groupItemsByDepth(shiftDepth(headings, -1), 1);
 
     const allSubCollectionItems = shiftDepth(
@@ -71,7 +73,7 @@ export const formatStaticPathEntry =
     const breadcrumbNavigation = navigationPathLookup[moonlightItem.path] ?? [];
 
     return {
-      params: { moonlight_slug: `${moonlightItem.collectionRootPagesPath}/${moonlightItem.entry.slug}` },
+      params: { moonlight_slug: `${moonlightItem.collectionRootPagesPath}/${moonlightItem.entry.id}` },
       props: {
         type: MOONLIGHT_PAGE_TYPE_ENTRY,
         kind: moonlightItem.entry.data.kind ?? MOONLIGHT_ENTRY_KIND_REGULAR,

@@ -5,7 +5,7 @@ import type { MoonlightItem } from './types';
 import { countSlugPathParts, extractSubCollectionName } from './utils';
 
 export function moonlightItemDepth<T extends CollectionEntry<MoonlightCollection>>(entry: T): number {
-  return Math.max(1, countSlugPathParts(entry.slug));
+  return Math.max(1, countSlugPathParts(entry.id));
 }
 
 export const toMoonlightItem =
@@ -13,13 +13,13 @@ export const toMoonlightItem =
   <E extends CollectionEntry<T>>(entry: E): MoonlightItem<T> => ({
     collectionName,
     collectionRootPagesPath,
-    subCollectionName: extractSubCollectionName(entry.slug),
+    subCollectionName: extractSubCollectionName(entry.id),
     depth: moonlightItemDepth(entry),
-    path: entry.slug,
+    path: entry.id,
     order: entry.data.order,
     indexOrder: entry.data.indexOrder,
     entry: {
       ...entry,
-      slug: `${entry.slug}`,
+      id: `${entry.id}`,
     },
   });

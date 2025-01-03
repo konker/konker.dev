@@ -8,17 +8,17 @@ interface Props {
 }
 
 const { item, selectedUrlPathSlug, titleOverride } = Astro.props;
-const url = `${item.collectionRootPagesPath}/${item.entry.slug}`;
+const url = `${item.collectionRootPagesPath}/${item.entry.id}`;
 const title = titleOverride ?? item.entry.data.title;
-const classNames = selectedUrlPathSlug.endsWith(item.entry.slug) ? 'nav-link selected' : 'nav-link';
+const classNames = selectedUrlPathSlug.endsWith(item.entry.id) ? 'nav-link selected' : 'nav-link';
 ---
 
 {
   !item.entry.data.navigable ? (
     title
-  ) : (
-    <a class={classNames} href={`${url}`}>
-      {title}
-    </a>
-  )
-}
+    ) : (
+  <a class={classNames} href={`${url}`}>
+    {title}
+  </a>
+    )
+  }

@@ -1,19 +1,19 @@
 ---
 import { getCollection } from 'astro:content';
 import BlogIndexLayout from '../../layouts/blog/BlogIndexLayout.astro';
-import { HomeBreadcrumb } from '../../lib';
+import { HomeBreadcrumb, loadMarkdownContent } from '../../lib';
 import type { TagCollection } from '../../lib/collections';
 import { itemIconLookup, itemTextClassLookup } from '../../lib/collections/helpers';
 import type { LinkT } from '../../lib/types';
 import '../../styles/global.css';
 
 // --------------------------------------------------------------------------
-const collection: TagCollection = 'til';
+const collection: TagCollection = 'til' as const;
 const allPosts = await getCollection(collection);
 const filteredPosts = allPosts.filter((post) => !post.data.draft);
 
 // --------------------------------------------------------------------------
-const content = (await Astro.glob('./index-content.md'))[0];
+const content = loadMarkdownContent(import.meta.glob('./index-content.md', { eager: true }));
 const pageTitle = content?.frontmatter.title;
 const thisBreadcrumb: LinkT = {
   title: pageTitle,
