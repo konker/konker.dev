@@ -35,6 +35,7 @@
     "@fontsource-variable/work-sans": "^5.1.0",
     "@fontsource/ibm-plex-serif": "^5.1.0",
     "@fontsource/merriweather": "^5.1.0",
+    "@kindspells/astro-shield": "^1.7.1",
     "@tailwindcss/typography": "^0.5.15",
     "astro": "^5.1.1",
     "date-fns": "^3.6.0",
