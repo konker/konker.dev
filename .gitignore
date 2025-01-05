@@ -32,3 +32,4 @@ pnpm-debug.log*
 .vscode
 
 .turbo
+apps/konker.dev/src/generated/sriHashes.mjs
