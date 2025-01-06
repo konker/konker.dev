@@ -64,6 +64,9 @@
       type: 'cloudfront-s3',
       domainName: 'konker.dev',
       originPath: '/www',
+
+      // Cloudfront key-value store for functions
+      keyValueStore: true,
     },
     {
       type: 'cloudfront-https',
