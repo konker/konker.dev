@@ -19,6 +19,7 @@ on:
 env:
   AWS_S3_BUCKET: ${{ secrets.KONKER_DOT_DEV_AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.KONKER_DOT_DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+  KEY_VALUE_STORE_ARN: ${{ secrets.KONKER_DOT_DEV_KEY_VALUE_STORE_ARN }}
   AWS_DEFAULT_REGION: 'eu-west-1'
   CWD: './apps/konker.dev'
   SOURCE_DIR: './apps/konker.dev/www'
@@ -64,6 +65,10 @@ jobs:
       - name: Sync files to S3
         run: |
           aws s3 sync ${{ env.SOURCE_DIR }} s3://${{ env.AWS_S3_BUCKET }}${{ env.DEST_DIR }} --delete --exclude '.*git*'
+
+      - name: Upload CSP hashes to Cloudfront key-value store
+        run: |
+          pnpm run upload-csp-hashes
 
       - name: Invalidate CloudFront Cache
         run: |

@@ -28,6 +28,10 @@
       "dependsOn": ["^codecov"],
       "env": ["CODECOV_TOKEN"]
     },
+    "upload-csp-hashes": {
+      "dependsOn": ["^upload-csp-hashes"],
+      "env": ["KEY_VALUE_STORE_ARN"]
+    },
     "dev": {
       "persistent": true,
       "cache": false

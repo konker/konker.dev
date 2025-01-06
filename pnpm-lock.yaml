@@ -109,8 +109,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10(aws-crt@1.24.2)
       '@types/gulp':
         specifier: ^4.0.17
         version: 4.0.17
@@ -2870,6 +2870,10 @@ packages:
     engines: {node: '>= 18.0.0'}
     peerDependencies:
       astro: ^4.0.0
+
+  '@konker.dev/common-config@0.1.10':
+    resolution: {integrity: sha512-kFngzz+vxmdhESKtFPk45md5IiRp5AC286HqGfkJlXS5ILdrRcBHqlfkXYyEDPUTXHsxikvHZnZGIS547sb/WA==}
+    hasBin: true
 
   '@konker.dev/common-config@0.1.9':
     resolution: {integrity: sha512-nIiAofBX+MuotaA+g/OrHSjhXl0WSe96D/uGLBHolay/WwPZehkF8Nps9H5wLcyY3nNs6nSJb/eRrKmCijhsig==}
@@ -10120,6 +10124,19 @@ snapshots:
   '@kindspells/astro-shield@1.7.1(astro@5.1.1(@azure/storage-blob@12.26.0)(@types/node@20.17.10)(jiti@1.21.6)(rollup@4.28.1)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.6.1))':
     dependencies:
       astro: 5.1.1(@azure/storage-blob@12.26.0)(@types/node@20.17.10)(jiti@1.21.6)(rollup@4.28.1)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.6.1)
+
+  '@konker.dev/common-config@0.1.10(aws-crt@1.24.2)':
+    dependencies:
+      '@aws-sdk/client-cloudfront-keyvaluestore': 3.721.0(aws-crt@1.24.2)
+      '@aws-sdk/signature-v4-crt': 3.721.0
+      json5: 2.2.3
+      lodash: 4.17.21
+    transitivePeerDependencies:
+      - aws-crt
+      - bufferutil
+      - debug
+      - supports-color
+      - utf-8-validate
 
   '@konker.dev/common-config@0.1.9': {}
 
