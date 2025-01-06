@@ -44,6 +44,7 @@
     "ci": "turbo run ci",
     "cd": "turbo run cd",
     "codecov": "turbo run codecov",
+    "upload-csp-hashes": "turbo run upload-csp-hashes",
     "local-ci": "TURBO_API=http://localhost:3333/ TURBO_TEAM=ci TURBO_TOKEN=ci pnpm run ci",
     "local-cd": "TURBO_API=http://localhost:3333/ TURBO_TEAM=ci TURBO_TOKEN=ci pnpm run cd"
   }
