@@ -1,5 +1,7 @@
-# See: https://docs.codecov.com/docs/flags#advanced-bespoke-flag-management
+codecov:
+  max_report_age: off
 
+# See: https://docs.codecov.com/docs/flags#advanced-bespoke-flag-management
 # Setting coverage targets per flag
 coverage:
   status:
