@@ -53,6 +53,11 @@ flags:
       - "packages/aws-client-effect-ssm/**"
     carryforward: true
 
+  fetch-fp:
+    paths:
+      - "packages/fetch-fp/**"
+    carryforward: true
+
   middleware-fp:
     paths:
       - "packages/middleware-fp/**"
