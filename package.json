@@ -31,8 +31,8 @@
     }
   },
   "devDependencies": {
-    "turbo": "^2.3.3",
-    "turborepo-remote-cache": "^2.2.8"
+    "turbo": "^2.4.4",
+    "turborepo-remote-cache": "^2.3.4"
   },
   "scripts": {
     "dev": "turbo run dev",
