@@ -121,6 +121,6 @@
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/tiny-auth-utils-fp'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
-    "cd": "pnpm run build && pnpm publish --access public"
+    "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
   }
 }
