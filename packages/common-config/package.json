@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/common-config",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -17,7 +17,8 @@
     "generate-exports-verify": "./dist/scripts/generate-exports-verify.js",
     "generate-exports": "./dist/scripts/generate-exports.js",
     "upload-csp-hashes": "./dist/scripts/upload-csp-hashes.js",
-    "codecov-upload": "./dist/scripts/codecov-upload.sh"
+    "codecov-upload": "./dist/scripts/codecov-upload.sh",
+    "npm-publish-if-version-not-exists": "./dist/scripts/npm-publish-if-version-not-exists.sh"
   },
   "files": [
     "dist/**/*",
@@ -73,7 +74,7 @@
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run exports-check && pnpm run fixme-check",
-    "cd": "pnpm run build && pnpm publish --access public",
+    "cd": "pnpm run build && scripts/npm-publish-if-version-not-exists.sh packages/common-config",
     "local-turbo-cache": "docker run -d --env-file=turbo-cache.env -p 3333:3333 ducktors/turborepo-remote-cache"
   }
 }
