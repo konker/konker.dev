@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-PWD="${1}"
-if [ -z "${1}" ]; then
-  echo -e "${0}: ERROR: No pwd"
+if [[ -z "$PWD" ]]; then
+  echo "No pwd"
   exit 1
 fi
 
