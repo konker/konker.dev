@@ -24,15 +24,19 @@ echo "FLAG: $FLAG"
 TMPDIR=${RUNNER_TEMP:-'/tmp'}
 echo "TMPDIR: $TMPDIR"
 
-# Download and verify the uploader tool to the temp directory
-curl --output-dir "$TMPDIR" https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import # One-time step
-curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov
-curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM
-curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM.sig
-gpg --verify "$TMPDIR/codecov.SHA256SUM.sig" "$TMPDIR/codecov.SHA256SUM"
+if [[ -f "$TMPDIR/codecov" ]]; then
+  echo "codecov exists at $TMPDIR/codecov. Skipping download"
+else
+  # Download and verify the uploader tool to the temp directory
+  curl --output-dir "$TMPDIR" https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import # One-time step
+  curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov
+  curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM
+  curl --output-dir "$TMPDIR" -Os https://cli.codecov.io/latest/linux/codecov.SHA256SUM.sig
+  gpg --verify "$TMPDIR/codecov.SHA256SUM.sig" "$TMPDIR/codecov.SHA256SUM"
 
-shasum -a 256 -c "$TMPDIR/codecov.SHA256SUM"
-chmod +x "$TMPDIR/codecov"
+  shasum -a 256 -c "$TMPDIR/codecov.SHA256SUM"
+  chmod +x "$TMPDIR/codecov"
+fi
 
 # Change to code root
 cd "$PWD" || exit
