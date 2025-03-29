@@ -35,8 +35,8 @@ else
   gpg --verify "$TMPDIR/codecov.SHA256SUM.sig" "$TMPDIR/codecov.SHA256SUM"
 
   shasum -a 256 -c "$TMPDIR/codecov.SHA256SUM"
-  chmod +x "$TMPDIR/codecov"
 fi
+chmod +x "$TMPDIR/codecov"
 
 # Change to code root
 cd "$PWD" || exit
