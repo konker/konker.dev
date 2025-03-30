@@ -28,7 +28,7 @@ describe('error/ApiError', () => {
   describe('toApiError', () => {
     it('should function as expected when passed an ApiError', () => {
       expect(unit.toHttpApiError(ae)).toStrictEqual(ae);
-      expect(unit.toHttpApiError(aei)).toStrictEqual(ae);
+      expect(unit.toHttpApiError(aei)).toStrictEqual(aei);
     });
 
     it('should function as expected when passed an Error', () => {
