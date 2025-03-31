@@ -8,20 +8,23 @@
       "dependsOn": ["^typecheck"]
     },
     "test": {
-      "dependsOn": ["^test"]
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/**"]
     },
     "lint-check": {
       "dependsOn": ["^lint-check"]
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["src/*", "dist/**"]
     },
     "ci": {
-      "dependsOn": ["^ci"]
+      "dependsOn": ["^ci"],
+      "outputs": ["src/*", "dist/**"]
     },
     "cd": {
       "dependsOn": ["^cd"],
+      "outputs": ["src/*", "dist/**"],
       "env": ["CODECOV_TOKEN"]
     },
     "codecov": {
