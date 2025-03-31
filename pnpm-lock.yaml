@@ -109,8 +109,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/gulp':
         specifier: ^4.0.17
         version: 4.0.17
@@ -188,8 +188,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -276,8 +276,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -358,8 +358,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -440,8 +440,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -522,8 +522,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -604,8 +604,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -871,8 +871,8 @@ importers:
         specifier: ^1.102.0
         version: 1.102.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -971,8 +971,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -1044,8 +1044,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/aws-lambda':
         specifier: ^8.10.146
         version: 8.10.146
@@ -1132,8 +1132,8 @@ importers:
         specifier: ^1.102.0
         version: 1.102.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@konker.dev/momento-cache-client-effect':
         specifier: workspace:*
         version: link:../momento-cache-client-effect
@@ -1202,8 +1202,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -1272,8 +1272,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -1345,8 +1345,8 @@ importers:
         specifier: ^9.22.0
         version: 9.22.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/node':
         specifier: ^20.17.24
         version: 20.17.24
@@ -1433,8 +1433,8 @@ importers:
         specifier: workspace:*
         version: link:../aws-client-effect-s3
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@swc/core':
         specifier: ^1.10.0
         version: 1.10.1
@@ -1506,8 +1506,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -1597,8 +1597,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3(aws-crt@1.24.2)
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@smithy/smithy-client':
         specifier: ^2.5.1
         version: 2.5.1
@@ -1682,8 +1682,8 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0
       '@konker.dev/common-config':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4(aws-crt@1.24.2)
       '@types/node':
         specifier: ^20.17.10
         version: 20.17.10
@@ -3239,8 +3239,8 @@ packages:
     resolution: {integrity: sha512-kFngzz+vxmdhESKtFPk45md5IiRp5AC286HqGfkJlXS5ILdrRcBHqlfkXYyEDPUTXHsxikvHZnZGIS547sb/WA==}
     hasBin: true
 
-  '@konker.dev/common-config@0.2.3':
-    resolution: {integrity: sha512-RWWt2Tl5p3fmRfsEFPxTSMrWmrwsHG/c+Dowj2sNqJtjZ9JPIH1Aw2+csRKVMdqn9s59tRqfIualr4G/994Usw==}
+  '@konker.dev/common-config@0.2.4':
+    resolution: {integrity: sha512-JK4oxIIczPoCI88x/0/hCnDWkpoCOZw4J4U0BAPWjfoIiN1tN5OG5pphOBkTd4AjV3+qvyGmyhECU49+H3izAQ==}
     hasBin: true
 
   '@loaderkit/resolve@1.0.3':
@@ -11182,19 +11182,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@konker.dev/common-config@0.2.3':
-    dependencies:
-      '@aws-sdk/client-cloudfront-keyvaluestore': 3.721.0
-      '@aws-sdk/signature-v4-crt': 3.721.0
-      lodash: 4.17.21
-    transitivePeerDependencies:
-      - aws-crt
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
-
-  '@konker.dev/common-config@0.2.3(aws-crt@1.24.2)':
+  '@konker.dev/common-config@0.2.4(aws-crt@1.24.2)':
     dependencies:
       '@aws-sdk/client-cloudfront-keyvaluestore': 3.721.0(aws-crt@1.24.2)
       '@aws-sdk/signature-v4-crt': 3.721.0
