@@ -2,19 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import * as unit from './lib.js';
 
-export type In = { headers: Record<string, string | undefined> };
-
 describe('middleware/headers-normalizer/lib', () => {
-  describe('isWithHeaders', () => {
-    it('should work as expected', () => {
-      expect(unit.isWithOutputHeaders({ headers: { foo: 'abc' } })).toEqual(true);
-      expect(unit.isWithOutputHeaders({ headers: {} })).toEqual(true);
-      expect(unit.isWithOutputHeaders({ headers: undefined })).toEqual(false);
-      expect(unit.isWithOutputHeaders({})).toEqual(false);
-      expect(unit.isWithOutputHeaders('banana')).toEqual(false);
-    });
-  });
-
   describe('fromExceptionList', () => {
     it('should work as expected', () => {
       expect(unit.fromExceptionList('MIME-Version')).toEqual('MIME-Version');
@@ -56,35 +44,35 @@ describe('middleware/headers-normalizer/lib', () => {
 
   describe('transformInput', () => {
     it('should work as expected', () => {
-      expect(unit.transformInput(true)({ headers: { FOO: 'ABC' } })).toStrictEqual({
+      expect(unit.transformInput(true)({ headers: { FOO: 'ABC' } } as never)).toStrictEqual({
         headers: { foo: 'ABC' },
-        normalizerRawInputHeaders: { FOO: 'ABC' },
+        headersNormalizerRequestRaw: { FOO: 'ABC' },
       });
-      expect(unit.transformInput(true)({ headers: { FOO: undefined } })).toStrictEqual({
+      expect(unit.transformInput(true)({ headers: { FOO: undefined } } as never)).toStrictEqual({
         headers: { foo: undefined },
-        normalizerRawInputHeaders: { FOO: undefined },
+        headersNormalizerRequestRaw: { FOO: undefined },
       });
-      expect(unit.transformInput(true)({})).toStrictEqual({
+      expect(unit.transformInput(true)({} as never)).toStrictEqual({
         headers: {},
-        normalizerRawInputHeaders: undefined,
+        headersNormalizerRequestRaw: undefined,
       });
-      expect(unit.transformInput(false)({ headers: { FOO: 'ABC' } })).toStrictEqual({
+      expect(unit.transformInput(false)({ headers: { FOO: 'ABC' } } as never)).toStrictEqual({
         headers: { FOO: 'ABC' },
-        normalizerRawInputHeaders: { FOO: 'ABC' },
+        headersNormalizerRequestRaw: { FOO: 'ABC' },
       });
     });
   });
 
   describe('transformInput', () => {
     it('should work as expected', () => {
-      expect(unit.transformOutput(true)({ headers: { FOO: 'ABC' } })).toStrictEqual({
+      expect(unit.transformOutput(true)({ headers: { FOO: 'ABC' } } as never)).toStrictEqual({
         headers: { Foo: 'ABC' },
       });
-      expect(unit.transformOutput(false)({ headers: { FOO: 'ABC' } })).toStrictEqual({
+      expect(unit.transformOutput(false)({ headers: { FOO: 'ABC' } } as never)).toStrictEqual({
         headers: { FOO: 'ABC' },
       });
-      expect(unit.transformOutput(true)({})).toStrictEqual({});
-      expect(unit.transformOutput(false)({})).toStrictEqual({});
+      expect(unit.transformOutput(true)({} as never)).toStrictEqual({ headers: {} });
+      expect(unit.transformOutput(false)({} as never)).toStrictEqual({ headers: {} });
     });
   });
 });

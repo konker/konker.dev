@@ -1,56 +1,47 @@
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import type { Handler } from '../index.js';
-import type { BaseResponse } from '../lib/http.js';
+import { EMPTY_REQUEST_W, makeResponseW, type RequestW, type ResponseW } from '../lib/http.js';
 import { HttpApiError } from '../lib/HttpApiError.js';
-import { TestDeps } from '../test/test-common.js';
-import * as unit from './awsApiGatewayProcessor.js';
+import { TestDepsW } from '../test/test-common.js';
+import * as unit from './responseProcessor.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099
 vi.mock('effect/Effect', { spy: true });
 
-const TEST_IN: APIGatewayProxyEventV2 = {
-  headers: {},
-  isBase64Encoded: false,
-  requestContext: {} as any,
-  body: {},
-} as APIGatewayProxyEventV2;
-const TEST_DEPS: TestDeps = TestDeps.of({ bar: 'bar' });
+const TEST_DEPS: TestDepsW = TestDepsW.of({ bar: 'bar' });
 
-const TEST_OUT_1 = {
+const TEST_OUT_1 = makeResponseW({
   statusCode: 200,
   headers: {
     QUX: 'qux_value',
   },
-  isBase64Encoded: false,
-  body: { foo: 'foo_value' },
-};
+  body: JSON.stringify({ foo: 'foo_value' }),
+});
 
-const TEST_OUT_2 = {
+const TEST_OUT_2 = makeResponseW({
   statusCode: 200,
   headers: {
     QUX: 'qux_value',
   },
-  isBase64Encoded: false,
   body: 'string body',
-};
+});
 const TEST_OUT_3 = HttpApiError('SomeError', 'Some Error Message', 409);
 
 export const testCoreL =
-  (out: any): Handler<APIGatewayProxyEventV2, BaseResponse, Error, unknown> =>
-  (_: APIGatewayProxyEventV2) =>
+  (out: any): Handler<RequestW, ResponseW, Error, unknown> =>
+  (_: RequestW) =>
     Effect.fail(out);
 
 export const testCoreR =
-  (out: any): Handler<APIGatewayProxyEventV2, BaseResponse, Error, unknown> =>
-  (_: APIGatewayProxyEventV2) =>
+  (out: any): Handler<RequestW, ResponseW, Error, unknown> =>
+  (_: RequestW) =>
     Effect.succeed(out);
 
-describe('middleware/aws-api-gateway-processor', () => {
+describe('middleware/responseProcessor', () => {
   let errorSpy: MockInstance;
 
   beforeEach(() => {
@@ -63,7 +54,7 @@ describe('middleware/aws-api-gateway-processor', () => {
 
   it('should work as expected in an success case', async () => {
     const stack = pipe(testCoreR(TEST_OUT_1), unit.middleware());
-    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const result = await pipe(stack(EMPTY_REQUEST_W), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
@@ -71,14 +62,13 @@ describe('middleware/aws-api-gateway-processor', () => {
         QUX: 'qux_value',
       },
       body: JSON.stringify({ foo: 'foo_value' }),
-      isBase64Encoded: false,
     });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should work as expected in an success case with string body', async () => {
     const stack = pipe(testCoreR(TEST_OUT_2), unit.middleware());
-    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const result = await pipe(stack(EMPTY_REQUEST_W), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
@@ -86,14 +76,13 @@ describe('middleware/aws-api-gateway-processor', () => {
         QUX: 'qux_value',
       },
       body: 'string body',
-      isBase64Encoded: false,
     });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should work as expected in an error case', async () => {
     const stack = pipe(testCoreL(TEST_OUT_3), unit.middleware());
-    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const result = await pipe(stack(EMPTY_REQUEST_W), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 409,

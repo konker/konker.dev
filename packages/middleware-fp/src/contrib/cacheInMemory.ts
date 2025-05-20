@@ -4,17 +4,21 @@ import { InMemoryCache } from '@konker.dev/tiny-cache-fp/memory/InMemoryCache';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
+import type { RequestW, ResponseW } from '../lib/http.js';
 import type { MiddlewareError } from '../lib/MiddlewareError.js';
 import { toMiddlewareError } from '../lib/MiddlewareError.js';
 
 const TAG = 'cacheInMemory';
 
 export const middleware =
-  <I, CR>(cacheKeyResolver: CacheKeyResolver<I, CR>) =>
-  <O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E | MiddlewareError, R | CR> => {
-    const cache = InMemoryCache<O>();
-    return (i: I) =>
+  <I extends Rec, CR>(cacheKeyResolver: CacheKeyResolver<I, CR>) =>
+  <O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I, O, E, R>
+  ): RequestResponseHandler<I, O, E | MiddlewareError, R | CR> => {
+    const cache = InMemoryCache<ResponseW<O>>();
+
+    return (i: RequestW<I>) =>
       pipe(
         // Lift the input
         Effect.succeed(i),

@@ -2,69 +2,63 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import type { Handler } from '../../index.js';
-import { TestDeps } from '../../test/test-common.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../../lib/http.js';
+import { echoCoreIn200W } from '../../test/test-common.js';
 import * as unit from './index.js';
 
-export type In = { headers: Record<string, string | undefined> };
-
-const TEST_IN: In = { headers: { FOO: 'foo_value' } };
-const TEST_DEPS: TestDeps = { bar: 'bar' };
-
-export function _testCore<E, D extends TestDeps, I extends In>(i: I): Effect.Effect<D, E, any> {
-  return pipe(
-    TestDeps,
-    Effect.flatMap((deps) =>
-      Effect.succeed({
-        ...i,
-        ...deps,
-        headers: {
-          ...i.headers,
-          QUX: 'qux_value',
-        },
-      })
-    )
-  );
-}
-export const testCore: Handler<any, object, any, any> = _testCore;
+const TEST_IN = makeRequestW(EMPTY_REQUEST_W, {
+  headers: { FOO: 'foo_value' },
+});
 
 describe('middleware/headers-normalizer', () => {
   it('should work as expected with default params', async () => {
-    const egHandler = pipe(testCore, unit.middleware());
-    const result = pipe(egHandler(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
+    const result = pipe(egHandler(TEST_IN), Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
-      bar: 'bar',
-      headers: {
-        Foo: 'foo_value',
-        Qux: 'qux_value',
+      statusCode: 200,
+      body: 'OK',
+      headers: { Foo: 'foo_value' },
+      in: {
+        method: 'GET',
+        headers: { foo: 'foo_value' },
+        headersNormalizerRequestRaw: { FOO: 'foo_value' },
+        pathParameters: {},
+        queryStringParameters: {},
       },
-      normalizerRawInputHeaders: { FOO: 'foo_value' },
     });
   });
 
   it('should work as expected with un-normalized request param', async () => {
-    const egHandler = pipe(testCore, unit.middleware({ normalizeRequestHeaders: false }));
-    const result = pipe(egHandler(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const egHandler = pipe(echoCoreIn200W, unit.middleware({ normalizeRequestHeaders: false }));
+    const result = pipe(egHandler(TEST_IN), Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
-      bar: 'bar',
-      headers: {
-        Foo: 'foo_value',
-        Qux: 'qux_value',
+      statusCode: 200,
+      body: 'OK',
+      headers: { Foo: 'foo_value' },
+      in: {
+        headers: { FOO: 'foo_value' },
+        headersNormalizerRequestRaw: { FOO: 'foo_value' },
+        method: 'GET',
+        pathParameters: {},
+        queryStringParameters: {},
       },
-      normalizerRawInputHeaders: { FOO: 'foo_value' },
     });
   });
 
   it('should work as expected with un-normalized response params', async () => {
-    const egHandler = pipe(testCore, unit.middleware({ normalizeResponseHeaders: false }));
-    const result = pipe(egHandler(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const egHandler = pipe(echoCoreIn200W, unit.middleware({ normalizeResponseHeaders: false }));
+    const result = pipe(egHandler(TEST_IN), Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
-      bar: 'bar',
-      headers: {
-        foo: 'foo_value',
-        QUX: 'qux_value',
+      statusCode: 200,
+      body: 'OK',
+      headers: { foo: 'foo_value' },
+      in: {
+        headers: { foo: 'foo_value' },
+        headersNormalizerRequestRaw: { FOO: 'foo_value' },
+        method: 'GET',
+        pathParameters: {},
+        queryStringParameters: {},
       },
-      normalizerRawInputHeaders: { FOO: 'foo_value' },
     });
   });
 });

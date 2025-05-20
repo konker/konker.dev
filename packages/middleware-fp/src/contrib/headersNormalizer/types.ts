@@ -1,22 +1,10 @@
-import type {
-  OptionalRequestHeaders,
-  OptionalResponseHeaders,
-  RequestHeaders,
-  ResponseHeaders,
-} from '../../lib/http.js';
-
-export type WithPossibleInputHeaders = { headers?: OptionalRequestHeaders };
-export type WithPossibleOutputHeaders = { headers?: OptionalResponseHeaders };
+import type { RequestW, ResponseW } from '../../lib/http.js';
 
 export type WithNormalizedInputHeaders = {
-  headers: RequestHeaders;
-  normalizerRawInputHeaders: OptionalRequestHeaders;
+  headers: RequestW['headers'];
+  headersNormalizerRequestRaw: Record<string, string>;
 };
 
 export type WithNormalizedOutputHeaders = {
-  headers?: ResponseHeaders;
-};
-
-export type WithUserId = {
-  readonly userId: string | undefined;
+  headers: ResponseW['headers'];
 };

@@ -1,13 +1,13 @@
 import type { ValidBasicAuthCredentialSet } from '@konker.dev/tiny-auth-utils-fp/basic-auth';
 import { basicAuthDecodeHeaderValue, basicAuthVerifyCredentials } from '@konker.dev/tiny-auth-utils-fp/basic-auth';
 import { extractBasicAuthHeaderValue } from '@konker.dev/tiny-auth-utils-fp/helpers';
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
+import type { RequestW } from '../lib/http.js';
 import { HttpApiError } from '../lib/HttpApiError.js';
-import type { WithNormalizedInputHeaders, WithUserId } from './headersNormalizer/types.js';
+import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
 
 const TAG = 'basicAuthAuthenticator';
 
@@ -17,13 +17,17 @@ export type BasicAuthAuthenticatorDeps = {
 };
 export const BasicAuthAuthenticatorDeps = Context.GenericTag<BasicAuthAuthenticatorDeps>('BasicAuthAuthenticatorDeps');
 
+export type WithUserId = {
+  readonly userId: string | undefined;
+};
+
 // --------------------------------------------------------------------------
 export const middleware =
   () =>
-  <I extends APIGatewayProxyEventV2, O, E, R>(
-    wrapped: Handler<I & WithUserId, O, E, R>
-  ): Handler<I & WithNormalizedInputHeaders, O, E | HttpApiError, R | BasicAuthAuthenticatorDeps> =>
-  (i: I & WithNormalizedInputHeaders) => {
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I & WithUserId, O, E, R>
+  ): RequestResponseHandler<I & WithNormalizedInputHeaders, O, E | HttpApiError, R | BasicAuthAuthenticatorDeps> =>
+  (i: RequestW<I & WithNormalizedInputHeaders>) => {
     return pipe(
       Effect.Do,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),

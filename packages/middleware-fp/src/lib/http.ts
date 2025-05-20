@@ -1,71 +1,86 @@
-import { Schema } from 'effect';
-import * as Effect from 'effect/Effect';
+// --------------------------------------------------------------------------
+import { Effect } from 'effect';
 
 export const UNKNOWN_STRING_EFFECT = <E, R>(): Effect.Effect<string, E, R> => Effect.succeed('UNKNOWN');
 
-export const WithBody = Schema.Struct({
-  body: Schema.Unknown,
-});
-export type WithBody = Schema.Schema.Type<typeof WithBody>;
-
-export const RequestHeaders = Schema.Record({
-  key: Schema.String,
-  value: Schema.Union(Schema.String, Schema.Undefined),
-});
-export type RequestHeaders = Schema.Schema.Type<typeof RequestHeaders>;
-
-export const OptionalRequestHeaders = Schema.Union(RequestHeaders, Schema.Undefined);
-export type OptionalRequestHeaders = Schema.Schema.Type<typeof OptionalRequestHeaders>;
-
-export const ResponseHeaders = Schema.Record({
-  key: Schema.String,
-  value: Schema.Union(Schema.String, Schema.Number, Schema.Boolean),
-});
-export type ResponseHeaders = Schema.Schema.Type<typeof ResponseHeaders>;
-
-export const OptionalResponseHeaders = Schema.Union(ResponseHeaders, Schema.Undefined);
-export type OptionalResponseHeaders = Schema.Schema.Type<typeof OptionalResponseHeaders>;
+// --------------------------------------------------------------------------
+export type RequestW<T extends Record<string, unknown> = {}> = {
+  readonly method: string;
+  readonly body?: string;
+  readonly headers: Record<string, string>;
+  readonly queryStringParameters: Record<string, string>;
+  readonly pathParameters: Record<string, string>;
+} & T;
 
 // --------------------------------------------------------------------------
-export const BaseResponse = Schema.partial(
-  Schema.Struct({
-    statusCode: Schema.Number,
-    headers: ResponseHeaders,
-    isBase64Encoded: Schema.Union(Schema.Boolean, Schema.Undefined),
-    body: Schema.Unknown,
-  })
-);
-export type BaseResponse = Schema.Schema.Type<typeof BaseResponse>;
+export function makeRequestW<T extends Record<string, unknown>>(requestW: RequestW<T>): RequestW<T>;
 
-// --------------------------------------------------------------------------
-export const BaseSimpleAuthResponse = Schema.Struct({
-  isAuthorized: Schema.Boolean,
-});
-export type BaseSimpleAuthResponse = Schema.Schema.Type<typeof BaseSimpleAuthResponse>;
+export function makeRequestW<
+  T extends Record<string, unknown> = {},
+  U extends Record<string, unknown> | undefined = undefined,
+>(requestW: RequestW<T>, u: U): NoInfer<U extends undefined ? RequestW<T> : RequestW<T & U>>;
 
-export function BaseSimpleAuthResponseWithContext<T>(T: Schema.Schema<T>) {
-  return Schema.extend(
-    BaseSimpleAuthResponse,
-    Schema.Struct({
-      context: T,
-    })
-  );
-}
-export type BaseSimpleAuthResponseWithContext<T> = Schema.Schema.Type<
-  ReturnType<typeof BaseSimpleAuthResponseWithContext<T>>
->;
-
-// --------------------------------------------------------------------------
-export function DEFAULT_500_RESPONSE() {
-  return {
-    statusCode: 500,
-    body: '"InternalServerError"',
-  };
+export function makeRequestW<T extends Record<string, unknown>, U extends Record<string, unknown>>(
+  requestW: RequestW<T>,
+  u?: U
+): RequestW<T> | RequestW<T & U> {
+  return u
+    ? {
+        ...requestW,
+        ...u,
+      }
+    : { ...requestW };
 }
 
 // --------------------------------------------------------------------------
-// eslint-disable-next-line fp/no-nil
-export function CHAOS<T>(_: T): T {
-  // eslint-disable-next-line fp/no-throw
-  throw new Error('BOOM');
+export const EMPTY_REQUEST_W: RequestW = {
+  method: 'GET',
+  headers: {},
+  queryStringParameters: {},
+  pathParameters: {},
+} as const;
+
+// --------------------------------------------------------------------------
+export type ResponseW<T extends Record<string, unknown> = {}> = {
+  readonly statusCode: number;
+  readonly headers: Record<string, string>;
+  readonly body?: string;
+} & T;
+
+export function makeResponseW<T extends Record<string, unknown>>(responseW: ResponseW<T>): ResponseW<T>;
+
+export function makeResponseW<
+  T extends Record<string, unknown> = {},
+  U extends Record<string, unknown> | undefined = undefined,
+>(responseW: ResponseW<T>, u: U): ResponseW<T & U>;
+
+export function makeResponseW<T extends Record<string, unknown>, U extends Record<string, unknown>>(
+  responseW: ResponseW<T>,
+  u?: U
+): NoInfer<ResponseW<T> | ResponseW<T & U>> {
+  return u
+    ? {
+        ...responseW,
+        ...u,
+      }
+    : { ...responseW };
 }
+
+// --------------------------------------------------------------------------
+export const EMPTY_RESPONSE_W: ResponseW = {
+  statusCode: 200,
+  headers: {},
+} as const;
+
+// --------------------------------------------------------------------------
+// export const foo: RequestW<{}> = makeRequestW(EMPTY_REQUEST_W);
+// export const bar: RequestW<{ bum: string }> = makeRequestW(EMPTY_REQUEST_W, { bum: 'pupka' });
+// export const bar1: RequestW<{ bum: string }> = makeRequestW<{}, { bum: string }>(EMPTY_REQUEST_W, { bum: 'pupka' });
+// export const baz = makeRequestW(bar, { ball: 'sack' });
+//
+// export const foo_r: ResponseW<{}> = makeResponseW(EMPTY_RESPONSE_W);
+// export const bar_r: ResponseW<{ bum: string }> = makeResponseW(EMPTY_RESPONSE_W, { bum: 'pupka' });
+// export const bar1_r: ResponseW<{ bum: string }> = makeResponseW<{}, { bum: string }>(EMPTY_RESPONSE_W, {
+//   bum: 'pupka',
+// });
+// export const baz_r: ResponseW<{ bum: string; ball: string }> = makeResponseW(bar_r, { ball: 'sack' });

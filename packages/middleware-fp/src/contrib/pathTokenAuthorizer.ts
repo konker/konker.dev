@@ -1,8 +1,8 @@
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
+import type { RequestW } from '../lib/http.js';
 import { HttpApiError } from '../lib/HttpApiError.js';
 
 const TAG = 'pathTokenAuthorizer';
@@ -17,10 +17,10 @@ export const PathTokenAuthorizerDeps = Context.GenericTag<PathTokenAuthorizerDep
 // --------------------------------------------------------------------------
 export const middleware =
   () =>
-  <I extends APIGatewayProxyEventV2, O, E, R>(
-    wrapped: Handler<I, O, E, R>
-  ): Handler<I, O, E | HttpApiError, R | PathTokenAuthorizerDeps> =>
-  (i: I) => {
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I, O, E, R>
+  ): RequestResponseHandler<I, O, E | HttpApiError, R | PathTokenAuthorizerDeps> =>
+  (i: RequestW<I>) => {
     return pipe(
       PathTokenAuthorizerDeps,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),

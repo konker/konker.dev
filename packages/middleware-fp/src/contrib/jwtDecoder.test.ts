@@ -1,12 +1,11 @@
 import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
 import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens';
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common.js';
-import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../lib/http.js';
+import { echoCoreIn200W } from '../test/test-common.js';
 import * as unit from './jwtDecoder.js';
 
 // https://stackoverflow.com/a/72885576/203284
@@ -16,21 +15,24 @@ vi.mock('effect/Effect', { spy: true });
 const VALID_JWT_VALUE = `Bearer ${TEST_TOKEN}`;
 const INVALID_JWT_VALUE = 'Bearer Banana';
 
-const TEST_IN_1 = {
+const TEST_IN_1 = makeRequestW(EMPTY_REQUEST_W, {
   headers: {
     authorization: VALID_JWT_VALUE,
   },
-  isBase64Encoded: false,
+  headersNormalizerRequestRaw: {
+    Authorization: VALID_JWT_VALUE,
+  },
   body: {},
-} as unknown as APIGatewayProxyEventV2 & WithNormalizedInputHeaders;
+});
 
-const TEST_IN_2 = {
+const TEST_IN_2 = makeRequestW(EMPTY_REQUEST_W, {
   headers: {
     authorization: INVALID_JWT_VALUE,
   },
-  isBase64Encoded: false,
-  body: {},
-} as unknown as APIGatewayProxyEventV2 & WithNormalizedInputHeaders;
+  headersNormalizerRequestRaw: {
+    Authorization: INVALID_JWT_VALUE,
+  },
+});
 
 describe('middleware/jwt-decoder', () => {
   let errorSpy: MockInstance;
@@ -45,22 +47,37 @@ describe('middleware/jwt-decoder', () => {
   });
 
   it('should work as expected in an success case', async () => {
-    const egHandler = pipe(echoCoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = await pipe(egHandler(TEST_IN_1), Effect.runPromise);
 
     expect(result).toStrictEqual({
-      headers: {
-        authorization: VALID_JWT_VALUE,
-      },
+      statusCode: 200,
       body: {},
-      isBase64Encoded: false,
-      userId: 'test-sub',
+      headers: {
+        authorization:
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.IfZ_IlbKl2S7pkKBqTis0kyBmDuXGbBkCdCkrDdLq_Q',
+      },
+      in: {
+        method: 'GET',
+        body: {},
+        pathParameters: {},
+        queryStringParameters: {},
+        headers: {
+          authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.IfZ_IlbKl2S7pkKBqTis0kyBmDuXGbBkCdCkrDdLq_Q',
+        },
+        headersNormalizerRequestRaw: {
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.IfZ_IlbKl2S7pkKBqTis0kyBmDuXGbBkCdCkrDdLq_Q',
+        },
+        userId: 'test-sub',
+      },
     });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should work as expected in an error case', async () => {
-    const egHandler = pipe(echoCoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = pipe(egHandler(TEST_IN_2), Effect.runPromise);
 
     await expect(result).rejects.toThrow('Invalid JWT credentials');

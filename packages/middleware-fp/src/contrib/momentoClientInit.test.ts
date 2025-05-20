@@ -4,11 +4,9 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { echoCoreInDeps } from '../test/test-common.js';
+import { EMPTY_REQUEST_W } from '../lib/http.js';
+import { echoCoreInDepsW } from '../test/test-common.js';
 import * as unit from './momentoClientInit.js';
-
-export type In = { foo: 'foo' };
-const TEST_IN: In = { foo: 'foo' };
 
 describe('middleware/momento-client-init', () => {
   const OLD_ENV = process.env;
@@ -21,16 +19,22 @@ describe('middleware/momento-client-init', () => {
   });
 
   it('should work as expected', async () => {
-    const egHandler = pipe(
-      echoCoreInDeps(MomentoClientDeps),
-      (x) => x,
-      unit.middleware({}),
-      (x) => x
-    );
-    const result = await pipe(egHandler(TEST_IN), mockMomentoClientFactoryDeps(), Effect.runPromise);
+    const egHandler = pipe(echoCoreInDepsW(MomentoClientDeps), unit.middleware({}));
 
-    expect(result).toMatchObject(TEST_IN);
-    expect(result).toHaveProperty('makeMomentoClient');
+    const result = await pipe(egHandler(EMPTY_REQUEST_W), mockMomentoClientFactoryDeps(), Effect.runPromise);
+
+    expect(result).toMatchObject({
+      body: 'OK',
+      headers: {},
+      in: {
+        headers: {},
+        method: 'GET',
+        pathParameters: {},
+        queryStringParameters: {},
+      },
+      statusCode: 200,
+    });
+    expect(result.deps).toHaveProperty('makeMomentoClient');
     // expect(clientFactoryMock).toHaveBeenCalledTimes(1);
   });
 });

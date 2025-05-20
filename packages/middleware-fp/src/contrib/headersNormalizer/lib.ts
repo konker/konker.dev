@@ -1,10 +1,7 @@
 // FROM: https://github.com/middyjs/middy/blob/main/packages/http-header-normalizer/index.js
-import type {
-  WithNormalizedInputHeaders,
-  WithNormalizedOutputHeaders,
-  WithPossibleInputHeaders,
-  WithPossibleOutputHeaders,
-} from './types.js';
+import type { Rec } from '../../index.js';
+import { makeRequestW, makeResponseW, type RequestW, type ResponseW } from '../../lib/http.js';
+import type { WithNormalizedInputHeaders, WithNormalizedOutputHeaders } from './types.js';
 
 const EXCEPTIONS_LIST = [
   'ALPN',
@@ -39,10 +36,6 @@ const EXCEPTIONS_LIST = [
 ];
 
 // --------------------------------------------------------------------------
-export function isWithOutputHeaders(x: unknown): x is WithPossibleOutputHeaders {
-  return !!(x && typeof x === 'object' && 'headers' in x && typeof x.headers === 'object');
-}
-
 export function fromExceptionList(s: string): string | undefined {
   const ss = s.toLowerCase();
   return EXCEPTIONS_LIST.find((i) => i.toLowerCase() === ss);
@@ -81,22 +74,17 @@ export function normalizeKeys(
 
 // --------------------------------------------------------------------------
 export const transformInput =
-  <I extends WithPossibleInputHeaders>(normalizeRequestHeaders: boolean) =>
-  (i: I): I & WithNormalizedInputHeaders => ({
-    ...i,
-    headers: normalizeRequestHeaders ? normalizeKeys(i.headers, lowerCaseNormalizer) : { ...i.headers },
-    normalizerRawInputHeaders: i.headers,
-  });
+  <I extends Rec>(normalizeRequestHeaders: boolean) =>
+  (i: RequestW<I>): RequestW<I & WithNormalizedInputHeaders> =>
+    makeRequestW(i, {
+      headers: normalizeRequestHeaders ? normalizeKeys(i.headers, lowerCaseNormalizer) : { ...i.headers },
+      headersNormalizerRequestRaw: i.headers,
+    });
 
 export const transformOutput =
-  (normalizeResponseHeaders: boolean) =>
-  <O extends WithPossibleOutputHeaders>(o: O): O & WithNormalizedOutputHeaders =>
-    Object.assign(
-      {},
-      o,
-      normalizeResponseHeaders && isWithOutputHeaders(o)
-        ? { headers: normalizeKeys(o.headers, canonicalNormalizer) }
-        : isWithOutputHeaders(o)
-          ? { headers: { ...o.headers } }
-          : {}
-    );
+  <O extends Rec>(normalizeResponseHeaders: boolean) =>
+  (o: ResponseW<O>): ResponseW<O & WithNormalizedOutputHeaders> => {
+    return makeResponseW(o, {
+      headers: normalizeResponseHeaders ? normalizeKeys(o.headers, canonicalNormalizer) : { ...o.headers },
+    });
+  };

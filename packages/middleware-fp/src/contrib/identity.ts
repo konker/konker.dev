@@ -1,6 +1,8 @@
-import type { Handler } from '../index.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
 
 export const middleware =
-  <I, O, E, R>(_params?: never) =>
-  (wrapped: Handler<I, O, E, R>): Handler<I, O, E, R> =>
+  (_params?: never) =>
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I, O, E, R>
+  ): RequestResponseHandler<I, O, E, R> =>
     wrapped;

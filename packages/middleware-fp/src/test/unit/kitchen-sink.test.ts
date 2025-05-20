@@ -1,5 +1,3 @@
-import type { DynamoDBDocumentClientDeps } from '@konker.dev/aws-client-effect-dynamodb/lib/client';
-import { defaultDynamoDBDocumentClientFactoryDeps } from '@konker.dev/aws-client-effect-dynamodb/lib/client';
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { mockMomentoClientFactoryDeps } from '@konker.dev/momento-cache-client-effect/lib/test';
 import type { JwtVerificationConfig } from '@konker.dev/tiny-auth-utils-fp/jwt';
@@ -12,7 +10,6 @@ import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jw
 import { JsonCache } from '@konker.dev/tiny-cache-fp';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
 import { MomentoStringCache } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCache';
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -20,7 +17,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import * as M from '../../contrib/index.js';
 import * as unit from '../../contrib/jwtAuthenticator.js';
 import { PathTokenAuthorizerDeps } from '../../contrib/pathTokenAuthorizer.js';
-import type { BaseResponse } from '../../lib/http.js';
+import { makeResponseW, type RequestW, type ResponseW } from '../../lib/http.js';
 
 export const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 export const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
@@ -92,58 +89,62 @@ describe('kitchen sink', () => {
 
   it('should work as expected', async () => {
     function echoCore(
-      i: APIGatewayProxyEventV2 &
+      i: RequestW<
         M.bodyValidator.WithValidatedBody<Body> &
-        M.pathParametersValidator.WithValidatedPathParameters<PathParams> &
-        M.queryStringValidator.WithValidatedQueryStringParameters<QueryParams> &
-        M.headersValidator.WithValidatedHeaders<Headers> &
-        M.jwtAuthenticator.WithUserId
-    ): Effect.Effect<BaseResponse, never, DynamoDBDocumentClientDeps | MomentoClientDeps> {
-      return Effect.succeed({
-        statusCode: 200,
-        headers: { 'content-type': 'application/json; charset=UTF-8' },
-        multiValueHeaders: {},
-        isBase64Encoded: false,
-        body: {
-          foo: i.body.foo.toUpperCase(),
-          bar: i.body.bar * 2,
-          baz: !i.body.baz,
-          pt: i.pathParameters.pathToken,
-          q: i.queryStringParameters.q,
-          h: i.headers['content-type'].toUpperCase(),
-          u: i.userId,
-        },
-      });
+          M.pathParametersValidator.WithValidatedPathParameters<PathParams> &
+          M.queryStringValidator.WithValidatedQueryStringParameters<QueryParams> &
+          M.headersValidator.WithValidatedHeaders<Headers> &
+          M.jwtAuthenticator.WithUserId
+      >
+    ): Effect.Effect<ResponseW, never, never> {
+      return Effect.succeed(
+        makeResponseW({
+          statusCode: 200,
+          headers: { 'content-type': 'application/json; charset=UTF-8' },
+          multiValueHeaders: {},
+          isBase64Encoded: false,
+          i: JSON.stringify(i, null, 2),
+          body: JSON.stringify({
+            foo: i.body.foo.toUpperCase(),
+            bar: i.body.bar * 2,
+            baz: !i.body.baz,
+            pt: i.pathParameters.pathToken,
+            q: i.queryStringParameters.q,
+            h: i.headers['content-type'].toUpperCase(),
+            u: i.userId,
+          }),
+        })
+      );
     }
 
     const stack = pipe(
       echoCore,
-      M.dynamodbDocClientInit.middleware({ region: 'eu-west-1' }),
       M.bodyValidator.middleware(Body),
       M.jsonBodyParser.middleware(),
-      M.base64BodyDecoder.middleware(),
+      M.base64BodyDecoder.middleware(() => false),
       M.jwtAuthenticator.middleware(),
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
-      M.helmetJsHeaders.middleware(),
       M.queryStringValidator.middleware(QueryParams),
       M.pathTokenAuthorizer.middleware(),
       M.pathParametersValidator.middleware(PathParams),
       M.identity.middleware(),
       M.trivial.middleware(),
-      M.awsApiGatewayProcessor.middleware(),
+      M.helmetJsHeaders.middleware(),
+      M.responseProcessor.middleware(),
       M.requestResponseLogger.middleware(),
       M.cacheInMemory.middleware(JsonHashCacheKeyResolver()),
-      M.cacheMomento.middleware(JsonHashCacheKeyResolver(), JsonCache(MomentoStringCache)),
+      M.cacheMomento.middleware(JsonHashCacheKeyResolver(), JsonCache<MomentoClientDeps>(MomentoStringCache)),
       M.momentoClientInit.middleware({}),
       M.envValidator.middleware(Env)
     );
 
     const actual1 = stack({
-      version: 'string',
-      routeKey: 'string',
-      rawPath: 'string',
-      rawQueryString: 'string',
+      // version: 'string',
+      // routeKey: 'string',
+      // rawPath: 'string',
+      // rawQueryString: 'string',
+      method: 'POST',
       // cookies?: [],
       headers: {
         'content-type': 'application/json; charset=UTF-8',
@@ -152,25 +153,18 @@ describe('kitchen sink', () => {
       queryStringParameters: {
         q: 'wtf',
       },
-      requestContext: {} as any,
+      // requestContext: {} as any,
       body: '{ "foo": "abc", "bar": 123, "baz": true }',
       pathParameters: {
         id: 'test-id',
         pathToken: CORRECT_TEST_PATH_TOKEN_VALUE,
       },
-      isBase64Encoded: false,
       // stageVariables?: {},
     });
 
     await expect(
       Effect.runPromise(
-        pipe(
-          actual1,
-          defaultDynamoDBDocumentClientFactoryDeps,
-          mockMomentoClientFactoryDeps(__cache),
-          mockPathTokenAuthorizerDeps,
-          mockJwtAuthenticatorDeps
-        )
+        pipe(actual1, mockPathTokenAuthorizerDeps, mockJwtAuthenticatorDeps, mockMomentoClientFactoryDeps(__cache))
       )
     ).resolves.toStrictEqual({
       statusCode: 200,
@@ -191,11 +185,55 @@ describe('kitchen sink', () => {
         'X-Permitted-Cross-Domain-Policies': 'none',
         'X-XSS-Protection': '0',
       },
-      multiValueHeaders: {},
       isBase64Encoded: false,
+      multiValueHeaders: {},
       body: '{"foo":"ABC","bar":246,"baz":false,"pt":"test-token-value","q":"wtf","h":"APPLICATION/JSON; CHARSET=UTF-8","u":"test-sub"}',
+      i: `{
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.IfZ_IlbKl2S7pkKBqTis0kyBmDuXGbBkCdCkrDdLq_Q"
+  },
+  "queryStringParameters": {
+    "q": "wtf"
+  },
+  "body": {
+    "foo": "abc",
+    "bar": 123,
+    "baz": true
+  },
+  "pathParameters": {
+    "id": "test-id",
+    "pathToken": "test-token-value"
+  },
+  "validatedEnv": {
+    "MOMENTO_AUTH_TOKEN": "TEST_MOMENTO_AUTH_TOKEN"
+  },
+  "pathParametersValidatorRaw": {
+    "id": "test-id",
+    "pathToken": "test-token-value"
+  },
+  "queryStringValidatorRaw": {
+    "q": "wtf"
+  },
+  "headersNormalizerRequestRaw": {
+    "content-type": "application/json; charset=UTF-8",
+    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.IfZ_IlbKl2S7pkKBqTis0kyBmDuXGbBkCdCkrDdLq_Q"
+  },
+  "headersValidatorRaw": {
+    "content-type": "application/json; charset=UTF-8",
+    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJzdWIiOiJ0ZXN0LXN1YiIsImlhdCI6MTY3MTU3MzgwOCwiZXhwIjoxNjcxNTc3NDA4LCJpc3MiOiJ0ZXN0LWlzcyJ9.IfZ_IlbKl2S7pkKBqTis0kyBmDuXGbBkCdCkrDdLq_Q"
+  },
+  "userId": "test-sub",
+  "jsonBodyParserRaw": "{ \\"foo\\": \\"abc\\", \\"bar\\": 123, \\"baz\\": true }",
+  "bodyValidatorRaw": {
+    "foo": "abc",
+    "bar": 123,
+    "baz": true
+  }
+}`,
     });
 
-    expect(__cache).toHaveProperty('default-cache_d3dc0612e0b4841fccb17c34342c1b38');
+    expect(__cache).toHaveProperty('default-cache_89f05974dfc4a3ae4af70ea0fee174e1');
   });
 });
