@@ -18,6 +18,7 @@ on:
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_NPM_TOKEN }}
+  TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.base_ref || github.event.before || 'HEAD^' }}
   TURBO_TELEMETRY_DISABLED: '1'
   TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
   TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
@@ -31,7 +32,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+
+      # Explicitly fetch the target branch
+      - name: Fetch base branch
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+          git branch --track ${{ github.base_ref }} origin/${{ github.base_ref }} || echo "Branch already tracked or other issue, continuing..."
 
       - name: Setup Node
         uses: actions/setup-node@v4
