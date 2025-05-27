@@ -1,0 +1,785 @@
+{
+  "name": "@konker.dev/tiny-money-fp",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "Konrad Markus <mail@konker.dev>",
+  "license": "ISC",
+  "description": "Tools for accurately performing safe calculations on money values for Node.js TypeScript projects based on Effect-ts",
+  "homepage": "https://konker.dev/",
+  "keywords": [
+    "node",
+    "money",
+    "typescript",
+    "functional-programming",
+    "effect-ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konker.dev/packages/tiny-money-fp"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./currency/Currency": {
+      "types": "./dist/currency/Currency.d.ts",
+      "import": "./dist/currency/Currency.js"
+    },
+    "./currency/defs/AED": {
+      "types": "./dist/currency/defs/AED.d.ts",
+      "import": "./dist/currency/defs/AED.js"
+    },
+    "./currency/defs/AFN": {
+      "types": "./dist/currency/defs/AFN.d.ts",
+      "import": "./dist/currency/defs/AFN.js"
+    },
+    "./currency/defs/ALL": {
+      "types": "./dist/currency/defs/ALL.d.ts",
+      "import": "./dist/currency/defs/ALL.js"
+    },
+    "./currency/defs/AMD": {
+      "types": "./dist/currency/defs/AMD.d.ts",
+      "import": "./dist/currency/defs/AMD.js"
+    },
+    "./currency/defs/ANG": {
+      "types": "./dist/currency/defs/ANG.d.ts",
+      "import": "./dist/currency/defs/ANG.js"
+    },
+    "./currency/defs/AOA": {
+      "types": "./dist/currency/defs/AOA.d.ts",
+      "import": "./dist/currency/defs/AOA.js"
+    },
+    "./currency/defs/ARS": {
+      "types": "./dist/currency/defs/ARS.d.ts",
+      "import": "./dist/currency/defs/ARS.js"
+    },
+    "./currency/defs/AUD": {
+      "types": "./dist/currency/defs/AUD.d.ts",
+      "import": "./dist/currency/defs/AUD.js"
+    },
+    "./currency/defs/AWG": {
+      "types": "./dist/currency/defs/AWG.d.ts",
+      "import": "./dist/currency/defs/AWG.js"
+    },
+    "./currency/defs/AZN": {
+      "types": "./dist/currency/defs/AZN.d.ts",
+      "import": "./dist/currency/defs/AZN.js"
+    },
+    "./currency/defs/BAM": {
+      "types": "./dist/currency/defs/BAM.d.ts",
+      "import": "./dist/currency/defs/BAM.js"
+    },
+    "./currency/defs/BBD": {
+      "types": "./dist/currency/defs/BBD.d.ts",
+      "import": "./dist/currency/defs/BBD.js"
+    },
+    "./currency/defs/BDT": {
+      "types": "./dist/currency/defs/BDT.d.ts",
+      "import": "./dist/currency/defs/BDT.js"
+    },
+    "./currency/defs/BGN": {
+      "types": "./dist/currency/defs/BGN.d.ts",
+      "import": "./dist/currency/defs/BGN.js"
+    },
+    "./currency/defs/BHD": {
+      "types": "./dist/currency/defs/BHD.d.ts",
+      "import": "./dist/currency/defs/BHD.js"
+    },
+    "./currency/defs/BIF": {
+      "types": "./dist/currency/defs/BIF.d.ts",
+      "import": "./dist/currency/defs/BIF.js"
+    },
+    "./currency/defs/BMD": {
+      "types": "./dist/currency/defs/BMD.d.ts",
+      "import": "./dist/currency/defs/BMD.js"
+    },
+    "./currency/defs/BND": {
+      "types": "./dist/currency/defs/BND.d.ts",
+      "import": "./dist/currency/defs/BND.js"
+    },
+    "./currency/defs/BOB": {
+      "types": "./dist/currency/defs/BOB.d.ts",
+      "import": "./dist/currency/defs/BOB.js"
+    },
+    "./currency/defs/BRL": {
+      "types": "./dist/currency/defs/BRL.d.ts",
+      "import": "./dist/currency/defs/BRL.js"
+    },
+    "./currency/defs/BSD": {
+      "types": "./dist/currency/defs/BSD.d.ts",
+      "import": "./dist/currency/defs/BSD.js"
+    },
+    "./currency/defs/BTN": {
+      "types": "./dist/currency/defs/BTN.d.ts",
+      "import": "./dist/currency/defs/BTN.js"
+    },
+    "./currency/defs/BWP": {
+      "types": "./dist/currency/defs/BWP.d.ts",
+      "import": "./dist/currency/defs/BWP.js"
+    },
+    "./currency/defs/BYN": {
+      "types": "./dist/currency/defs/BYN.d.ts",
+      "import": "./dist/currency/defs/BYN.js"
+    },
+    "./currency/defs/BZD": {
+      "types": "./dist/currency/defs/BZD.d.ts",
+      "import": "./dist/currency/defs/BZD.js"
+    },
+    "./currency/defs/CAD": {
+      "types": "./dist/currency/defs/CAD.d.ts",
+      "import": "./dist/currency/defs/CAD.js"
+    },
+    "./currency/defs/CDF": {
+      "types": "./dist/currency/defs/CDF.d.ts",
+      "import": "./dist/currency/defs/CDF.js"
+    },
+    "./currency/defs/CHF": {
+      "types": "./dist/currency/defs/CHF.d.ts",
+      "import": "./dist/currency/defs/CHF.js"
+    },
+    "./currency/defs/CLP": {
+      "types": "./dist/currency/defs/CLP.d.ts",
+      "import": "./dist/currency/defs/CLP.js"
+    },
+    "./currency/defs/CNY": {
+      "types": "./dist/currency/defs/CNY.d.ts",
+      "import": "./dist/currency/defs/CNY.js"
+    },
+    "./currency/defs/COP": {
+      "types": "./dist/currency/defs/COP.d.ts",
+      "import": "./dist/currency/defs/COP.js"
+    },
+    "./currency/defs/CRC": {
+      "types": "./dist/currency/defs/CRC.d.ts",
+      "import": "./dist/currency/defs/CRC.js"
+    },
+    "./currency/defs/CUC": {
+      "types": "./dist/currency/defs/CUC.d.ts",
+      "import": "./dist/currency/defs/CUC.js"
+    },
+    "./currency/defs/CUP": {
+      "types": "./dist/currency/defs/CUP.d.ts",
+      "import": "./dist/currency/defs/CUP.js"
+    },
+    "./currency/defs/CVE": {
+      "types": "./dist/currency/defs/CVE.d.ts",
+      "import": "./dist/currency/defs/CVE.js"
+    },
+    "./currency/defs/CZK": {
+      "types": "./dist/currency/defs/CZK.d.ts",
+      "import": "./dist/currency/defs/CZK.js"
+    },
+    "./currency/defs/DJF": {
+      "types": "./dist/currency/defs/DJF.d.ts",
+      "import": "./dist/currency/defs/DJF.js"
+    },
+    "./currency/defs/DKK": {
+      "types": "./dist/currency/defs/DKK.d.ts",
+      "import": "./dist/currency/defs/DKK.js"
+    },
+    "./currency/defs/DOP": {
+      "types": "./dist/currency/defs/DOP.d.ts",
+      "import": "./dist/currency/defs/DOP.js"
+    },
+    "./currency/defs/DZD": {
+      "types": "./dist/currency/defs/DZD.d.ts",
+      "import": "./dist/currency/defs/DZD.js"
+    },
+    "./currency/defs/EGP": {
+      "types": "./dist/currency/defs/EGP.d.ts",
+      "import": "./dist/currency/defs/EGP.js"
+    },
+    "./currency/defs/ERN": {
+      "types": "./dist/currency/defs/ERN.d.ts",
+      "import": "./dist/currency/defs/ERN.js"
+    },
+    "./currency/defs/ETB": {
+      "types": "./dist/currency/defs/ETB.d.ts",
+      "import": "./dist/currency/defs/ETB.js"
+    },
+    "./currency/defs/EUR": {
+      "types": "./dist/currency/defs/EUR.d.ts",
+      "import": "./dist/currency/defs/EUR.js"
+    },
+    "./currency/defs/FJD": {
+      "types": "./dist/currency/defs/FJD.d.ts",
+      "import": "./dist/currency/defs/FJD.js"
+    },
+    "./currency/defs/FKP": {
+      "types": "./dist/currency/defs/FKP.d.ts",
+      "import": "./dist/currency/defs/FKP.js"
+    },
+    "./currency/defs/GBP": {
+      "types": "./dist/currency/defs/GBP.d.ts",
+      "import": "./dist/currency/defs/GBP.js"
+    },
+    "./currency/defs/GEL": {
+      "types": "./dist/currency/defs/GEL.d.ts",
+      "import": "./dist/currency/defs/GEL.js"
+    },
+    "./currency/defs/GHS": {
+      "types": "./dist/currency/defs/GHS.d.ts",
+      "import": "./dist/currency/defs/GHS.js"
+    },
+    "./currency/defs/GIP": {
+      "types": "./dist/currency/defs/GIP.d.ts",
+      "import": "./dist/currency/defs/GIP.js"
+    },
+    "./currency/defs/GMD": {
+      "types": "./dist/currency/defs/GMD.d.ts",
+      "import": "./dist/currency/defs/GMD.js"
+    },
+    "./currency/defs/GNF": {
+      "types": "./dist/currency/defs/GNF.d.ts",
+      "import": "./dist/currency/defs/GNF.js"
+    },
+    "./currency/defs/GTQ": {
+      "types": "./dist/currency/defs/GTQ.d.ts",
+      "import": "./dist/currency/defs/GTQ.js"
+    },
+    "./currency/defs/GYD": {
+      "types": "./dist/currency/defs/GYD.d.ts",
+      "import": "./dist/currency/defs/GYD.js"
+    },
+    "./currency/defs/HKD": {
+      "types": "./dist/currency/defs/HKD.d.ts",
+      "import": "./dist/currency/defs/HKD.js"
+    },
+    "./currency/defs/HNL": {
+      "types": "./dist/currency/defs/HNL.d.ts",
+      "import": "./dist/currency/defs/HNL.js"
+    },
+    "./currency/defs/HTG": {
+      "types": "./dist/currency/defs/HTG.d.ts",
+      "import": "./dist/currency/defs/HTG.js"
+    },
+    "./currency/defs/HUF": {
+      "types": "./dist/currency/defs/HUF.d.ts",
+      "import": "./dist/currency/defs/HUF.js"
+    },
+    "./currency/defs/IDR": {
+      "types": "./dist/currency/defs/IDR.d.ts",
+      "import": "./dist/currency/defs/IDR.js"
+    },
+    "./currency/defs/ILS": {
+      "types": "./dist/currency/defs/ILS.d.ts",
+      "import": "./dist/currency/defs/ILS.js"
+    },
+    "./currency/defs": {
+      "types": "./dist/currency/defs/index.d.ts",
+      "import": "./dist/currency/defs/index.js"
+    },
+    "./currency/defs/INR": {
+      "types": "./dist/currency/defs/INR.d.ts",
+      "import": "./dist/currency/defs/INR.js"
+    },
+    "./currency/defs/IQD": {
+      "types": "./dist/currency/defs/IQD.d.ts",
+      "import": "./dist/currency/defs/IQD.js"
+    },
+    "./currency/defs/IRR": {
+      "types": "./dist/currency/defs/IRR.d.ts",
+      "import": "./dist/currency/defs/IRR.js"
+    },
+    "./currency/defs/ISK": {
+      "types": "./dist/currency/defs/ISK.d.ts",
+      "import": "./dist/currency/defs/ISK.js"
+    },
+    "./currency/defs/JMD": {
+      "types": "./dist/currency/defs/JMD.d.ts",
+      "import": "./dist/currency/defs/JMD.js"
+    },
+    "./currency/defs/JOD": {
+      "types": "./dist/currency/defs/JOD.d.ts",
+      "import": "./dist/currency/defs/JOD.js"
+    },
+    "./currency/defs/JPY": {
+      "types": "./dist/currency/defs/JPY.d.ts",
+      "import": "./dist/currency/defs/JPY.js"
+    },
+    "./currency/defs/KES": {
+      "types": "./dist/currency/defs/KES.d.ts",
+      "import": "./dist/currency/defs/KES.js"
+    },
+    "./currency/defs/KGS": {
+      "types": "./dist/currency/defs/KGS.d.ts",
+      "import": "./dist/currency/defs/KGS.js"
+    },
+    "./currency/defs/KHR": {
+      "types": "./dist/currency/defs/KHR.d.ts",
+      "import": "./dist/currency/defs/KHR.js"
+    },
+    "./currency/defs/KMF": {
+      "types": "./dist/currency/defs/KMF.d.ts",
+      "import": "./dist/currency/defs/KMF.js"
+    },
+    "./currency/defs/KPW": {
+      "types": "./dist/currency/defs/KPW.d.ts",
+      "import": "./dist/currency/defs/KPW.js"
+    },
+    "./currency/defs/KRW": {
+      "types": "./dist/currency/defs/KRW.d.ts",
+      "import": "./dist/currency/defs/KRW.js"
+    },
+    "./currency/defs/KWD": {
+      "types": "./dist/currency/defs/KWD.d.ts",
+      "import": "./dist/currency/defs/KWD.js"
+    },
+    "./currency/defs/KYD": {
+      "types": "./dist/currency/defs/KYD.d.ts",
+      "import": "./dist/currency/defs/KYD.js"
+    },
+    "./currency/defs/KZT": {
+      "types": "./dist/currency/defs/KZT.d.ts",
+      "import": "./dist/currency/defs/KZT.js"
+    },
+    "./currency/defs/LAK": {
+      "types": "./dist/currency/defs/LAK.d.ts",
+      "import": "./dist/currency/defs/LAK.js"
+    },
+    "./currency/defs/LBP": {
+      "types": "./dist/currency/defs/LBP.d.ts",
+      "import": "./dist/currency/defs/LBP.js"
+    },
+    "./currency/defs/LKR": {
+      "types": "./dist/currency/defs/LKR.d.ts",
+      "import": "./dist/currency/defs/LKR.js"
+    },
+    "./currency/defs/LRD": {
+      "types": "./dist/currency/defs/LRD.d.ts",
+      "import": "./dist/currency/defs/LRD.js"
+    },
+    "./currency/defs/LSL": {
+      "types": "./dist/currency/defs/LSL.d.ts",
+      "import": "./dist/currency/defs/LSL.js"
+    },
+    "./currency/defs/LYD": {
+      "types": "./dist/currency/defs/LYD.d.ts",
+      "import": "./dist/currency/defs/LYD.js"
+    },
+    "./currency/defs/MAD": {
+      "types": "./dist/currency/defs/MAD.d.ts",
+      "import": "./dist/currency/defs/MAD.js"
+    },
+    "./currency/defs/MDL": {
+      "types": "./dist/currency/defs/MDL.d.ts",
+      "import": "./dist/currency/defs/MDL.js"
+    },
+    "./currency/defs/MGA": {
+      "types": "./dist/currency/defs/MGA.d.ts",
+      "import": "./dist/currency/defs/MGA.js"
+    },
+    "./currency/defs/MKD": {
+      "types": "./dist/currency/defs/MKD.d.ts",
+      "import": "./dist/currency/defs/MKD.js"
+    },
+    "./currency/defs/MMK": {
+      "types": "./dist/currency/defs/MMK.d.ts",
+      "import": "./dist/currency/defs/MMK.js"
+    },
+    "./currency/defs/MNT": {
+      "types": "./dist/currency/defs/MNT.d.ts",
+      "import": "./dist/currency/defs/MNT.js"
+    },
+    "./currency/defs/MOP": {
+      "types": "./dist/currency/defs/MOP.d.ts",
+      "import": "./dist/currency/defs/MOP.js"
+    },
+    "./currency/defs/MRU": {
+      "types": "./dist/currency/defs/MRU.d.ts",
+      "import": "./dist/currency/defs/MRU.js"
+    },
+    "./currency/defs/MUR": {
+      "types": "./dist/currency/defs/MUR.d.ts",
+      "import": "./dist/currency/defs/MUR.js"
+    },
+    "./currency/defs/MVR": {
+      "types": "./dist/currency/defs/MVR.d.ts",
+      "import": "./dist/currency/defs/MVR.js"
+    },
+    "./currency/defs/MWK": {
+      "types": "./dist/currency/defs/MWK.d.ts",
+      "import": "./dist/currency/defs/MWK.js"
+    },
+    "./currency/defs/MXN": {
+      "types": "./dist/currency/defs/MXN.d.ts",
+      "import": "./dist/currency/defs/MXN.js"
+    },
+    "./currency/defs/MYR": {
+      "types": "./dist/currency/defs/MYR.d.ts",
+      "import": "./dist/currency/defs/MYR.js"
+    },
+    "./currency/defs/MZN": {
+      "types": "./dist/currency/defs/MZN.d.ts",
+      "import": "./dist/currency/defs/MZN.js"
+    },
+    "./currency/defs/NAD": {
+      "types": "./dist/currency/defs/NAD.d.ts",
+      "import": "./dist/currency/defs/NAD.js"
+    },
+    "./currency/defs/NGN": {
+      "types": "./dist/currency/defs/NGN.d.ts",
+      "import": "./dist/currency/defs/NGN.js"
+    },
+    "./currency/defs/NIO": {
+      "types": "./dist/currency/defs/NIO.d.ts",
+      "import": "./dist/currency/defs/NIO.js"
+    },
+    "./currency/defs/NOK": {
+      "types": "./dist/currency/defs/NOK.d.ts",
+      "import": "./dist/currency/defs/NOK.js"
+    },
+    "./currency/defs/NPR": {
+      "types": "./dist/currency/defs/NPR.d.ts",
+      "import": "./dist/currency/defs/NPR.js"
+    },
+    "./currency/defs/NZD": {
+      "types": "./dist/currency/defs/NZD.d.ts",
+      "import": "./dist/currency/defs/NZD.js"
+    },
+    "./currency/defs/OMR": {
+      "types": "./dist/currency/defs/OMR.d.ts",
+      "import": "./dist/currency/defs/OMR.js"
+    },
+    "./currency/defs/PAB": {
+      "types": "./dist/currency/defs/PAB.d.ts",
+      "import": "./dist/currency/defs/PAB.js"
+    },
+    "./currency/defs/PEN": {
+      "types": "./dist/currency/defs/PEN.d.ts",
+      "import": "./dist/currency/defs/PEN.js"
+    },
+    "./currency/defs/PGK": {
+      "types": "./dist/currency/defs/PGK.d.ts",
+      "import": "./dist/currency/defs/PGK.js"
+    },
+    "./currency/defs/PHP": {
+      "types": "./dist/currency/defs/PHP.d.ts",
+      "import": "./dist/currency/defs/PHP.js"
+    },
+    "./currency/defs/PKR": {
+      "types": "./dist/currency/defs/PKR.d.ts",
+      "import": "./dist/currency/defs/PKR.js"
+    },
+    "./currency/defs/PLN": {
+      "types": "./dist/currency/defs/PLN.d.ts",
+      "import": "./dist/currency/defs/PLN.js"
+    },
+    "./currency/defs/PYG": {
+      "types": "./dist/currency/defs/PYG.d.ts",
+      "import": "./dist/currency/defs/PYG.js"
+    },
+    "./currency/defs/QAR": {
+      "types": "./dist/currency/defs/QAR.d.ts",
+      "import": "./dist/currency/defs/QAR.js"
+    },
+    "./currency/defs/RON": {
+      "types": "./dist/currency/defs/RON.d.ts",
+      "import": "./dist/currency/defs/RON.js"
+    },
+    "./currency/defs/RSD": {
+      "types": "./dist/currency/defs/RSD.d.ts",
+      "import": "./dist/currency/defs/RSD.js"
+    },
+    "./currency/defs/RUB": {
+      "types": "./dist/currency/defs/RUB.d.ts",
+      "import": "./dist/currency/defs/RUB.js"
+    },
+    "./currency/defs/RWF": {
+      "types": "./dist/currency/defs/RWF.d.ts",
+      "import": "./dist/currency/defs/RWF.js"
+    },
+    "./currency/defs/SAR": {
+      "types": "./dist/currency/defs/SAR.d.ts",
+      "import": "./dist/currency/defs/SAR.js"
+    },
+    "./currency/defs/SBD": {
+      "types": "./dist/currency/defs/SBD.d.ts",
+      "import": "./dist/currency/defs/SBD.js"
+    },
+    "./currency/defs/SCR": {
+      "types": "./dist/currency/defs/SCR.d.ts",
+      "import": "./dist/currency/defs/SCR.js"
+    },
+    "./currency/defs/SDG": {
+      "types": "./dist/currency/defs/SDG.d.ts",
+      "import": "./dist/currency/defs/SDG.js"
+    },
+    "./currency/defs/SEK": {
+      "types": "./dist/currency/defs/SEK.d.ts",
+      "import": "./dist/currency/defs/SEK.js"
+    },
+    "./currency/defs/SGD": {
+      "types": "./dist/currency/defs/SGD.d.ts",
+      "import": "./dist/currency/defs/SGD.js"
+    },
+    "./currency/defs/SHP": {
+      "types": "./dist/currency/defs/SHP.d.ts",
+      "import": "./dist/currency/defs/SHP.js"
+    },
+    "./currency/defs/SOS": {
+      "types": "./dist/currency/defs/SOS.d.ts",
+      "import": "./dist/currency/defs/SOS.js"
+    },
+    "./currency/defs/SRD": {
+      "types": "./dist/currency/defs/SRD.d.ts",
+      "import": "./dist/currency/defs/SRD.js"
+    },
+    "./currency/defs/SSP": {
+      "types": "./dist/currency/defs/SSP.d.ts",
+      "import": "./dist/currency/defs/SSP.js"
+    },
+    "./currency/defs/STN": {
+      "types": "./dist/currency/defs/STN.d.ts",
+      "import": "./dist/currency/defs/STN.js"
+    },
+    "./currency/defs/SVC": {
+      "types": "./dist/currency/defs/SVC.d.ts",
+      "import": "./dist/currency/defs/SVC.js"
+    },
+    "./currency/defs/SYP": {
+      "types": "./dist/currency/defs/SYP.d.ts",
+      "import": "./dist/currency/defs/SYP.js"
+    },
+    "./currency/defs/SZL": {
+      "types": "./dist/currency/defs/SZL.d.ts",
+      "import": "./dist/currency/defs/SZL.js"
+    },
+    "./currency/defs/THB": {
+      "types": "./dist/currency/defs/THB.d.ts",
+      "import": "./dist/currency/defs/THB.js"
+    },
+    "./currency/defs/TJS": {
+      "types": "./dist/currency/defs/TJS.d.ts",
+      "import": "./dist/currency/defs/TJS.js"
+    },
+    "./currency/defs/TMT": {
+      "types": "./dist/currency/defs/TMT.d.ts",
+      "import": "./dist/currency/defs/TMT.js"
+    },
+    "./currency/defs/TND": {
+      "types": "./dist/currency/defs/TND.d.ts",
+      "import": "./dist/currency/defs/TND.js"
+    },
+    "./currency/defs/TOP": {
+      "types": "./dist/currency/defs/TOP.d.ts",
+      "import": "./dist/currency/defs/TOP.js"
+    },
+    "./currency/defs/TRY": {
+      "types": "./dist/currency/defs/TRY.d.ts",
+      "import": "./dist/currency/defs/TRY.js"
+    },
+    "./currency/defs/TTD": {
+      "types": "./dist/currency/defs/TTD.d.ts",
+      "import": "./dist/currency/defs/TTD.js"
+    },
+    "./currency/defs/TWD": {
+      "types": "./dist/currency/defs/TWD.d.ts",
+      "import": "./dist/currency/defs/TWD.js"
+    },
+    "./currency/defs/TZS": {
+      "types": "./dist/currency/defs/TZS.d.ts",
+      "import": "./dist/currency/defs/TZS.js"
+    },
+    "./currency/defs/UAH": {
+      "types": "./dist/currency/defs/UAH.d.ts",
+      "import": "./dist/currency/defs/UAH.js"
+    },
+    "./currency/defs/UGX": {
+      "types": "./dist/currency/defs/UGX.d.ts",
+      "import": "./dist/currency/defs/UGX.js"
+    },
+    "./currency/defs/USD": {
+      "types": "./dist/currency/defs/USD.d.ts",
+      "import": "./dist/currency/defs/USD.js"
+    },
+    "./currency/defs/UYU": {
+      "types": "./dist/currency/defs/UYU.d.ts",
+      "import": "./dist/currency/defs/UYU.js"
+    },
+    "./currency/defs/UZS": {
+      "types": "./dist/currency/defs/UZS.d.ts",
+      "import": "./dist/currency/defs/UZS.js"
+    },
+    "./currency/defs/VED": {
+      "types": "./dist/currency/defs/VED.d.ts",
+      "import": "./dist/currency/defs/VED.js"
+    },
+    "./currency/defs/VES": {
+      "types": "./dist/currency/defs/VES.d.ts",
+      "import": "./dist/currency/defs/VES.js"
+    },
+    "./currency/defs/VND": {
+      "types": "./dist/currency/defs/VND.d.ts",
+      "import": "./dist/currency/defs/VND.js"
+    },
+    "./currency/defs/VUV": {
+      "types": "./dist/currency/defs/VUV.d.ts",
+      "import": "./dist/currency/defs/VUV.js"
+    },
+    "./currency/defs/WST": {
+      "types": "./dist/currency/defs/WST.d.ts",
+      "import": "./dist/currency/defs/WST.js"
+    },
+    "./currency/defs/XAF": {
+      "types": "./dist/currency/defs/XAF.d.ts",
+      "import": "./dist/currency/defs/XAF.js"
+    },
+    "./currency/defs/XCD": {
+      "types": "./dist/currency/defs/XCD.d.ts",
+      "import": "./dist/currency/defs/XCD.js"
+    },
+    "./currency/defs/XOF": {
+      "types": "./dist/currency/defs/XOF.d.ts",
+      "import": "./dist/currency/defs/XOF.js"
+    },
+    "./currency/defs/XPF": {
+      "types": "./dist/currency/defs/XPF.d.ts",
+      "import": "./dist/currency/defs/XPF.js"
+    },
+    "./currency/defs/YER": {
+      "types": "./dist/currency/defs/YER.d.ts",
+      "import": "./dist/currency/defs/YER.js"
+    },
+    "./currency/defs/ZAR": {
+      "types": "./dist/currency/defs/ZAR.d.ts",
+      "import": "./dist/currency/defs/ZAR.js"
+    },
+    "./currency/defs/ZMW": {
+      "types": "./dist/currency/defs/ZMW.d.ts",
+      "import": "./dist/currency/defs/ZMW.js"
+    },
+    "./currency": {
+      "types": "./dist/currency/index.d.ts",
+      "import": "./dist/currency/index.js"
+    },
+    "./currency/lookup": {
+      "types": "./dist/currency/lookup.d.ts",
+      "import": "./dist/currency/lookup.js"
+    },
+    "./lib/helpers": {
+      "types": "./dist/lib/helpers.d.ts",
+      "import": "./dist/lib/helpers.js"
+    },
+    "./lib/NonNegativeRational": {
+      "types": "./dist/lib/NonNegativeRational.d.ts",
+      "import": "./dist/lib/NonNegativeRational.js"
+    },
+    "./lib/number": {
+      "types": "./dist/lib/number.d.ts",
+      "import": "./dist/lib/number.js"
+    },
+    "./Money/add": {
+      "types": "./dist/Money/add.d.ts",
+      "import": "./dist/Money/add.js"
+    },
+    "./Money/div": {
+      "types": "./dist/Money/div.d.ts",
+      "import": "./dist/Money/div.js"
+    },
+    "./Money/from-number": {
+      "types": "./dist/Money/from-number.d.ts",
+      "import": "./dist/Money/from-number.js"
+    },
+    "./Money": {
+      "types": "./dist/Money/index.d.ts",
+      "import": "./dist/Money/index.js"
+    },
+    "./Money/Money": {
+      "types": "./dist/Money/Money.d.ts",
+      "import": "./dist/Money/Money.js"
+    },
+    "./Money/mul": {
+      "types": "./dist/Money/mul.d.ts",
+      "import": "./dist/Money/mul.js"
+    },
+    "./Money/sub": {
+      "types": "./dist/Money/sub.d.ts",
+      "import": "./dist/Money/sub.js"
+    },
+    "./Money/sum": {
+      "types": "./dist/Money/sum.d.ts",
+      "import": "./dist/Money/sum.js"
+    },
+    "./scripts/generate-currency-defs/data/currency-block-list": {
+      "types": "./dist/scripts/generate-currency-defs/data/currency-block-list.d.ts",
+      "import": "./dist/scripts/generate-currency-defs/data/currency-block-list.js"
+    },
+    "./scripts/generate-currency-defs/data/currency-check-list": {
+      "types": "./dist/scripts/generate-currency-defs/data/currency-check-list.d.ts",
+      "import": "./dist/scripts/generate-currency-defs/data/currency-check-list.js"
+    },
+    "./scripts/generate-currency-defs/data/currency-unit-names": {
+      "types": "./dist/scripts/generate-currency-defs/data/currency-unit-names.d.ts",
+      "import": "./dist/scripts/generate-currency-defs/data/currency-unit-names.js"
+    },
+    "./scripts/generate-currency-defs/helpers": {
+      "types": "./dist/scripts/generate-currency-defs/helpers.d.ts",
+      "import": "./dist/scripts/generate-currency-defs/helpers.js"
+    },
+    "./scripts/generate-currency-defs": {
+      "types": "./dist/scripts/generate-currency-defs/index.d.ts",
+      "import": "./dist/scripts/generate-currency-defs/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "!dist/**/*.test.*"
+  ],
+  "main": "dist/index.js",
+  "dependencies": {
+    "@konker.dev/tiny-error-fp": "workspace:*",
+    "effect": "^3.11.3"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.1",
+    "@effect/language-service": "^0.1.0",
+    "@eslint/compat": "^1.2.4",
+    "@eslint/js": "^9.17.0",
+    "@konker.dev/common-config": "0.2.4",
+    "@types/node": "^20.17.10",
+    "@vitest/coverage-istanbul": "^3.0.9",
+    "codecov": "^3.8.3",
+    "currency-codes": "^2.1.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^1.6.0",
+    "handlebars": "^4.7.8",
+    "leasot": "^13.3.0",
+    "madge": "^6.1.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "type-coverage": "^2.29.7",
+    "typedoc": "^0.28.4",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^3.0.9"
+  },
+  "scripts": {
+    "test": "vitest run --coverage",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm run clean && tsc",
+    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files src/index.test.ts --ignore-files src/scripts/generate-currency-defs/index.ts",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
+    "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
+    "eslint-fix": "npx eslint --fix||true",
+    "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
+    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
+    "fixme-check": "leasot --exit-nicely --skip-unsupported src",
+    "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
+    "prettier-fix": "pnpm run prettier-check --write",
+    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
+    "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
+    "pre-push": "pnpm run lint-check && pnpm run typecheck",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/tiny-money-fp'",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
+    "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`",
+    "clean-currency-defs": "rm src/currency/defs/*.ts; touch src/currency/defs/index.ts",
+    "generate-currency-defs": "npx tsx ./src/scripts/generate-currency-defs"
+  }
+}

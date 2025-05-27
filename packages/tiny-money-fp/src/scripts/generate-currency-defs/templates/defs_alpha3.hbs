@@ -1,0 +1,31 @@
+/* WARNING!!! THIS IS GENERATED CODE: DO NOT EDIT MANUALLY */
+/* eslint-disable */
+
+import * as NonNegativeRational from '../../lib/NonNegativeRational.js';
+import * as N from '../../lib/number.js';
+import { CURRENCIES } from '../Currency.js';
+
+declare module '../Currency.js' {
+  interface CURRENCIES {
+    {{currency.symbol}}: {
+      symbol: '{{currency.symbol}}';
+      scales: {
+        {{#each currency.units}}
+        {{{enquoteUnit this.unit}}}: CurrencyScale;
+        {{/each}}
+      };
+    };
+  }
+}
+
+CURRENCIES['{{currency.symbol}}'] = {
+  symbol: '{{currency.symbol}}',
+  scales: {
+    {{#each currency.units}}
+    {{{enquoteUnit this.unit}}}: {
+      multiplier: {{this.multiplier}},
+      decimals: {{this.decimals}},
+    },
+    {{/each}}
+  },
+};
