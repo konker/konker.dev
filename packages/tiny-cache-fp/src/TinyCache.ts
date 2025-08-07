@@ -3,11 +3,7 @@ import type * as Effect from 'effect/Effect';
 
 import type { CacheError } from './lib/error.js';
 
-export const CACHE_KIND_CACHE = 'Cache' as const;
-
-export type Cache<C, R> = {
-  readonly _kind: typeof CACHE_KIND_CACHE;
-
+export type TinyCache<C, R = never> = {
   // Write a cache entry with the given key and value
   readonly setVal: (key: string, value: C, ttlSecs?: number) => Effect.Effect<void, CacheError, R>;
 

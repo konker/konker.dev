@@ -9,8 +9,9 @@ import {
   TEST_JWT_SIGNING_SECRET,
 } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
 import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens';
+import { JsonCache } from '@konker.dev/tiny-cache-fp';
 import { JsonHashCacheKeyResolver } from '@konker.dev/tiny-cache-fp/lib/CacheKeyResolver/JsonHashCacheKeyResolver';
-import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCacheJson';
+import { MomentoStringCache } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCache';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
@@ -133,7 +134,7 @@ describe('kitchen sink', () => {
       M.awsApiGatewayProcessor.middleware(),
       M.requestResponseLogger.middleware(),
       M.cacheInMemory.middleware(JsonHashCacheKeyResolver()),
-      M.cacheMomento.middleware(JsonHashCacheKeyResolver(), MomentoStringCacheJson()),
+      M.cacheMomento.middleware(JsonHashCacheKeyResolver(), JsonCache(MomentoStringCache)),
       M.momentoClientInit.middleware({}),
       M.envValidator.middleware(Env)
     );

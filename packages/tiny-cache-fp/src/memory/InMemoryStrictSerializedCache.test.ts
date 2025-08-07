@@ -2,8 +2,9 @@ import { Option, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
+import { StrictSerializedCache } from '../StrictSerializedCache.js';
+import type { TinyCache } from '../TinyCache.js';
 import { InMemoryCache } from './InMemoryCache.js';
-import * as unit from './InMemoryStrictSerializedCache.js';
 
 const TEST_KEY = 'test-key';
 const TEST_VALUE = {
@@ -18,10 +19,7 @@ const TEST_SCHEMA = Schema.Struct({
 type TestSchema = Schema.Schema.Type<typeof TEST_SCHEMA>;
 
 describe('InMemoryStrictSerializedCache', () => {
-  const cache: unit.InMemoryStrictSerializedCache<TestSchema> = unit.InMemoryStrictSerializedCache(
-    InMemoryCache<TestSchema>(),
-    TEST_SCHEMA
-  );
+  const cache: TinyCache<TestSchema> = StrictSerializedCache(InMemoryCache<TestSchema>(), TEST_SCHEMA);
 
   it('should be able to get a value which does not exist', async () => {
     const result1 = cache.getVal('non-existing-key');

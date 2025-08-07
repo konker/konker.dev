@@ -1,6 +1,7 @@
 import { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
 import { MockMomentoClient, TEST_MOMENTO_AUTH_TOKEN } from '@konker.dev/momento-cache-client-effect/lib/test';
-import { MomentoStringCacheJson } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCacheJson';
+import { JsonCache } from '@konker.dev/tiny-cache-fp/JsonCache';
+import { MomentoStringCache } from '@konker.dev/tiny-cache-fp/momento/MomentoStringCache';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -14,7 +15,8 @@ export type In = { foo: 'foo' };
 const TEST_IN: In = { foo: 'foo' };
 
 describe('middleware/cache-momento', () => {
-  const cache = MomentoStringCacheJson();
+  const cache = JsonCache(MomentoStringCache);
+
   let TEST_DEPS: MomentoClientDeps;
   let oldEnv: any;
 
