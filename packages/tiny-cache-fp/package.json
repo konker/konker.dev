@@ -53,37 +53,25 @@
       "types": "./dist/memory/InMemoryCache.d.ts",
       "import": "./dist/memory/InMemoryCache.js"
     },
-    "./memory/InMemoryStrictSerializedCache": {
-      "types": "./dist/memory/InMemoryStrictSerializedCache.d.ts",
-      "import": "./dist/memory/InMemoryStrictSerializedCache.js"
-    },
-    "./memory/InMemoryStrictSerializedCacheJson": {
-      "types": "./dist/memory/InMemoryStrictSerializedCacheJson.d.ts",
-      "import": "./dist/memory/InMemoryStrictSerializedCacheJson.js"
-    },
-    "./momento/MomentoStrictSerializedCache": {
-      "types": "./dist/momento/MomentoStrictSerializedCache.d.ts",
-      "import": "./dist/momento/MomentoStrictSerializedCache.js"
-    },
-    "./momento/MomentoStrictSerializedCacheJson": {
-      "types": "./dist/momento/MomentoStrictSerializedCacheJson.d.ts",
-      "import": "./dist/momento/MomentoStrictSerializedCacheJson.js"
-    },
     "./momento/MomentoStringCache": {
       "types": "./dist/momento/MomentoStringCache.d.ts",
       "import": "./dist/momento/MomentoStringCache.js"
-    },
-    "./momento/MomentoStringCacheJson": {
-      "types": "./dist/momento/MomentoStringCacheJson.d.ts",
-      "import": "./dist/momento/MomentoStringCacheJson.js"
     },
     "./Cache": {
       "types": "./dist/Cache.d.ts",
       "import": "./dist/Cache.js"
     },
+    "./JsonCache": {
+      "types": "./dist/JsonCache.d.ts",
+      "import": "./dist/JsonCache.js"
+    },
     "./StrictSerializedCache": {
       "types": "./dist/StrictSerializedCache.d.ts",
       "import": "./dist/StrictSerializedCache.js"
+    },
+    "./StrictSerializedJsonCache": {
+      "types": "./dist/StrictSerializedJsonCache.d.ts",
+      "import": "./dist/StrictSerializedJsonCache.js"
     }
   },
   "files": [
