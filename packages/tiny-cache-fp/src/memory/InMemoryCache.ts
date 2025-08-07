@@ -3,7 +3,6 @@ import { Option } from 'effect';
 import * as Effect from 'effect/Effect';
 
 import type { Cache } from '../Cache.js';
-import { CACHE_KIND_CACHE } from '../Cache.js';
 import type { CacheError } from '../lib/error.js';
 
 const setVal =
@@ -32,8 +31,6 @@ export const InMemoryCache = <V>(): InMemoryCache<V> => {
   const __cache = {} as Record<string, V | undefined>;
 
   return {
-    _kind: CACHE_KIND_CACHE,
-
     setVal: setVal(__cache),
     getVal: getVal(__cache),
     delVal: delVal(__cache),

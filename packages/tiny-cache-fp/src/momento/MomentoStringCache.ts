@@ -4,7 +4,6 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
 import type { Cache } from '../Cache.js';
-import { CACHE_KIND_CACHE } from '../Cache.js';
 import type { CacheError } from '../lib/error.js';
 import { toCacheError } from '../lib/error.js';
 
@@ -18,8 +17,6 @@ const delVal = (key: string): Effect.Effect<void, CacheError, M.MomentoClientDep
   pipe(M.MomentoDelDefaultCache(key), Effect.mapError(toCacheError));
 
 export const MomentoStringCache: Cache<string, M.MomentoClientDeps> = {
-  _kind: CACHE_KIND_CACHE,
-
   getVal,
   setVal,
   delVal,

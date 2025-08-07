@@ -28,16 +28,10 @@ const delVal =
   (key: string): Effect.Effect<void, CacheError, R> =>
     cache.delVal(key);
 
-export type StrictSerializedCache<V, R = never> = Omit<Cache<V, R>, '_kind'> & {
-  _kind: typeof CACHE_KIND_STRICT_SERIALIZED_CACHE;
-};
-
 export const StrictSerializedCache = <V, C, R = never>(
   cache: Cache<C, R>,
   schema: Schema.Schema<V, C>
-): StrictSerializedCache<V, R> => ({
-  _kind: CACHE_KIND_STRICT_SERIALIZED_CACHE,
-
+): Cache<V, R> => ({
   setVal: setVal(cache, schema),
   getVal: getVal(cache, schema),
   delVal: delVal(cache),

@@ -5,6 +5,7 @@ import { Option, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import type { Cache } from '../Cache.js';
 import { JsonCache } from '../JsonCache.js';
 import { MomentoStringCache } from './MomentoStringCache.js';
 
@@ -12,7 +13,7 @@ const TEST_KEY_1 = 'test-key-1';
 const TEST_VALUE_1 = 'test-value';
 
 describe('MomentoStringCacheJson', () => {
-  const cache: JsonCache<MomentoClientDeps> = JsonCache(MomentoStringCache);
+  const cache: Cache<unknown, MomentoClientDeps> = JsonCache(MomentoStringCache);
 
   let momentoClient: momento.CacheClient;
   let deps: MomentoClientDeps;

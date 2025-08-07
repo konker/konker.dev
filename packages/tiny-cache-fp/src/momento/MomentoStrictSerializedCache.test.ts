@@ -5,6 +5,7 @@ import { Option, pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import type { Cache } from '../Cache.js';
 import { StrictSerializedCache } from '../StrictSerializedCache.js';
 import { MomentoStringCache } from './MomentoStringCache.js';
 
@@ -23,7 +24,7 @@ const TEST_SCHEMA_STRING = Schema.parseJson(TEST_SCHEMA);
 type TestSchemaString = Schema.Schema.Type<typeof TEST_SCHEMA_STRING>;
 
 describe('MomentoStrictSerializedCache', () => {
-  const cache: StrictSerializedCache<TestSchemaString, MomentoClientDeps> = StrictSerializedCache(
+  const cache: Cache<TestSchemaString, MomentoClientDeps> = StrictSerializedCache(
     MomentoStringCache,
     TEST_SCHEMA_STRING
   );
