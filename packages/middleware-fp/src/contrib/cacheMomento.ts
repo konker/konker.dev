@@ -1,5 +1,5 @@
 import type { MomentoClientDeps } from '@konker.dev/momento-cache-client-effect';
-import type { CacheType } from '@konker.dev/tiny-cache-fp';
+import type { TinyCache } from '@konker.dev/tiny-cache-fp';
 import type { CacheKeyResolver } from '@konker.dev/tiny-cache-fp/lib/CacheKeyResolver';
 import { chainGetVal, chainSetVal } from '@konker.dev/tiny-cache-fp/lib/helpers';
 import { pipe } from 'effect';
@@ -12,7 +12,7 @@ import { toMiddlewareError } from '../lib/MiddlewareError.js';
 const TAG = 'cacheMomento';
 
 export const middleware =
-  <I, O, CR>(cacheKeyResolver: CacheKeyResolver<I, CR>, cache: CacheType<O, MomentoClientDeps>, ttl?: number) =>
+  <I, O, CR>(cacheKeyResolver: CacheKeyResolver<I, CR>, cache: TinyCache<O, MomentoClientDeps>, ttl?: number) =>
   <E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E | MiddlewareError, R | CR | MomentoClientDeps> =>
   (i: I) =>
     pipe(
