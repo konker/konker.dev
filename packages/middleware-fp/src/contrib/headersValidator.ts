@@ -1,25 +1,24 @@
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index.js';
-import type { RequestHeaders } from '../lib/http.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
+import { makeRequestW, type RequestW } from '../lib/http.js';
 import type { MiddlewareError } from '../lib/MiddlewareError.js';
 import { toMiddlewareError } from '../lib/MiddlewareError.js';
-import type { WithPossibleInputHeaders } from './headersNormalizer/types.js';
 
 const TAG = 'headersValidator';
 
 export type WithValidatedHeaders<V> = {
   headers: V;
-  validatorRawHeaders: RequestHeaders | undefined;
+  headersValidatorRaw: RequestW['headers'] | undefined;
 };
 
 export const middleware =
   <V0, V1>(schema: Schema.Schema<V0, V1>) =>
-  <I, O, E, R>(
-    wrapped: Handler<I & WithValidatedHeaders<V0>, O, E, R>
-  ): Handler<I & WithPossibleInputHeaders, O, E | MiddlewareError, R> =>
-  (i: I & WithPossibleInputHeaders) =>
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I & WithValidatedHeaders<V0>, O, E, R>
+  ): RequestResponseHandler<I, O, E | MiddlewareError, R> =>
+  (i: RequestW<I>) =>
     pipe(
       Effect.succeed(i),
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
@@ -27,10 +26,11 @@ export const middleware =
         pipe(i.headers, Schema.decodeUnknown(schema, { errors: 'all', onExcessProperty: 'ignore' }))
       ),
       Effect.mapError((e) => toMiddlewareError(e)),
-      Effect.map((validatedHeaders: V0) => ({
-        ...i,
-        headers: validatedHeaders,
-        validatorRawHeaders: i.headers,
-      })),
+      Effect.map((validatedHeaders: V0) =>
+        makeRequestW(i, {
+          headers: validatedHeaders,
+          headersValidatorRaw: i.headers,
+        })
+      ),
       Effect.flatMap(wrapped)
     );

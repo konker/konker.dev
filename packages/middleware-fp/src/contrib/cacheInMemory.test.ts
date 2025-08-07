@@ -2,24 +2,35 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it, vi } from 'vitest';
 
+import { EMPTY_REQUEST_W } from '../lib/http.js';
 import * as common from '../test/test-common.js';
-import { TestDeps } from '../test/test-common.js';
+import { TestDepsW } from '../test/test-common.js';
 import * as unit from './cacheInMemory.js';
 
-export type In = { foo: 'foo' };
-
-const TEST_IN: In = { foo: 'foo' };
-const TEST_DEPS: common.TestDeps = { bar: 'bar' };
+const TEST_DEPS: TestDepsW = { bar: 'bar' };
 
 describe('middleware/cache-in-memory', () => {
   const cacheKeyResolver = <I>(_: I) => Effect.succeed('CACHE_KEY');
-  const coreSpy = vi.spyOn(common, 'echoCoreInDeps');
-  const stack = pipe(common.echoCoreInDeps(common.TestDeps), unit.middleware<In, common.TestDeps>(cacheKeyResolver));
+  const coreSpy = vi.spyOn(common, 'echoCoreInDepsW');
+  const stack = pipe(common.echoCoreInDepsW(TestDepsW), unit.middleware<{}, common.TestDepsW>(cacheKeyResolver));
 
   it('should work as expected', async () => {
-    const result1 = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
-    const result2 = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
-    expect(result1).toStrictEqual({ foo: 'foo', bar: 'bar' });
+    const result1 = await pipe(stack(EMPTY_REQUEST_W), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
+    const result2 = await pipe(stack(EMPTY_REQUEST_W), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
+    expect(result1).toStrictEqual({
+      body: 'OK',
+      deps: {
+        bar: 'bar',
+      },
+      headers: {},
+      in: {
+        headers: {},
+        method: 'GET',
+        pathParameters: {},
+        queryStringParameters: {},
+      },
+      statusCode: 200,
+    });
     expect(result2).toStrictEqual(result1);
     expect(coreSpy).toHaveBeenCalledTimes(1);
   });

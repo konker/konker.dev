@@ -1,10 +1,10 @@
 import * as hashUtils from '@konker.dev/tiny-utils-fp/hash';
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { http200CoreIn } from '../../test/test-common.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../../lib/http.js';
+import { echoCoreIn200W } from '../../test/test-common.js';
 import * as unit from './index.js';
 
 // https://stackoverflow.com/a/72885576/203284
@@ -27,23 +27,21 @@ export const mockHeaderSignatureAuthorizerDeps = Effect.provideService(
   HEADER_SIGNATURE_AUTHORIZER_TEST_DEPS
 );
 
-const TEST_IN_1: APIGatewayProxyEventV2 = {
-  isBase64Encoded: false,
-  requestContext: {} as any,
+const TEST_IN_1 = makeRequestW(EMPTY_REQUEST_W, {
+  method: 'POST',
   body: 'TEST_BODY',
   headers: {
     [TEST_SIGNATURE_HEADER_NAME]: CORRECT_TEST_HMAC_VALUE,
   },
-} as unknown as APIGatewayProxyEventV2;
+});
 
-const TEST_IN_2: APIGatewayProxyEventV2 = {
-  isBase64Encoded: false,
-  requestContext: {} as any,
+const TEST_IN_2 = makeRequestW(EMPTY_REQUEST_W, {
+  method: 'POST',
   body: 'TEST_BODY',
   headers: {
     [TEST_SIGNATURE_HEADER_NAME]: INCORRECT_TEST_HMAC_VALUE,
   },
-} as unknown as APIGatewayProxyEventV2;
+});
 
 describe('middleware/header-signature-authorizer', () => {
   let errorSpy: MockInstance;
@@ -58,22 +56,30 @@ describe('middleware/header-signature-authorizer', () => {
   });
 
   it('should work as expected in an success case', async () => {
-    const egHandler = pipe(http200CoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = await pipe(egHandler(TEST_IN_1), mockHeaderSignatureAuthorizerDeps, Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
+      body: 'TEST_BODY',
       headers: {
-        QUX: 'qux_value',
+        'x-test-signature': 'test-hmac-value',
       },
-      body: JSON.stringify({ result: 'OK' }),
-      isBase64Encoded: false,
+      in: {
+        body: 'TEST_BODY',
+        headers: {
+          'x-test-signature': 'test-hmac-value',
+        },
+        method: 'POST',
+        pathParameters: {},
+        queryStringParameters: {},
+      },
     });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should work as expected in an error case', async () => {
-    const egHandler = pipe(http200CoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = pipe(egHandler(TEST_IN_2), mockHeaderSignatureAuthorizerDeps, Effect.runPromise);
 
     await expect(result).rejects.toThrow('Invalid signature');

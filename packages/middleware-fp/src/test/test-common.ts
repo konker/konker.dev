@@ -1,35 +1,44 @@
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { BaseResponse } from '../lib/http.js';
+import { makeResponseW, type RequestW, type ResponseW } from '../lib/http.js';
 
-export type TestDeps = any;
-export const TestDeps = Context.GenericTag<any>('Deps');
+export type TestDepsW = any;
+export const TestDepsW = Context.GenericTag<any>('DepsW');
 
 // TODO: type annotation comment
-export function echoCoreIn<I>(i: I): Effect.Effect<I, never, never> {
-  return Effect.succeed(i);
+export function echoCoreIn200W<I extends RequestW>(i: I): Effect.Effect<ResponseW<{ in: I }>> {
+  return Effect.succeed(
+    makeResponseW(
+      {
+        statusCode: 200,
+        headers: {
+          ...i.headers,
+        },
+        body: i.body ?? 'OK',
+      },
+      { in: i }
+    )
+  );
 }
 
 // TODO: type annotation comment
-export const echoCoreInDeps =
-  <I, E, R>(Deps: Context.Tag<R, R>) =>
-  (i: I): Effect.Effect<unknown, E, R> => {
+export const echoCoreInDepsW =
+  <I extends RequestW, E, R extends Record<string, unknown>>(Deps: Context.Tag<R, R>) =>
+  (i: I): Effect.Effect<ResponseW<{ in: I; deps: R }>, E, R> => {
     return pipe(
       Deps,
-      Effect.map((deps) => ({
-        ...i,
-        ...deps,
-      }))
+      Effect.map((deps) =>
+        makeResponseW(
+          {
+            statusCode: 200,
+            headers: {
+              ...i.headers,
+            },
+            body: i.body ?? 'OK',
+          },
+          { in: i, deps }
+        )
+      )
     );
   };
-
-// TODO: type annotation comment
-export function http200CoreIn<I>(_i: I): Effect.Effect<BaseResponse> {
-  return Effect.succeed({
-    statusCode: 200,
-    headers: { QUX: 'qux_value' },
-    body: JSON.stringify({ result: 'OK' }),
-    isBase64Encoded: false,
-  });
-}

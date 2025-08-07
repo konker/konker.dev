@@ -3,7 +3,8 @@ import { MomentoClientDeps, MomentoClientFactoryDeps } from '@konker.dev/momento
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
+import type { RequestW } from '../lib/http.js';
 
 const TAG = 'momentoClientInit';
 
@@ -12,8 +13,10 @@ export type Adapted<R> = Exclude<R, MomentoClientDeps> | MomentoClientFactoryDep
 // --------------------------------------------------------------------------
 export const middleware =
   (config: MomentoClientConfigProps) =>
-  <I, O, E, R>(wrapped: Handler<I, O, E, R | MomentoClientDeps>): Handler<I, O, E, Adapted<R>> =>
-  (i: I) =>
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I, O, E, R | MomentoClientDeps>
+  ): RequestResponseHandler<I, O, E, Adapted<R>> =>
+  (i: RequestW<I>) =>
     pipe(
       MomentoClientFactoryDeps,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),

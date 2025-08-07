@@ -1,8 +1,8 @@
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../../index.js';
+import type { Rec, RequestResponseHandler } from '../../index.js';
+import type { RequestW } from '../../lib/http.js';
 import { HttpApiError } from '../../lib/HttpApiError.js';
 import { validateHeaderSignature } from './lib.js';
 
@@ -20,15 +20,15 @@ export const HeaderSignatureAuthorizerDeps = Context.GenericTag<HeaderSignatureA
 // --------------------------------------------------------------------------
 export const middleware =
   () =>
-  <I extends APIGatewayProxyEventV2, O, E, R>(
-    wrapped: Handler<I, O, E, R>
-  ): Handler<I, O, E | HttpApiError, R | HeaderSignatureAuthorizerDeps> =>
-  (i: I) => {
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I, O, E, R>
+  ): RequestResponseHandler<I, O, E | HttpApiError, R | HeaderSignatureAuthorizerDeps> =>
+  (i: RequestW<I>) => {
     return pipe(
       HeaderSignatureAuthorizerDeps,
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
       Effect.flatMap(({ secret, signatureHeaderName }) =>
-        Effect.if(validateHeaderSignature(i.headers[signatureHeaderName]!, i.body, secret), {
+        Effect.if(validateHeaderSignature(i.headers[signatureHeaderName], i.body, secret), {
           onTrue: () => Effect.succeed(i),
           onFalse: () => Effect.fail(HttpApiError('UnauthorizedError', 'Invalid signature', 401)),
         })

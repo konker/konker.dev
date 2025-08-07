@@ -1,9 +1,9 @@
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { http200CoreIn } from '../test/test-common.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../lib/http.js';
+import { echoCoreIn200W } from '../test/test-common.js';
 import * as unit from './pathTokenAuthorizer.js';
 
 // https://stackoverflow.com/a/72885576/203284
@@ -24,25 +24,17 @@ export const mockPathTokenAuthorizerDeps = Effect.provideService(
   PATH_TOKEN_AUTHORIZER_TEST_DEPS
 );
 
-const TEST_IN_1: APIGatewayProxyEventV2 = {
-  headers: {},
-  isBase64Encoded: false,
-  requestContext: {} as any,
-  body: {},
+const TEST_IN_1 = makeRequestW(EMPTY_REQUEST_W, {
   pathParameters: {
     pathToken: CORRECT_TEST_PATH_TOKEN_VALUE,
   },
-} as unknown as APIGatewayProxyEventV2;
+});
 
-const TEST_IN_2: APIGatewayProxyEventV2 = {
-  headers: {},
-  isBase64Encoded: false,
-  requestContext: {} as any,
-  body: {},
+const TEST_IN_2 = makeRequestW(EMPTY_REQUEST_W, {
   pathParameters: {
     pathToken: INCORRECT_TEST_PATH_TOKEN_VALUE,
   },
-} as unknown as APIGatewayProxyEventV2;
+});
 
 describe('middleware/path-token-authorizer KONK90', () => {
   let errorSpy: MockInstance;
@@ -63,22 +55,27 @@ describe('middleware/path-token-authorizer KONK90', () => {
   });
 
   it('should work as expected in an success case', async () => {
-    const egHandler = pipe(http200CoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = await pipe(egHandler(TEST_IN_1), mockPathTokenAuthorizerDeps, Effect.runPromise);
 
     expect(result).toStrictEqual({
       statusCode: 200,
-      headers: {
-        QUX: 'qux_value',
+      body: 'OK',
+      headers: {},
+      in: {
+        headers: {},
+        method: 'GET',
+        pathParameters: {
+          pathToken: 'test-token-value',
+        },
+        queryStringParameters: {},
       },
-      body: JSON.stringify({ result: 'OK' }),
-      isBase64Encoded: false,
     });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should work as expected in an error case', async () => {
-    const egHandler = pipe(http200CoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = pipe(egHandler(TEST_IN_2), mockPathTokenAuthorizerDeps, Effect.runPromise);
 
     await expect(result).rejects.toThrow('Invalid token');

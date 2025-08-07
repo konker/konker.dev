@@ -4,21 +4,17 @@ import type { MockInstance } from 'vitest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { Handler } from '../index.js';
-import { TestDeps } from '../test/test-common.js';
+import { EMPTY_REQUEST_W, EMPTY_RESPONSE_W, type RequestW, type ResponseW } from '../lib/http.js';
+import { TestDepsW } from '../test/test-common.js';
 import * as unit from './requestResponseLogger.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099
 vi.mock('effect/Effect', { spy: true });
 
-type In = { foo: 'foo' };
-type Out = { qux: 'qux' };
+const TEST_DEPS: TestDepsW = { bar: 'bar' };
 
-const TEST_IN: In = { foo: 'foo' } as const;
-const TEST_OUT: Out = { qux: 'qux' } as const;
-const TEST_DEPS: TestDeps = { bar: 'bar' };
-
-const testCore: Handler<any, Out, Error, TestDeps> = (_) => Effect.succeed(TEST_OUT);
+const testCore: Handler<RequestW, ResponseW, Error, TestDepsW> = (_) => Effect.succeed(EMPTY_RESPONSE_W);
 
 describe('middleware/response-request-logger', () => {
   let logSpy: MockInstance;
@@ -32,13 +28,11 @@ describe('middleware/response-request-logger', () => {
 
   it('should work as expected', async () => {
     const stack = pipe(testCore, unit.middleware());
-    const result = await pipe(stack(TEST_IN), Effect.provideService(TestDeps, TEST_DEPS), Effect.runPromise);
+    const result = await pipe(stack(EMPTY_REQUEST_W), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
 
-    expect(result).toStrictEqual({
-      qux: 'qux',
-    });
+    expect(result).toStrictEqual(EMPTY_RESPONSE_W);
     expect(logSpy).toHaveBeenCalledTimes(2);
-    expect(logSpy).toHaveBeenNthCalledWith(1, '[requestResponseLogger] REQUEST', TEST_IN);
-    expect(logSpy).toHaveBeenNthCalledWith(2, '[requestResponseLogger] RESPONSE', TEST_OUT);
+    expect(logSpy).toHaveBeenNthCalledWith(1, '[requestResponseLogger] REQUEST', EMPTY_REQUEST_W);
+    expect(logSpy).toHaveBeenNthCalledWith(2, '[requestResponseLogger] RESPONSE', EMPTY_RESPONSE_W);
   });
 });

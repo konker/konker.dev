@@ -32,6 +32,12 @@ describe('middleware/header-signature-authorizer/lib', () => {
     expect(result).toStrictEqual(true);
   });
 
+  it('should work as expected in an success case with missing signature', async () => {
+    const result = await pipe(unit.validateHeaderSignature(undefined, TEST_BODY, TEST_SECRET), Effect.runPromise);
+
+    expect(result).toStrictEqual(false);
+  });
+
   it('should work as expected in an error case', async () => {
     const result = await pipe(
       unit.validateHeaderSignature(INCORRECT_TEST_HMAC_VALUE, TEST_BODY, TEST_SECRET),

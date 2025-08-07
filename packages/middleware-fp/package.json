@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/middleware-fp",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -23,22 +23,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./contrib/awsApiGatewayProcessor": {
-      "types": "./dist/contrib/awsApiGatewayProcessor.d.ts",
-      "import": "./dist/contrib/awsApiGatewayProcessor.js"
-    },
-    "./contrib/awsIamAuthorizerProcessor": {
-      "types": "./dist/contrib/awsIamAuthorizerProcessor.d.ts",
-      "import": "./dist/contrib/awsIamAuthorizerProcessor.js"
-    },
-    "./contrib/awsSimpleAuthorizerProcessor": {
-      "types": "./dist/contrib/awsSimpleAuthorizerProcessor.d.ts",
-      "import": "./dist/contrib/awsSimpleAuthorizerProcessor.js"
-    },
-    "./contrib/awsSimpleAuthorizerWithContextProcessor": {
-      "types": "./dist/contrib/awsSimpleAuthorizerWithContextProcessor.d.ts",
-      "import": "./dist/contrib/awsSimpleAuthorizerWithContextProcessor.js"
     },
     "./contrib/base64BodyDecoder": {
       "types": "./dist/contrib/base64BodyDecoder.d.ts",
@@ -63,10 +47,6 @@
     "./contrib/cacheMomento": {
       "types": "./dist/contrib/cacheMomento.d.ts",
       "import": "./dist/contrib/cacheMomento.js"
-    },
-    "./contrib/dynamodbDocClientInit": {
-      "types": "./dist/contrib/dynamodbDocClientInit/index.d.ts",
-      "import": "./dist/contrib/dynamodbDocClientInit/index.js"
     },
     "./contrib/envValidator": {
       "types": "./dist/contrib/envValidator.d.ts",
@@ -143,6 +123,10 @@
     "./contrib/requestResponseLogger": {
       "types": "./dist/contrib/requestResponseLogger.d.ts",
       "import": "./dist/contrib/requestResponseLogger.js"
+    },
+    "./contrib/responseProcessor": {
+      "types": "./dist/contrib/responseProcessor.d.ts",
+      "import": "./dist/contrib/responseProcessor.js"
     },
     "./contrib/trivial": {
       "types": "./dist/contrib/trivial.d.ts",

@@ -1,23 +1,19 @@
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../../index.js';
+import type { Rec, RequestResponseHandler } from '../../index.js';
+import type { RequestW } from '../../lib/http.js';
 import { transformInput, transformOutput } from './lib.js';
-import type {
-  WithNormalizedInputHeaders,
-  WithNormalizedOutputHeaders,
-  WithPossibleInputHeaders,
-  WithPossibleOutputHeaders,
-} from './types.js';
+import type { WithNormalizedInputHeaders, WithNormalizedOutputHeaders } from './types.js';
 
-const TAG = 'headerNormalizer';
+const TAG = 'headersNormalizer';
 
 export const middleware =
-  <I, O, E, R>({ normalizeRequestHeaders = true, normalizeResponseHeaders = true } = {}) =>
-  (
-    wrapped: Handler<I & WithNormalizedInputHeaders, O & WithPossibleOutputHeaders, E, R>
-  ): Handler<I & WithPossibleInputHeaders, O & WithNormalizedOutputHeaders, E, R> =>
-  (i: I & WithPossibleInputHeaders) => {
+  ({ normalizeRequestHeaders = true, normalizeResponseHeaders = true } = {}) =>
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I & WithNormalizedInputHeaders, O, E, R>
+  ): RequestResponseHandler<I, O & WithNormalizedOutputHeaders, E, R> =>
+  (i: RequestW<I>) => {
     return pipe(
       Effect.succeed(i),
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),

@@ -1,11 +1,10 @@
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import { echoCoreIn } from '../test/test-common.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../lib/http.js';
+import { echoCoreIn200W } from '../test/test-common.js';
 import * as unit from './basicAuthAuthenticator.js';
-import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
 
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099
@@ -31,21 +30,23 @@ const VALID_BASIC_AUTH_VALUE = 'Basic dXNlcjA6c2VjcmV0LTA=';
 // user0:bad-secret
 const INVALID_BASIC_AUTH_VALUE = 'Basic dXNlcjA6YmFkLXNlY3JldA==';
 
-const TEST_IN_1 = {
+const TEST_IN_1 = makeRequestW(EMPTY_REQUEST_W, {
   headers: {
     authorization: VALID_BASIC_AUTH_VALUE,
   },
-  isBase64Encoded: false,
-  body: {},
-} as unknown as APIGatewayProxyEventV2 & WithNormalizedInputHeaders;
+  headersNormalizerRequestRaw: {
+    Authorization: VALID_BASIC_AUTH_VALUE,
+  },
+});
 
-const TEST_IN_2 = {
+const TEST_IN_2 = makeRequestW(EMPTY_REQUEST_W, {
   headers: {
     authorization: INVALID_BASIC_AUTH_VALUE,
   },
-  isBase64Encoded: false,
-  body: {},
-} as unknown as APIGatewayProxyEventV2 & WithNormalizedInputHeaders;
+  headersNormalizerRequestRaw: {
+    Authorization: INVALID_BASIC_AUTH_VALUE,
+  },
+});
 
 describe('middleware/basic-auth-authenticator', () => {
   let errorSpy: MockInstance;
@@ -59,22 +60,33 @@ describe('middleware/basic-auth-authenticator', () => {
   });
 
   it('should work as expected in an success case', async () => {
-    const egHandler = pipe(echoCoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = await pipe(egHandler(TEST_IN_1), mockBasicAuthAuthenticatorDeps, Effect.runPromise);
 
     expect(result).toStrictEqual({
+      statusCode: 200,
+      body: 'OK',
       headers: {
-        authorization: VALID_BASIC_AUTH_VALUE,
+        authorization: 'Basic dXNlcjA6c2VjcmV0LTA=',
       },
-      body: {},
-      isBase64Encoded: false,
-      userId: 'user0',
+      in: {
+        headers: {
+          authorization: 'Basic dXNlcjA6c2VjcmV0LTA=',
+        },
+        method: 'GET',
+        headersNormalizerRequestRaw: {
+          Authorization: 'Basic dXNlcjA6c2VjcmV0LTA=',
+        },
+        pathParameters: {},
+        queryStringParameters: {},
+        userId: 'user0',
+      },
     });
     expect(errorSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should work as expected in an error case', async () => {
-    const egHandler = pipe(echoCoreIn, unit.middleware());
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = pipe(egHandler(TEST_IN_2), mockBasicAuthAuthenticatorDeps, Effect.runPromise);
 
     await expect(result).rejects.toThrow('Invalid basic auth credentials');

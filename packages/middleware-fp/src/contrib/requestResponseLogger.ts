@@ -1,14 +1,17 @@
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../index.js';
+import type { Rec, RequestResponseHandler } from '../index.js';
+import type { RequestW } from '../lib/http.js';
 
 const TAG = 'requestResponseLogger';
 
 export const middleware =
   () =>
-  <I, O, E, R>(wrapped: Handler<I, O, E, R>): Handler<I, O, E, R> =>
-  (i: I) => {
+  <I extends Rec, O extends Rec, E, R>(
+    wrapped: RequestResponseHandler<I, O, E, R>
+  ): RequestResponseHandler<I, O, E, R> =>
+  (i: RequestW<I>) => {
     return pipe(
       Effect.succeed(i),
       Effect.tap(Effect.logDebug(`[${TAG}] IN`)),

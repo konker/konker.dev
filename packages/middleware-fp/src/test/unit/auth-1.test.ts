@@ -1,10 +1,16 @@
-import type { APIGatewayRequestAuthorizerEventV2 } from 'aws-lambda';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import * as M from '../../contrib/index.js';
-import type { BaseSimpleAuthResponse } from '../../lib/http.js';
+import {
+  EMPTY_REQUEST_W,
+  EMPTY_RESPONSE_W,
+  makeRequestW,
+  makeResponseW,
+  type RequestW,
+  type ResponseW,
+} from '../../lib/http.js';
 import event from '../fixtures/APIGatewayRequestAuthorizerEventV2-1.json' with { type: 'json' };
 
 const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
@@ -20,9 +26,7 @@ const Headers = Schema.Struct({
 });
 type Headers = Schema.Schema.Type<typeof Headers>;
 
-type CoreEvent = APIGatewayRequestAuthorizerEventV2 &
-  M.envValidator.WithValidatedEnv<Env> &
-  M.headersValidator.WithValidatedHeaders<Headers>;
+type CoreEvent = RequestW<M.envValidator.WithValidatedEnv<Env> & M.headersValidator.WithValidatedHeaders<Headers>>;
 
 describe('auth test 1', () => {
   let oldEnv: NodeJS.ProcessEnv;
@@ -39,10 +43,12 @@ describe('auth test 1', () => {
   });
 
   it('should work as expected', async () => {
-    function echoCore(_i: CoreEvent): Effect.Effect<BaseSimpleAuthResponse, never, never> {
-      return Effect.succeed({
-        isAuthorized: true,
-      });
+    function echoCore(_i: CoreEvent): Effect.Effect<ResponseW<{ isAuthorized: boolean }>, never, never> {
+      return Effect.succeed(
+        makeResponseW(EMPTY_RESPONSE_W, {
+          isAuthorized: true,
+        })
+      );
     }
 
     const stack = pipe(
@@ -50,14 +56,16 @@ describe('auth test 1', () => {
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
       M.envValidator.middleware(Env),
-      M.awsSimpleAuthorizerProcessor.middleware(),
+      M.responseProcessor.middleware(),
       M.requestResponseLogger.middleware()
     );
 
-    const actual1 = stack(event as APIGatewayRequestAuthorizerEventV2);
+    const actual1 = stack(makeRequestW(EMPTY_REQUEST_W, event));
 
     await expect(Effect.runPromise(actual1)).resolves.toStrictEqual({
+      headers: {},
       isAuthorized: true,
+      statusCode: 200,
     });
   });
 });

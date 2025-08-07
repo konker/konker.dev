@@ -1,11 +1,10 @@
 import { TEST_TOKEN } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens';
-import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import * as M from '../../contrib/index.js';
-import type { BaseResponse } from '../../lib/http.js';
+import { makeResponseW, type RequestW, type ResponseW } from '../../lib/http.js';
 
 const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';
@@ -21,10 +20,9 @@ const Headers = Schema.Struct({
 });
 type Headers = Schema.Schema.Type<typeof Headers>;
 
-type CoreEvent = APIGatewayProxyEventV2 &
-  M.jwtDecoder.WithUserId &
-  M.envValidator.WithValidatedEnv<Env> &
-  M.headersValidator.WithValidatedHeaders<Headers>;
+type CoreEvent = RequestW<
+  M.jwtDecoder.WithUserId & M.envValidator.WithValidatedEnv<Env> & M.headersValidator.WithValidatedHeaders<Headers>
+>;
 
 describe('basic test 3', () => {
   let oldEnv: NodeJS.ProcessEnv;
@@ -41,18 +39,20 @@ describe('basic test 3', () => {
   });
 
   it('should work as expected', async () => {
-    function echoCore(i: CoreEvent): Effect.Effect<BaseResponse, never, never> {
-      return Effect.succeed({
-        statusCode: 200,
-        headers: { 'content-type': 'application/json; charset=UTF-8' },
-        multiValueHeaders: {},
-        isBase64Encoded: false,
-        body: {
-          foo: i.validatedEnv.MOMENTO_AUTH_TOKEN,
-          h: i.headers['content-type'].toUpperCase(),
-          u: i.userId,
-        },
-      });
+    function echoCore(i: CoreEvent): Effect.Effect<ResponseW, never, never> {
+      return Effect.succeed(
+        makeResponseW({
+          statusCode: 200,
+          headers: { 'content-type': 'application/json; charset=UTF-8' },
+          multiValueHeaders: {},
+          isBase64Encoded: false,
+          body: JSON.stringify({
+            foo: i.validatedEnv.MOMENTO_AUTH_TOKEN,
+            h: i.headers['content-type'].toUpperCase(),
+            u: i.userId,
+          }),
+        })
+      );
     }
 
     const stack = pipe(
@@ -61,7 +61,7 @@ describe('basic test 3', () => {
       M.headersValidator.middleware(Headers),
       M.headersNormalizer.middleware(),
       M.envValidator.middleware(Env),
-      M.awsApiGatewayProcessor.middleware(),
+      M.responseProcessor.middleware(),
       M.requestResponseLogger.middleware()
     );
 
@@ -71,6 +71,7 @@ describe('basic test 3', () => {
       rawPath: 'string',
       rawQueryString: 'string',
       // cookies?: [],
+      method: 'POST',
       headers: {
         'content-type': 'application/json; charset=UTF-8',
         authorization: `Bearer ${TEST_TOKEN}`,

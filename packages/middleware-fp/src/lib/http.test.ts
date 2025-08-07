@@ -1,89 +1,144 @@
-import { pipe, Schema } from 'effect';
-import * as Effect from 'effect/Effect';
-import * as Either from 'effect/Either';
+import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './http.js';
+import { EMPTY_REQUEST_W, EMPTY_RESPONSE_W } from './http.js';
 
-describe('lib/http', () => {
+describe('lib/http-std', () => {
   describe('UNKNOWN_STRING_EFFECT', () => {
     it('should work as expected', () => {
       expect(Effect.runSync(unit.UNKNOWN_STRING_EFFECT())).toStrictEqual('UNKNOWN');
     });
   });
 
-  describe('ResponseHeaders', () => {
-    it('should work as expected', () => {
-      expect(pipe({ 'content-type': 'text/plain' }, Schema.decode(unit.ResponseHeaders))).toStrictEqual(
-        Either.right({
-          'content-type': 'text/plain',
-        })
-      );
-    });
-  });
+  describe('makeRequestW', () => {
+    const TEST_REQUEST_W_1 = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      pathParameters: {
+        id: 'abc123',
+      },
+      queryStringParameters: {
+        page: '123',
+      },
+    };
 
-  describe('OptionalResponseHeaders', () => {
-    it('should work as expected', () => {
-      expect(pipe({ 'content-type': 'text/plain' }, Schema.decode(unit.OptionalResponseHeaders))).toStrictEqual(
-        Either.right({
-          'content-type': 'text/plain',
-        })
-      );
-      expect(pipe(undefined, Schema.decode(unit.OptionalResponseHeaders))).toStrictEqual(Either.right(undefined));
+    it('should work with empty request and without extra properties', () => {
+      expect(unit.makeRequestW(EMPTY_REQUEST_W)).toStrictEqual({
+        method: 'GET',
+        headers: {},
+        pathParameters: {},
+        queryStringParameters: {},
+      });
     });
-  });
 
-  describe('BaseResponse', () => {
-    it('should work as expected', () => {
+    it('should work with request and without extra properties', () => {
+      expect(unit.makeRequestW(TEST_REQUEST_W_1)).toStrictEqual(TEST_REQUEST_W_1);
+    });
+
+    it('should work with empty request and with extra properties', () => {
+      expect(unit.makeRequestW(EMPTY_REQUEST_W, { foo: 'bar' })).toStrictEqual({
+        method: 'GET',
+        headers: {},
+        pathParameters: {},
+        queryStringParameters: {},
+        foo: 'bar',
+      });
+    });
+
+    it('should work with request and with extra properties', () => {
+      expect(unit.makeRequestW(TEST_REQUEST_W_1, { foo: 'bar' })).toStrictEqual({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        pathParameters: {
+          id: 'abc123',
+        },
+        queryStringParameters: {
+          page: '123',
+        },
+        foo: 'bar',
+      });
+    });
+
+    it('should work with request and with extra properties which override base properties', () => {
       expect(
-        pipe(
-          { statusCode: 200, headers: { 'content-type': 'text/plain' }, isBase64Encoded: false, body: 'abc' },
-          Schema.decode(unit.BaseResponse)
-        )
-      ).toStrictEqual(
-        Either.right({
-          statusCode: 200,
-          headers: { 'content-type': 'text/plain' },
-          isBase64Encoded: false,
-          body: 'abc',
-        })
-      );
-    });
-  });
-
-  describe('BaseSimpleAuthResponse', () => {
-    it('should work as expected', () => {
-      expect(pipe({ isAuthorized: false }, Schema.decode(unit.BaseSimpleAuthResponse))).toStrictEqual(
-        Either.right({ isAuthorized: false })
-      );
-    });
-  });
-
-  describe('BaseSimpleAuthResponseWithContext', () => {
-    const TEST_CONTEXT = Schema.Struct({ userId: Schema.String });
-
-    it('should work as expected', () => {
-      expect(
-        pipe(
-          { isAuthorized: false, context: { userId: 'abc' } },
-          Schema.decode(unit.BaseSimpleAuthResponseWithContext(TEST_CONTEXT))
-        )
-      ).toStrictEqual(Either.right({ isAuthorized: false, context: { userId: 'abc' } }));
-    });
-  });
-
-  describe('DEFAULT_500_RESPONSE', () => {
-    it('should work as expected', () => {
-      expect(unit.DEFAULT_500_RESPONSE()).toStrictEqual({
-        statusCode: 500,
-        body: '"InternalServerError"',
+        unit.makeRequestW(TEST_REQUEST_W_1, { foo: 'bar', headers: { 'content-type': 'text/xml' } })
+      ).toStrictEqual({
+        method: 'POST',
+        headers: {
+          'content-type': 'text/xml',
+        },
+        pathParameters: {
+          id: 'abc123',
+        },
+        queryStringParameters: {
+          page: '123',
+        },
+        foo: 'bar',
       });
     });
   });
 
-  describe('CHAOS', () => {
-    it('should work as expected', () => {
-      expect(() => unit.CHAOS('Tag')).toThrow('BOOM');
+  describe('makeResponseW', () => {
+    const TEST_RESPONSE_W_1 = {
+      statusCode: 201,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: '{ "wham": "bam!" }',
+    };
+
+    it('should work with empty response and without extra properties', () => {
+      expect(unit.makeResponseW(TEST_RESPONSE_W_1)).toStrictEqual({
+        statusCode: 201,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: '{ "wham": "bam!" }',
+      });
+    });
+
+    it('should work without extra properties', () => {
+      expect(unit.makeResponseW(EMPTY_RESPONSE_W)).toStrictEqual({
+        statusCode: 200,
+        headers: {},
+      });
+    });
+
+    it('should work with empty response and extra properties', () => {
+      expect(unit.makeResponseW(EMPTY_RESPONSE_W, { foo: 'bar' })).toStrictEqual({
+        statusCode: 200,
+        headers: {},
+        foo: 'bar',
+      });
+    });
+
+    it('should work with extra properties', () => {
+      expect(unit.makeResponseW(TEST_RESPONSE_W_1, { foo: 'bar' })).toStrictEqual({
+        statusCode: 201,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: '{ "wham": "bam!" }',
+        foo: 'bar',
+      });
+    });
+
+    it('should work with extra properties which override base properties', () => {
+      expect(
+        unit.makeResponseW(TEST_RESPONSE_W_1, { foo: 'bar', headers: { 'content-type': 'text/xml' } })
+      ).toStrictEqual({
+        statusCode: 201,
+        headers: {
+          'content-type': 'text/xml',
+        },
+        body: '{ "wham": "bam!" }',
+        foo: 'bar',
+      });
     });
   });
 });
