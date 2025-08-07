@@ -1,8 +1,8 @@
 import * as Effect from 'effect/Effect';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import type { Cache } from '../Cache.js';
 import { InMemoryCache } from '../memory/InMemoryCache.js';
+import type { TinyCache } from '../TinyCache.js';
 import * as unit from './helpers.js';
 
 const TEST_KEY = 'test-key-1';
@@ -10,7 +10,7 @@ const TEST_VALUE = 'test-value';
 
 describe('helpers', () => {
   describe('chainGetValue', () => {
-    let cache: Cache<string, never>;
+    let cache: TinyCache<string, never>;
 
     beforeEach(() => {
       cache = InMemoryCache();
@@ -27,7 +27,7 @@ describe('helpers', () => {
   });
 
   describe('chainSetValue', () => {
-    let cache: Cache<string, never>;
+    let cache: TinyCache<string, never>;
 
     beforeEach(() => {
       cache = InMemoryCache();

@@ -57,10 +57,6 @@
       "types": "./dist/momento/MomentoStringCache.d.ts",
       "import": "./dist/momento/MomentoStringCache.js"
     },
-    "./Cache": {
-      "types": "./dist/Cache.d.ts",
-      "import": "./dist/Cache.js"
-    },
     "./JsonCache": {
       "types": "./dist/JsonCache.d.ts",
       "import": "./dist/JsonCache.js"
@@ -72,6 +68,10 @@
     "./StrictSerializedJsonCache": {
       "types": "./dist/StrictSerializedJsonCache.d.ts",
       "import": "./dist/StrictSerializedJsonCache.js"
+    },
+    "./TinyCache": {
+      "types": "./dist/TinyCache.d.ts",
+      "import": "./dist/TinyCache.js"
     }
   },
   "files": [

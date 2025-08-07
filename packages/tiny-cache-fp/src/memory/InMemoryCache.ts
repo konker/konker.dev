@@ -2,8 +2,8 @@
 import { Option } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Cache } from '../Cache.js';
 import type { CacheError } from '../lib/error.js';
+import type { TinyCache } from '../TinyCache.js';
 
 const setVal =
   <V>(cache: Record<string, V | undefined>) =>
@@ -26,7 +26,7 @@ const delVal =
       delete cache[key];
     });
 
-export type InMemoryCache<V> = Cache<V, never>;
+export type InMemoryCache<V> = TinyCache<V, never>;
 export const InMemoryCache = <V>(): InMemoryCache<V> => {
   const __cache = {} as Record<string, V | undefined>;
 

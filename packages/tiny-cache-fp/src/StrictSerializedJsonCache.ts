@@ -1,9 +1,9 @@
 import { Schema } from 'effect';
 
-import type { Cache } from './Cache.js';
 import { StrictSerializedCache } from './StrictSerializedCache.js';
+import type { TinyCache } from './TinyCache.js';
 
 export const StrictSerializedJsonCache = <V, C, R = never>(
-  cache: Cache<string, R>,
+  cache: TinyCache<string, R>,
   schema: Schema.Schema<V, C>
-): Cache<V, R> => StrictSerializedCache<V, string, R>(cache, Schema.parseJson(schema));
+): TinyCache<V, R> => StrictSerializedCache<V, string, R>(cache, Schema.parseJson(schema));

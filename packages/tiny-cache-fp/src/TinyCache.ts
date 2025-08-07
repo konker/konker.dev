@@ -3,7 +3,7 @@ import type * as Effect from 'effect/Effect';
 
 import type { CacheError } from './lib/error.js';
 
-export type Cache<C, R = never> = {
+export type TinyCache<C, R = never> = {
   // Write a cache entry with the given key and value
   readonly setVal: (key: string, value: C, ttlSecs?: number) => Effect.Effect<void, CacheError, R>;
 

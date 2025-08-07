@@ -1,7 +1,7 @@
 import { Option, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Cache } from '../Cache.js';
+import type { TinyCache } from '../TinyCache.js';
 import type { CacheError } from './error.js';
 import { toCacheError } from './error.js';
 
@@ -9,7 +9,7 @@ import { toCacheError } from './error.js';
  * Convenience helper for getting a cache value and destructuring the Option into succeed or fail
  */
 export const chainGetVal =
-  <V, R>(cache: Cache<V, R>) =>
+  <V, R>(cache: TinyCache<V, R>) =>
   (key: string): Effect.Effect<V, CacheError, R> =>
     pipe(
       cache.getVal(key),
@@ -24,7 +24,7 @@ export const chainGetVal =
  * Convenience helper for setting a cache value and getting the value back
  */
 export const chainSetVal = <V, R>(
-  cache: Cache<V, R>,
+  cache: TinyCache<V, R>,
   key: string,
   value: V,
   ttl?: number
