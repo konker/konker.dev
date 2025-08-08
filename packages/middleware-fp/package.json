@@ -160,7 +160,6 @@
   },
   "dependencies": {
     "@effect/schema": "^0.72.4",
-    "@konker.dev/aws-client-effect-dynamodb": "workspace:*",
     "@konker.dev/momento-cache-client-effect": "workspace:*",
     "@konker.dev/tiny-auth-utils-fp": "workspace:*",
     "@konker.dev/tiny-cache-fp": "workspace:*",
