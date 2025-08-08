@@ -405,9 +405,6 @@ importers:
 
   packages/middleware-fp:
     dependencies:
-      '@effect/schema':
-        specifier: ^0.72.4
-        version: 0.72.4(effect@3.11.8)
       '@konker.dev/momento-cache-client-effect':
         specifier: workspace:*
         version: link:../momento-cache-client-effect
@@ -1856,11 +1853,6 @@ packages:
 
   '@effect/language-service@0.1.0':
     resolution: {integrity: sha512-BnlM8LlaqCAYgdRfxlbR7gXGh/FD1scL1fPgNVJEPoOM08od1jtJz+iKhwfaud8TPnnhZR+TED2h5ynjanLeCQ==}
-
-  '@effect/schema@0.72.4':
-    resolution: {integrity: sha512-DCAOuLmfFf18ci/LeFaweN1uaYbgmbPwSFALHhS/Hj3seB4BPneGzZnNwBnI7kZ8NXFDhei7uuhXLvDjMCwphQ==}
-    peerDependencies:
-      effect: ^3.7.3
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -9943,11 +9935,6 @@ snapshots:
   '@effect/language-service@0.0.21': {}
 
   '@effect/language-service@0.1.0': {}
-
-  '@effect/schema@0.72.4(effect@3.11.8)':
-    dependencies:
-      effect: 3.11.8
-      fast-check: 3.23.2
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
