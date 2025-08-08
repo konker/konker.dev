@@ -731,7 +731,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "@konker.dev/tiny-error-fp": "workspace:*",
-    "effect": "^3.11.3"
+    "effect": "^3.17.6"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",

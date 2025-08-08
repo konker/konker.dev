@@ -45,7 +45,7 @@
   "dependencies": {
     "@konker.dev/tiny-error-fp": "workspace:*",
     "aws-jwt-verify": "^5.0.0",
-    "effect": "^3.11.3"
+    "effect": "^3.17.6"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",
