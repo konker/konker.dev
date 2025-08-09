@@ -1,12 +1,13 @@
 import type { S3Client } from '@aws-sdk/client-s3';
 import * as s3Client from '@aws-sdk/client-s3';
 import type { Command, HttpHandlerOptions } from '@aws-sdk/types';
-import type { SmithyResolvedConfiguration } from '@smithy/smithy-client/dist-types';
+import type { SmithyResolvedConfiguration } from '@smithy/smithy-client';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
 import type { S3Error } from './lib/error.js';
 import { toS3Error } from './lib/error.js';
+
 export { TAG as S3_ERROR_TAG } from './lib/error.js';
 
 //------------------------------------------------------

@@ -196,7 +196,7 @@ const readFile =
 
 const writeFile =
   (s3Client: S3Client) =>
-  (s3url: string, data: ArrayBuffer | string): Effect.Effect<void, TinyFileSystemError> => {
+  (s3url: string, data: ArrayBuffer | Uint8Array | string): Effect.Effect<void, TinyFileSystemError> => {
     return pipe(
       s3Utils.parseS3Url(s3url),
       Effect.filterOrFail(s3UrlDataIsFile, () =>
@@ -208,7 +208,7 @@ const writeFile =
             Bucket: parsed.Bucket,
             Key: parsed.FullPath,
           },
-          typeof data === 'string' ? Buffer.from(data) : Buffer.from(data)
+          data instanceof ArrayBuffer ? Buffer.from(new Uint8Array(data)) : Buffer.from(data)
         )
       ),
       Effect.mapError(toTinyFileSystemError),

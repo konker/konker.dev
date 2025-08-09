@@ -123,9 +123,16 @@ function readFile(filePath: string): Effect.Effect<Uint8Array, TinyFileSystemErr
   });
 }
 
-function writeFile(filePath: string, data: ArrayBuffer | string): Effect.Effect<void, TinyFileSystemError> {
+function writeFile(
+  filePath: string,
+  data: ArrayBuffer | Uint8Array | string
+): Effect.Effect<void, TinyFileSystemError> {
   return Effect.tryPromise({
-    try: async () => fs.promises.writeFile(filePath, typeof data === 'string' ? data : Buffer.from(data)),
+    try: async () =>
+      fs.promises.writeFile(
+        filePath,
+        typeof data === 'string' ? data : data instanceof ArrayBuffer ? new Uint8Array(data) : Buffer.from(data)
+      ),
     catch: toTinyFileSystemError,
   });
 }

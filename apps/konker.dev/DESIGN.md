@@ -1,7 +1,6 @@
 # konker.dev
 
 - Immediate
-
   - Serif font on SubCollectionNavigation, non-navigable items
   - Breadcrumbs a bit long for reference content?
   - Naming for moonlight functions

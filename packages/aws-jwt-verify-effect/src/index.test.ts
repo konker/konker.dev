@@ -80,8 +80,8 @@ describe('aws-jwt-verify-effect', () => {
 
       keypair = generateKeyPair();
 
-      vi.spyOn(httpsLib.SimpleFetcher.prototype, 'fetch').mockImplementation(async () =>
-        Buffer.from(JSON.stringify(keypair.jwks))
+      vi.spyOn(httpsLib.SimpleFetcher.prototype, 'fetch').mockImplementation(
+        async () => Buffer.from(JSON.stringify(keypair.jwks)) as never // This is needed for some reason
       );
     });
 

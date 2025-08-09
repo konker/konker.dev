@@ -29,7 +29,7 @@ export type FileData = {
   _tag: TreeCrawlerDataType.File;
   path: string;
   level: number;
-  data: ArrayBuffer;
+  data: ArrayBuffer | NodeJS.ArrayBufferView;
 };
 
 /**

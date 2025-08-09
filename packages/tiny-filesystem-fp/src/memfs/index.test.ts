@@ -296,7 +296,7 @@ describe('MemFsTinyFileSystem', () => {
       stub1.mockClear();
     });
 
-    it('should function correctly', async () => {
+    it('should function correctly with string input', async () => {
       await Effect.runPromise(testMemFsTinyFileSystem.writeFile('/foo/bar.txt', 'some test text'));
 
       expect(stub1).toHaveBeenCalledTimes(1);
@@ -304,12 +304,22 @@ describe('MemFsTinyFileSystem', () => {
       expect(stub1.mock.calls[0]?.[1]).toStrictEqual('some test text');
     });
 
-    it('should function correctly', async () => {
+    it('should function correctly with Uint8Array input', async () => {
       await Effect.runPromise(testMemFsTinyFileSystem.writeFile('/foo/bar.txt', stringToUint8Array('some test text')));
 
       expect(stub1).toHaveBeenCalledTimes(1);
       expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
       expect(stub1.mock.calls[0]?.[1]).toStrictEqual(Buffer.from(stringToUint8Array('some test text')));
+    });
+
+    it('should function correctly with ArrayBuffer input', async () => {
+      await Effect.runPromise(
+        testMemFsTinyFileSystem.writeFile('/foo/bar.txt', stringToUint8Array('some test text').buffer as ArrayBuffer)
+      );
+
+      expect(stub1).toHaveBeenCalledTimes(1);
+      expect(stub1.mock.calls[0]?.[0]).toBe('/foo/bar.txt');
+      expect(stub1.mock.calls[0]?.[1]).toStrictEqual(stringToUint8Array('some test text'));
     });
   });
 
