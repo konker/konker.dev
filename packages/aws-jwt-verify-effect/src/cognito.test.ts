@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer';
+
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import * as httpsLib from 'aws-jwt-verify/https';
 import { pipe } from 'effect';
@@ -87,8 +89,8 @@ describe('aws-jwt-verify-effect/cognito', () => {
 
       keypair = generateKeyPair();
 
-      vi.spyOn(httpsLib.SimpleFetcher.prototype, 'fetch').mockImplementation(async () =>
-        Buffer.from(JSON.stringify(keypair.jwks))
+      vi.spyOn(httpsLib.SimpleFetcher.prototype, 'fetch').mockImplementation(
+        async () => Buffer.from(JSON.stringify(keypair.jwks)) as never // This is needed for some reason
       );
     });
 

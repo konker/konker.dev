@@ -73,7 +73,7 @@ export type TinyFileSystem = {
    * @param filePath - The full path of the file to write
    * @param data - The data to write
    */
-  writeFile: (filePath: string, data: string | ArrayBuffer) => Effect.Effect<void, TinyFileSystemError>;
+  writeFile: (filePath: string, data: string | ArrayBuffer | Uint8Array) => Effect.Effect<void, TinyFileSystemError>;
 
   /**
    * Delete the given file

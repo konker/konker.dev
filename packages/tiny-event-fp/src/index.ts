@@ -16,7 +16,7 @@ export function createTinyEventDispatcher<T, A>(): Effect.Effect<TinyEventDispat
 }
 
 export const addListener =
-  <T, A>(eventType: T, listener: TinyEventListener<T, A>) =>
+  <T, A>(eventType: NoInfer<T>, listener: TinyEventListener<T, A>) =>
   (dispatcher: TinyEventDispatcher<T, A>): Effect.Effect<TinyEventDispatcher<T, A>, Error> => {
     if (!dispatcher.listeners.has(eventType)) {
       dispatcher.listeners.set(eventType, new Set<TinyEventListener<T, A>>());
@@ -33,7 +33,7 @@ export const addStarListener =
   };
 
 export const removeListener =
-  <T, A>(eventType: T, listener: TinyEventListener<T, A>) =>
+  <T, A>(eventType: NoInfer<T>, listener: TinyEventListener<T, A>) =>
   (dispatcher: TinyEventDispatcher<T, A>): Effect.Effect<TinyEventDispatcher<T, A>, Error> => {
     if (dispatcher.listeners.has(eventType)) {
       dispatcher.listeners.get(eventType)!.delete(listener);
@@ -60,7 +60,7 @@ export const removeAllListeners =
   };
 
 export const notify =
-  <T, A>(eventType: T, eventData?: A) =>
+  <T, A>(eventType: NoInfer<T>, eventData?: A) =>
   (dispatcher: TinyEventDispatcher<T, A>): Effect.Effect<TinyEventDispatcher<T, A>, Error> => {
     const listenerValues = dispatcher.listeners.get(eventType)?.values() ?? [];
     const starListenerValues = dispatcher.starListeners.values();
