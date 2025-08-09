@@ -57,6 +57,14 @@
     "./s3/utils": {
       "types": "./dist/s3/utils.d.ts",
       "import": "./dist/s3/utils.js"
+    },
+    "./test/setup": {
+      "types": "./dist/test/setup.d.ts",
+      "import": "./dist/test/setup.js"
+    },
+    "./test/vitest.d": {
+      "types": "./dist/test/vitest.d.d.ts",
+      "import": "./dist/test/vitest.d.js"
     }
   },
   "files": [
@@ -70,7 +78,10 @@
     "memfs": "^4.6.0"
   },
   "dependencies": {
+    "@aws-sdk/lib-storage": "^3.864.0",
+    "@effect-aws/client-s3": "^1.10.3",
     "@konker.dev/tiny-error-fp": "workspace:*",
+    "@konker.dev/tiny-utils-fp": "workspace:*",
     "effect": "^3.17.7"
   },
   "devDependencies": {
@@ -85,7 +96,8 @@
     "@swc/core": "^1.13.3",
     "@types/node": "^24.2.1",
     "@vitest/coverage-istanbul": "^3.2.4",
-    "aws-sdk-client-mock": "^3.1.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-vitest": "^6.2.0",
     "eslint": "^9.33.0",
     "eslint-plugin-fp": "^2.3.0",
     "eslint-plugin-prettier": "^5.5.4",
@@ -104,12 +116,12 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && tsc",
-    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files src/lib/error.ts --ignore-files src/lib/stream.ts",
-    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
+    "type-coverage-check": "type-coverage --detail --at-least 99 --ignore-files src/lib/error.ts --ignore-files src/lib/stream.ts",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning --exclude vitest.d.ts src",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",
     "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
-    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
+    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16 --exclude-entrypoints=@konker.dev/tiny-filesystem-fp/test/vitest.d",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",

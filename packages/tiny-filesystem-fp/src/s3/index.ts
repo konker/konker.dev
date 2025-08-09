@@ -2,11 +2,9 @@ import { Buffer } from 'node:buffer';
 import type readline from 'node:readline';
 import type { Readable, Writable } from 'node:stream';
 
-import type { S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
-import * as S from '@konker.dev/aws-client-effect-s3';
-import { S3ClientDeps, S3ClientFactoryDeps } from '@konker.dev/aws-client-effect-s3';
-import { UploadObjectEffect, UploadObjectWriteStreamEffect } from '@konker.dev/aws-client-effect-s3/extra';
-import type { S3Error } from '@konker.dev/aws-client-effect-s3/lib/error';
+import type { S3Client } from '@aws-sdk/client-s3';
+import { S3 } from '@effect-aws/client-s3';
+import { S3ClientInstance } from '@effect-aws/client-s3/S3ClientInstance';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import path from 'path';
@@ -19,7 +17,7 @@ import { readlineInterfaceFromReadStream, readStreamToBuffer } from '../lib/stre
 import type { S3IoUrl, S3UrlData } from './s3-uri-utils.js';
 import * as s3Utils from './s3-uri-utils.js';
 import { s3UrlDataIsDirectory, s3UrlDataIsFile } from './s3-uri-utils.js';
-import { s3ObjectIsReadable } from './utils.js';
+import { s3ObjectIsReadable, UploadObjectEffect, UploadObjectWriteStreamEffect } from './utils.js';
 
 const getFileReadStream =
   (s3Client: S3Client) =>
@@ -30,7 +28,7 @@ const getFileReadStream =
         toTinyFileSystemError('[S3TinyFileSystem] Cannot read a file with a non-file url')
       ),
       Effect.flatMap((parsed) =>
-        S.GetObjectCommandEffect({
+        S3.getObject({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
@@ -40,7 +38,7 @@ const getFileReadStream =
       ),
       Effect.map((s3File) => s3File.Body as Readable),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -64,13 +62,13 @@ const getFileWriteStream =
         toTinyFileSystemError('[S3TinyFileSystem] Cannot write to a file with a non-file url')
       ),
       Effect.flatMap((parsed) =>
-        UploadObjectWriteStreamEffect({
+        UploadObjectWriteStreamEffect(s3Client, {
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -103,7 +101,7 @@ const listFiles =
       ),
       Effect.flatMap((parsed) =>
         pipe(
-          S.ListObjectsV2CommandEffect({
+          S3.listObjectsV2({
             Bucket: parsed.Bucket,
             Delimiter: '/',
             Prefix: parsed.Path,
@@ -124,7 +122,7 @@ const listFiles =
             })
           ),
           Effect.mapError(toTinyFileSystemError),
-          Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+          Effect.provide(S3.baseLayer(() => s3Client))
         )
       )
     );
@@ -136,26 +134,15 @@ const exists =
     return pipe(
       s3Utils.parseS3Url(fileOrDirPath),
       Effect.flatMap((parsed: S3UrlData) =>
-        S.HeadObjectCommandEffect({
+        S3.headObject({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
       Effect.map((_) => true),
-      Effect.catchTag(S.S3_ERROR_TAG, (resp: S3Error) => {
-        const cause = resp.cause;
-        // eslint-disable-next-line fp/no-nil
-        const metadata = !!cause && typeof cause === 'object' && '$metadata' in cause ? cause.$metadata : undefined;
-        const httpStatusCode =
-          !!metadata && typeof metadata === 'object' && 'httpStatusCode' in metadata
-            ? metadata.httpStatusCode
-            : // eslint-disable-next-line fp/no-nil
-              undefined;
-
-        return httpStatusCode === 404 ? Effect.succeed(false) : Effect.fail(resp);
-      }),
+      Effect.catchTag('NotFound', () => Effect.succeed(false)),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -177,7 +164,7 @@ const readFile =
         toTinyFileSystemError('[S3TinyFileSystem] Cannot read a file with a directory url')
       ),
       Effect.flatMap((parsed) =>
-        S.GetObjectCommandEffect({
+        S3.getObject({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
@@ -190,7 +177,7 @@ const readFile =
       Effect.flatMap((resp) => readStreamToBuffer(resp.Body as Readable)),
       Effect.map((buffer) => new Uint8Array(buffer)),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -204,6 +191,7 @@ const writeFile =
       ),
       Effect.flatMap((parsed) =>
         UploadObjectEffect(
+          s3Client,
           {
             Bucket: parsed.Bucket,
             Key: parsed.FullPath,
@@ -211,8 +199,7 @@ const writeFile =
           data instanceof ArrayBuffer ? Buffer.from(new Uint8Array(data)) : Buffer.from(data)
         )
       ),
-      Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.mapError(toTinyFileSystemError)
     );
   };
 
@@ -225,13 +212,13 @@ const deleteFile =
         toTinyFileSystemError('[S3TinyFileSystem] Cannot delete a file with a directory url')
       ),
       Effect.flatMap((parsed) =>
-        S.DeleteObjectCommandEffect({
+        S3.deleteObject({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
         })
       ),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -244,14 +231,14 @@ const createDirectory =
         toTinyFileSystemError('[S3TinyFileSystem] Cannot create a directory with a non-directory url')
       ),
       Effect.flatMap((parsed) =>
-        S.PutObjectCommandEffect({
+        S3.putObject({
           Bucket: parsed.Bucket,
           Key: parsed.FullPath,
           ContentLength: 0,
         })
       ),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -281,7 +268,7 @@ const removeDirectory =
         pipe(
           s3Utils.parseS3Url(dirPath),
           Effect.flatMap((parsed) =>
-            S.DeleteObjectCommandEffect({
+            S3.deleteObject({
               Bucket: parsed.Bucket,
               Key: parsed.FullPath,
             })
@@ -289,7 +276,7 @@ const removeDirectory =
         )
       ),
       Effect.mapError(toTinyFileSystemError),
-      Effect.provideService(S3ClientDeps, S3ClientDeps.of({ s3Client }))
+      Effect.provide(S3.baseLayer(() => s3Client))
     );
   };
 
@@ -335,12 +322,10 @@ function isAbsolute(fileOrDirPath: string): boolean {
   return fileOrDirPath.startsWith(s3Utils.S3_PROTOCOL);
 }
 
-export const S3TinyFileSystem = (config: S3ClientConfig): Effect.Effect<TinyFileSystem, never, S3ClientFactoryDeps> =>
+export const S3TinyFileSystem = (): Effect.Effect<TinyFileSystem, never, S3ClientInstance> =>
   pipe(
-    S3ClientFactoryDeps,
-    Effect.map((deps) => {
-      const s3Client: S3Client = deps.s3ClientFactory(config);
-
+    S3ClientInstance,
+    Effect.map((s3Client) => {
       return {
         ID: 'S3TinyFileSystem',
 
