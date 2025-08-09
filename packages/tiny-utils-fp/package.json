@@ -31,6 +31,10 @@
       "types": "./dist/stream/index.d.ts",
       "import": "./dist/stream/index.js"
     },
+    "./stream/PromiseDependentWritableStream": {
+      "types": "./dist/stream/PromiseDependentWritableStream.d.ts",
+      "import": "./dist/stream/PromiseDependentWritableStream.js"
+    },
     "./array": {
       "types": "./dist/array.d.ts",
       "import": "./dist/array.js"
