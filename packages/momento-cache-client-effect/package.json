@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/momento-cache-client-effect",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
