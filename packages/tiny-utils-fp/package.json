@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-utils-fp",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -30,6 +30,10 @@
     "./stream": {
       "types": "./dist/stream/index.d.ts",
       "import": "./dist/stream/index.js"
+    },
+    "./stream/PromiseDependentWritableStream": {
+      "types": "./dist/stream/PromiseDependentWritableStream.d.ts",
+      "import": "./dist/stream/PromiseDependentWritableStream.js"
     },
     "./array": {
       "types": "./dist/array.d.ts",
