@@ -2,15 +2,9 @@ import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import * as M from '../../contrib/index.js';
-import {
-  EMPTY_REQUEST_W,
-  EMPTY_RESPONSE_W,
-  makeRequestW,
-  makeResponseW,
-  type RequestW,
-  type ResponseW,
-} from '../../lib/http.js';
+import * as M from '../../http/contrib/index.js';
+import { EMPTY_REQUEST_W, makeRequestW, type RequestW } from '../../http/request.js';
+import { EMPTY_RESPONSE_W, makeResponseW, type ResponseW } from '../../http/response.js';
 import event from '../fixtures/APIGatewayRequestAuthorizerEventV2-1.json' with { type: 'json' };
 
 const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
