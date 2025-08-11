@@ -160,91 +160,6 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.10)(jiti@1.21.7)(tsx@4.20.3)(yaml@2.8.1)
 
-  packages/aws-client-effect-s3:
-    dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.864.0
-        version: 3.864.0(aws-crt@1.27.3)
-      '@aws-sdk/lib-storage':
-        specifier: ^3.864.0
-        version: 3.864.0(@aws-sdk/client-s3@3.864.0(aws-crt@1.27.3))
-      '@aws-sdk/s3-request-presigner':
-        specifier: ^3.864.0
-        version: 3.864.0
-      '@konker.dev/tiny-error-fp':
-        specifier: workspace:*
-        version: link:../tiny-error-fp
-      effect:
-        specifier: ^3.17.7
-        version: 3.17.7
-    devDependencies:
-      '@arethetypeswrong/cli':
-        specifier: ^0.17.4
-        version: 0.17.4
-      '@aws-sdk/types':
-        specifier: ^3.862.0
-        version: 3.862.0
-      '@effect/language-service':
-        specifier: ^0.0.21
-        version: 0.0.21
-      '@eslint/js':
-        specifier: ^9.33.0
-        version: 9.33.0
-      '@konker.dev/common-config':
-        specifier: 0.2.4
-        version: 0.2.4(aws-crt@1.27.3)
-      '@smithy/smithy-client':
-        specifier: ^2.5.1
-        version: 2.5.1
-      '@smithy/util-stream':
-        specifier: ^4.2.4
-        version: 4.2.4
-      '@types/node':
-        specifier: ^24.2.1
-        version: 24.2.1
-      '@vitest/coverage-istanbul':
-        specifier: ^3.2.4
-        version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.2.1)(jiti@1.21.7)(tsx@4.20.3)(yaml@2.8.1))
-      aws-sdk-client-mock:
-        specifier: ^3.1.0
-        version: 3.1.0
-      eslint:
-        specifier: ^9.33.0
-        version: 9.33.0(jiti@1.21.7)
-      eslint-plugin-fp:
-        specifier: ^2.3.0
-        version: 2.3.0(eslint@9.33.0(jiti@1.21.7))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@9.1.0(eslint@9.33.0(jiti@1.21.7)))(eslint@9.33.0(jiti@1.21.7))(prettier@3.6.2)
-      eslint-plugin-simple-import-sort:
-        specifier: ^12.1.1
-        version: 12.1.1(eslint@9.33.0(jiti@1.21.7))
-      eslint-plugin-sort-destructure-keys:
-        specifier: ^1.6.0
-        version: 1.6.0(eslint@9.33.0(jiti@1.21.7))
-      leasot:
-        specifier: ^13.3.0
-        version: 13.3.0
-      madge:
-        specifier: ^6.1.0
-        version: 6.1.0(typescript@5.9.2)
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
-      type-coverage:
-        specifier: ^2.29.7
-        version: 2.29.7(typescript@5.9.2)
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.39.0
-        version: 8.39.0(eslint@9.33.0(jiti@1.21.7))(typescript@5.9.2)
-      vitest:
-        specifier: ^3.2.4
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.2.1)(jiti@1.21.7)(tsx@4.20.3)(yaml@2.8.1)
-
   packages/aws-jwt-verify-effect:
     dependencies:
       '@konker.dev/tiny-error-fp':
@@ -989,9 +904,6 @@ importers:
       '@gomomento/sdk':
         specifier: ^1.111.0
         version: 1.111.0
-      '@konker.dev/aws-client-effect-s3':
-        specifier: workspace:*
-        version: link:../aws-client-effect-s3
       '@konker.dev/common-config':
         specifier: 0.2.4
         version: 0.2.4(aws-crt@1.27.3)
