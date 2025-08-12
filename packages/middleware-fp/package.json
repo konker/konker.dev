@@ -24,121 +24,129 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./contrib/base64BodyDecoder": {
-      "types": "./dist/contrib/base64BodyDecoder.d.ts",
-      "import": "./dist/contrib/base64BodyDecoder.js"
+    "./http/contrib/base64BodyDecoder": {
+      "types": "./dist/http/contrib/base64BodyDecoder.d.ts",
+      "import": "./dist/http/contrib/base64BodyDecoder.js"
     },
-    "./contrib/basicAuthAuthenticator": {
-      "types": "./dist/contrib/basicAuthAuthenticator.d.ts",
-      "import": "./dist/contrib/basicAuthAuthenticator.js"
+    "./http/contrib/basicAuthAuthenticator": {
+      "types": "./dist/http/contrib/basicAuthAuthenticator.d.ts",
+      "import": "./dist/http/contrib/basicAuthAuthenticator.js"
     },
-    "./contrib/basicAuthDecoder": {
-      "types": "./dist/contrib/basicAuthDecoder.d.ts",
-      "import": "./dist/contrib/basicAuthDecoder.js"
+    "./http/contrib/basicAuthDecoder": {
+      "types": "./dist/http/contrib/basicAuthDecoder.d.ts",
+      "import": "./dist/http/contrib/basicAuthDecoder.js"
     },
-    "./contrib/bodyValidator": {
-      "types": "./dist/contrib/bodyValidator.d.ts",
-      "import": "./dist/contrib/bodyValidator.js"
+    "./http/contrib/bodyValidator": {
+      "types": "./dist/http/contrib/bodyValidator.d.ts",
+      "import": "./dist/http/contrib/bodyValidator.js"
     },
-    "./contrib/cacheInMemory": {
-      "types": "./dist/contrib/cacheInMemory.d.ts",
-      "import": "./dist/contrib/cacheInMemory.js"
+    "./http/contrib/cacheInMemory": {
+      "types": "./dist/http/contrib/cacheInMemory.d.ts",
+      "import": "./dist/http/contrib/cacheInMemory.js"
     },
-    "./contrib/cacheMomento": {
-      "types": "./dist/contrib/cacheMomento.d.ts",
-      "import": "./dist/contrib/cacheMomento.js"
+    "./http/contrib/cacheMomento": {
+      "types": "./dist/http/contrib/cacheMomento.d.ts",
+      "import": "./dist/http/contrib/cacheMomento.js"
     },
-    "./contrib/envValidator": {
-      "types": "./dist/contrib/envValidator.d.ts",
-      "import": "./dist/contrib/envValidator.js"
+    "./http/contrib/envValidator": {
+      "types": "./dist/http/contrib/envValidator.d.ts",
+      "import": "./dist/http/contrib/envValidator.js"
     },
-    "./contrib/headerSignatureAuthorizer": {
-      "types": "./dist/contrib/headerSignatureAuthorizer/index.d.ts",
-      "import": "./dist/contrib/headerSignatureAuthorizer/index.js"
+    "./http/contrib/headerSignatureAuthorizer": {
+      "types": "./dist/http/contrib/headerSignatureAuthorizer/index.d.ts",
+      "import": "./dist/http/contrib/headerSignatureAuthorizer/index.js"
     },
-    "./contrib/headerSignatureAuthorizer/lib": {
-      "types": "./dist/contrib/headerSignatureAuthorizer/lib.d.ts",
-      "import": "./dist/contrib/headerSignatureAuthorizer/lib.js"
+    "./http/contrib/headerSignatureAuthorizer/lib": {
+      "types": "./dist/http/contrib/headerSignatureAuthorizer/lib.d.ts",
+      "import": "./dist/http/contrib/headerSignatureAuthorizer/lib.js"
     },
-    "./contrib/headersNormalizer": {
-      "types": "./dist/contrib/headersNormalizer/index.d.ts",
-      "import": "./dist/contrib/headersNormalizer/index.js"
+    "./http/contrib/headersNormalizer": {
+      "types": "./dist/http/contrib/headersNormalizer/index.d.ts",
+      "import": "./dist/http/contrib/headersNormalizer/index.js"
     },
-    "./contrib/headersNormalizer/lib": {
-      "types": "./dist/contrib/headersNormalizer/lib.d.ts",
-      "import": "./dist/contrib/headersNormalizer/lib.js"
+    "./http/contrib/headersNormalizer/lib": {
+      "types": "./dist/http/contrib/headersNormalizer/lib.d.ts",
+      "import": "./dist/http/contrib/headersNormalizer/lib.js"
     },
-    "./contrib/headersNormalizer/types": {
-      "types": "./dist/contrib/headersNormalizer/types.d.ts",
-      "import": "./dist/contrib/headersNormalizer/types.js"
+    "./http/contrib/headersNormalizer/types": {
+      "types": "./dist/http/contrib/headersNormalizer/types.d.ts",
+      "import": "./dist/http/contrib/headersNormalizer/types.js"
     },
-    "./contrib/headersValidator": {
-      "types": "./dist/contrib/headersValidator.d.ts",
-      "import": "./dist/contrib/headersValidator.js"
+    "./http/contrib/headersValidator": {
+      "types": "./dist/http/contrib/headersValidator.d.ts",
+      "import": "./dist/http/contrib/headersValidator.js"
     },
-    "./contrib/helmetJsHeaders": {
-      "types": "./dist/contrib/helmetJsHeaders.d.ts",
-      "import": "./dist/contrib/helmetJsHeaders.js"
+    "./http/contrib/helmetJsHeaders": {
+      "types": "./dist/http/contrib/helmetJsHeaders.d.ts",
+      "import": "./dist/http/contrib/helmetJsHeaders.js"
     },
-    "./contrib/identity": {
-      "types": "./dist/contrib/identity.d.ts",
-      "import": "./dist/contrib/identity.js"
+    "./http/contrib/identity": {
+      "types": "./dist/http/contrib/identity.d.ts",
+      "import": "./dist/http/contrib/identity.js"
     },
-    "./contrib": {
-      "types": "./dist/contrib/index.d.ts",
-      "import": "./dist/contrib/index.js"
+    "./http/contrib": {
+      "types": "./dist/http/contrib/index.d.ts",
+      "import": "./dist/http/contrib/index.js"
     },
-    "./contrib/jsonBodyParser": {
-      "types": "./dist/contrib/jsonBodyParser.d.ts",
-      "import": "./dist/contrib/jsonBodyParser.js"
+    "./http/contrib/jsonBodyParser": {
+      "types": "./dist/http/contrib/jsonBodyParser.d.ts",
+      "import": "./dist/http/contrib/jsonBodyParser.js"
     },
-    "./contrib/jwtAuthenticator": {
-      "types": "./dist/contrib/jwtAuthenticator.d.ts",
-      "import": "./dist/contrib/jwtAuthenticator.js"
+    "./http/contrib/jwtAuthenticator": {
+      "types": "./dist/http/contrib/jwtAuthenticator.d.ts",
+      "import": "./dist/http/contrib/jwtAuthenticator.js"
     },
-    "./contrib/jwtAuthenticatorRsa": {
-      "types": "./dist/contrib/jwtAuthenticatorRsa.d.ts",
-      "import": "./dist/contrib/jwtAuthenticatorRsa.js"
+    "./http/contrib/jwtAuthenticatorRsa": {
+      "types": "./dist/http/contrib/jwtAuthenticatorRsa.d.ts",
+      "import": "./dist/http/contrib/jwtAuthenticatorRsa.js"
     },
-    "./contrib/jwtDecoder": {
-      "types": "./dist/contrib/jwtDecoder.d.ts",
-      "import": "./dist/contrib/jwtDecoder.js"
+    "./http/contrib/jwtDecoder": {
+      "types": "./dist/http/contrib/jwtDecoder.d.ts",
+      "import": "./dist/http/contrib/jwtDecoder.js"
     },
-    "./contrib/momentoClientInit": {
-      "types": "./dist/contrib/momentoClientInit.d.ts",
-      "import": "./dist/contrib/momentoClientInit.js"
+    "./http/contrib/momentoClientInit": {
+      "types": "./dist/http/contrib/momentoClientInit.d.ts",
+      "import": "./dist/http/contrib/momentoClientInit.js"
     },
-    "./contrib/pathParametersValidator": {
-      "types": "./dist/contrib/pathParametersValidator.d.ts",
-      "import": "./dist/contrib/pathParametersValidator.js"
+    "./http/contrib/pathParametersValidator": {
+      "types": "./dist/http/contrib/pathParametersValidator.d.ts",
+      "import": "./dist/http/contrib/pathParametersValidator.js"
     },
-    "./contrib/pathTokenAuthorizer": {
-      "types": "./dist/contrib/pathTokenAuthorizer.d.ts",
-      "import": "./dist/contrib/pathTokenAuthorizer.js"
+    "./http/contrib/pathTokenAuthorizer": {
+      "types": "./dist/http/contrib/pathTokenAuthorizer.d.ts",
+      "import": "./dist/http/contrib/pathTokenAuthorizer.js"
     },
-    "./contrib/queryStringValidator": {
-      "types": "./dist/contrib/queryStringValidator.d.ts",
-      "import": "./dist/contrib/queryStringValidator.js"
+    "./http/contrib/queryStringValidator": {
+      "types": "./dist/http/contrib/queryStringValidator.d.ts",
+      "import": "./dist/http/contrib/queryStringValidator.js"
     },
-    "./contrib/requestResponseLogger": {
-      "types": "./dist/contrib/requestResponseLogger.d.ts",
-      "import": "./dist/contrib/requestResponseLogger.js"
+    "./http/contrib/requestResponseLogger": {
+      "types": "./dist/http/contrib/requestResponseLogger.d.ts",
+      "import": "./dist/http/contrib/requestResponseLogger.js"
     },
-    "./contrib/responseProcessor": {
-      "types": "./dist/contrib/responseProcessor.d.ts",
-      "import": "./dist/contrib/responseProcessor.js"
+    "./http/contrib/responseProcessor": {
+      "types": "./dist/http/contrib/responseProcessor.d.ts",
+      "import": "./dist/http/contrib/responseProcessor.js"
     },
-    "./contrib/trivial": {
-      "types": "./dist/contrib/trivial.d.ts",
-      "import": "./dist/contrib/trivial.js"
+    "./http/contrib/trivial": {
+      "types": "./dist/http/contrib/trivial.d.ts",
+      "import": "./dist/http/contrib/trivial.js"
     },
-    "./lib/http": {
-      "types": "./dist/lib/http.d.ts",
-      "import": "./dist/lib/http.js"
+    "./http/HttpApiError": {
+      "types": "./dist/http/HttpApiError.d.ts",
+      "import": "./dist/http/HttpApiError.js"
     },
-    "./lib/HttpApiError": {
-      "types": "./dist/lib/HttpApiError.d.ts",
-      "import": "./dist/lib/HttpApiError.js"
+    "./http": {
+      "types": "./dist/http/index.d.ts",
+      "import": "./dist/http/index.js"
+    },
+    "./http/request": {
+      "types": "./dist/http/request.d.ts",
+      "import": "./dist/http/request.js"
+    },
+    "./http/response": {
+      "types": "./dist/http/response.d.ts",
+      "import": "./dist/http/response.js"
     },
     "./lib/MiddlewareError": {
       "types": "./dist/lib/MiddlewareError.d.ts",
