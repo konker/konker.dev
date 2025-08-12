@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/common-config",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
