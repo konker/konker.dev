@@ -1,0 +1,78 @@
+{
+  "name": "@konker.dev/backend-boilerplate.konker.dev",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "Konrad Markus <mail@konker.dev>",
+  "license": "ISC",
+  "description": "Boilerplate for backend services",
+  "homepage": "https://konker.dev/",
+  "keywords": [
+    "node",
+    "utils",
+    "typescript",
+    "functional-programming",
+    "effect-ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konker.dev/apps/backend-boilerplate.konker.dev"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "!dist/**/*.test.*"
+  ],
+  "main": "dist/index.js",
+  "dependencies": {
+    "effect": "^3.17.7"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.4",
+    "@effect/language-service": "^0.1.0",
+    "@eslint/compat": "^1.3.2",
+    "@eslint/js": "^9.33.0",
+    "@konker.dev/common-config": "0.2.6",
+    "@types/node": "^24.2.1",
+    "@vitest/coverage-istanbul": "^3.2.4",
+    "eslint": "^9.33.0",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^1.6.0",
+    "leasot": "^13.3.0",
+    "madge": "^6.1.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "type-coverage": "^2.29.7",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0",
+    "vitest": "^3.2.4"
+  },
+  "scripts": {
+    "test": "vitest run --coverage",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm run clean && tsc",
+    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files src/index.test.ts --ignore-files src/stream/index.ts",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
+    "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
+    "eslint-fix": "npx eslint --fix||true",
+    "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
+    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
+    "fixme-check": "leasot --exit-nicely --skip-unsupported src",
+    "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
+    "prettier-fix": "pnpm run prettier-check --write",
+    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
+    "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
+    "pre-push": "pnpm run lint-check && pnpm run typecheck",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/backend-boilerplate'",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
+    "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
+  }
+}
