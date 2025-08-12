@@ -24,6 +24,7 @@ import { generateExports } from './generate-exports-common.js';
   // Compare package.exports with generated exports
   if (JSON.stringify(exports) !== JSON.stringify(generated)) {
     console.error(`ERROR: Exports for ${fullProjectPath} differ from generate-exports output`);
+    console.error(JSON.stringify(generated));
     return process.exit(1);
   }
 
