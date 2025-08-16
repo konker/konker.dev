@@ -1,5 +1,5 @@
-# konker.dev
+# backend-boilerplate.konker.dev
 
-Source code for [konker.dev](https://konker.dev/)
+Boilerplate project for konker.dev backend projects.
 
 ![License](https://img.shields.io/github/license/konker/konker.dev)
