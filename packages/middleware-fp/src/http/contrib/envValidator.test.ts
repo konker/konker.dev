@@ -30,6 +30,7 @@ describe('middleware/env-validator', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         headers: {},
         pathParameters: {},

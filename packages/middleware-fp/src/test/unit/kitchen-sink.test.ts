@@ -141,6 +141,7 @@ describe('kitchen sink', () => {
     );
 
     const actual1 = stack({
+      url: '/',
       // version: 'string',
       // routeKey: 'string',
       // rawPath: 'string',
@@ -190,6 +191,7 @@ describe('kitchen sink', () => {
       multiValueHeaders: {},
       body: '{"foo":"ABC","bar":246,"baz":false,"pt":"test-token-value","q":"wtf","h":"APPLICATION/JSON; CHARSET=UTF-8","u":"test-sub"}',
       i: `{
+  "url": "/",
   "method": "POST",
   "headers": {
     "content-type": "application/json; charset=UTF-8",
@@ -235,6 +237,6 @@ describe('kitchen sink', () => {
 }`,
     });
 
-    expect(__cache).toHaveProperty('default-cache_89f05974dfc4a3ae4af70ea0fee174e1');
+    expect(__cache).toHaveProperty('default-cache_e910b73b0866b50e5be3fe318b53fbc2');
   });
 });

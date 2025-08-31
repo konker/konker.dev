@@ -33,6 +33,7 @@ describe('middleware/headers-validator', () => {
         num: 123,
       },
       in: {
+        url: '/',
         method: 'GET',
         pathParameters: {},
         queryStringParameters: {},

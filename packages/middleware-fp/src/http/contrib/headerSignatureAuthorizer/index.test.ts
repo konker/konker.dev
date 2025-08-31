@@ -66,6 +66,7 @@ describe('middleware/header-signature-authorizer', () => {
         'x-test-signature': 'test-hmac-value',
       },
       in: {
+        url: '/',
         body: 'TEST_BODY',
         headers: {
           'x-test-signature': 'test-hmac-value',

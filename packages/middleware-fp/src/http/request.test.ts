@@ -6,6 +6,7 @@ import * as unit from './request.js';
 describe('http/request', () => {
   describe('makeRequestW', () => {
     const TEST_REQUEST_W_1 = {
+      url: '/',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,6 +21,7 @@ describe('http/request', () => {
 
     it('should work with empty request and without extra properties', () => {
       expect(unit.makeRequestW(EMPTY_REQUEST_W)).toStrictEqual({
+        url: '/',
         method: 'GET',
         headers: {},
         pathParameters: {},
@@ -33,6 +35,7 @@ describe('http/request', () => {
 
     it('should work with empty request and with extra properties', () => {
       expect(unit.makeRequestW(EMPTY_REQUEST_W, { foo: 'bar' })).toStrictEqual({
+        url: '/',
         method: 'GET',
         headers: {},
         pathParameters: {},
@@ -43,6 +46,7 @@ describe('http/request', () => {
 
     it('should work with request and with extra properties', () => {
       expect(unit.makeRequestW(TEST_REQUEST_W_1, { foo: 'bar' })).toStrictEqual({
+        url: '/',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,6 +65,7 @@ describe('http/request', () => {
       expect(
         unit.makeRequestW(TEST_REQUEST_W_1, { foo: 'bar', headers: { 'content-type': 'text/xml' } })
       ).toStrictEqual({
+        url: '/',
         method: 'POST',
         headers: {
           'content-type': 'text/xml',

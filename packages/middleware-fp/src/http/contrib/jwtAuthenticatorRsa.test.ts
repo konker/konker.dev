@@ -68,6 +68,7 @@ describe('middleware/jwt-authenticator-rsa', () => {
         authorization: VALID_JWT_RSA_VALUE,
       },
       in: {
+        url: '/',
         method: 'GET',
         pathParameters: {},
         queryStringParameters: {},

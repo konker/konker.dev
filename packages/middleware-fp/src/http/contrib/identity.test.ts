@@ -20,6 +20,7 @@ describe('middleware/identity', () => {
         method: 'GET',
         pathParameters: {},
         queryStringParameters: {},
+        url: '/',
       },
       statusCode: 200,
     });

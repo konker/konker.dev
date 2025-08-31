@@ -27,6 +27,7 @@ describe('middleware/momento-client-init', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         headers: {},
         method: 'GET',
         pathParameters: {},

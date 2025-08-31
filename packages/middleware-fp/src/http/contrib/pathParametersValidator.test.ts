@@ -24,6 +24,7 @@ describe('middleware/path-parameters-validator', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         headers: {},
         queryStringParameters: {},

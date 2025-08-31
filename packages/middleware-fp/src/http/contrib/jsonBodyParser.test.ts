@@ -18,6 +18,7 @@ describe('middleware/json-body-parser', () => {
       body: { foo: 'ABC' },
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         headers: {},
         pathParameters: {},
@@ -42,6 +43,7 @@ describe('middleware/json-body-parser', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         headers: {},
         pathParameters: {},

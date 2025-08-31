@@ -1,5 +1,6 @@
 // --------------------------------------------------------------------------
 export type RequestW<T extends Record<string, unknown> = {}> = {
+  readonly url: string;
   readonly method: string;
   readonly body?: string;
   readonly headers: Record<string, string>;
@@ -29,6 +30,7 @@ export function makeRequestW<T extends Record<string, unknown>, U extends Record
 
 // --------------------------------------------------------------------------
 export const EMPTY_REQUEST_W: RequestW = {
+  url: '/',
   method: 'GET',
   headers: {},
   queryStringParameters: {},

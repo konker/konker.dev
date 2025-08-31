@@ -64,6 +64,7 @@ describe('middleware/cache-momento', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         headers: {},
         method: 'GET',
         pathParameters: {},
