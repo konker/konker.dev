@@ -61,6 +61,7 @@ describe('basic test 1', () => {
     );
 
     const actual1 = stack({
+      url: '/',
       version: 'string',
       routeKey: 'string',
       rawPath: 'string',

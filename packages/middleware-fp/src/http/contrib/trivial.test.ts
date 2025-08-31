@@ -17,6 +17,7 @@ describe('middleware/trivial', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         headers: {},
         pathParameters: {},

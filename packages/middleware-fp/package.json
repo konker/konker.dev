@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/middleware-fp",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -23,6 +23,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./http/contrib/apiGatewayProxyEventV2Adapter": {
+      "types": "./dist/http/contrib/apiGatewayProxyEventV2Adapter.d.ts",
+      "import": "./dist/http/contrib/apiGatewayProxyEventV2Adapter.js"
     },
     "./http/contrib/base64BodyDecoder": {
       "types": "./dist/http/contrib/base64BodyDecoder.d.ts",
@@ -128,6 +132,10 @@
       "types": "./dist/http/contrib/responseProcessor.d.ts",
       "import": "./dist/http/contrib/responseProcessor.js"
     },
+    "./http/contrib/standardRequestResponseAdapter": {
+      "types": "./dist/http/contrib/standardRequestResponseAdapter.d.ts",
+      "import": "./dist/http/contrib/standardRequestResponseAdapter.js"
+    },
     "./http/contrib/trivial": {
       "types": "./dist/http/contrib/trivial.d.ts",
       "import": "./dist/http/contrib/trivial.js"
@@ -151,6 +159,22 @@
     "./lib/MiddlewareError": {
       "types": "./dist/lib/MiddlewareError.d.ts",
       "import": "./dist/lib/MiddlewareError.js"
+    },
+    "./test/fixtures/apiGatewayProxyEventV2-allUndefined": {
+      "types": "./dist/test/fixtures/apiGatewayProxyEventV2-allUndefined.d.ts",
+      "import": "./dist/test/fixtures/apiGatewayProxyEventV2-allUndefined.js"
+    },
+    "./test/fixtures/apiGatewayProxyEventV2-complete": {
+      "types": "./dist/test/fixtures/apiGatewayProxyEventV2-complete.d.ts",
+      "import": "./dist/test/fixtures/apiGatewayProxyEventV2-complete.js"
+    },
+    "./test/fixtures/apiGatewayProxyEventV2-endToEnd": {
+      "types": "./dist/test/fixtures/apiGatewayProxyEventV2-endToEnd.d.ts",
+      "import": "./dist/test/fixtures/apiGatewayProxyEventV2-endToEnd.js"
+    },
+    "./test/fixtures/apiGatewayProxyEventV2-withUndefined": {
+      "types": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.d.ts",
+      "import": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.js"
     },
     "./test/test-common": {
       "types": "./dist/test/test-common.d.ts",

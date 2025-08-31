@@ -36,7 +36,7 @@ const TEST_IN_2 = makeRequestW(EMPTY_REQUEST_W, {
   },
 });
 
-describe('middleware/path-token-authorizer KONK90', () => {
+describe('middleware/path-token-authorizer', () => {
   let errorSpy: MockInstance;
   let oldEnv: NodeJS.ProcessEnv;
 
@@ -63,6 +63,7 @@ describe('middleware/path-token-authorizer KONK90', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         headers: {},
         method: 'GET',
         pathParameters: {

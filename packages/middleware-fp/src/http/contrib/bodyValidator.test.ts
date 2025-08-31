@@ -23,6 +23,7 @@ describe('middleware/body-validator', () => {
       body: { foo: 'foo_value' },
       headers: {},
       in: {
+        url: '/',
         body: {
           foo: 'foo_value',
         },

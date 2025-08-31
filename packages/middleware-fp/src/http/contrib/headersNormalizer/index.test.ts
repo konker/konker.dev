@@ -19,6 +19,7 @@ describe('middleware/headers-normalizer', () => {
       body: 'OK',
       headers: { Foo: 'foo_value' },
       in: {
+        url: '/',
         method: 'GET',
         headers: { foo: 'foo_value' },
         headersNormalizerRequestRaw: { FOO: 'foo_value' },
@@ -36,6 +37,7 @@ describe('middleware/headers-normalizer', () => {
       body: 'OK',
       headers: { Foo: 'foo_value' },
       in: {
+        url: '/',
         headers: { FOO: 'foo_value' },
         headersNormalizerRequestRaw: { FOO: 'foo_value' },
         method: 'GET',
@@ -53,6 +55,7 @@ describe('middleware/headers-normalizer', () => {
       body: 'OK',
       headers: { foo: 'foo_value' },
       in: {
+        url: '/',
         headers: { foo: 'foo_value' },
         headersNormalizerRequestRaw: { FOO: 'foo_value' },
         method: 'GET',

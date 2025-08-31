@@ -48,6 +48,7 @@ describe('middleware/basic-auth-decoder', () => {
         authorization: VALID_BASIC_AUTH_VALUE,
       },
       in: {
+        url: '/',
         method: 'GET',
         body: {},
         headers: {

@@ -24,6 +24,7 @@ describe('middleware/query-string-validator', () => {
       body: 'OK',
       headers: {},
       in: {
+        url: '/',
         headers: {},
         method: 'GET',
         pathParameters: {},

@@ -26,6 +26,7 @@ describe('middleware/base64-body-decoder', () => {
       body: '{"foo":"ABC"}',
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         body: '{"foo":"ABC"}',
         headers: {},
@@ -46,6 +47,7 @@ describe('middleware/base64-body-decoder', () => {
       body: '{"foo":"ABC"}',
       headers: {},
       in: {
+        url: '/',
         method: 'GET',
         body: '{"foo":"ABC"}',
         headers: {},
@@ -66,6 +68,7 @@ describe('middleware/base64-body-decoder', () => {
       body: '',
       headers: {},
       in: {
+        url: '/',
         body: '',
         headers: {},
         method: 'GET',

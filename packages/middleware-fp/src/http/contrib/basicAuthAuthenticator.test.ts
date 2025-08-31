@@ -70,6 +70,7 @@ describe('middleware/basic-auth-authenticator', () => {
         authorization: 'Basic dXNlcjA6c2VjcmV0LTA=',
       },
       in: {
+        url: '/',
         headers: {
           authorization: 'Basic dXNlcjA6c2VjcmV0LTA=',
         },

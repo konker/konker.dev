@@ -24,6 +24,7 @@ describe('middleware/cache-in-memory', () => {
       },
       headers: {},
       in: {
+        url: '/',
         headers: {},
         method: 'GET',
         pathParameters: {},
