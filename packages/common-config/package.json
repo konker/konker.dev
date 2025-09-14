@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/common-config",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -31,6 +31,8 @@
   "dependencies": {
     "@aws-sdk/client-cloudfront-keyvaluestore": "^3.864.0",
     "@aws-sdk/signature-v4-crt": "^3.864.0",
+    "eslint-plugin-jsonc": "^2.20.1",
+    "jsonc-eslint-parser": "^2.4.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
