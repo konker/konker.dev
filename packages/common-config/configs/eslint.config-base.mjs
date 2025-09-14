@@ -43,7 +43,7 @@ export default tsEslint.config(
     },
   },
   {
-    files: ['*.json5'],
+    files: ['**/*.json5'],
     languageOptions: {
       parser: jsoncEslintParser,
     },
