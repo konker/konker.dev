@@ -3,6 +3,8 @@ import fp from 'eslint-plugin-fp';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import sortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
 import tsEslint from 'typescript-eslint';
+import jsoncPlugin from 'eslint-plugin-jsonc';
+import * as jsoncEslintParser from 'jsonc-eslint-parser';
 
 export default tsEslint.config(
   eslint.configs.recommended,
@@ -39,6 +41,13 @@ export default tsEslint.config(
       'no-unused-vars': 'off',
       'sort-destructure-keys/sort-destructure-keys': 'error',
     },
+  },
+  {
+    files: ['*.json5'],
+    languageOptions: {
+      parser: jsoncEslintParser,
+    },
+    ...jsoncPlugin.configs['flat/recommended-with-json5'],
   },
   {
     files: ['**/__tests__/**/*', '**/*.test.*'],
