@@ -1,3 +1,4 @@
+export * as apiGatewayProxyEventV2Adapter from './apiGatewayProxyEventV2Adapter.js';
 export * as base64BodyDecoder from './base64BodyDecoder.js';
 export * as basicAuthAuthenticator from './basicAuthAuthenticator.js';
 export * as basicAuthDecoder from './basicAuthDecoder.js';
@@ -20,4 +21,5 @@ export * as pathTokenAuthorizer from './pathTokenAuthorizer.js';
 export * as queryStringValidator from './queryStringValidator.js';
 export * as responseProcessor from './responseProcessor.js';
 export * as requestResponseLogger from './requestResponseLogger.js';
+export * as standardRequestResponseAdapter from './standardRequestResponseAdapter.js';
 export * as trivial from './trivial.js';
