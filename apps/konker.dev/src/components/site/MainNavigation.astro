@@ -61,6 +61,8 @@ const navLinks: ReadonlyArray<LinkT> = navLinksConfig.map((linkConfig, i) => ({
 </NavigationPanel>
 
 <style is:global>
+  @reference "../../styles/global.css";
+
   .main-navigation .nav-links .nav-link {
     @apply block md:inline-block min-w-[8rem] mx-[0.025rem] p-[0.4rem] text-center border-gray-400 dark:border-gray-500 border border-t-0 border-l-0 border-r-0 md:border-l bg-kdd md:bg-kdd-nav;
   }
