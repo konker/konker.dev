@@ -206,7 +206,7 @@
     "@effect/language-service": "^0.41.0",
     "@eslint/js": "^9.36.0",
     "@gomomento/sdk": "^1.116.0",
-    "@konker.dev/common-config": "0.5.0",
+    "@konker.dev/common-config": "latest",
     "@smithy/smithy-client": "^4.6.5",
     "@swc/core": "^1.13.20",
     "@types/aws-lambda": "^8.10.152",

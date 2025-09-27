@@ -80,7 +80,7 @@
     "@effect/language-service": "^0.41.0",
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.36.0",
-    "@konker.dev/common-config": "0.5.0",
+    "@konker.dev/common-config": "latest",
     "@types/aws-lambda": "^8.10.152",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.5.2",
