@@ -72,8 +72,8 @@
     "!dist/**/*.test.*"
   ],
   "peerDependencies": {
-    "@aws-sdk/client-s3": "^3.705.0",
-    "@aws-sdk/lib-storage": "^3.864.0",
+    "@aws-sdk/client-s3": "^3",
+    "@aws-sdk/lib-storage": "^3",
     "@effect-aws/client-s3": "^1.10.3",
     "fast-glob": "^3.3.2",
     "memfs": "^4.6.0"
@@ -85,7 +85,6 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@aws-sdk/client-s3": "^3.896.0",
     "@effect/language-service": "^0.41.0",
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.36.0",
