@@ -10,12 +10,19 @@ import type { ResponseW } from '../response.js';
 export const TAG = 'apiGatewayProxyEventV2Adapter';
 
 // --------------------------------------------------------------------------
+export type WithApiGatewayProxyEventRaw = {
+  readonly apiGatewayProxyEventV2Raw: APIGatewayProxyEventV2;
+};
+
+// --------------------------------------------------------------------------
 function sanitizeRecord(record?: Record<string, string | undefined>): Record<string, string> {
   return Object.fromEntries(Object.entries(record ?? {}).map(([k, v]) => [k, v ?? '']));
 }
 
 // --------------------------------------------------------------------------
-export function adaptFromApiGatewayProxyEventV2(request: APIGatewayProxyEventV2): RequestW {
+export function adaptFromApiGatewayProxyEventV2(
+  request: APIGatewayProxyEventV2
+): RequestW<WithApiGatewayProxyEventRaw> {
   return {
     url: request.requestContext.http.path,
     method: request.requestContext.http.method,
@@ -23,6 +30,7 @@ export function adaptFromApiGatewayProxyEventV2(request: APIGatewayProxyEventV2)
     headers: sanitizeRecord(request.headers),
     queryStringParameters: sanitizeRecord(request.queryStringParameters),
     pathParameters: sanitizeRecord(request.pathParameters),
+    apiGatewayProxyEventV2Raw: request,
   };
 }
 
@@ -38,7 +46,7 @@ export function adaptToApiGatewayProxyResult<O extends Rec>(responseW: ResponseW
 export const middleware =
   (_params?: never) =>
   <O extends Rec, E, R>(
-    wrapped: Handler<RequestW, ResponseW<O>, E, R>
+    wrapped: Handler<RequestW<WithApiGatewayProxyEventRaw>, ResponseW<O>, E, R>
   ): Handler<APIGatewayProxyEventV2, APIGatewayProxyResult, E, R> =>
   (i: APIGatewayProxyEventV2) =>
     pipe(

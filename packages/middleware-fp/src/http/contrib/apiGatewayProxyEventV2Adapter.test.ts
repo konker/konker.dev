@@ -31,6 +31,7 @@ describe('middleware/apiGatewayProxyEventV2Adapter', () => {
         pathParameters: {
           id: '123',
         },
+        apiGatewayProxyEventV2Raw: apiGatewayProxyEventV2Complete,
       });
     });
 
@@ -53,6 +54,7 @@ describe('middleware/apiGatewayProxyEventV2Adapter', () => {
           id: '123',
           missing: '',
         },
+        apiGatewayProxyEventV2Raw: apiGatewayProxyEventV2WithUndefined,
       });
     });
 
@@ -66,6 +68,7 @@ describe('middleware/apiGatewayProxyEventV2Adapter', () => {
         headers: {},
         queryStringParameters: {},
         pathParameters: {},
+        apiGatewayProxyEventV2Raw: apiGatewayProxyEventV2AllUndefined,
       });
     });
   });
