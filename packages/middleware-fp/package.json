@@ -84,6 +84,10 @@
       "types": "./dist/http/contrib/helmetJsHeaders.d.ts",
       "import": "./dist/http/contrib/helmetJsHeaders.js"
     },
+    "./http/contrib/honoAdapter": {
+      "types": "./dist/http/contrib/honoAdapter.d.ts",
+      "import": "./dist/http/contrib/honoAdapter.js"
+    },
     "./http/contrib/identity": {
       "types": "./dist/http/contrib/identity.d.ts",
       "import": "./dist/http/contrib/identity.js"
@@ -176,6 +180,26 @@
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.d.ts",
       "import": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.js"
     },
+    "./test/fixtures/honoRequest-allUndefined": {
+      "types": "./dist/test/fixtures/honoRequest-allUndefined.d.ts",
+      "import": "./dist/test/fixtures/honoRequest-allUndefined.js"
+    },
+    "./test/fixtures/honoRequest-complete": {
+      "types": "./dist/test/fixtures/honoRequest-complete.d.ts",
+      "import": "./dist/test/fixtures/honoRequest-complete.js"
+    },
+    "./test/fixtures/honoRequest-endToEnd": {
+      "types": "./dist/test/fixtures/honoRequest-endToEnd.d.ts",
+      "import": "./dist/test/fixtures/honoRequest-endToEnd.js"
+    },
+    "./test/fixtures/honoRequest-withUndefined": {
+      "types": "./dist/test/fixtures/honoRequest-withUndefined.d.ts",
+      "import": "./dist/test/fixtures/honoRequest-withUndefined.js"
+    },
+    "./test/fixtures/honoRequestFactory": {
+      "types": "./dist/test/fixtures/honoRequestFactory.d.ts",
+      "import": "./dist/test/fixtures/honoRequestFactory.js"
+    },
     "./test/test-common": {
       "types": "./dist/test/test-common.d.ts",
       "import": "./dist/test/test-common.js"
@@ -188,7 +212,8 @@
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
     "@gomomento/sdk": "^1.102.0",
-    "aws-lambda": "^1.0.7"
+    "aws-lambda": "^1.0.7",
+    "hono": "^4.9.9"
   },
   "dependencies": {
     "@konker.dev/momento-cache-client-effect": "workspace:*",
@@ -220,6 +245,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "hono": "^4.9.9",
     "leasot": "^14.4.0",
     "madge": "^8.0.0",
     "micromatch": "^4.0.8",
