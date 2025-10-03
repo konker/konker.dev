@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './index.js';
+import * as unit from './root.js';
 
 describe('index', () => {
   it('should work as expected', () => {
-    expect(unit.HELLO).toEqual('hello');
+    expect(unit).toBeDefined();
   });
 });

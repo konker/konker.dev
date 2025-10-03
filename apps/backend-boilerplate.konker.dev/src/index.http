@@ -1,0 +1,8 @@
+### GET
+GET https://b0xxqnqxle.execute-api.eu-west-1.amazonaws.com
+Accept: application/json
+
+### GET
+GET https://q39g3bx5b5.execute-api.us-east-1.amazonaws.com
+Accept: application/json
+

@@ -32,4 +32,6 @@ pnpm-debug.log*
 .vscode
 
 .turbo
-.sst
+
+# sst
+.sst/
