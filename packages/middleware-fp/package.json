@@ -56,6 +56,10 @@
       "types": "./dist/http/contrib/envValidator.d.ts",
       "import": "./dist/http/contrib/envValidator.js"
     },
+    "./http/contrib/fetchAdapter": {
+      "types": "./dist/http/contrib/fetchAdapter.d.ts",
+      "import": "./dist/http/contrib/fetchAdapter.js"
+    },
     "./http/contrib/headerSignatureAuthorizer": {
       "types": "./dist/http/contrib/headerSignatureAuthorizer/index.d.ts",
       "import": "./dist/http/contrib/headerSignatureAuthorizer/index.js"
@@ -172,13 +176,17 @@
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-complete.d.ts",
       "import": "./dist/test/fixtures/apiGatewayProxyEventV2-complete.js"
     },
-    "./test/fixtures/apiGatewayProxyEventV2-endToEnd": {
-      "types": "./dist/test/fixtures/apiGatewayProxyEventV2-endToEnd.d.ts",
-      "import": "./dist/test/fixtures/apiGatewayProxyEventV2-endToEnd.js"
-    },
     "./test/fixtures/apiGatewayProxyEventV2-withUndefined": {
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.d.ts",
       "import": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.js"
+    },
+    "./test/fixtures/fetchRequest-allUndefined": {
+      "types": "./dist/test/fixtures/fetchRequest-allUndefined.d.ts",
+      "import": "./dist/test/fixtures/fetchRequest-allUndefined.js"
+    },
+    "./test/fixtures/fetchRequest-complete": {
+      "types": "./dist/test/fixtures/fetchRequest-complete.d.ts",
+      "import": "./dist/test/fixtures/fetchRequest-complete.js"
     },
     "./test/fixtures/honoRequest-allUndefined": {
       "types": "./dist/test/fixtures/honoRequest-allUndefined.d.ts",
@@ -187,14 +195,6 @@
     "./test/fixtures/honoRequest-complete": {
       "types": "./dist/test/fixtures/honoRequest-complete.d.ts",
       "import": "./dist/test/fixtures/honoRequest-complete.js"
-    },
-    "./test/fixtures/honoRequest-endToEnd": {
-      "types": "./dist/test/fixtures/honoRequest-endToEnd.d.ts",
-      "import": "./dist/test/fixtures/honoRequest-endToEnd.js"
-    },
-    "./test/fixtures/honoRequest-withUndefined": {
-      "types": "./dist/test/fixtures/honoRequest-withUndefined.d.ts",
-      "import": "./dist/test/fixtures/honoRequest-withUndefined.js"
     },
     "./test/fixtures/honoRequestFactory": {
       "types": "./dist/test/fixtures/honoRequestFactory.d.ts",
