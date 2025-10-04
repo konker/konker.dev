@@ -1,3 +1,5 @@
+import type { HonoRequest } from 'hono';
+
 import { honoRequestFactory } from './honoRequestFactory.js';
 
-export const honoRequestAllUndefined = honoRequestFactory('https://example.com/test', {});
+export const honoRequestAllUndefined: HonoRequest = honoRequestFactory('https://example.com/test', {});
