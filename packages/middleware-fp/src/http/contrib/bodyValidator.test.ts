@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { echoCoreIn200W } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W, makeRequestW } from '../request.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../RequestW.js';
 import * as unit from './bodyValidator.js';
 
 export const testSchema = Schema.Struct({

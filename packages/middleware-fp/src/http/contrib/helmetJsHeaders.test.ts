@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { echoCoreIn200W } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W } from '../request.js';
+import { EMPTY_REQUEST_W } from '../RequestW.js';
 import * as unit from './helmetJsHeaders.js';
 
 describe('middleware/helmet-js-headers', () => {

@@ -156,13 +156,21 @@
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.js"
     },
-    "./http/request": {
-      "types": "./dist/http/request.d.ts",
-      "import": "./dist/http/request.js"
+    "./http/RequestResponseHandler": {
+      "types": "./dist/http/RequestResponseHandler.d.ts",
+      "import": "./dist/http/RequestResponseHandler.js"
     },
-    "./http/response": {
-      "types": "./dist/http/response.d.ts",
-      "import": "./dist/http/response.js"
+    "./http/RequestW": {
+      "types": "./dist/http/RequestW.d.ts",
+      "import": "./dist/http/RequestW.js"
+    },
+    "./http/ResponseW": {
+      "types": "./dist/http/ResponseW.d.ts",
+      "import": "./dist/http/ResponseW.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
     },
     "./lib/MiddlewareError": {
       "types": "./dist/lib/MiddlewareError.d.ts",
@@ -203,6 +211,10 @@
     "./test/test-common": {
       "types": "./dist/test/test-common.d.ts",
       "import": "./dist/test/test-common.js"
+    },
+    "./handler": {
+      "types": "./dist/handler.d.ts",
+      "import": "./dist/handler.js"
     }
   },
   "files": [

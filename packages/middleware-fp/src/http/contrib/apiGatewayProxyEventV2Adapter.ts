@@ -2,10 +2,10 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResult } from 'aws-lambda';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { Handler } from '../../index.js';
+import type { Handler } from '../../handler.js';
 import type { Rec } from '../index.js';
-import type { RequestW } from '../request.js';
-import type { ResponseW } from '../response.js';
+import type { RequestW } from '../RequestW.js';
+import type { ResponseW } from '../ResponseW.js';
 
 export const TAG = 'apiGatewayProxyEventV2Adapter';
 

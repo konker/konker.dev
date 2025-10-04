@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 
 import { HttpApiError } from '../../HttpApiError.js';
 import type { Rec, RequestResponseHandler } from '../../index.js';
-import type { RequestW } from '../../request.js';
+import type { RequestW } from '../../RequestW.js';
 import { validateHeaderSignature } from './lib.js';
 
 const TAG = 'headerSignatureAuthorizer';

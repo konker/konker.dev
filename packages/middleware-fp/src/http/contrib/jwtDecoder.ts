@@ -5,7 +5,7 @@ import * as Effect from 'effect/Effect';
 
 import { HttpApiError } from '../HttpApiError.js';
 import type { Rec, RequestResponseHandler } from '../index.js';
-import { makeRequestW, type RequestW } from '../request.js';
+import { makeRequestW, type RequestW } from '../RequestW.js';
 import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
 
 const TAG = 'jwtDecoder';

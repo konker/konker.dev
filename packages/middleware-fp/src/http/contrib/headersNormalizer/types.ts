@@ -1,5 +1,5 @@
-import type { RequestW } from '../../request.js';
-import type { ResponseW } from '../../response.js';
+import type { RequestW } from '../../RequestW.js';
+import type { ResponseW } from '../../ResponseW.js';
 
 export type WithNormalizedInputHeaders = {
   headers: RequestW['headers'];

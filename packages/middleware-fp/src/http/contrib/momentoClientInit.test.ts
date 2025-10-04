@@ -5,7 +5,7 @@ import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { echoCoreInDepsW } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W } from '../request.js';
+import { EMPTY_REQUEST_W } from '../RequestW.js';
 import * as unit from './momentoClientInit.js';
 
 describe('middleware/momento-client-init', () => {

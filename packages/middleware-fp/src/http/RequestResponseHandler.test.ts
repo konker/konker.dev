@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './index.js';
+import * as unit from './RequestResponseHandler.js';
 
 describe('http', () => {
   describe('UNKNOWN_STRING_EFFECT', () => {

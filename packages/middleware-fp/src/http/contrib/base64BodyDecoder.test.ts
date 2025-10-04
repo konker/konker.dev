@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { echoCoreIn200W } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W, makeRequestW } from '../request.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../RequestW.js';
 import * as unit from './base64BodyDecoder.js';
 
 const TEST_IN_1 = makeRequestW(EMPTY_REQUEST_W, { body: '{"foo":"ABC"}' });

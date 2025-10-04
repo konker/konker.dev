@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import * as unit from './response.js';
-import { EMPTY_RESPONSE_W } from './response.js';
+import * as unit from './ResponseW.js';
+import { EMPTY_RESPONSE_W } from './ResponseW.js';
 
 describe('http/response', () => {
   describe('makeResponseW', () => {

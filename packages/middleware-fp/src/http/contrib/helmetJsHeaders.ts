@@ -2,7 +2,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
 import type { Rec, RequestResponseHandler } from '../index.js';
-import type { RequestW } from '../request.js';
+import type { RequestW } from '../RequestW.js';
 
 // Based on : https://helmetjs.github.io/
 const TAG = 'helmetJsHeaders';

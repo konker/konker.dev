@@ -1,7 +1,7 @@
 // FROM: https://github.com/middyjs/middy/blob/main/packages/http-header-normalizer/index.js
 import type { Rec } from '../../index.js';
-import { makeRequestW, type RequestW } from '../../request.js';
-import { makeResponseW, type ResponseW } from '../../response.js';
+import { makeRequestW, type RequestW } from '../../RequestW.js';
+import { makeResponseW, type ResponseW } from '../../ResponseW.js';
 import type { WithNormalizedInputHeaders, WithNormalizedOutputHeaders } from './types.js';
 
 const EXCEPTIONS_LIST = [

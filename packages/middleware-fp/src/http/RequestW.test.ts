@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { EMPTY_REQUEST_W } from './request.js';
-import * as unit from './request.js';
+import { EMPTY_REQUEST_W } from './RequestW.js';
+import * as unit from './RequestW.js';
 
 describe('http/request', () => {
   describe('makeRequestW', () => {

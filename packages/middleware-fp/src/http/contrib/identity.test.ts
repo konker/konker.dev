@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { echoCoreIn200W, TestDepsW } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W } from '../request.js';
+import { EMPTY_REQUEST_W } from '../RequestW.js';
 import * as unit from './identity.js';
 
 const TEST_DEPS: TestDepsW = TestDepsW.of({ bar: 'bar' });
