@@ -5,8 +5,9 @@
 
 declare module "sst" {
   export interface Resource {
-    "MyApi": {
-      "type": "sst.aws.ApiGatewayV2"
+    "API_ip.dev.domain-o-matic.com": {
+      "name": string
+      "type": "sst.aws.Function"
       "url": string
     }
   }

@@ -56,10 +56,6 @@
       "types": "./dist/http/contrib/envValidator.d.ts",
       "import": "./dist/http/contrib/envValidator.js"
     },
-    "./http/contrib/fetchAdapter": {
-      "types": "./dist/http/contrib/fetchAdapter.d.ts",
-      "import": "./dist/http/contrib/fetchAdapter.js"
-    },
     "./http/contrib/headerSignatureAuthorizer": {
       "types": "./dist/http/contrib/headerSignatureAuthorizer/index.d.ts",
       "import": "./dist/http/contrib/headerSignatureAuthorizer/index.js"
@@ -175,6 +171,10 @@
     "./lib/MiddlewareError": {
       "types": "./dist/lib/MiddlewareError.d.ts",
       "import": "./dist/lib/MiddlewareError.js"
+    },
+    "./lib/utils": {
+      "types": "./dist/lib/utils.d.ts",
+      "import": "./dist/lib/utils.js"
     },
     "./test/fixtures/apiGatewayProxyEventV2-allUndefined": {
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-allUndefined.d.ts",

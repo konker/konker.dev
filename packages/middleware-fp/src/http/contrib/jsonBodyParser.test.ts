@@ -15,6 +15,25 @@ describe('middleware/json-body-parser', () => {
     const result = pipe(egHandler(TEST_IN_1), Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       statusCode: 200,
+      body: '{"foo":"ABC"}',
+      headers: {},
+      in: {
+        url: '/',
+        method: 'GET',
+        headers: {},
+        pathParameters: {},
+        queryStringParameters: {},
+        jsonBodyParserRaw: '{"foo":"ABC"}',
+        body: { foo: 'ABC' },
+      },
+    });
+  });
+
+  it('should work as expected with encodeResponseBody=false', async () => {
+    const egHandler = pipe(echoCoreIn200W, unit.middleware({ encodeResponseBody: false }));
+    const result = pipe(egHandler(TEST_IN_1), Effect.runPromise);
+    await expect(result).resolves.toStrictEqual({
+      statusCode: 200,
       body: { foo: 'ABC' },
       headers: {},
       in: {
@@ -40,7 +59,7 @@ describe('middleware/json-body-parser', () => {
     const result = pipe(egHandler(EMPTY_REQUEST_W), Effect.runPromise);
     await expect(result).resolves.toStrictEqual({
       statusCode: 200,
-      body: 'OK',
+      body: '"OK"',
       headers: {},
       in: {
         url: '/',

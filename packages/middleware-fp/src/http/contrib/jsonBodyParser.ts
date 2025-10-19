@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 
 import type { MiddlewareError } from '../../lib/MiddlewareError.js';
 import { toMiddlewareError } from '../../lib/MiddlewareError.js';
-import type { Rec, RequestResponseHandler } from '../index.js';
+import { type BodyRec, makeResponseW, type RequestResponseHandler, type StrBodyRec } from '../index.js';
 import { makeRequestW, type RequestW } from '../RequestW.js';
 
 const TAG = 'jsonBodyParser';
@@ -14,8 +14,8 @@ export type WithParsedBody = {
 };
 
 export const middleware =
-  () =>
-  <I extends Rec, O extends Rec, E, R>(
+  ({ encodeResponseBody = true } = {}) =>
+  <I extends StrBodyRec, O extends BodyRec, E, R>(
     wrapped: RequestResponseHandler<I & WithParsedBody, O, E, R>
   ): RequestResponseHandler<I, O, E | MiddlewareError, R> =>
   (i: RequestW<I>) =>
@@ -33,8 +33,22 @@ export const middleware =
           jsonBodyParserRaw: i.body,
         })
       ),
+
       // Call the next middleware in the stack
       Effect.flatMap(wrapped),
+
+      // Encode the response body
+      Effect.flatMap((o) =>
+        o.body && encodeResponseBody
+          ? pipe(
+              o.body,
+              Schema.encode(Schema.parseJson()),
+              Effect.mapError(toMiddlewareError),
+              Effect.map((encodedBody: string) => makeResponseW(o, { body: encodedBody }))
+            )
+          : Effect.succeed(o)
+      ),
+
       // Log after
       Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );

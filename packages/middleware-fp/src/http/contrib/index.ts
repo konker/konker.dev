@@ -6,7 +6,6 @@ export * as bodyValidator from './bodyValidator.js';
 export * as cacheInMemory from './cacheInMemory.js';
 export * as cacheMomento from './cacheMomento.js';
 export * as envValidator from './envValidator.js';
-export * as fetchAdapter from './fetchAdapter.js';
 export * as headerSignatureAuthorizer from './headerSignatureAuthorizer/index.js';
 export * as headersNormalizer from './headersNormalizer/index.js';
 export * as headersValidator from './headersValidator.js';

@@ -1,7 +1,11 @@
+import { text } from 'node:stream/consumers';
+
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
+import { fetchRequestAllUndefined } from '../../test/fixtures/fetchRequest-allUndefined.js';
+import { fetchRequestComplete } from '../../test/fixtures/fetchRequest-complete.js';
 import { echoCoreIn200W, TestDepsW } from '../../test/test-common.js';
 import * as unit from './standardRequestResponseAdapter.js';
 
@@ -9,37 +13,27 @@ const TEST_DEPS: TestDepsW = TestDepsW.of({ bar: 'bar' });
 
 describe('middleware/standardRequestResponseAdapter', () => {
   describe('adaptFromStandardRequest', () => {
-    it('should adapt a standard Request to RequestW', async () => {
-      const request = new Request('https://example.com/test?param=value', {
-        method: 'POST',
-        body: 'test body',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer token',
-        },
-      });
-
-      const result = await unit.adaptFromStandardRequest(request);
+    it('should adapt StandardRequest to RequestW', async () => {
+      const fetchRequestIn = fetchRequestComplete();
+      const result = await pipe(unit.adaptFromStandardRequest(fetchRequestIn), Effect.runPromise);
 
       expect(result).toStrictEqual({
-        url: 'https://example.com/test?param=value',
+        url: 'https://example.com/test?param=value&other=test',
         method: 'POST',
         body: 'test body',
         headers: {
           'content-type': 'application/json',
           authorization: 'Bearer token',
         },
-        queryStringParameters: {
-          param: 'value',
-        },
+        queryStringParameters: { param: 'value', other: 'test' },
         pathParameters: {},
+        fetchRequestRaw: fetchRequestIn,
       });
     });
 
-    it('should handle empty body and no headers', async () => {
-      const request = new Request('https://example.com/test');
-
-      const result = await unit.adaptFromStandardRequest(request);
+    it('should handle completely undefined headers, queryStringParameters, and pathParameters', async () => {
+      const fetchRequestIn = fetchRequestAllUndefined();
+      const result = await pipe(unit.adaptFromStandardRequest(fetchRequestIn), Effect.runPromise);
 
       expect(result).toStrictEqual({
         url: 'https://example.com/test',
@@ -48,12 +42,13 @@ describe('middleware/standardRequestResponseAdapter', () => {
         headers: {},
         queryStringParameters: {},
         pathParameters: {},
+        fetchRequestRaw: fetchRequestIn,
       });
     });
   });
 
   describe('adaptToStandardResponse', () => {
-    it('should adapt ResponseW to standard Response', () => {
+    it('should adapt ResponseW to StandardResponse', async () => {
       const responseW = {
         statusCode: 201,
         body: 'created',
@@ -62,29 +57,43 @@ describe('middleware/standardRequestResponseAdapter', () => {
         },
       };
 
-      const result = unit.adaptToStandardResponse(responseW);
+      const result = await pipe(unit.adaptToStandardResponse(responseW), Effect.runPromise);
 
       expect(result.status).toEqual(201);
-      expect(result.headers.get('Content-Type')).toEqual('application/json');
+      expect(await text(result.body!)).toEqual('created');
+      expect(Object.fromEntries(result.headers.entries())).toStrictEqual({
+        'content-type': 'application/json',
+      });
+    });
+
+    it('should handle undefined body and headers', async () => {
+      const responseW = {
+        statusCode: 404,
+      };
+
+      const result = await pipe(unit.adaptToStandardResponse(responseW as never), Effect.runPromise);
+
+      expect(result.status).toEqual(404);
+      expect(await text(result.body!)).toEqual('');
+      expect(Object.fromEntries(result.headers.entries())).toStrictEqual({});
     });
   });
 
   describe('middleware', () => {
     it('should work end-to-end', async () => {
-      const request = new Request('https://example.com/test?param=value', {
-        method: 'POST',
-        body: 'test body',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
       const egHandler = pipe(echoCoreIn200W, unit.middleware());
-      const result = pipe(egHandler(request), Effect.provideService(TestDepsW, TEST_DEPS), Effect.runPromise);
+      const result = await pipe(
+        egHandler(fetchRequestComplete()),
+        Effect.provideService(TestDepsW, TEST_DEPS),
+        Effect.runPromise
+      );
 
-      await expect(result).resolves.toBeInstanceOf(Response);
-      const response = await result;
-      expect(response.status).toEqual(200);
+      expect(result.status).toEqual(200);
+      expect(await text(result.body!)).toEqual('test body');
+      expect(Object.fromEntries(result.headers.entries())).toStrictEqual({
+        authorization: 'Bearer token',
+        'content-type': 'application/json',
+      });
     });
   });
 });

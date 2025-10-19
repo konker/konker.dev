@@ -18,11 +18,35 @@
     "url": "https://github.com/konker.dev/apps/backend-boilerplate.konker.dev"
   },
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+    "./package.json": "./package.json",
+    "./api/root/core": {
+      "types": "./dist/api/root/core.d.ts",
+      "import": "./dist/api/root/core.js"
     },
-    "./package.json": "./package.json"
+    "./api/root/handler": {
+      "types": "./dist/api/root/handler.d.ts",
+      "import": "./dist/api/root/handler.js"
+    },
+    "./hono/hono-app": {
+      "types": "./dist/hono/hono-app.d.ts",
+      "import": "./dist/hono/hono-app.js"
+    },
+    "./hono/hono-aws-serverless": {
+      "types": "./dist/hono/hono-aws-serverless.d.ts",
+      "import": "./dist/hono/hono-aws-serverless.js"
+    },
+    "./hono/hono-cloudflare-serverless": {
+      "types": "./dist/hono/hono-cloudflare-serverless.d.ts",
+      "import": "./dist/hono/hono-cloudflare-serverless.js"
+    },
+    "./hono/hono-node-server": {
+      "types": "./dist/hono/hono-node-server.d.ts",
+      "import": "./dist/hono/hono-node-server.js"
+    },
+    "./lib/consts": {
+      "types": "./dist/lib/consts.d.ts",
+      "import": "./dist/lib/consts.js"
+    }
   },
   "files": [
     "dist/**/*",
@@ -30,9 +54,11 @@
   ],
   "main": "dist/index.js",
   "dependencies": {
+    "@hono/node-server": "^1.19.5",
     "@konker.dev/middleware-fp": "workspace:*",
     "aws-lambda": "^1.0.7",
     "effect": "^3.17.14",
+    "hono": "^4.9.9",
     "sst": "3.17.14"
   },
   "devDependencies": {
@@ -61,10 +87,11 @@
   },
   "scripts": {
     "build": "pnpm run clean && tsc",
-    "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`",
+    "dev": "tsx watch src/hono/hono-node-server.ts",
+    "cd": "",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
-    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "clean": "rm -rf dist && rm -rf .deploy && rm -f tsconfig.tsbuildinfo",
     "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/backend-boilerplate'",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",

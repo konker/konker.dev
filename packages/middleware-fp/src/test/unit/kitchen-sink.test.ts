@@ -121,7 +121,7 @@ describe('kitchen sink', () => {
     const stack = pipe(
       echoCore,
       M.bodyValidator.middleware(Body),
-      M.jsonBodyParser.middleware(),
+      M.jsonBodyParser.middleware({ encodeResponseBody: false }),
       M.base64BodyDecoder.middleware(() => false),
       M.jwtAuthenticator.middleware(),
       M.headersValidator.middleware(Headers),

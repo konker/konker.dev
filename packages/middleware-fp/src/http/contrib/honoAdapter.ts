@@ -6,7 +6,8 @@ import type { HonoRequest } from 'hono';
 
 import type { Handler } from '../../handler.js';
 import { type MiddlewareError, toMiddlewareError } from '../../lib/MiddlewareError.js';
-import type { Rec } from '../index.js';
+import { sanitizeRecord } from '../../lib/utils.js';
+import type { StrBodyRec } from '../index.js';
 import type { RequestW } from '../RequestW.js';
 import type { ResponseW } from '../ResponseW.js';
 
@@ -16,11 +17,6 @@ export const TAG = 'honoAdapter';
 export type WithHonoRequestRaw = {
   readonly honoRequestRaw: HonoRequest;
 };
-
-// --------------------------------------------------------------------------
-export function sanitizeRecord(record?: Record<string, string | undefined>): Record<string, string> {
-  return Object.fromEntries(Object.entries(record ?? {}).map(([k, v]) => [k, v ?? '']));
-}
 
 // --------------------------------------------------------------------------
 export function adaptFromHonoRequest(
@@ -40,7 +36,9 @@ export function adaptFromHonoRequest(
   });
 }
 
-export function adaptToHonoResponse<O extends Rec>(responseW: ResponseW<O>): Effect.Effect<Response, MiddlewareError> {
+export function adaptToHonoResponse<O extends StrBodyRec>(
+  responseW: ResponseW<O>
+): Effect.Effect<Response, MiddlewareError> {
   return Effect.tryPromise({
     try: async () =>
       new Response(Buffer.from(responseW.body ?? ''), {
@@ -54,7 +52,7 @@ export function adaptToHonoResponse<O extends Rec>(responseW: ResponseW<O>): Eff
 // --------------------------------------------------------------------------
 export const middleware =
   (_params?: never) =>
-  <O extends Rec, E, R>(
+  <O extends StrBodyRec, E, R>(
     wrapped: Handler<RequestW<WithHonoRequestRaw>, ResponseW<O>, E, R>
   ): Handler<HonoRequest, Response, E | MiddlewareError, R> =>
   (i: HonoRequest) =>

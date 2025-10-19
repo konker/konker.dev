@@ -3,7 +3,7 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
 import type { Handler } from '../../handler.js';
-import type { Rec } from '../index.js';
+import type { StrBodyRec } from '../index.js';
 import type { RequestW } from '../RequestW.js';
 import type { ResponseW } from '../ResponseW.js';
 
@@ -34,7 +34,7 @@ export function adaptFromApiGatewayProxyEventV2(
   };
 }
 
-export function adaptToApiGatewayProxyResult<O extends Rec>(responseW: ResponseW<O>): APIGatewayProxyResult {
+export function adaptToApiGatewayProxyResult<O extends StrBodyRec>(responseW: ResponseW<O>): APIGatewayProxyResult {
   return {
     statusCode: responseW.statusCode,
     body: responseW.body ?? '',
@@ -45,7 +45,7 @@ export function adaptToApiGatewayProxyResult<O extends Rec>(responseW: ResponseW
 // --------------------------------------------------------------------------
 export const middleware =
   (_params?: never) =>
-  <O extends Rec, E, R>(
+  <O extends StrBodyRec, E, R>(
     wrapped: Handler<RequestW<WithApiGatewayProxyEventRaw>, ResponseW<O>, E, R>
   ): Handler<APIGatewayProxyEventV2, APIGatewayProxyResult, E, R> =>
   (i: APIGatewayProxyEventV2) =>

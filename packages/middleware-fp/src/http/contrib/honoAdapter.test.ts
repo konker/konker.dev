@@ -12,18 +12,6 @@ import * as unit from './honoAdapter.js';
 const TEST_DEPS: TestDepsW = TestDepsW.of({ bar: 'bar' });
 
 describe('middleware/honoAdapter', () => {
-  describe('sanitizeRecord', () => {
-    it('should work as expected', () => {
-      expect(unit.sanitizeRecord({ foo: 'abc', bar: undefined })).toStrictEqual({
-        foo: 'abc',
-        bar: '',
-      });
-
-      expect(unit.sanitizeRecord({})).toStrictEqual({});
-      expect(unit.sanitizeRecord(undefined)).toStrictEqual({});
-    });
-  });
-
   describe('adaptFromHonoRequest', () => {
     it('should adapt HonoRequest to RequestW', async () => {
       const result = await pipe(unit.adaptFromHonoRequest(honoRequestComplete), Effect.runPromise);
