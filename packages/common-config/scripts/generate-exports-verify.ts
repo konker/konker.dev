@@ -28,6 +28,6 @@ import { generateExports } from './generate-exports-common.js';
     return process.exit(1);
   }
 
-  console.log(`OK: Exports for ${fullProjectPath} matvh from generate-exports output`);
+  console.log(`OK: Exports for ${fullProjectPath} match from generate-exports output`);
   return process.exit(0);
 })().catch(console.error);
