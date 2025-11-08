@@ -3,10 +3,10 @@ import * as Effect from 'effect/Effect';
 import type { MockInstance } from 'vitest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import type { Handler } from '../../index.js';
+import type { Handler } from '../../handler.js';
 import { TestDepsW } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W, type RequestW } from '../request.js';
-import { EMPTY_RESPONSE_W, type ResponseW } from '../response.js';
+import { EMPTY_REQUEST_W, type RequestW } from '../RequestW.js';
+import { EMPTY_RESPONSE_W, type ResponseW } from '../ResponseW.js';
 import * as unit from './requestResponseLogger.js';
 
 // https://stackoverflow.com/a/72885576/203284

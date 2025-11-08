@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import * as common from '../../test/test-common.js';
 import { TestDepsW } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W } from '../request.js';
+import { EMPTY_REQUEST_W } from '../RequestW.js';
 import * as unit from './cacheInMemory.js';
 
 const TEST_DEPS: TestDepsW = { bar: 'bar' };

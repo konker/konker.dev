@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import { echoCoreIn200W } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W, makeRequestW } from '../request.js';
+import { EMPTY_REQUEST_W, makeRequestW } from '../RequestW.js';
 import * as unit from './pathTokenAuthorizer.js';
 
 // https://stackoverflow.com/a/72885576/203284

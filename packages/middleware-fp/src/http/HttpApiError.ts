@@ -2,8 +2,8 @@ import { isTinyError, TinyError, toTinyError } from '@konker.dev/tiny-error-fp';
 import { pipe, Schema } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import { UNKNOWN_STRING_EFFECT } from './index.js';
-import { makeResponseW, type ResponseW } from './response.js';
+import { UNKNOWN_STRING_EFFECT } from './RequestResponseHandler.js';
+import { makeResponseW, type ResponseW } from './ResponseW.js';
 
 export const ERROR_TAG = 'HttpApiError' as const;
 export type ERROR_TAG = typeof ERROR_TAG;

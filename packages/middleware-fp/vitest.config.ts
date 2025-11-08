@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     coverage: {
       ...baseConfig.test.coverage,
-      exclude: ['src/examples/example1.ts', ...coverageConfigDefaults.exclude],
+      exclude: ['src/test/fixtures/', 'src/examples/example1.ts', ...coverageConfigDefaults.exclude],
     },
   },
 });

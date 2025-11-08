@@ -4,7 +4,7 @@ import * as Effect from 'effect/Effect';
 import type { MiddlewareError } from '../../lib/MiddlewareError.js';
 import { toMiddlewareError } from '../../lib/MiddlewareError.js';
 import type { Rec, RequestResponseHandler } from '../index.js';
-import { makeRequestW, type RequestW } from '../request.js';
+import { makeRequestW, type RequestW } from '../RequestW.js';
 
 const TAG = 'base64BodyDecoder';
 

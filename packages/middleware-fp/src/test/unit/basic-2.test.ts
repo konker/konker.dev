@@ -8,8 +8,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import * as M from '../../http/contrib/index.js';
 import * as unit from '../../http/contrib/jwtAuthenticatorRsa.js';
-import type { RequestW } from '../../http/request.js';
-import { makeResponseW, type ResponseW } from '../../http/response.js';
+import type { RequestW } from '../../http/RequestW.js';
+import { makeResponseW, type ResponseW } from '../../http/ResponseW.js';
 
 const CORRECT_TEST_PATH_TOKEN_VALUE = 'test-token-value';
 const TEST_SECRET_TOKEN_ENV_NAME = 'test-secret-token-env-name';

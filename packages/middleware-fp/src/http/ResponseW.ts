@@ -1,8 +1,9 @@
 // --------------------------------------------------------------------------
-export type ResponseW<T extends Record<string, unknown> = {}> = {
+import type { BodyRec } from './RequestResponseHandler.js';
+
+export type ResponseW<T extends Record<string, unknown> = BodyRec> = {
   readonly statusCode: number;
   readonly headers: Record<string, string>;
-  readonly body?: string;
 } & T;
 
 export function makeResponseW<T extends Record<string, unknown>>(responseW: ResponseW<T>): ResponseW<T>;

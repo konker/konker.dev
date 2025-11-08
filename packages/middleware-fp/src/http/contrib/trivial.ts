@@ -2,8 +2,8 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
 import type { Rec, RequestResponseHandler } from '../index.js';
-import { makeRequestW, type RequestW } from '../request.js';
-import { makeResponseW } from '../response.js';
+import { makeRequestW, type RequestW } from '../RequestW.js';
+import { makeResponseW } from '../ResponseW.js';
 
 export const TAG = 'trivial';
 

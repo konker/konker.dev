@@ -6,8 +6,8 @@ import * as Effect from 'effect/Effect';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TestDepsW } from '../../test/test-common.js';
-import { EMPTY_REQUEST_W } from '../request.js';
-import { makeResponseW } from '../response.js';
+import { EMPTY_REQUEST_W } from '../RequestW.js';
+import { makeResponseW } from '../ResponseW.js';
 import * as unit from './cacheMomento.js';
 
 describe('middleware/cache-momento', () => {

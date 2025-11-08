@@ -4,6 +4,7 @@ node_modules/
 # build output
 dist/
 www/
+.deploy/
 
 # Coverage directory used by tools like istanbul
 coverage
@@ -32,4 +33,6 @@ pnpm-debug.log*
 .vscode
 
 .turbo
-.sst
+
+# sst
+.sst/

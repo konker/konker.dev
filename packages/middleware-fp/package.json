@@ -84,6 +84,10 @@
       "types": "./dist/http/contrib/helmetJsHeaders.d.ts",
       "import": "./dist/http/contrib/helmetJsHeaders.js"
     },
+    "./http/contrib/honoAdapter": {
+      "types": "./dist/http/contrib/honoAdapter.d.ts",
+      "import": "./dist/http/contrib/honoAdapter.js"
+    },
     "./http/contrib/identity": {
       "types": "./dist/http/contrib/identity.d.ts",
       "import": "./dist/http/contrib/identity.js"
@@ -148,17 +152,29 @@
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.js"
     },
-    "./http/request": {
-      "types": "./dist/http/request.d.ts",
-      "import": "./dist/http/request.js"
+    "./http/RequestResponseHandler": {
+      "types": "./dist/http/RequestResponseHandler.d.ts",
+      "import": "./dist/http/RequestResponseHandler.js"
     },
-    "./http/response": {
-      "types": "./dist/http/response.d.ts",
-      "import": "./dist/http/response.js"
+    "./http/RequestW": {
+      "types": "./dist/http/RequestW.d.ts",
+      "import": "./dist/http/RequestW.js"
+    },
+    "./http/ResponseW": {
+      "types": "./dist/http/ResponseW.d.ts",
+      "import": "./dist/http/ResponseW.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
     },
     "./lib/MiddlewareError": {
       "types": "./dist/lib/MiddlewareError.d.ts",
       "import": "./dist/lib/MiddlewareError.js"
+    },
+    "./lib/utils": {
+      "types": "./dist/lib/utils.d.ts",
+      "import": "./dist/lib/utils.js"
     },
     "./test/fixtures/apiGatewayProxyEventV2-allUndefined": {
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-allUndefined.d.ts",
@@ -168,17 +184,37 @@
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-complete.d.ts",
       "import": "./dist/test/fixtures/apiGatewayProxyEventV2-complete.js"
     },
-    "./test/fixtures/apiGatewayProxyEventV2-endToEnd": {
-      "types": "./dist/test/fixtures/apiGatewayProxyEventV2-endToEnd.d.ts",
-      "import": "./dist/test/fixtures/apiGatewayProxyEventV2-endToEnd.js"
-    },
     "./test/fixtures/apiGatewayProxyEventV2-withUndefined": {
       "types": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.d.ts",
       "import": "./dist/test/fixtures/apiGatewayProxyEventV2-withUndefined.js"
     },
+    "./test/fixtures/fetchRequest-allUndefined": {
+      "types": "./dist/test/fixtures/fetchRequest-allUndefined.d.ts",
+      "import": "./dist/test/fixtures/fetchRequest-allUndefined.js"
+    },
+    "./test/fixtures/fetchRequest-complete": {
+      "types": "./dist/test/fixtures/fetchRequest-complete.d.ts",
+      "import": "./dist/test/fixtures/fetchRequest-complete.js"
+    },
+    "./test/fixtures/honoRequest-allUndefined": {
+      "types": "./dist/test/fixtures/honoRequest-allUndefined.d.ts",
+      "import": "./dist/test/fixtures/honoRequest-allUndefined.js"
+    },
+    "./test/fixtures/honoRequest-complete": {
+      "types": "./dist/test/fixtures/honoRequest-complete.d.ts",
+      "import": "./dist/test/fixtures/honoRequest-complete.js"
+    },
+    "./test/fixtures/honoRequestFactory": {
+      "types": "./dist/test/fixtures/honoRequestFactory.d.ts",
+      "import": "./dist/test/fixtures/honoRequestFactory.js"
+    },
     "./test/test-common": {
       "types": "./dist/test/test-common.d.ts",
       "import": "./dist/test/test-common.js"
+    },
+    "./handler": {
+      "types": "./dist/handler.d.ts",
+      "import": "./dist/handler.js"
     }
   },
   "files": [
@@ -188,7 +224,8 @@
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
     "@gomomento/sdk": "^1.102.0",
-    "aws-lambda": "^1.0.7"
+    "aws-lambda": "^1.0.7",
+    "hono": "^4.9.9"
   },
   "dependencies": {
     "@konker.dev/momento-cache-client-effect": "workspace:*",
@@ -220,6 +257,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "hono": "^4.9.9",
     "leasot": "^14.4.0",
     "madge": "^8.0.0",
     "micromatch": "^4.0.8",

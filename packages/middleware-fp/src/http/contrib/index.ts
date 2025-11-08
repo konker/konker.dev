@@ -10,6 +10,7 @@ export * as headerSignatureAuthorizer from './headerSignatureAuthorizer/index.js
 export * as headersNormalizer from './headersNormalizer/index.js';
 export * as headersValidator from './headersValidator.js';
 export * as helmetJsHeaders from './helmetJsHeaders.js';
+export * as honoAdapter from './honoAdapter.js';
 export * as identity from './identity.js';
 export * as jsonBodyParser from './jsonBodyParser.js';
 export * as jwtAuthenticator from './jwtAuthenticator.js';

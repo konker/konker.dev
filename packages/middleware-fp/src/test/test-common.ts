@@ -1,8 +1,8 @@
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import type { RequestW } from '../http/request.js';
-import { makeResponseW, type ResponseW } from '../http/response.js';
+import type { RequestW } from '../http/RequestW.js';
+import { makeResponseW, type ResponseW } from '../http/ResponseW.js';
 
 export type TestDepsW = any;
 export const TestDepsW = Context.GenericTag<any>('DepsW');

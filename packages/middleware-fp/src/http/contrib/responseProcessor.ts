@@ -3,8 +3,8 @@ import * as Effect from 'effect/Effect';
 
 import { toHttpApiError, toResponseW } from '../HttpApiError.js';
 import type { Rec, RequestResponseHandler } from '../index.js';
-import type { RequestW } from '../request.js';
-import type { ResponseW } from '../response.js';
+import type { RequestW } from '../RequestW.js';
+import type { ResponseW } from '../ResponseW.js';
 
 const TAG = 'responseProcessor';
 

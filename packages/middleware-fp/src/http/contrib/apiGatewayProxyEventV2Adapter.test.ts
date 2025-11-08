@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest';
 
 import { apiGatewayProxyEventV2AllUndefined } from '../../test/fixtures/apiGatewayProxyEventV2-allUndefined.js';
 import { apiGatewayProxyEventV2Complete } from '../../test/fixtures/apiGatewayProxyEventV2-complete.js';
-import { apiGatewayProxyEventV2EndToEnd } from '../../test/fixtures/apiGatewayProxyEventV2-endToEnd.js';
 import { apiGatewayProxyEventV2WithUndefined } from '../../test/fixtures/apiGatewayProxyEventV2-withUndefined.js';
 import { echoCoreIn200W, TestDepsW } from '../../test/test-common.js';
 import * as unit from './apiGatewayProxyEventV2Adapter.js';
@@ -113,7 +112,7 @@ describe('middleware/apiGatewayProxyEventV2Adapter', () => {
     it('should work end-to-end', async () => {
       const egHandler = pipe(echoCoreIn200W, unit.middleware());
       const result = pipe(
-        egHandler(apiGatewayProxyEventV2EndToEnd),
+        egHandler(apiGatewayProxyEventV2Complete),
         Effect.provideService(TestDepsW, TEST_DEPS),
         Effect.runPromise
       );
@@ -122,6 +121,7 @@ describe('middleware/apiGatewayProxyEventV2Adapter', () => {
         statusCode: 200,
         body: 'test body',
         headers: {
+          authorization: 'Bearer token',
           'content-type': 'application/json',
         },
       });

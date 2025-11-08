@@ -2,11 +2,11 @@ import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
-import type { Handler } from '../../index.js';
+import type { Handler } from '../../handler.js';
 import { TestDepsW } from '../../test/test-common.js';
 import { HttpApiError } from '../HttpApiError.js';
-import { EMPTY_REQUEST_W, type RequestW } from '../request.js';
-import { makeResponseW, type ResponseW } from '../response.js';
+import { EMPTY_REQUEST_W, type RequestW } from '../RequestW.js';
+import { makeResponseW, type ResponseW } from '../ResponseW.js';
 import * as unit from './responseProcessor.js';
 
 // https://stackoverflow.com/a/72885576/203284

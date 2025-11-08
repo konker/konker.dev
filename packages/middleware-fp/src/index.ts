@@ -1,3 +1,2 @@
-import type { Effect } from 'effect';
-
-export type Handler<I, O, E, R> = (i: I) => Effect.Effect<O, E, R>;
+export * as http from './http/index.js';
+export * as lib from './lib/index.js';
