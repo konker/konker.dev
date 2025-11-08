@@ -4,6 +4,7 @@ import { coverageConfigDefaults, defineConfig } from 'vitest/config';
 export default defineConfig({
   ...baseConfig,
   test: {
+    ...baseConfig.test,
     coverage: {
       ...baseConfig.test.coverage,
       exclude: ['src/test/fixtures/', 'src/examples/example1.ts', ...coverageConfigDefaults.exclude],
