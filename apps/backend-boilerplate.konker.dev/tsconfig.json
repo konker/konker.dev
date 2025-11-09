@@ -1,6 +1,8 @@
 {
   "extends": "../../packages/common-config/configs/tsconfig-base.json",
   "include": ["./src"],
+  "exclude": ["./.deploy"],
+  "exclude": ["./.sst"],
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
