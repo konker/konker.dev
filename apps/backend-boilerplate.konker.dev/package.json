@@ -87,6 +87,8 @@
   },
   "scripts": {
     "build": "pnpm run clean && tsc",
+    "build:prod": "pnpm run build && pnpm deploy --filter @konker.dev/backend-boilerplate.konker.dev --prod ./.deploy",
+    "build:container": "pnpm run build:prod && docker buildx build -t backend-boilerplate.konker.dev -f ./deployment/Dockerfile .",
     "dev": "tsx watch src/hono/hono-node-server.ts",
     "cd": "",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
