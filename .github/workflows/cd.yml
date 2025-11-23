@@ -21,6 +21,10 @@ on:
 env:
   NODE_AUTH_TOKEN: "${{ secrets.PRIVATE_NPM_TOKEN }}"
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  AWS_REGION: 'eu-west-1'
+  AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
+  TURBOCACHE_S3_BUCKET: ${{ secrets.TURBOCACHE_S3_BUCKET }}
   TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.base_ref || github.event.before || 'HEAD^' }}
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: ${{ (inputs.filter == '' && '--affected') || format('--filter={0}', inputs.filter) }}
@@ -69,11 +73,11 @@ jobs:
         uses: trappar/turborepo-remote-cache-gh-action@main
         with:
           storage-provider: s3
-          storage-path: ${{ secrets.TURBOCACHE_S3_BUCKET }}
+          storage-path: ${{ env.TURBOCACHE_S3_BUCKET }}
         env:
-          AWS_REGION: 'eu-west-1'
-          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
 
       - name: Run Checks
         run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
