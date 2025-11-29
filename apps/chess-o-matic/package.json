@@ -2,13 +2,12 @@
   "name": "chess-voice-recognition-browser",
   "version": "1.0.0",
   "description": "Chess move voice recognition using Vosk in the browser",
-  "main": "dist/chess-voice-recognition.js",
-  "types": "dist/chess-voice-recognition.d.ts",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "serve": "python3 -m http.server 8000",
-    "start": "npm run build && npm run serve"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "chess",

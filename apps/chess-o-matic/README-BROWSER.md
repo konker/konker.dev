@@ -17,11 +17,12 @@ A TypeScript/JavaScript implementation of chess move voice recognition using Vos
 ### 1. Install Dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 This installs:
 - `vosk-browser` - Vosk speech recognition for browsers
+- `vite` - Fast development server and build tool
 - `typescript` - TypeScript compiler
 
 ### 2. Download Vosk Model
@@ -34,58 +35,70 @@ Download a browser-compatible Vosk model:
 
 Extract to your project directory, e.g., `./vosk-model-small-en-us-0.15/`
 
-### 3. Build the TypeScript
+### 3. Development Mode
+
+Start the Vite dev server with hot module replacement:
 
 ```bash
-npm run build
+pnpm dev
 ```
 
-This compiles the TypeScript to JavaScript in the `dist/` directory.
+This will:
+- Start a dev server with HTTPS (required for microphone access)
+- Automatically open your browser at `https://localhost:3000`
+- Provide hot module replacement for instant updates
+- Show helpful error messages
 
-### 4. Serve the Files
+**Note:** You may need to accept the self-signed certificate in your browser.
 
-You need to serve the files over HTTP (not file://) because Vosk uses Web Workers.
+### 4. Production Build
 
-**Option 1: Using Python**
+Build for production:
+
 ```bash
-npm run serve
-# or manually:
-python3 -m http.server 8000
+pnpm build
 ```
 
-**Option 2: Using Node.js**
+Preview the production build:
+
 ```bash
-npx http-server -p 8000
+pnpm preview
 ```
 
-**Option 3: Using VS Code Live Server**
-- Install "Live Server" extension
-- Right-click on `chess-voice-demo.html` → "Open with Live Server"
+### 5. Type Checking
 
-### 5. Open in Browser
+Run TypeScript type checking without emitting files:
 
-Navigate to: `http://localhost:8000/chess-voice-demo.html`
+```bash
+pnpm typecheck
+```
 
 ## Project Structure
 
 ```
 .
-├── chess-voice-recognition.ts    # Main TypeScript implementation
-├── chess-voice-demo.html         # Demo web page
-├── package.json                  # NPM dependencies
-├── tsconfig.json                 # TypeScript configuration
-├── vosk-model-small-en-us-0.15/  # Vosk model (you download this)
-└── dist/                         # Compiled JavaScript (generated)
-    └── chess-voice-recognition.js
+├── src/
+│   └── chess-voice-recognition.ts  # Main TypeScript implementation
+├── index.html                      # Demo web page (entry point)
+├── vite.config.ts                  # Vite configuration
+├── package.json                    # NPM dependencies & scripts
+├── tsconfig.json                   # TypeScript configuration
+├── vosk-model-small-en-us-0.15/    # Vosk model (you download this)
+└── dist/                           # Production build output (generated)
+    ├── index.html
+    └── assets/
+        └── *.js                    # Bundled JavaScript
 ```
 
 ## Usage
 
 ### Basic Usage in HTML
 
+With Vite, you can import TypeScript files directly:
+
 ```html
 <script type="module">
-  import { ChessVoiceRecognizer, generateChessGrammar } from './dist/chess-voice-recognition.js';
+  import { ChessVoiceRecognizer, generateChessGrammar } from './src/chess-voice-recognition.ts';
 
   const recognizer = new ChessVoiceRecognizer();
   const grammar = generateChessGrammar();
@@ -103,6 +116,8 @@ Navigate to: `http://localhost:8000/chess-voice-demo.html`
   recognizer.stopListening();
 </script>
 ```
+
+In production builds, the TypeScript will be compiled and bundled automatically.
 
 ### Integration with Chess.js
 
