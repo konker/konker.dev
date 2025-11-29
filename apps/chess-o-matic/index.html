@@ -232,7 +232,7 @@
     </div>
 
     <script type="module">
-        import { ChessVoiceRecognizer, convertToStandardNotation, generateChessGrammar } from './dist/chess-voice-recognition.js';
+        import { ChessVoiceRecognizer, convertToStandardNotation, generateChessGrammar } from './src/chess-voice-recognition.ts';
 
         // DOM elements
         const statusEl = document.getElementById('status');
@@ -276,7 +276,7 @@
                 
                 // Initialize with model URL
                 // Note: You need to host the Vosk model files and update this URL
-                const modelUrl = './vosk-model-small-en-us-0.15';
+                const modelUrl = './vosk-model-small-en-us-0.15.zip';
                 await recognizer.initialize(modelUrl, grammar);
                 
                 setStatus('Ready! Click "Start Listening" to begin', 'ready');

@@ -192,9 +192,24 @@ export function convertToStandardNotation(spokenMove: string): string | null {
     return 'O-O-O';
   }
 
+  // Convert spoken numbers to digits
+  const wordToDigit: { [key: string]: string } = {
+    'one': '1', 'two': '2', 'three': '3', 'four': '4',
+    'five': '5', 'six': '6', 'seven': '7', 'eight': '8'
+  };
+
+  let processedMove = move;
+  for (const [word, digit] of Object.entries(wordToDigit)) {
+    processedMove = processedMove.replace(new RegExp(`\\b${word}\\b`, 'g'), digit);
+  }
+
+  // Clean up spaces and [unk] tokens to reconstruct moves
+  // This handles cases like "e 4" or "e [unk]" -> "e4"
+  const cleanedMove = processedMove.replace(/\[unk]/g, '').replace(/\s+/g, '');
+
   // Simple symbolic notation (already correct)
-  if (/^[a-h][1-8]$/.test(move)) {
-    return move;
+  if (/^[a-h][1-8]$/.test(cleanedMove)) {
+    return cleanedMove;
   }
 
   // Piece moves with symbols (e.g., "nf3", "qd4")
@@ -207,20 +222,20 @@ export function convertToStandardNotation(spokenMove: string): string | null {
   };
 
   // Check for symbolic notation like "nf3"
-  if (move.length === 3 && pieceMap[move[0]] && /^[a-h][1-8]$/.test(move.slice(1))) {
-    return pieceMap[move[0]] + move.slice(1);
+  if (cleanedMove.length === 3 && pieceMap[cleanedMove[0]] && /^[a-h][1-8]$/.test(cleanedMove.slice(1))) {
+    return pieceMap[cleanedMove[0]] + cleanedMove.slice(1);
   }
 
   // Handle "piece to square" format
   const pieceNames = ['knight', 'bishop', 'rook', 'queen', 'king', 'pawn'];
-  
+
   for (const pieceName of pieceNames) {
-    if (move.startsWith(pieceName)) {
+    if (processedMove.startsWith(pieceName)) {
       const piece = pieceName === 'pawn' ? '' : pieceName[0].toUpperCase();
-      
+
       // "knight takes f3" or "knight captures f3"
-      if (move.includes('takes') || move.includes('captures')) {
-        const parts = move.split(/takes|captures/);
+      if (processedMove.includes('takes') || processedMove.includes('captures')) {
+        const parts = processedMove.split(/takes|captures/);
         if (parts.length === 2) {
           const square = parts[1].trim().replace(/\s/g, '');
           if (/^[a-h][1-8]$/.test(square)) {
@@ -228,10 +243,10 @@ export function convertToStandardNotation(spokenMove: string): string | null {
           }
         }
       }
-      
+
       // "knight to f3"
-      if (move.includes(' to ')) {
-        const parts = move.split(' to ');
+      if (processedMove.includes(' to ')) {
+        const parts = processedMove.split(' to ');
         if (parts.length === 2) {
           const square = parts[1].trim().replace(/\s/g, '');
           if (/^[a-h][1-8]$/.test(square)) {
@@ -243,7 +258,7 @@ export function convertToStandardNotation(spokenMove: string): string | null {
   }
 
   // Handle pawn captures like "e takes d5"
-  const captureMatch = move.match(/^([a-h])\s*(?:takes|captures)\s*([a-h][1-8])$/);
+  const captureMatch = processedMove.match(/^([a-h])\s*(?:takes|captures)\s*([a-h][1-8])$/);
   if (captureMatch) {
     return `${captureMatch[1]}x${captureMatch[2]}`;
   }
@@ -258,8 +273,8 @@ export function convertToStandardNotation(spokenMove: string): string | null {
     draw: 'DRAW',
   };
 
-  if (commands[move]) {
-    return commands[move];
+  if (commands[cleanedMove]) {
+    return commands[cleanedMove];
   }
 
   return null;
@@ -270,9 +285,10 @@ export function convertToStandardNotation(spokenMove: string): string | null {
  */
 export function generateChessGrammar(): string[] {
   const grammar: string[] = ['[unk]'];
-  
+
   const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
   const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+  const rankWords = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
   const pieces = [
     { name: 'knight', symbol: 'n' },
     { name: 'bishop', symbol: 'b' },
@@ -281,32 +297,45 @@ export function generateChessGrammar(): string[] {
     { name: 'king', symbol: 'k' },
   ];
 
+  // Add individual files and rank words to vocabulary
+  for (const file of files) {
+    grammar.push(file);
+  }
+  for (const rankWord of rankWords) {
+    grammar.push(rankWord);
+  }
+
   // Generate all squares
   for (const file of files) {
-    for (const rank of ranks) {
+    for (let i = 0; i < ranks.length; i++) {
+      const rank = ranks[i];
+      const rankWord = rankWords[i];
       const square = file + rank;
-      
-      // Pawn moves (just square name)
-      grammar.push(square);
-      
-      // Piece moves (symbolic: nf3, bd3, etc.)
+      const squareSpoken = `${file} ${rankWord}`;
+
+      // Pawn moves (spoken form: "e four")
+      grammar.push(squareSpoken);
+
+      // Piece moves with spoken squares
       for (const piece of pieces) {
-        grammar.push(piece.symbol + square);
-        
-        // English forms: "knight to f3"
-        grammar.push(`${piece.name} to ${square}`);
-        grammar.push(`${piece.name} ${square}`);
-        
-        // Captures: "knight takes f3"
-        grammar.push(`${piece.name} takes ${square}`);
-        grammar.push(`${piece.name} captures ${square}`);
+        // Symbolic notation spoken: "n f three"
+        grammar.push(`${piece.symbol} ${file} ${rankWord}`);
+
+        // English forms: "knight to e four"
+        grammar.push(`${piece.name} to ${file} ${rankWord}`);
+        grammar.push(`${piece.name} ${file} ${rankWord}`);
+
+        // Captures: "knight takes e four"
+        grammar.push(`${piece.name} takes ${file} ${rankWord}`);
+        grammar.push(`${piece.name} captures ${file} ${rankWord}`);
       }
-      
+
       // Pawn captures
       for (const file2 of files) {
         if (file !== file2) {
-          grammar.push(`${file} takes ${file2}${rank}`);
-          grammar.push(`pawn takes ${square}`);
+          const file2Square = `${file2} ${rankWord}`;
+          grammar.push(`${file} takes ${file2Square}`);
+          grammar.push(`pawn takes ${file} ${rankWord}`);
         }
       }
     }
