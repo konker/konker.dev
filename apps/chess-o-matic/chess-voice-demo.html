@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Voice Recognition Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.listening {
+            background: #d1ecf1;
+            color: #0c5460;
+            animation: pulse 2s infinite;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-start {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-stop {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .partial-result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 50px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .moves-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .moves-list h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .move-item {
+            background: white;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .move-item .spoken {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .move-item .notation {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #004085;
+        }
+
+        .instructions h4 {
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .mic-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>♟️ Chess Voice Recognition</h1>
+        <p class="subtitle">Speak your chess moves naturally</p>
+
+        <div id="status" class="status loading">
+            Loading Vosk model...
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn-start" disabled>
+                <span class="mic-icon">🎤</span> Start Listening
+            </button>
+            <button id="stopBtn" class="btn-stop" disabled>
+                <span class="mic-icon">🛑</span> Stop
+            </button>
+        </div>
+
+        <div class="partial-result">
+            <strong>Listening for:</strong> <span id="partialText">...</span>
+        </div>
+
+        <div class="moves-list">
+            <h3>Recognized Moves</h3>
+            <div id="movesList"></div>
+        </div>
+
+        <div class="instructions">
+            <h4>How to use:</h4>
+            <ul>
+                <li>Click "Start Listening" and allow microphone access</li>
+                <li>Speak moves like: "e4", "knight to f3", "queen takes d5"</li>
+                <li>Both symbolic (Nf3) and English (knight to f3) work</li>
+                <li>Supports castling, captures, and special moves</li>
+            </ul>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ChessVoiceRecognizer, convertToStandardNotation, generateChessGrammar } from './dist/chess-voice-recognition.js';
+
+        // DOM elements
+        const statusEl = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const partialTextEl = document.getElementById('partialText');
+        const movesListEl = document.getElementById('movesList');
+
+        // Initialize recognizer
+        const recognizer = new ChessVoiceRecognizer();
+        let moveCount = 0;
+
+        // Update status
+        function setStatus(message, type) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Add move to list
+        function addMove(spoken, notation) {
+            moveCount++;
+            const moveItem = document.createElement('div');
+            moveItem.className = 'move-item';
+            moveItem.innerHTML = `
+                <div>
+                    <div class="notation">${moveCount}. ${notation}</div>
+                    <div class="spoken">"${spoken}"</div>
+                </div>
+            `;
+            movesListEl.insertBefore(moveItem, movesListEl.firstChild);
+        }
+
+        // Initialize the model
+        async function initialize() {
+            try {
+                setStatus('Loading Vosk model...', 'loading');
+                
+                // Generate chess grammar
+                const grammar = generateChessGrammar();
+                console.log(`Generated grammar with ${grammar.length} phrases`);
+                
+                // Initialize with model URL
+                // Note: You need to host the Vosk model files and update this URL
+                const modelUrl = './vosk-model-small-en-us-0.15';
+                await recognizer.initialize(modelUrl, grammar);
+                
+                setStatus('Ready! Click "Start Listening" to begin', 'ready');
+                startBtn.disabled = false;
+            } catch (error) {
+                console.error('Initialization error:', error);
+                setStatus('Error loading model. See console for details.', 'error');
+            }
+        }
+
+        // Start listening
+        startBtn.addEventListener('click', async () => {
+            try {
+                setStatus('Listening... Speak your chess moves', 'listening');
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                partialTextEl.textContent = '...';
+
+                await recognizer.startListening(
+                    // On final result
+                    (spokenMove) => {
+                        console.log('Recognized:', spokenMove);
+                        const notation = convertToStandardNotation(spokenMove);
+                        
+                        if (notation) {
+                            addMove(spokenMove, notation);
+                            partialTextEl.textContent = '...';
+                        } else {
+                            console.warn('Could not convert to standard notation:', spokenMove);
+                        }
+                    },
+                    // On partial result
+                    (partial) => {
+                        partialTextEl.textContent = partial || '...';
+                    }
+                );
+            } catch (error) {
+                console.error('Error starting listening:', error);
+                setStatus('Error accessing microphone', 'error');
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        });
+
+        // Stop listening
+        stopBtn.addEventListener('click', () => {
+            recognizer.stopListening();
+            setStatus('Stopped. Click "Start Listening" to resume', 'ready');
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            partialTextEl.textContent = '...';
+        });
+
+        // Initialize on page load
+        initialize();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            recognizer.destroy();
+        });
+    </script>
+</body>
+</html>
