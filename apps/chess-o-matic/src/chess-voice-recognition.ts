@@ -22,7 +22,7 @@ export class ChessVoiceRecognizer {
   private recognizer: KaldiRecognizer | null = null;
   private audioContext: AudioContext | null = null;
   private mediaStream: MediaStream | null = null;
-  private processor: ScriptProcessorNode | null = null;
+  private workletNode: AudioWorkletNode | null = null;
   private isListening: boolean = false;
 
   /**
@@ -104,20 +104,29 @@ export class ChessVoiceRecognizer {
       this.audioContext = new AudioContext({ sampleRate: 16000 });
       const source = this.audioContext.createMediaStreamSource(this.mediaStream);
 
-      // Create script processor for audio processing
-      this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+      // Load and create AudioWorklet processor
+      await this.audioContext.audioWorklet.addModule(
+        new URL('./audio-processor.worklet.ts', import.meta.url).href
+      );
 
-      this.processor.onaudioprocess = (event) => {
+      this.workletNode = new AudioWorkletNode(
+        this.audioContext,
+        'audio-capture-processor'
+      );
+
+      // Handle audio data from worklet
+      this.workletNode.port.onmessage = (event) => {
         if (!this.recognizer || !this.isListening) return;
 
-        const inputData = event.inputBuffer.getChannelData(0);
-
-        // Send Float32Array directly to recognizer
-        this.recognizer.acceptWaveformFloat(inputData, this.audioContext!.sampleRate);
+        if (event.data.type === 'audio') {
+          const audioData = event.data.data;
+          // Send Float32Array directly to recognizer
+          this.recognizer.acceptWaveformFloat(audioData, this.audioContext!.sampleRate);
+        }
       };
 
-      source.connect(this.processor);
-      this.processor.connect(this.audioContext.destination);
+      source.connect(this.workletNode);
+      this.workletNode.connect(this.audioContext.destination);
 
       this.isListening = true;
       console.log('Started listening');
@@ -142,13 +151,14 @@ export class ChessVoiceRecognizer {
     }
 
     // Clean up audio resources
-    if (this.processor) {
-      this.processor.disconnect();
-      this.processor = null;
+    if (this.workletNode) {
+      this.workletNode.disconnect();
+      this.workletNode.port.onmessage = null;
+      this.workletNode = null;
     }
 
     if (this.audioContext) {
-      this.audioContext.close();
+      void this.audioContext.close();
       this.audioContext = null;
     }
 
@@ -185,10 +195,22 @@ export function convertToStandardNotation(spokenMove: string): string | null {
   const move = spokenMove.trim().toLowerCase();
 
   // Handle castling
-  if (move.includes('castle kingside') || move.includes('short castle')) {
+  if (
+    move.includes('castle kingside') ||
+    move.includes('castle king side') ||
+    move.includes('kingside castle') ||
+    move.includes('king side castle') ||
+    move.includes('short castle')
+  ) {
     return 'O-O';
   }
-  if (move.includes('castle queenside') || move.includes('long castle')) {
+  if (
+    move.includes('castle queenside') ||
+    move.includes('castle queen side') ||
+    move.includes('queenside castle') ||
+    move.includes('queen side castle') ||
+    move.includes('long castle')
+  ) {
     return 'O-O-O';
   }
 
@@ -305,12 +327,21 @@ export function generateChessGrammar(): string[] {
     grammar.push(rankWord);
   }
 
+  // Add common chess terms
+  grammar.push('to', 'takes', 'captures', 'castle', 'kingside', 'queenside');
+  grammar.push('short', 'long', 'check', 'checkmate', 'mate');
+  grammar.push('undo', 'resign', 'draw', 'pawn');
+
+  // Add piece names
+  for (const piece of pieces) {
+    grammar.push(piece.name);
+    grammar.push(piece.symbol);
+  }
+
   // Generate all squares
   for (const file of files) {
     for (let i = 0; i < ranks.length; i++) {
-      const rank = ranks[i];
       const rankWord = rankWords[i];
-      const square = file + rank;
       const squareSpoken = `${file} ${rankWord}`;
 
       // Pawn moves (spoken form: "e four")
@@ -343,8 +374,10 @@ export function generateChessGrammar(): string[] {
 
   // Special moves
   grammar.push('castle kingside', 'castle queenside');
+  grammar.push('castle king side', 'castle queen side');
   grammar.push('short castle', 'long castle');
   grammar.push('kingside castle', 'queenside castle');
+  grammar.push('king side castle', 'queen side castle');
   grammar.push('check', 'checkmate', 'mate');
   grammar.push('undo', 'resign', 'draw');
 
