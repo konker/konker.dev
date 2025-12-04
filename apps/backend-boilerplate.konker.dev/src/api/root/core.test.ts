@@ -26,7 +26,7 @@ describe('root/core', () => {
       body: {
         apiId: 'backend-boilerplate-konker-dev',
         ip: 'UNKNOWN',
-        version: '0.0.1',
+        version: '0.0.2',
       },
     });
   });
@@ -54,7 +54,7 @@ describe('root/core', () => {
       body: {
         apiId: 'backend-boilerplate-konker-dev',
         ip: '123.123.123.123',
-        version: '0.0.1',
+        version: '0.0.2',
       },
     });
   });

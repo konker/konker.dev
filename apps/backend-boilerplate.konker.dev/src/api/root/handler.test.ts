@@ -19,7 +19,7 @@ describe('root/handler', () => {
     expect(await text(actual.body!)).toEqual(
       JSON.stringify({
         apiId: 'backend-boilerplate-konker-dev',
-        version: '0.0.1',
+        version: '0.0.2',
         ip: 'UNKNOWN',
       })
     );
@@ -56,7 +56,7 @@ describe('root/handler', () => {
     expect(await text(actual.body!)).toEqual(
       JSON.stringify({
         apiId: 'backend-boilerplate-konker-dev',
-        version: '0.0.1',
+        version: '0.0.2',
         ip: '123.123.123.123',
       })
     );
