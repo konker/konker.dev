@@ -195,11 +195,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>♟️ Chess Voice Recognition</h1>
+        <h1>♟️ Chess-o-Matic</h1>
         <p class="subtitle">Speak your chess moves naturally</p>
 
         <div id="status" class="status loading">
-            Loading Vosk model...
+            Loading model...
         </div>
 
         <div class="controls">
@@ -220,20 +220,11 @@
             <div id="movesList"></div>
         </div>
 
-        <div class="instructions">
-            <h4>How to use:</h4>
-            <ul>
-                <li>Click "Start Listening" and allow microphone access</li>
-                <li>Speak moves like: "e4", "knight to f3", "queen takes d5"</li>
-                <li>Both symbolic (Nf3) and English (knight to f3) work</li>
-                <li>Supports castling, captures, and special moves</li>
-            </ul>
-        </div>
     </div>
 
     <script type="module">
-        import { ChessVoiceRecognizer, convertToStandardNotation } from './src/chess-voice-recognition.ts';
-        import chessGrammar from './src/chess-grammar.json';
+        import { ChessVoiceRecognizer, convertToStandardNotation } from './chess-voice-recognition.ts';
+        import chessGrammar from './chess-grammar.json';
 
         // DOM elements
         const statusEl = document.getElementById('status');
