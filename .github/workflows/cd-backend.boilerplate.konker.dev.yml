@@ -63,7 +63,7 @@ jobs:
       - name: Build production deployment
         run: |
           cd ${{ env.CWD }}
-          pnpm run build:prod
+          pnpm run build:container
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
