@@ -27,9 +27,12 @@
       "outputs": ["src/*", "dist/**"],
       "env": [
         "CODECOV_TOKEN",
+        "AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND",
+        "AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND",
         "AWS_ECR_REGISTRY",
         "AWS_ECR_REPOSITORY",
         "IMAGE_TAG",
+        "HETZNER_K3S_KUBECONFIG",
         "AWS_DEFAULT_REGION"
       ]
     },
