@@ -60,24 +60,10 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build production deployment
+      - name: Build and push to ECR
         run: |
           cd ${{ env.CWD }}
-          pnpm run build:container
-
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image to Amazon ECR
-        run: |
-          cd ${{ env.CWD }}
-          docker build \
-            -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-            -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:latest \
-            -f deployment/Dockerfile \
-            .
-          docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:latest
+          pnpm run cd
 
       - name: Configure kubectl
         run: |
@@ -88,15 +74,6 @@ jobs:
       - name: Create namespace if not exists
         run: |
           kubectl get namespace ${{ env.K8S_NAMESPACE }} || kubectl create namespace ${{ env.K8S_NAMESPACE }}
-
-      - name: Update ECR secret
-        run: |
-          kubectl delete secret ecr-secret -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
-          kubectl create secret docker-registry ecr-secret \
-            -n ${{ env.K8S_NAMESPACE }} \
-            --docker-server=${{ env.AWS_ECR_REGISTRY }} \
-            --docker-username=AWS \
-            --docker-password=$(aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }})
 
       - name: Deploy to k3s
         run: |
