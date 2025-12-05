@@ -21,6 +21,7 @@ describe('root/handler', () => {
         apiId: 'backend-boilerplate-konker-dev',
         version: '0.0.2',
         ip: 'UNKNOWN',
+        konker: 'RULEZ!',
       })
     );
     expect(Object.fromEntries(actual.headers.entries())).toStrictEqual({
@@ -58,6 +59,7 @@ describe('root/handler', () => {
         apiId: 'backend-boilerplate-konker-dev',
         version: '0.0.2',
         ip: '123.123.123.123',
+        konker: 'RULEZ!',
       })
     );
     expect(Object.fromEntries(actual.headers.entries())).toStrictEqual({
