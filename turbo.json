@@ -25,7 +25,13 @@
     "cd": {
       "dependsOn": ["^cd"],
       "outputs": ["src/*", "dist/**"],
-      "env": ["CODECOV_TOKEN"]
+      "env": [
+        "CODECOV_TOKEN",
+        "AWS_ECR_REGISTRY",
+        "AWS_ECR_REPOSITORY",
+        "IMAGE_TAG",
+        "AWS_DEFAULT_REGION"
+      ]
     },
     "codecov": {
       "dependsOn": ["^codecov"],
