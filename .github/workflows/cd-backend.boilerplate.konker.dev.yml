@@ -61,9 +61,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build and push to ECR
-        run: |
-          cd ${{ env.CWD }}
-          pnpm run cd
+        run: pnpm run cd ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
 
       - name: Configure kubectl
         run: |
