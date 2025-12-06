@@ -16,6 +16,7 @@ echo "Pod name: $POD"
 ```
 
 **Result:**
+
 ```
 Pod name: backend-boilerplatedotkonkerdotdev-8b7b9c457-2w6ks
 ```
@@ -27,6 +28,7 @@ kubectl get endpoints -n backend-boilerplate backend-boilerplatedotkonkerdotdev
 ```
 
 **Result:**
+
 ```
 NAME                                 ENDPOINTS         AGE
 backend-boilerplatedotkonkerdotdev   10.42.0.41:3000   18h
@@ -37,7 +39,7 @@ backend-boilerplatedotkonkerdotdev   10.42.0.41:3000   18h
 ### 3. Check Pod Logs
 
 ```bash
-kubectl logs -n backend-boilerplate backend-boilerplatedotkonkerdotdev-8b7b9c457-2w6ks
+kubectl logs -n backend-boilerplate $POD
 ```
 
 **Result:** No output (no startup logging in current version)
@@ -45,10 +47,11 @@ kubectl logs -n backend-boilerplate backend-boilerplatedotkonkerdotdev-8b7b9c457
 ### 4. Describe Pod
 
 ```bash
-kubectl describe pod -n backend-boilerplate backend-boilerplatedotkonkerdotdev-8b7b9c457-2w6ks
+kubectl describe pod -n backend-boilerplate $POD
 ```
 
 **Key findings:**
+
 - Status: Running
 - Ready: True
 - Container ID: containerd://7185e909bfff8a5bb29c82cab890b9bd83e9b91a5e4f942ad2d62a65cba9be32
@@ -67,6 +70,7 @@ kubectl run test-curl --image=curlimages/curl:latest --rm -it --restart=Never --
 ```
 
 **Result:**
+
 ```
 * Host backend-boilerplatedotkonkerdotdev.backend-boilerplate.svc.cluster.local:3000 was resolved.
 * IPv4: 10.43.11.115
@@ -85,6 +89,7 @@ kubectl run test-curl --image=curlimages/curl:latest --rm -it --restart=Never --
 ```
 
 **Analysis:** ✅✅ **CRITICAL FINDING** - Application is working correctly and responding with 200 OK from within the cluster. This means:
+
 - The app is running properly
 - Service routing is working
 - The issue is NOT with the application or k8s service
@@ -97,6 +102,7 @@ kubectl logs -n traefik traefik-87ddb4fc4-vbq2q --tail=100 | grep -i backend-boi
 ```
 
 **Result:**
+
 ```
 2025-12-05T19:01:55Z ERR error="kubernetes service not found: backend-boilerplate/backend-boilerplatedotkonkerdotdev"
   ingress=backend-boilerplatedotkonkerdotdev namespace=backend-boilerplate providerName=kubernetescrd
@@ -111,6 +117,7 @@ kubectl describe ingressroute -n backend-boilerplate backend-boilerplatedotkonke
 ```
 
 **Result:**
+
 ```
 Creation Timestamp:  2025-12-05T19:01:55Z
 ```
@@ -120,11 +127,13 @@ kubectl get service -n backend-boilerplate backend-boilerplatedotkonkerdotdev -o
 ```
 
 **Result:**
+
 ```
 creationTimestamp: "2025-12-05T19:01:56Z"
 ```
 
 **Analysis:** 🔴 **TIMING ISSUE IDENTIFIED**
+
 - IngressRoute created: `2025-12-05T19:01:55Z`
 - Service created: `2025-12-05T19:01:56Z` (1 second LATER)
 - Traefik tried to configure the route before the service existed
@@ -134,6 +143,7 @@ creationTimestamp: "2025-12-05T19:01:56Z"
 ## Root Cause
 
 **Timing race condition during initial deployment:**
+
 1. IngressRoute was created 1 second before the Service
 2. Traefik attempted to configure routing immediately
 3. Service didn't exist yet → error logged
@@ -161,8 +171,9 @@ curl https://backend-boilerplate.hetzner.konker.dev/
 ```
 
 **Result:**
+
 ```json
-{"apiId":"backend-boilerplate-konker-dev","version":"0.0.2","ip":"10.42.0.1","konker":"RULEZ!"}
+{ "apiId": "backend-boilerplate-konker-dev", "version": "0.0.2", "ip": "10.42.0.1", "konker": "RULEZ!" }
 ```
 
 ## Verification
@@ -173,6 +184,7 @@ curl -I https://backend-boilerplate.hetzner.konker.dev/
 ```
 
 **Result:**
+
 ```
 HTTP/2 200
 content-type: application/json; charset=utf-8

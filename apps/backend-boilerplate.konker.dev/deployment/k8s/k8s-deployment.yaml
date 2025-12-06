@@ -23,7 +23,7 @@ spec:
           env:
             - name: NODE_ENV
               value: 'production'
-          # Health probes (enable after deploying image with /health endpoint)
+      # Health probes (enable after deploying image with /health endpoint)
           # livenessProbe:
           #   httpGet:
           #     path: /health
