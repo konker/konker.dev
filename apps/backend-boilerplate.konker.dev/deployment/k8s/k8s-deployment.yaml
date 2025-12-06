@@ -24,19 +24,19 @@ spec:
             - name: NODE_ENV
               value: 'production'
       # Health probes (enable after deploying image with /health endpoint)
-          # livenessProbe:
-          #   httpGet:
-          #     path: /health
-          #     port: 3000
-          #   initialDelaySeconds: 15
-          #   periodSeconds: 10
-          #   timeoutSeconds: 5
-          #   failureThreshold: 3
-          # readinessProbe:
-          #   httpGet:
-          #     path: /health
-          #     port: 3000
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          #   timeoutSeconds: 3
-          #   failureThreshold: 2
+      # livenessProbe:
+      #   httpGet:
+      #     path: /health
+      #     port: 3000
+      #   initialDelaySeconds: 15
+      #   periodSeconds: 10
+      #   timeoutSeconds: 5
+      #   failureThreshold: 3
+      # readinessProbe:
+      #   httpGet:
+      #     path: /health
+      #     port: 3000
+      #   initialDelaySeconds: 5
+      #   periodSeconds: 5
+      #   timeoutSeconds: 3
+      #   failureThreshold: 2

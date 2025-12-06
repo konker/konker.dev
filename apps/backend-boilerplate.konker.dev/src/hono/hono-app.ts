@@ -12,6 +12,6 @@ export const app = new Hono()
       status: 'healthy',
       timestamp: new Date().toISOString(),
       version: VERSION,
-      apiId: API_ID
+      apiId: API_ID,
     });
   });
