@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-boilerplatedotkonkerdotdev
+  namespace: backend-boilerplate
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`backend-boilerplate.hetzner.konker.dev`)
+      kind: Rule
+      services:
+        - name: backend-boilerplatedotkonkerdotdev
+          port: 3000
+  tls:
+    certResolver: letsencrypt
