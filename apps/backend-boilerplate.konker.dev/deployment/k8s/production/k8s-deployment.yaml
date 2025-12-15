@@ -13,6 +13,8 @@ spec:
       labels:
         app: backend-boilerplatedotkonkerdotdev
     spec:
+      nodeSelector:
+        node-type: worker
       imagePullSecrets:
         - name: ecr-secret
       containers:
