@@ -18,12 +18,10 @@ on:
 env:
   CWD: './apps/backend-boilerplate.konker.dev'
   AWS_DEFAULT_REGION: 'eu-west-1'
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_POWER_USER_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_POWER_USER_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}
-  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TAG: '${{ github.sha }}'
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_FILTER_ARG: '--filter=@konker.dev/backend-boilerplate.konker.dev'
-  TURBO_EXTRA_ARGS: ${{ inputs.extra_args }}
+  TURBO_EXTRA_ARGS: '${{ inputs.extra_args }}'
 
 jobs:
   cd:
@@ -37,13 +35,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -53,3 +44,43 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: '9.6.0'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .sst
+          key: ${{ runner.os }}-sst
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Assume config management role and export config
+      - name: Configure AWS credentials (Configuration management role)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
+          aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role" # ${{ env.CONFIG_MANAGEMENT_ROLE_ARN }}
+          role-external-id: "configuration-management-access"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-skip-session-tagging: true # apparently we cannot avoid this
+      # TODO
+
+      # Assume application deployment role
+      - name: Configure AWS credentials (Application deployment role)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
+          aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
+          role-to-assume: "arn:aws:iam::898403669204:role/infra/application-deployment-role" # ${{ env.APPLICATION_DEVELOPMENT_ROLE_ARN }}
+          role-external-id: "application-deployment-access"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-skip-session-tagging: true # apparently we cannot avoid this
+
+      - name: Deploy (Development)
+        run: |
+          cd ./apps/backend-boilerplate.konker.dev
+          pnpm sst install --config=./deployment/aws-serverless/sst.config.ts --stage=development --print-logs
+          pnpm sst deploy --config=./deployment/aws-serverless/sst.config.ts --stage=development --print-logs
+          cd ../../
+

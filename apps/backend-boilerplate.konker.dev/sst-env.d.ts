@@ -5,11 +5,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "API_ip.dev.domain-o-matic.com": {
-      "name": string
-      "type": "sst.aws.Function"
-      "url": string
-    }
   }
 }
 /// <reference path="sst-env.d.ts" />
