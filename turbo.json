@@ -37,6 +37,34 @@
         "K8S_NAMESPACE"
       ]
     },
+//    "build-container": {
+//      "dependsOn": ["^build-container"],
+//      "env": [
+//        "CODECOV_TOKEN",
+//        "AWS_DEFAULT_REGION",
+//        "AWS_ACCESS_KEY_ID",
+//        "AWS_SECRET_ACCESS_KEY",
+//        "AWS_ECR_REGISTRY",
+//        "AWS_ECR_REPOSITORY",
+//        "IMAGE_TAG",
+//        "HETZNER_K3S_KUBECONFIG",
+//        "K8S_NAMESPACE"
+//      ]
+//    },
+//    "push-container": {
+//      "dependsOn": ["^push-container"],
+//      "env": [
+//        "CODECOV_TOKEN",
+//        "AWS_DEFAULT_REGION",
+//        "AWS_ACCESS_KEY_ID",
+//        "AWS_SECRET_ACCESS_KEY",
+//        "AWS_ECR_REGISTRY",
+//        "AWS_ECR_REPOSITORY",
+//        "IMAGE_TAG",
+//        "HETZNER_K3S_KUBECONFIG",
+//        "K8S_NAMESPACE"
+//      ]
+//    },
     "codecov": {
       "dependsOn": ["^codecov"],
       "env": ["CODECOV_TOKEN"]

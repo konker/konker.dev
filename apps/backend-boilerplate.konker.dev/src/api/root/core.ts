@@ -15,6 +15,7 @@ export function core(event: RequestW<CoreEvent>): Effect.Effect<CoreResponse> {
       version: VERSION,
       ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
       konker: 'RULEZZ!',
+      foo: process.env.FOO,
     },
   });
 }

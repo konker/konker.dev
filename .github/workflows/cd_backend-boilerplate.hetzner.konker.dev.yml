@@ -70,7 +70,7 @@ jobs:
           echo "${{ env.HETZNER_K3S_KUBECONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      - name: Deploy to k3s (Production)
+      - name: Deploy to k3s
         run: |
           # Apply resources in order to prevent Traefik timing issues
           # 1. Namespace first (creates if not exists)
@@ -80,7 +80,9 @@ jobs:
           kubectl apply -f ${{ env.CWD }}/deployment/k8s/production/k8s-service.yaml -n ${{ env.K8S_NAMESPACE }}
 
           # 3. Deployment
-          kubectl apply -f ${{ env.CWD }}/deployment/k8s/production/k8s-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          ## kubectl apply -f ${{ env.CWD }}/deployment/k8s/production/k8s-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          npx sst install
+          DEPLOYMENT=kubernetes npx sst deploy --stage=development
 
           # 4. IngressRoute last (after Service exists to prevent 503 errors)
           kubectl apply -f ${{ env.CWD }}/deployment/k8s/production/k8s-ingresroute.yaml -n ${{ env.K8S_NAMESPACE }}

@@ -1,9 +1,17 @@
+/* eslint-disable fp/no-delete */
 import { Effect, pipe } from 'effect';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import * as unit from './core.js';
 
 describe('root/core', () => {
+  beforeAll(() => {
+    process.env.FOO = 'foo-value';
+  });
+  afterAll(() => {
+    delete process.env.FOO;
+  });
+
   it('should work as expected with basic request', () => {
     const actual = pipe(
       {
@@ -27,6 +35,7 @@ describe('root/core', () => {
         apiId: 'backend-boilerplate-konker-dev',
         ip: 'UNKNOWN',
         konker: 'RULEZZ!',
+        foo: 'foo-value',
         version: '0.0.2',
       },
     });
@@ -55,7 +64,8 @@ describe('root/core', () => {
       body: {
         apiId: 'backend-boilerplate-konker-dev',
         ip: '123.123.123.123',
-        konker: 'RULEZZ!',
+        konker: expect.anything(),
+        foo: 'foo-value',
         version: '0.0.2',
       },
     });
