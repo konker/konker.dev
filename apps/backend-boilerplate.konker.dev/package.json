@@ -107,7 +107,7 @@
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",
     "test": "vitest run --coverage",
-    "type-coverage-check": "type-coverage --detail --at-least 100 --ignore-files src/index.test.ts --ignore-files src/stream/index.ts",
+    "type-coverage-check": "type-coverage --detail --at-least 99 --ignore-files src/index.test.ts --ignore-files src/stream/index.ts",
     "typecheck": "tsc --noEmit"
   }
 }

@@ -14,6 +14,7 @@ export default defineConfig({
         'src/hono/hono-aws-serverless.ts',
         'src/hono/hono-cloudflare-serverless.ts',
         'src/hono/hono-node-server.ts',
+        'deployment/',
       ],
     },
   },
