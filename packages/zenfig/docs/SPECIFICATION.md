@@ -1,13 +1,13 @@
 # Specification: Zenfig Configuration & Secrets Management Tool
 
 ## 1. Goal
-Design and implement a CLI tool called **Zenfig** that orchestrates config providers, Jsonnet, and Zod. It ensures that application configurations are logic-driven, securely retrieved, and strictly validated before reaching the runtime environment.
+Design and implement a CLI tool called **Zenfig** that orchestrates config providers, Jsonnet, and TypeBox. It ensures that application configurations are logic-driven, securely retrieved, and strictly validated before reaching the runtime environment.
 
 ## 2. Technical Stack
 - **Runtime:** Node.js or Bun (TypeScript).
 - **Provider (default):** [Chamber](https://github.com/segmentio/chamber) via AWS SSM.
 - **Configuration Templating:** [Go-Jsonnet](https://github.com/google/go-jsonnet).
-- **Validation:** [Zod](https://zod.dev/).
+- **Validation:** [TypeBox](https://github.com/sinclairzx81/typebox) with Ajv.
 - **Process Management:** `execa` for calling system binaries.
 
 ---
@@ -18,12 +18,12 @@ Design and implement a CLI tool called **Zenfig** that orchestrates config provi
 1. **Fetch:** Execute provider `fetch` (default: `chamber export <service> --format json`) to get secrets.
 2. **Inject:** Pass secrets into `go-jsonnet` as External Variables (`extVar` / `extCode`).
 3. **Template:** Evaluate `config.jsonnet` to merge secrets with static defaults/logic.
-4. **Validate:** Parse the resulting JSON using a Zod schema.
+4. **Validate:** Parse the resulting JSON using a TypeBox schema (Ajv).
 5. **Format:** Convert the validated object into `.env` (flat) or `.json` (nested).
 
 ### B. Upsert Workflow (Input -> Validate -> Push)
 1. **Input:** Accept a service name, key, and value.
-2. **Validate:** Check the key and value against the Zod schema.
+2. **Validate:** Check the key and value against the TypeBox schema.
    - Verify the key exists in the schema.
    - Verify the value meets the type/constraint defined (e.g., regex, min length).
    - Support nested keys via a path notation (`DATABASE.URL` or `database.url`).
@@ -59,7 +59,7 @@ Design and implement a CLI tool called **Zenfig** that orchestrates config provi
 - `env`: optional environment (e.g., `NODE_ENV`).
 
 ### Jsonnet Output
-- Must evaluate to a JSON object compatible with the Zod schema.
+- Must evaluate to a JSON object compatible with the TypeBox schema.
 - Non-object or invalid JSON should produce a validation error with exit code 1.
 
 ---
@@ -107,7 +107,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 ### Project Structure
 - `src/cli.ts`: CLI entry point using `commander` or `yargs`.
-- `src/schema.ts`: Exported Zod schema (the "Source of Truth").
+- `src/schema.ts`: Exported TypeBox schema (the "Source of Truth").
 - `src/engine.ts`: Orchestrates provider, Jsonnet evaluation, and validation.
 - `src/transformer.ts`: Flattens nested objects into `KEY_SUBKEY=value`.
 - `src/providers/Provider.ts`: Provider interface and types.
@@ -117,11 +117,11 @@ Zenfig may compose multiple SSM roots into a single config output.
 ### CLI Interface
 - `zenfig export <service> [--format env|json] [--provider name] [--jsonnet config.jsonnet]`
 - `zenfig upsert <service> <key> <value> [--provider name]`
-- `zenfig init [--schema src/schema.ts] [--output config.jsonnet]`: Generates an identity Jsonnet template from the Zod schema.
+- `zenfig init [--schema src/schema.ts] [--output config.jsonnet]`: Generates an identity Jsonnet template from the TypeBox schema.
 
 ### Validation Details
-- The tool must use `ConfigSchema.partial()` or `ConfigSchema.shape[key]` to validate individual secrets.
-- For nested keys, resolve a path into the Zod schema; validation must apply to the target node only.
+- The tool must validate individual keys by resolving a schema path and validating the input value against that node.
+- For nested keys, resolve a path into the TypeBox schema; validation must apply to the target node only.
 - Ensure errors include the full path, expected type, and any constraint details.
 
 ### Output Formatting
@@ -146,6 +146,12 @@ Zenfig may compose multiple SSM roots into a single config output.
 - Favor functional composition and pure functions where possible.
 - Avoid OOP patterns such as classes, inheritance, or mutable shared state.
 
+### Testing
+- Include unit tests using Vitest for core logic (schema path resolution, merge ordering, Jsonnet input shaping, and env flattening).
+
+### Documentation
+- Provide Markdown-based documentation covering setup, CLI usage, provider configuration, and common workflows.
+
 ### Exit Codes
 - `0`: success.
 - `1`: validation errors, template errors, provider errors, or unknown failures.
@@ -157,20 +163,20 @@ Zenfig may compose multiple SSM roots into a single config output.
 ### Example Files
 `src/schema.ts`:
 ```ts
-import { z } from "zod";
+import { Type } from "@sinclair/typebox";
 
-export const ConfigSchema = z.object({
-  database: z.object({
-    url: z.string().url(),
+export const ConfigSchema = Type.Object({
+  database: Type.Object({
+    url: Type.String({ format: "uri" }),
   }),
-  redis: z.object({
-    url: z.string().url(),
+  redis: Type.Object({
+    url: Type.String({ format: "uri" }),
   }),
-  feature: z.object({
-    enableBeta: z.boolean().default(false),
+  feature: Type.Object({
+    enableBeta: Type.Boolean({ default: false }),
   }),
-  api: z.object({
-    timeoutMs: z.number().int().positive().default(5000),
+  api: Type.Object({
+    timeoutMs: Type.Integer({ minimum: 1, default: 5000 }),
   }),
 });
 ```
@@ -178,18 +184,21 @@ export const ConfigSchema = z.object({
 `config.jsonnet`:
 ```jsonnet
 local s = std.extVar("secrets");
+local env = std.extVar("env");
+local timeoutMs = std.min([std.max([std.get(s.api, "timeoutMs", 5000), 1000]), 30000]);
+local databaseUrl = s.database.url + "?application_name=api";
 {
   database: {
-    url: s.database.url,
+    url: databaseUrl,
   },
   redis: {
-    url: s.redis.url,
+    url: std.get(s.redis, "url", "redis://localhost:6379"),
   },
   feature: {
-    enableBeta: s.feature.enableBeta,
+    enableBeta: s.feature.enableBeta || env == "staging",
   },
   api: {
-    timeoutMs: s.api.timeoutMs,
+    timeoutMs: timeoutMs,
   },
 }
 ```
@@ -198,7 +207,7 @@ local s = std.extVar("secrets");
 - `/zenfig/api/prod/database/url = postgres://api-main`
 - `/zenfig/api/prod/feature/enableBeta = false`
 - `/zenfig/shared/prod/redis/url = redis://shared`
-- `/zenfig/shared/prod/api/timeoutMs = 7000`
+- `/zenfig/shared/prod/api/timeoutMs = 60000`
 - `/zenfig/overrides/prod/feature/enableBeta = true`
 
 ### Steps
@@ -206,7 +215,7 @@ local s = std.extVar("secrets");
 ```
 zenfig upsert api api.timeoutMs 6500 --env prod
 ```
-Result: writes `/zenfig/api/prod/api/timeoutMs = 6500` (validated as `number().int().positive()`).
+Result: writes `/zenfig/api/prod/api/timeoutMs = 6500` (validated as `Type.Integer({ minimum: 1 })`).
 
 2) **Upsert invalid value**
 ```
@@ -223,7 +232,7 @@ zenfig export api --source shared --source overrides --env prod --format json
 - `api`:
   `{"database":{"url":"postgres://api-main"},"feature":{"enableBeta":false},"api":{"timeoutMs":6500}}`
 - `shared`:
-  `{"redis":{"url":"redis://shared"},"api":{"timeoutMs":7000}}`
+  `{"redis":{"url":"redis://shared"},"api":{"timeoutMs":60000}}`
 - `overrides`:
   `{"feature":{"enableBeta":true}}`
 
@@ -233,24 +242,24 @@ zenfig export api --source shared --source overrides --env prod --format json
   "database": { "url": "postgres://api-main" },
   "redis": { "url": "redis://shared" },
   "feature": { "enableBeta": true },
-  "api": { "timeoutMs": 7000 }
+  "api": { "timeoutMs": 60000 }
 }
 ```
 
 ### Output (format json)
 ```json
 {
-  "database": { "url": "postgres://api-main" },
+  "database": { "url": "postgres://api-main?application_name=api" },
   "redis": { "url": "redis://shared" },
   "feature": { "enableBeta": true },
-  "api": { "timeoutMs": 7000 }
+  "api": { "timeoutMs": 30000 }
 }
 ```
 
 ### Output (format env)
 ```
-API_TIMEOUTMS=7000
-DATABASE_URL=postgres://api-main
+API_TIMEOUTMS=30000
+DATABASE_URL=postgres://api-main?application_name=api
 FEATURE_ENABLEBETA=true
 REDIS_URL=redis://shared
 ```
@@ -266,14 +275,14 @@ zenfig init --schema src/schema.ts --output config.jsonnet
 
 ### Input Schema
 ```ts
-import { z } from "zod";
+import { Type } from "@sinclair/typebox";
 
-export const ConfigSchema = z.object({
-  database: z.object({
-    url: z.string().url(),
+export const ConfigSchema = Type.Object({
+  database: Type.Object({
+    url: Type.String({ format: "uri" }),
   }),
-  feature: z.object({
-    enableBeta: z.boolean().default(false),
+  feature: Type.Object({
+    enableBeta: Type.Boolean({ default: false }),
   }),
 });
 ```
@@ -294,4 +303,4 @@ local s = std.extVar("secrets");
 ---
 
 ## 11. Implementation Prompt for LLM
-"Act as a Senior DevOps Engineer. Based on the Zenfig specification provided, generate a TypeScript implementation. Use `execa` for shell commands. Include a robust flattening function for the `.env` output. Ensure the `upsert` command validates the input value against the corresponding key in the Zod schema before calling the provider. Provide the `package.json` with necessary dependencies (zod, execa, commander)."
+"Act as a Senior DevOps Engineer. Based on the Zenfig specification provided, generate a TypeScript implementation. Use `execa` for shell commands. Include a robust flattening function for the `.env` output. Ensure the `upsert` command validates the input value against the corresponding key in the TypeBox schema before calling the provider. Provide the `package.json` with necessary dependencies (@sinclair/typebox, ajv, execa, commander)."
