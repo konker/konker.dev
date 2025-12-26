@@ -5,6 +5,7 @@
  */
 import { Kind, type TObject, type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -144,52 +145,74 @@ const generateJsonnetTemplate = (schema: TSchema, includeDefaults: boolean): str
 export const executeInit = (
   options: InitOptions
 ): Effect.Effect<InitResult, SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const { output, force = false, includeDefaults = false, config } = options;
-    const outputPath = output ?? config.jsonnet;
+  pipe(
+    Effect.sync(() => {
+      const { output, force = false, config } = options;
+      const outputPath = output ?? config.jsonnet;
 
-    // 1. Check if output file exists
-    if (fs.existsSync(outputPath) && !force) {
-      console.error(`Error: Output file already exists: ${outputPath}`);
-      console.error('Use --force to overwrite');
-      return { path: outputPath, created: false };
-    }
+      // 1. Check if output file exists
+      if (fs.existsSync(outputPath) && !force) {
+        console.error(`Error: Output file already exists: ${outputPath}`);
+        console.error('Use --force to overwrite');
+        return { outputPath, skip: true, includeDefaults: options.includeDefaults ?? false };
+      }
 
-    if (fs.existsSync(outputPath) && force) {
-      console.warn(`Warning: Overwriting existing file: ${outputPath}`);
-    }
+      if (fs.existsSync(outputPath) && force) {
+        console.warn(`Warning: Overwriting existing file: ${outputPath}`);
+      }
 
-    // 2. Load schema
-    const { schema } = yield* loadSchemaWithDefaults(config.schema, config.schemaExportName);
+      return { outputPath, skip: false, includeDefaults: options.includeDefaults ?? false };
+    }),
+    Effect.flatMap(({ outputPath, skip, includeDefaults }): Effect.Effect<InitResult, SystemError | ValidationError | ZenfigError> => {
+      if (skip) {
+        return Effect.succeed({ path: outputPath, created: false });
+      }
 
-    // 3. Validate schema is an object
-    if (!isObjectSchema(unwrapOptional(schema))) {
-      return yield* Effect.fail(fileNotFoundError('Schema must be a TypeBox Object type'));
-    }
+      // 2. Load schema
+      return pipe(
+        loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+        Effect.flatMap(({ schema }) => {
+          // 3. Validate schema is an object
+          if (!isObjectSchema(unwrapOptional(schema))) {
+            return Effect.fail(fileNotFoundError('Schema must be a TypeBox Object type'));
+          }
 
-    // 4. Generate Jsonnet template
-    const template = generateJsonnetTemplate(schema, includeDefaults);
+          // 4. Generate Jsonnet template
+          const template = generateJsonnetTemplate(schema, includeDefaults);
 
-    // 5. Ensure output directory exists
-    const outputDir = path.dirname(outputPath);
-    if (outputDir && outputDir !== '.') {
-      yield* Effect.try({
-        try: () => fs.mkdirSync(outputDir, { recursive: true }),
-        catch: () => permissionDeniedError(outputDir, 'create directory'),
-      });
-      console.log(`Info: Creating directory: ${outputDir}`);
-    }
+          // 5. Ensure output directory exists
+          const outputDir = path.dirname(outputPath);
+          const ensureDir: Effect.Effect<void, SystemError> =
+            outputDir && outputDir !== '.'
+              ? pipe(
+                  Effect.try({
+                    try: () => fs.mkdirSync(outputDir, { recursive: true }),
+                    catch: () => permissionDeniedError(outputDir, 'create directory'),
+                  }),
+                  Effect.tap(() =>
+                    Effect.sync(() => console.log(`Info: Creating directory: ${outputDir}`))
+                  )
+                )
+              : Effect.void;
 
-    // 6. Write template
-    yield* Effect.try({
-      try: () => fs.writeFileSync(outputPath, template),
-      catch: () => permissionDeniedError(outputPath, 'write'),
-    });
-
-    console.log(`Generated: ${outputPath}`);
-
-    return { path: outputPath, created: true };
-  });
+          return pipe(
+            ensureDir,
+            Effect.flatMap(() =>
+              // 6. Write template
+              Effect.try({
+                try: () => fs.writeFileSync(outputPath, template),
+                catch: () => permissionDeniedError(outputPath, 'write'),
+              })
+            ),
+            Effect.map((): InitResult => {
+              console.log(`Generated: ${outputPath}`);
+              return { path: outputPath, created: true };
+            })
+          );
+        })
+      );
+    })
+  );
 
 /**
  * Run init command
@@ -197,7 +220,7 @@ export const executeInit = (
 export const runInit = (
   options: InitOptions
 ): Effect.Effect<boolean, SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const result = yield* executeInit(options);
-    return result.created;
-  });
+  pipe(
+    executeInit(options),
+    Effect.map((result) => result.created)
+  );

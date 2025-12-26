@@ -8,6 +8,7 @@
  */
 import { Command } from 'commander';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { runDelete } from './commands/delete.js';
 import { runDiff } from './commands/diff.js';
@@ -85,22 +86,23 @@ program
       options: CLIOptions & { source?: Array<string>; strictMerge?: boolean; warnOnOverride?: boolean }
     ) => {
       runEffect(
-        Effect.gen(function* () {
-          const config = yield* resolveConfig({
+        pipe(
+          resolveConfig({
             ...options,
             source: options.source,
             ci: program.opts().ci,
             strict: program.opts().strict,
-          });
-
-          yield* runExport({
-            service,
-            sources: options.source,
-            config,
-            strictMerge: options.strictMerge,
-            warnOnOverride: options.warnOnOverride,
-          });
-        })
+          }),
+          Effect.flatMap((config) =>
+            runExport({
+              service,
+              sources: options.source,
+              config,
+              strictMerge: options.strictMerge,
+              warnOnOverride: options.warnOnOverride,
+            })
+          )
+        )
       );
     }
   );
@@ -128,23 +130,24 @@ program
       options: CLIOptions & { stdin?: boolean; type?: string; skipEncryptionCheck?: boolean }
     ) => {
       runEffect(
-        Effect.gen(function* () {
-          const config = yield* resolveConfig({
+        pipe(
+          resolveConfig({
             ...options,
             ci: program.opts().ci,
             strict: program.opts().strict,
-          });
-
-          yield* runUpsert({
-            service,
-            key,
-            value,
-            stdin: options.stdin,
-            type: options.type as 'auto' | 'string' | 'int' | 'float' | 'bool' | 'json' | undefined,
-            skipEncryptionCheck: options.skipEncryptionCheck,
-            config,
-          });
-        })
+          }),
+          Effect.flatMap((config) =>
+            runUpsert({
+              service,
+              key,
+              value,
+              stdin: options.stdin,
+              type: options.type as 'auto' | 'string' | 'int' | 'float' | 'bool' | 'json' | undefined,
+              skipEncryptionCheck: options.skipEncryptionCheck,
+              config,
+            })
+          )
+        )
       );
     }
   );
@@ -162,23 +165,27 @@ program
   .option('--format <env|json>', 'File format (auto-detected if not specified)')
   .action((options: CLIOptions & { file: string }) => {
     runEffect(
-      Effect.gen(function* () {
-        const config = yield* resolveConfig({
+      pipe(
+        resolveConfig({
           ...options,
           ci: program.opts().ci,
           strict: program.opts().strict,
-        });
-
-        const valid = yield* runValidate({
-          file: options.file,
-          format: options.format,
-          config,
-        });
-
-        if (!valid) {
-          process.exit(EXIT_VALIDATION_ERROR);
-        }
-      })
+        }),
+        Effect.flatMap((config) =>
+          runValidate({
+            file: options.file,
+            format: options.format,
+            config,
+          })
+        ),
+        Effect.tap((valid) =>
+          Effect.sync(() => {
+            if (!valid) {
+              process.exit(EXIT_VALIDATION_ERROR);
+            }
+          })
+        )
+      )
     );
   });
 
@@ -208,27 +215,31 @@ program
       options: CLIOptions & { source?: Array<string>; showValues?: boolean; unsafeShowValues?: boolean }
     ) => {
       runEffect(
-        Effect.gen(function* () {
-          const config = yield* resolveConfig({
+        pipe(
+          resolveConfig({
             ...options,
             source: options.source,
             ci: program.opts().ci,
             strict: program.opts().strict,
-          });
-
-          const hasChanges = yield* runDiff({
-            service,
-            sources: options.source,
-            config,
-            format: options.format as 'json' | 'table' | undefined,
-            showValues: options.showValues,
-            unsafeShowValues: options.unsafeShowValues,
-          });
-
-          if (hasChanges) {
-            process.exit(EXIT_VALIDATION_ERROR);
-          }
-        })
+          }),
+          Effect.flatMap((config) =>
+            runDiff({
+              service,
+              sources: options.source,
+              config,
+              format: options.format as 'json' | 'table' | undefined,
+              showValues: options.showValues,
+              unsafeShowValues: options.unsafeShowValues,
+            })
+          ),
+          Effect.tap((hasChanges) =>
+            Effect.sync(() => {
+              if (hasChanges) {
+                process.exit(EXIT_VALIDATION_ERROR);
+              }
+            })
+          )
+        )
       );
     }
   );
@@ -248,20 +259,21 @@ program
   .option('--schema-export-name <name>', 'Schema export name')
   .action((service: string, key: string, options: CLIOptions & { confirm?: boolean }) => {
     runEffect(
-      Effect.gen(function* () {
-        const config = yield* resolveConfig({
+      pipe(
+        resolveConfig({
           ...options,
           ci: program.opts().ci,
           strict: program.opts().strict,
-        });
-
-        yield* runDelete({
-          service,
-          key,
-          confirm: options.confirm,
-          config,
-        });
-      })
+        }),
+        Effect.flatMap((config) =>
+          runDelete({
+            service,
+            key,
+            confirm: options.confirm,
+            config,
+          })
+        )
+      )
     );
   });
 
@@ -289,23 +301,24 @@ snapshotCmd
       options: CLIOptions & { source?: Array<string>; output?: string; encrypt?: boolean; snapshotKeyFile?: string }
     ) => {
       runEffect(
-        Effect.gen(function* () {
-          const config = yield* resolveConfig({
+        pipe(
+          resolveConfig({
             ...options,
             source: options.source,
             ci: program.opts().ci,
             strict: program.opts().strict,
-          });
-
-          yield* runSnapshotSave({
-            service,
-            sources: options.source,
-            output: options.output,
-            encrypt: options.encrypt,
-            snapshotKeyFile: options.snapshotKeyFile,
-            config,
-          });
-        })
+          }),
+          Effect.flatMap((config) =>
+            runSnapshotSave({
+              service,
+              sources: options.source,
+              output: options.output,
+              encrypt: options.encrypt,
+              snapshotKeyFile: options.snapshotKeyFile,
+              config,
+            })
+          )
+        )
       );
     }
   );
@@ -334,23 +347,24 @@ snapshotCmd
       }
     ) => {
       runEffect(
-        Effect.gen(function* () {
-          const config = yield* resolveConfig({
+        pipe(
+          resolveConfig({
             ...options,
             ci: program.opts().ci,
             strict: program.opts().strict,
-          });
-
-          yield* runSnapshotRestore({
-            snapshotFile,
-            dryRun: options.dryRun,
-            forceSchemaMatch: options.forceSchemaMismatch,
-            confirm: options.confirm,
-            showValues: options.showValues,
-            unsafeShowValues: options.unsafeShowValues,
-            config,
-          });
-        })
+          }),
+          Effect.flatMap((config) =>
+            runSnapshotRestore({
+              snapshotFile,
+              dryRun: options.dryRun,
+              forceSchemaMatch: options.forceSchemaMismatch,
+              confirm: options.confirm,
+              showValues: options.showValues,
+              unsafeShowValues: options.unsafeShowValues,
+              config,
+            })
+          )
+        )
       );
     }
   );
@@ -369,20 +383,21 @@ program
   .option('--include-defaults', 'Include schema defaults in template')
   .action((options: CLIOptions & { output?: string; force?: boolean; includeDefaults?: boolean }) => {
     runEffect(
-      Effect.gen(function* () {
-        const config = yield* resolveConfig({
+      pipe(
+        resolveConfig({
           ...options,
           ci: program.opts().ci,
           strict: program.opts().strict,
-        });
-
-        yield* runInit({
-          output: options.output,
-          force: options.force,
-          includeDefaults: options.includeDefaults,
-          config,
-        });
-      })
+        }),
+        Effect.flatMap((config) =>
+          runInit({
+            output: options.output,
+            force: options.force,
+            includeDefaults: options.includeDefaults,
+            config,
+          })
+        )
+      )
     );
   });
 
@@ -399,19 +414,21 @@ program
   .option('--jsonnet <path>', 'Jsonnet template path')
   .action((options: CLIOptions) => {
     runEffect(
-      Effect.gen(function* () {
-        const config = yield* resolveConfig({
+      pipe(
+        resolveConfig({
           ...options,
           ci: program.opts().ci,
           strict: program.opts().strict,
-        });
-
-        const passed = yield* runDoctor({ config });
-
-        if (!passed) {
-          process.exit(EXIT_VALIDATION_ERROR);
-        }
-      })
+        }),
+        Effect.flatMap((config) => runDoctor({ config })),
+        Effect.tap((passed) =>
+          Effect.sync(() => {
+            if (!passed) {
+              process.exit(EXIT_VALIDATION_ERROR);
+            }
+          })
+        )
+      )
     );
   });
 

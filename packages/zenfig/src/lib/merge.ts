@@ -4,6 +4,7 @@
  * Merges configuration objects with conflict detection
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 // --------------------------------------------------------------------------
 // Types
@@ -139,42 +140,47 @@ export const mergeConfigs = (
   sources: ReadonlyArray<readonly [string, Record<string, unknown>]>,
   options: MergeOptions = {}
 ): Effect.Effect<MergeResult<Record<string, unknown>>, Error> =>
-  Effect.gen(function* () {
-    if (sources.length === 0) {
-      return { merged: {}, conflicts: [] };
-    }
+  pipe(
+    Effect.sync(() => {
+      if (sources.length === 0) {
+        return { merged: {} as Record<string, unknown>, conflicts: [] as Array<MergeConflict>, lastSourceName: '' };
+      }
 
-    const allConflicts: Array<MergeConflict> = [];
-    let merged: Record<string, unknown> = {};
-    let lastSourceName = '';
+      const allConflicts: Array<MergeConflict> = [];
+      let merged: Record<string, unknown> = {};
+      let lastSourceName = '';
 
-    for (const [sourceName, sourceObject] of sources) {
-      if (Object.keys(merged).length === 0) {
-        merged = { ...sourceObject };
+      for (const [sourceName, sourceObject] of sources) {
+        if (Object.keys(merged).length === 0) {
+          merged = { ...sourceObject };
+          lastSourceName = sourceName;
+          continue;
+        }
+
+        const result = deepMergeWithConflicts(merged, sourceObject, lastSourceName, sourceName);
+        merged = result.merged;
+        allConflicts.push(...result.conflicts);
         lastSourceName = sourceName;
-        continue;
       }
 
-      const result = deepMergeWithConflicts(merged, sourceObject, lastSourceName, sourceName);
-      merged = result.merged;
-      allConflicts.push(...result.conflicts);
-      lastSourceName = sourceName;
-    }
-
-    // Check for type mismatches in strict mode
-    if (options.strictMerge) {
-      const typeMismatches = allConflicts.filter((c) => c.type === 'type-mismatch');
-      if (typeMismatches.length > 0) {
-        const messages = typeMismatches.map(
-          (c) =>
-            `${c.path}: ${getTypeName(c.valueA)} (from ${c.sourceA}) vs ${getTypeName(c.valueB)} (from ${c.sourceB})`
-        );
-        return yield* Effect.fail(new Error(`Type conflicts during merge:\n${messages.join('\n')}`));
+      return { merged, conflicts: allConflicts, lastSourceName };
+    }),
+    Effect.flatMap(({ merged, conflicts }) => {
+      // Check for type mismatches in strict mode
+      if (options.strictMerge) {
+        const typeMismatches = conflicts.filter((c) => c.type === 'type-mismatch');
+        if (typeMismatches.length > 0) {
+          const messages = typeMismatches.map(
+            (c) =>
+              `${c.path}: ${getTypeName(c.valueA)} (from ${c.sourceA}) vs ${getTypeName(c.valueB)} (from ${c.sourceB})`
+          );
+          return Effect.fail(new Error(`Type conflicts during merge:\n${messages.join('\n')}`));
+        }
       }
-    }
 
-    return { merged, conflicts: allConflicts };
-  });
+      return Effect.succeed({ merged, conflicts });
+    })
+  );
 
 /**
  * Filter conflicts to only include type mismatches

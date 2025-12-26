@@ -4,6 +4,7 @@
  * Handles .zenfigrc.json loading and environment variable precedence
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -156,76 +157,74 @@ const isCIMode = (cliCi?: boolean): boolean => {
  * 4. Defaults (lowest)
  */
 export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<ResolvedConfig, never> =>
-  Effect.gen(function* () {
-    const rcConfig = yield* loadRcFile(process.cwd());
+  pipe(
+    loadRcFile(process.cwd()),
+    Effect.map((rcConfig) => {
+      // Resolve env (special: also check NODE_ENV)
+      const env =
+        cliOptions.env ??
+        getEnvVar('ZENFIG_ENV') ??
+        rcConfig?.env ??
+        getEnvVar('NODE_ENV') ??
+        DEFAULT_CONFIG.env;
 
-    // Resolve env (special: also check NODE_ENV)
-    const env =
-      cliOptions.env ??
-      getEnvVar('ZENFIG_ENV') ??
-      rcConfig?.env ??
-      getEnvVar('NODE_ENV') ??
-      DEFAULT_CONFIG.env;
+      // Resolve other values
+      const provider = cliOptions.provider ?? getEnvVar('ZENFIG_PROVIDER') ?? rcConfig?.provider ?? DEFAULT_CONFIG.provider;
 
-    // Resolve other values
-    const provider = cliOptions.provider ?? getEnvVar('ZENFIG_PROVIDER') ?? rcConfig?.provider ?? DEFAULT_CONFIG.provider;
+      const ssmPrefix =
+        cliOptions.ssmPrefix ?? getEnvVar('ZENFIG_SSM_PREFIX') ?? rcConfig?.ssmPrefix ?? DEFAULT_CONFIG.ssmPrefix;
 
-    const ssmPrefix =
-      cliOptions.ssmPrefix ?? getEnvVar('ZENFIG_SSM_PREFIX') ?? rcConfig?.ssmPrefix ?? DEFAULT_CONFIG.ssmPrefix;
+      const schema = cliOptions.schema ?? getEnvVar('ZENFIG_SCHEMA') ?? rcConfig?.schema ?? DEFAULT_CONFIG.schema;
 
-    const schema = cliOptions.schema ?? getEnvVar('ZENFIG_SCHEMA') ?? rcConfig?.schema ?? DEFAULT_CONFIG.schema;
+      const schemaExportName =
+        cliOptions.schemaExportName ??
+        getEnvVar('ZENFIG_SCHEMA_EXPORT_NAME') ??
+        rcConfig?.schemaExportName ??
+        DEFAULT_CONFIG.schemaExportName;
 
-    const schemaExportName =
-      cliOptions.schemaExportName ??
-      getEnvVar('ZENFIG_SCHEMA_EXPORT_NAME') ??
-      rcConfig?.schemaExportName ??
-      DEFAULT_CONFIG.schemaExportName;
+      const jsonnet = cliOptions.jsonnet ?? getEnvVar('ZENFIG_JSONNET') ?? rcConfig?.jsonnet ?? DEFAULT_CONFIG.jsonnet;
 
-    const jsonnet = cliOptions.jsonnet ?? getEnvVar('ZENFIG_JSONNET') ?? rcConfig?.jsonnet ?? DEFAULT_CONFIG.jsonnet;
+      const sources = cliOptions.source ?? rcConfig?.sources ?? DEFAULT_CONFIG.sources;
 
-    const sources = cliOptions.source ?? rcConfig?.sources ?? DEFAULT_CONFIG.sources;
+      const format =
+        (cliOptions.format as 'env' | 'json' | undefined) ??
+        (getEnvVar('ZENFIG_FORMAT') as 'env' | 'json' | undefined) ??
+        rcConfig?.format ??
+        DEFAULT_CONFIG.format;
 
-    const format =
-      (cliOptions.format as 'env' | 'json' | undefined) ??
-      (getEnvVar('ZENFIG_FORMAT') as 'env' | 'json' | undefined) ??
-      rcConfig?.format ??
-      DEFAULT_CONFIG.format;
+      const separator = cliOptions.separator ?? rcConfig?.separator ?? DEFAULT_CONFIG.separator;
 
-    const separator = cliOptions.separator ?? rcConfig?.separator ?? DEFAULT_CONFIG.separator;
+      // Cache handling: --no-cache disables, otherwise use env or rc
+      const cache = cliOptions.noCache
+        ? undefined
+        : cliOptions.cache ?? getEnvVar('ZENFIG_CACHE') ?? rcConfig?.cache ?? DEFAULT_CONFIG.cache;
 
-    // Cache handling: --no-cache disables, otherwise use env or rc
-    let cache: string | undefined;
-    if (cliOptions.noCache) {
-      cache = undefined;
-    } else {
-      cache = cliOptions.cache ?? getEnvVar('ZENFIG_CACHE') ?? rcConfig?.cache ?? DEFAULT_CONFIG.cache;
-    }
+      const jsonnetTimeoutMs =
+        cliOptions.jsonnetTimeout ??
+        getEnvInt('ZENFIG_JSONNET_TIMEOUT_MS') ??
+        rcConfig?.jsonnetTimeoutMs ??
+        DEFAULT_CONFIG.jsonnetTimeoutMs;
 
-    const jsonnetTimeoutMs =
-      cliOptions.jsonnetTimeout ??
-      getEnvInt('ZENFIG_JSONNET_TIMEOUT_MS') ??
-      rcConfig?.jsonnetTimeoutMs ??
-      DEFAULT_CONFIG.jsonnetTimeoutMs;
+      const ci = isCIMode(cliOptions.ci);
+      const strict = cliOptions.strict ?? false;
 
-    const ci = isCIMode(cliOptions.ci);
-    const strict = cliOptions.strict ?? false;
-
-    return {
-      env,
-      provider,
-      ssmPrefix,
-      schema,
-      schemaExportName,
-      jsonnet,
-      sources,
-      format,
-      separator,
-      cache,
-      jsonnetTimeoutMs,
-      ci,
-      strict,
-    };
-  });
+      return {
+        env,
+        provider,
+        ssmPrefix,
+        schema,
+        schemaExportName,
+        jsonnet,
+        sources,
+        format,
+        separator,
+        cache,
+        jsonnetTimeoutMs,
+        ci,
+        strict,
+      };
+    })
+  );
 
 /**
  * Merge CLI options into resolved config

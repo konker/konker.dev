@@ -4,6 +4,7 @@
  * Workflow: Input -> Resolve -> Parse -> Validate -> Serialize -> Push
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import {
@@ -67,59 +68,89 @@ const readFromStdin = (): Effect.Effect<string, never> =>
 export const executeUpsert = (
   options: UpsertOptions
 ): Effect.Effect<UpsertResult, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  Effect.gen(function* () {
-    const { service, key, type = 'auto', skipEncryptionCheck = false, config } = options;
-
+  pipe(
     // 1. Load schema
-    const { schema } = yield* loadSchemaWithDefaults(config.schema, config.schemaExportName);
+    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+    Effect.flatMap(({ schema }) =>
+      // 2. Resolve and canonicalize the key path
+      pipe(
+        resolvePath(schema, options.key),
+        Effect.map((resolved) => ({ resolved }))
+      )
+    ),
+    Effect.flatMap(({ resolved }) => {
+      const canonicalKey = resolved.canonicalPath;
 
-    // 2. Resolve and canonicalize the key path
-    const resolved = yield* resolvePath(schema, key);
-    const canonicalKey = resolved.canonicalPath;
+      // 3. Get the value
+      const valueEffect = options.stdin
+        ? readFromStdin()
+        : Effect.succeed(options.value ?? '');
 
-    // 3. Get the value
-    const rawValue = options.stdin
-      ? yield* readFromStdin()
-      : options.value ?? '';
+      return pipe(
+        valueEffect,
+        Effect.flatMap((rawValue) =>
+          // 4. Parse the value according to schema
+          pipe(
+            parseValue(rawValue, resolved.schema, canonicalKey, options.type ?? 'auto'),
+            Effect.flatMap((parsedValue) =>
+              // 5. Validate the parsed value
+              pipe(
+                validate(parsedValue, resolved.schema),
+                Effect.map((validatedValue) => ({
+                  canonicalKey,
+                  validatedValue,
+                  resolvedSchema: resolved.schema,
+                }))
+              )
+            )
+          )
+        )
+      );
+    }),
+    Effect.flatMap(({ canonicalKey, validatedValue, resolvedSchema }) => {
+      // 6. Serialize back to provider string format
+      const serialized = serializeValue(validatedValue, resolvedSchema);
 
-    // 4. Parse the value according to schema
-    const parsedValue = yield* parseValue(rawValue, resolved.schema, canonicalKey, type);
+      const { config, service, skipEncryptionCheck = false } = options;
+      const ctx: ProviderContext = {
+        prefix: config.ssmPrefix,
+        service,
+        env: config.env,
+      };
 
-    // 5. Validate the parsed value
-    const validatedValue = yield* validate(parsedValue, resolved.schema);
-
-    // 6. Serialize back to provider string format
-    const serialized = serializeValue(validatedValue, resolved.schema);
-
-    // 7. Get provider
-    const provider = yield* getProvider(config.provider);
-
-    // 8. Push to provider
-    const ctx: ProviderContext = {
-      prefix: config.ssmPrefix,
-      service,
-      env: config.env,
-    };
-
-    yield* provider.upsert(ctx, canonicalKey, serialized);
-
-    // 9. Verify encryption if supported and not skipped
-    let encrypted = true;
-    if (!skipEncryptionCheck && provider.capabilities.encryptionVerification && provider.verifyEncryption) {
-      const encType = yield* provider.verifyEncryption(ctx, canonicalKey);
-      if (encType !== EncryptionType.SECURE_STRING) {
-        encrypted = false;
-        console.error(`[zenfig] Warning: ${encryptionVerificationFailedError(canonicalKey).message}`);
-      }
-    }
-
-    return {
-      canonicalKey,
-      value: validatedValue,
-      serialized,
-      encrypted,
-    };
-  });
+      // 7. Get provider and push
+      return pipe(
+        getProvider(config.provider),
+        Effect.flatMap((provider) =>
+          pipe(
+            provider.upsert(ctx, canonicalKey, serialized),
+            Effect.flatMap(() => {
+              // 8. Verify encryption if supported and not skipped
+              if (!skipEncryptionCheck && provider.capabilities.encryptionVerification && provider.verifyEncryption) {
+                return pipe(
+                  provider.verifyEncryption(ctx, canonicalKey),
+                  Effect.map((encType) => {
+                    if (encType !== EncryptionType.SECURE_STRING) {
+                      console.error(`[zenfig] Warning: ${encryptionVerificationFailedError(canonicalKey).message}`);
+                      return false;
+                    }
+                    return true;
+                  })
+                );
+              }
+              return Effect.succeed(true);
+            }),
+            Effect.map((encrypted) => ({
+              canonicalKey,
+              value: validatedValue,
+              serialized,
+              encrypted,
+            }))
+          )
+        )
+      );
+    })
+  );
 
 /**
  * Run upsert and print result
@@ -127,12 +158,13 @@ export const executeUpsert = (
 export const runUpsert = (
   options: UpsertOptions
 ): Effect.Effect<void, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  Effect.gen(function* () {
-    const result = yield* executeUpsert(options);
+  pipe(
+    executeUpsert(options),
+    Effect.map((result) => {
+      console.log(`Successfully wrote ${result.canonicalKey} to ${options.config.ssmPrefix}/${options.service}/${options.config.env}`);
 
-    console.log(`Successfully wrote ${result.canonicalKey} to ${options.config.ssmPrefix}/${options.service}/${options.config.env}`);
-
-    if (!result.encrypted) {
-      console.warn('[zenfig] Warning: Value may not be encrypted as SecureString');
-    }
-  });
+      if (!result.encrypted) {
+        console.warn('[zenfig] Warning: Value may not be encrypted as SecureString');
+      }
+    })
+  );

@@ -6,6 +6,7 @@
  */
 import { Kind, type TObject, type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { keyNotFoundError, type ValidationError } from '../errors.js';
 
@@ -91,56 +92,67 @@ const findProperty = (
  * @returns Resolved path with canonical casing and schema node
  */
 export const resolvePath = (schema: TSchema, keyPath: string): Effect.Effect<ResolvedPath, ValidationError> =>
-  Effect.gen(function* () {
-    if (!keyPath || keyPath.trim() === '') {
-      return yield* Effect.fail(keyNotFoundError('(empty path)'));
-    }
-
-    const segments = keyPath.split('.');
-    const canonicalSegments: Array<string> = [];
-    let currentSchema = schema;
-
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i]!;
-
-      // Unwrap optional if present
-      currentSchema = unwrapOptional(currentSchema);
-
-      if (!isObjectSchema(currentSchema)) {
-        const partialPath = canonicalSegments.join('.');
-        return yield* Effect.fail(
-          keyNotFoundError(
-            keyPath,
-            partialPath ? [`${partialPath} is not an object`] : undefined
-          )
-        );
+  pipe(
+    Effect.sync(() => {
+      if (!keyPath || keyPath.trim() === '') {
+        return { valid: false as const, error: keyNotFoundError('(empty path)') };
+      }
+      return { valid: true as const, segments: keyPath.split('.') };
+    }),
+    Effect.flatMap((result) => {
+      if (!result.valid) {
+        return Effect.fail(result.error);
       }
 
-      const found = findProperty(currentSchema, segment);
-      if (!found) {
-        const availableKeys = Object.keys(currentSchema.properties).map((k) =>
-          canonicalSegments.length > 0 ? `${canonicalSegments.join('.')}.${k}` : k
-        );
-        return yield* Effect.fail(keyNotFoundError(keyPath, availableKeys));
+      const { segments } = result;
+      const canonicalSegments: Array<string> = [];
+      let currentSchema = schema;
+
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i]!;
+
+        // Unwrap optional if present
+        currentSchema = unwrapOptional(currentSchema);
+
+        if (!isObjectSchema(currentSchema)) {
+          const partialPath = canonicalSegments.join('.');
+          return Effect.fail(
+            keyNotFoundError(
+              keyPath,
+              partialPath ? [`${partialPath} is not an object`] : undefined
+            )
+          );
+        }
+
+        const found = findProperty(currentSchema, segment);
+        if (!found) {
+          const availableKeys = Object.keys(currentSchema.properties).map((k) =>
+            canonicalSegments.length > 0 ? `${canonicalSegments.join('.')}.${k}` : k
+          );
+          return Effect.fail(keyNotFoundError(keyPath, availableKeys));
+        }
+
+        canonicalSegments.push(found.propertyName);
+        currentSchema = found.schema;
       }
 
-      canonicalSegments.push(found.propertyName);
-      currentSchema = found.schema;
-    }
-
-    return {
-      canonicalPath: canonicalSegments.join('.'),
-      schema: currentSchema,
-      segments: canonicalSegments,
-    };
-  });
+      return Effect.succeed({
+        canonicalPath: canonicalSegments.join('.'),
+        schema: currentSchema,
+        segments: canonicalSegments,
+      });
+    })
+  );
 
 /**
  * Canonicalize a key path using the schema
  * Returns the path with correct casing from schema
  */
 export const canonicalizePath = (schema: TSchema, keyPath: string): Effect.Effect<string, ValidationError> =>
-  Effect.map(resolvePath(schema, keyPath), (result) => result.canonicalPath);
+  pipe(
+    resolvePath(schema, keyPath),
+    Effect.map((result) => result.canonicalPath)
+  );
 
 // --------------------------------------------------------------------------
 // Schema Enumeration

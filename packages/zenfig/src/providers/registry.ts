@@ -4,6 +4,7 @@
  * Manages available providers and returns instances by name
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { connectionFailedError, type ProviderError } from '../errors.js';
 import { type Provider } from './Provider.js';
@@ -37,13 +38,15 @@ export const registerProvider = (name: string, factory: ProviderFactory): void =
  * Get a provider by name
  */
 export const getProvider = (name: string): Effect.Effect<Provider, ProviderError> =>
-  Effect.gen(function* () {
-    const factory = registry.get(name.toLowerCase());
-    if (!factory) {
-      return yield* Effect.fail(connectionFailedError(name, `Provider '${name}' is not registered`));
-    }
-    return factory();
-  });
+  pipe(
+    Effect.sync(() => registry.get(name.toLowerCase())),
+    Effect.flatMap((factory) => {
+      if (!factory) {
+        return Effect.fail(connectionFailedError(name, `Provider '${name}' is not registered`));
+      }
+      return Effect.succeed(factory());
+    })
+  );
 
 /**
  * Get list of registered provider names

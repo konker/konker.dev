@@ -4,6 +4,7 @@
  * In-memory provider for testing and development
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { parameterNotFoundError, type ProviderError } from '../errors.js';
 import { type Provider, type ProviderCapabilities, type ProviderContext, type ProviderKV, EncryptionType, type EncryptionTypeValue } from './Provider.js';
@@ -61,16 +62,22 @@ export const createMockProvider = (initialData?: Record<string, ProviderKV>): Pr
     });
 
   const deleteKey = (ctx: ProviderContext, keyPath: string): Effect.Effect<void, ProviderError> =>
-    Effect.gen(function* () {
-      const key = getStorageKey(ctx);
-      const existing = storage.get(key);
-      if (!existing || !(keyPath in existing)) {
-        return yield* Effect.fail(parameterNotFoundError(keyPath, `${key}/${keyPath}`));
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [keyPath]: _, ...rest } = existing;
-      storage.set(key, rest);
-    });
+    pipe(
+      Effect.sync(() => {
+        const key = getStorageKey(ctx);
+        const existing = storage.get(key);
+        return { key, existing };
+      }),
+      Effect.flatMap(({ key, existing }) => {
+        if (!existing || !(keyPath in existing)) {
+          return Effect.fail(parameterNotFoundError(keyPath, `${key}/${keyPath}`));
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [keyPath]: _, ...rest } = existing;
+        storage.set(key, rest);
+        return Effect.void;
+      })
+    );
 
   const verifyEncryption = (_ctx: ProviderContext, _keyPath: string): Effect.Effect<EncryptionTypeValue, ProviderError> =>
     Effect.succeed(EncryptionType.SECURE_STRING);

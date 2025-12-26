@@ -5,6 +5,7 @@
  * Restore: Load -> Validate -> Diff -> Confirm -> Push
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
@@ -136,75 +137,97 @@ const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
 export const executeSnapshotSave = (
   options: SnapshotSaveOptions
 ): Effect.Effect<SnapshotSaveResult, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const { service, sources = [], config } = options;
-    const allServices = [service, ...sources];
-
+  pipe(
     // 1. Load schema for hash
-    const { schemaHash } = yield* loadSchemaWithDefaults(config.schema, config.schemaExportName);
+    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+    Effect.flatMap(({ schemaHash }) =>
+      // 2. Get provider
+      pipe(
+        getProvider(options.config.provider),
+        Effect.map((provider) => ({ schemaHash, provider }))
+      )
+    ),
+    Effect.flatMap(({ schemaHash, provider }) => {
+      const { service, sources = [], config } = options;
+      const allServices = [service, ...sources];
 
-    // 2. Get provider
-    const provider = yield* getProvider(config.provider);
+      // 3. Fetch stored values per service
+      return pipe(
+        Effect.forEach(allServices, (svc) => {
+          const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+          return pipe(
+            provider.fetch(ctx),
+            Effect.map((kv) => ({ svc, kv }))
+          );
+        }),
+        Effect.map((results) => {
+          const data: Record<string, ProviderKV> = {};
+          let totalKeys = 0;
 
-    // 3. Fetch stored values per service
-    const data: Record<string, ProviderKV> = {};
-    let totalKeys = 0;
+          for (const { svc, kv } of results) {
+            data[svc] = kv;
+            totalKeys += Object.keys(kv).length;
+          }
 
-    for (const svc of allServices) {
-      const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-      const kv = yield* provider.fetch(ctx);
-      data[svc] = kv;
-      totalKeys += Object.keys(kv).length;
-    }
-
-    // 4. Build snapshot
-    const snapshot: SnapshotV1 = {
-      version: 1,
-      layer: 'stored',
-      meta: {
-        timestamp: new Date().toISOString(),
-        env: config.env,
-        provider: config.provider,
-        ssmPrefix: config.ssmPrefix,
-        schemaHash,
-        services: allServices,
-      },
-      data,
-    };
-
-    // 5. Determine output path
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const defaultPath = path.join('.zenfig', 'snapshots', `${service}-${config.env}-${timestamp}.json`);
-    const outputPath = options.output ?? defaultPath;
-
-    // 6. Ensure directory exists
-    yield* ensureDirectoryExists(outputPath);
-
-    // 7. Check gitignore
-    const isIgnored = yield* checkGitIgnore(path.dirname(outputPath));
-    if (!isIgnored) {
-      console.warn(
-        '[zenfig] Warning: Snapshot directory may not be covered by .gitignore. ' +
-          'Add ".zenfig/snapshots" to .gitignore to avoid committing secrets.'
+          return { schemaHash, allServices, data, totalKeys, config };
+        })
       );
-    }
+    }),
+    Effect.flatMap(({ schemaHash, allServices, data, totalKeys, config }) => {
+      // 4. Build snapshot
+      const snapshot: SnapshotV1 = {
+        version: 1,
+        layer: 'stored',
+        meta: {
+          timestamp: new Date().toISOString(),
+          env: config.env,
+          provider: config.provider,
+          ssmPrefix: config.ssmPrefix,
+          schemaHash,
+          services: allServices,
+        },
+        data,
+      };
 
-    // 8. Write snapshot with restrictive permissions
-    const content = JSON.stringify(snapshot, null, 2);
+      // 5. Determine output path
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const defaultPath = path.join('.zenfig', 'snapshots', `${options.service}-${config.env}-${timestamp}.json`);
+      const outputPath = options.output ?? defaultPath;
 
-    yield* Effect.try({
-      try: () => fs.writeFileSync(outputPath, content, { mode: 0o600 }),
-      catch: () => permissionDeniedError(outputPath, 'write'),
-    });
+      // 6. Ensure directory exists
+      return pipe(
+        ensureDirectoryExists(outputPath),
+        Effect.flatMap(() => checkGitIgnore(path.dirname(outputPath))),
+        Effect.flatMap((isIgnored) => {
+          if (!isIgnored) {
+            console.warn(
+              '[zenfig] Warning: Snapshot directory may not be covered by .gitignore. ' +
+                'Add ".zenfig/snapshots" to .gitignore to avoid committing secrets.'
+            );
+          }
 
-    console.log(`Snapshot saved to ${outputPath}`);
+          // 7. Write snapshot with restrictive permissions
+          const content = JSON.stringify(snapshot, null, 2);
 
-    return {
-      path: outputPath,
-      services: allServices,
-      keyCount: totalKeys,
-    };
-  });
+          return pipe(
+            Effect.try({
+              try: () => fs.writeFileSync(outputPath, content, { mode: 0o600 }),
+              catch: () => permissionDeniedError(outputPath, 'write'),
+            }),
+            Effect.map(() => {
+              console.log(`Snapshot saved to ${outputPath}`);
+
+              return {
+                path: outputPath,
+                services: allServices,
+                keyCount: totalKeys,
+              };
+            })
+          );
+        })
+      );
+    })
+  );
 
 // --------------------------------------------------------------------------
 // Snapshot Restore
@@ -216,101 +239,153 @@ export const executeSnapshotSave = (
 export const executeSnapshotRestore = (
   options: SnapshotRestoreOptions
 ): Effect.Effect<SnapshotRestoreResult, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const { snapshotFile, dryRun = false, forceSchemaMatch = false, confirm = false, config } = options;
-
+  pipe(
     // 1. Load snapshot file
-    if (!fs.existsSync(snapshotFile)) {
-      return yield* Effect.fail(fileNotFoundError(snapshotFile));
-    }
-
-    const content = yield* Effect.try({
-      try: () => fs.readFileSync(snapshotFile, 'utf-8'),
-      catch: () => fileNotFoundError(snapshotFile),
-    });
-
-    const snapshot = yield* Effect.try({
-      try: () => JSON.parse(content) as SnapshotV1,
-      catch: () => fileNotFoundError(`Invalid JSON in ${snapshotFile}`),
-    });
-
-    // 2. Validate snapshot version
-    if (snapshot.version !== 1) {
-      return yield* Effect.fail(fileNotFoundError(`Unsupported snapshot version: ${snapshot.version}`));
-    }
-
-    // 3. Check schema hash
-    const { schemaHash } = yield* loadSchemaWithDefaults(config.schema, config.schemaExportName);
-
-    if (snapshot.meta.schemaHash !== schemaHash && !forceSchemaMatch) {
-      return yield* Effect.fail(snapshotSchemaMismatchError(snapshot.meta.schemaHash, schemaHash));
-    }
-
-    if (snapshot.meta.schemaHash !== schemaHash) {
-      console.warn('[zenfig] Warning: Schema has changed since snapshot was created. Proceeding with --force-schema-mismatch.');
-    }
-
-    // 4. Get provider
-    const provider = yield* getProvider(config.provider);
-
-    // 5. Calculate changes
-    const changes: Array<{ key: string; service: string; action: 'add' | 'update' }> = [];
-
-    for (const [svc, kv] of Object.entries(snapshot.data)) {
-      const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-      const currentKv = yield* provider.fetch(ctx);
-
-      for (const [key, value] of Object.entries(kv)) {
-        if (!(key in currentKv)) {
-          changes.push({ key, service: svc, action: 'add' });
-        } else if (currentKv[key] !== value) {
-          changes.push({ key, service: svc, action: 'update' });
-        }
+    Effect.sync(() => {
+      if (!fs.existsSync(options.snapshotFile)) {
+        return { exists: false as const, content: '' };
       }
-    }
-
-    // 6. Show diff
-    console.log(`\nChanges to apply (${changes.length} keys):`);
-    for (const change of changes) {
-      const action = change.action === 'add' ? '[ADD]' : '[UPDATE]';
-      console.log(`  ${action} ${change.service}/${change.key}`);
-    }
-
-    if (changes.length === 0) {
-      console.log('No changes to apply.');
-      return { applied: false, changes: [] };
-    }
-
-    if (dryRun) {
-      console.log('\nDry run - no changes applied.');
-      return { applied: false, changes };
-    }
-
-    // 7. Confirm
-    if (!confirm && !config.ci) {
-      const confirmed = yield* promptConfirmation('\nApply these changes?');
-      if (!confirmed) {
-        console.log('Restore cancelled.');
-        return { applied: false, changes };
+      return { exists: true as const, content: '' };
+    }),
+    Effect.flatMap(({ exists }) => {
+      if (!exists) {
+        return Effect.fail(fileNotFoundError(options.snapshotFile));
       }
-    } else if (!confirm && config.ci) {
-      console.error('Error: --confirm flag required in CI mode');
-      return { applied: false, changes };
-    }
 
-    // 8. Apply changes
-    for (const [svc, kv] of Object.entries(snapshot.data)) {
-      const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-
-      for (const [key, value] of Object.entries(kv)) {
-        yield* provider.upsert(ctx, key, value);
+      return Effect.try({
+        try: () => fs.readFileSync(options.snapshotFile, 'utf-8'),
+        catch: () => fileNotFoundError(options.snapshotFile),
+      });
+    }),
+    Effect.flatMap((content) =>
+      Effect.try({
+        try: () => JSON.parse(content) as SnapshotV1,
+        catch: () => fileNotFoundError(`Invalid JSON in ${options.snapshotFile}`),
+      })
+    ),
+    Effect.flatMap((snapshot) => {
+      // 2. Validate snapshot version
+      if (snapshot.version !== 1) {
+        return Effect.fail(fileNotFoundError(`Unsupported snapshot version: ${snapshot.version}`));
       }
-    }
 
-    console.log(`\nRestored ${changes.length} keys from snapshot.`);
+      // 3. Check schema hash
+      return pipe(
+        loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+        Effect.flatMap(({ schemaHash }) => {
+          const { forceSchemaMatch = false } = options;
 
-    return { applied: true, changes };
-  });
+          if (snapshot.meta.schemaHash !== schemaHash && !forceSchemaMatch) {
+            return Effect.fail(snapshotSchemaMismatchError(snapshot.meta.schemaHash, schemaHash));
+          }
+
+          if (snapshot.meta.schemaHash !== schemaHash) {
+            console.warn('[zenfig] Warning: Schema has changed since snapshot was created. Proceeding with --force-schema-mismatch.');
+          }
+
+          return Effect.succeed({ snapshot, schemaHash });
+        })
+      );
+    }),
+    Effect.flatMap(({ snapshot }) =>
+      // 4. Get provider
+      pipe(
+        getProvider(options.config.provider),
+        Effect.map((provider) => ({ snapshot, provider }))
+      )
+    ),
+    Effect.flatMap(({ snapshot, provider }) => {
+      const { config, dryRun = false, confirm = false } = options;
+
+      // 5. Calculate changes
+      return pipe(
+        Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
+          const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+          return pipe(
+            provider.fetch(ctx),
+            Effect.map((currentKv) => ({ svc, kv, currentKv }))
+          );
+        }),
+        Effect.map((results) => {
+          const changes: Array<{ key: string; service: string; action: 'add' | 'update' }> = [];
+
+          for (const { svc, kv, currentKv } of results) {
+            for (const [key, value] of Object.entries(kv)) {
+              if (!(key in currentKv)) {
+                changes.push({ key, service: svc, action: 'add' });
+              } else if (currentKv[key] !== value) {
+                changes.push({ key, service: svc, action: 'update' });
+              }
+            }
+          }
+
+          return { snapshot, provider, changes, config, dryRun, confirm };
+        })
+      );
+    }),
+    Effect.flatMap(({ snapshot, provider, changes, config, dryRun, confirm }): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
+      // 6. Show diff
+      console.log(`\nChanges to apply (${changes.length} keys):`);
+      for (const change of changes) {
+        const action = change.action === 'add' ? '[ADD]' : '[UPDATE]';
+        console.log(`  ${action} ${change.service}/${change.key}`);
+      }
+
+      if (changes.length === 0) {
+        console.log('No changes to apply.');
+        return Effect.succeed({ applied: false, changes: [] });
+      }
+
+      if (dryRun) {
+        console.log('\nDry run - no changes applied.');
+        return Effect.succeed({ applied: false, changes });
+      }
+
+      // 7. Confirm
+      if (!confirm && !config.ci) {
+        return pipe(
+          promptConfirmation('\nApply these changes?'),
+          Effect.flatMap((confirmed): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
+            if (!confirmed) {
+              console.log('Restore cancelled.');
+              return Effect.succeed({ applied: false, changes });
+            }
+
+            // 8. Apply changes
+            return pipe(
+              Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
+                const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+                return Effect.forEach(Object.entries(kv), ([key, value]) =>
+                  provider.upsert(ctx, key, value)
+                );
+              }),
+              Effect.map((): SnapshotRestoreResult => {
+                console.log(`\nRestored ${changes.length} keys from snapshot.`);
+                return { applied: true, changes };
+              })
+            );
+          })
+        );
+      } else if (!confirm && config.ci) {
+        console.error('Error: --confirm flag required in CI mode');
+        return Effect.succeed({ applied: false, changes });
+      }
+
+      // 8. Apply changes (with confirm flag)
+      return pipe(
+        Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
+          const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+          return Effect.forEach(Object.entries(kv), ([key, value]) =>
+            provider.upsert(ctx, key, value)
+          );
+        }),
+        Effect.map((): SnapshotRestoreResult => {
+          console.log(`\nRestored ${changes.length} keys from snapshot.`);
+          return { applied: true, changes };
+        })
+      );
+    })
+  );
 
 /**
  * Run snapshot save
@@ -318,10 +393,12 @@ export const executeSnapshotRestore = (
 export const runSnapshotSave = (
   options: SnapshotSaveOptions
 ): Effect.Effect<void, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const result = yield* executeSnapshotSave(options);
-    console.log(`Saved ${result.keyCount} keys from ${result.services.length} service(s)`);
-  });
+  pipe(
+    executeSnapshotSave(options),
+    Effect.map((result) => {
+      console.log(`Saved ${result.keyCount} keys from ${result.services.length} service(s)`);
+    })
+  );
 
 /**
  * Run snapshot restore
@@ -329,7 +406,7 @@ export const runSnapshotSave = (
 export const runSnapshotRestore = (
   options: SnapshotRestoreOptions
 ): Effect.Effect<boolean, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const result = yield* executeSnapshotRestore(options);
-    return result.applied;
-  });
+  pipe(
+    executeSnapshotRestore(options),
+    Effect.map((result) => result.applied)
+  );

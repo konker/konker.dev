@@ -4,6 +4,7 @@
  * Workflow: Input -> Validate -> Confirm -> Remove -> Audit
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import * as readline from 'node:readline';
 
 import { type ResolvedConfig } from '../config.js';
@@ -61,59 +62,75 @@ const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
 export const executeDelete = (
   options: DeleteOptions
 ): Effect.Effect<DeleteResult, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  Effect.gen(function* () {
-    const { service, key, confirm = false, config } = options;
-
+  pipe(
     // 1. Load schema
-    const { schema } = yield* loadSchemaWithDefaults(config.schema, config.schemaExportName);
+    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+    Effect.flatMap(({ schema }) =>
+      // 2. Resolve the key path (may not exist in schema - warn but allow)
+      pipe(
+        Effect.either(resolvePath(schema, options.key)),
+        Effect.map((resolveResult) => {
+          if (resolveResult._tag === 'Left') {
+            // Key not in schema - warn but use the input as-is
+            console.warn(`[zenfig] Warning: Key '${options.key}' not found in schema. Proceeding with deletion anyway.`);
+            return options.key;
+          }
+          return resolveResult.right.canonicalPath;
+        })
+      )
+    ),
+    Effect.flatMap((canonicalKey) => {
+      const { confirm = false, config, service } = options;
 
-    // 2. Resolve the key path (may not exist in schema - warn but allow)
-    const resolveResult = yield* Effect.either(resolvePath(schema, key));
-    let canonicalKey: string;
-
-    if (resolveResult._tag === 'Left') {
-      // Key not in schema - warn but use the input as-is
-      console.warn(`[zenfig] Warning: Key '${key}' not found in schema. Proceeding with deletion anyway.`);
-      canonicalKey = key;
-    } else {
-      canonicalKey = resolveResult.right.canonicalPath;
-    }
-
-    // 3. Confirm deletion
-    if (!confirm && !config.ci) {
-      const confirmed = yield* promptConfirmation(
-        `Delete key '${canonicalKey}' from ${config.ssmPrefix}/${service}/${config.env}?`
-      );
-
-      if (!confirmed) {
-        console.log('Deletion cancelled.');
-        return { canonicalKey, deleted: false };
+      // 3. Confirm deletion
+      if (!confirm && !config.ci) {
+        return pipe(
+          promptConfirmation(
+            `Delete key '${canonicalKey}' from ${config.ssmPrefix}/${service}/${config.env}?`
+          ),
+          Effect.flatMap((confirmed): Effect.Effect<{ canonicalKey: string; deleted: boolean; shouldDelete: boolean }, never> => {
+            if (!confirmed) {
+              console.log('Deletion cancelled.');
+              return Effect.succeed({ canonicalKey, deleted: false, shouldDelete: false });
+            }
+            return Effect.succeed({ canonicalKey, deleted: false, shouldDelete: true });
+          })
+        );
+      } else if (!confirm && config.ci) {
+        // CI mode requires explicit --confirm
+        console.error('Error: --confirm flag required in CI mode');
+        return Effect.succeed({ canonicalKey, deleted: false, shouldDelete: false });
       }
-    } else if (!confirm && config.ci) {
-      // CI mode requires explicit --confirm
-      console.error('Error: --confirm flag required in CI mode');
-      return { canonicalKey, deleted: false };
-    }
 
-    // 4. Get provider
-    const provider = yield* getProvider(config.provider);
+      return Effect.succeed({ canonicalKey, deleted: false, shouldDelete: true });
+    }),
+    Effect.flatMap(({ canonicalKey, shouldDelete }): Effect.Effect<DeleteResult, ProviderError> => {
+      if (!shouldDelete) {
+        return Effect.succeed({ canonicalKey, deleted: false });
+      }
 
-    // 5. Delete from provider
-    const ctx: ProviderContext = {
-      prefix: config.ssmPrefix,
-      service,
-      env: config.env,
-    };
+      const { config, service } = options;
+      const ctx: ProviderContext = {
+        prefix: config.ssmPrefix,
+        service,
+        env: config.env,
+      };
 
-    yield* provider.delete(ctx, canonicalKey);
+      // 4. Get provider and delete
+      return pipe(
+        getProvider(config.provider),
+        Effect.flatMap((provider) => provider.delete(ctx, canonicalKey)),
+        Effect.map(() => {
+          // 5. Audit log
+          const timestamp = new Date().toISOString();
+          const user = process.env['USER'] ?? process.env['USERNAME'] ?? 'unknown';
+          console.error(`[${timestamp}] Deleted: ${canonicalKey} by ${user}`);
 
-    // 6. Audit log
-    const timestamp = new Date().toISOString();
-    const user = process.env['USER'] ?? process.env['USERNAME'] ?? 'unknown';
-    console.error(`[${timestamp}] Deleted: ${canonicalKey} by ${user}`);
-
-    return { canonicalKey, deleted: true };
-  });
+          return { canonicalKey, deleted: true };
+        })
+      );
+    })
+  );
 
 /**
  * Run delete and print result
@@ -121,12 +138,12 @@ export const executeDelete = (
 export const runDelete = (
   options: DeleteOptions
 ): Effect.Effect<boolean, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  Effect.gen(function* () {
-    const result = yield* executeDelete(options);
-
-    if (result.deleted) {
-      console.log(`Successfully deleted ${result.canonicalKey}`);
-    }
-
-    return result.deleted;
-  });
+  pipe(
+    executeDelete(options),
+    Effect.map((result) => {
+      if (result.deleted) {
+        console.log(`Successfully deleted ${result.canonicalKey}`);
+      }
+      return result.deleted;
+    })
+  );

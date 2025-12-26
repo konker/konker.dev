@@ -4,6 +4,7 @@
  * Creates and manages temporary files for passing secrets to Jsonnet
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -40,31 +41,35 @@ const generateTempPath = (prefix = 'zenfig-'): string => {
  * @returns TempFile with path and cleanup function
  */
 export const createTempFile = (content: string, prefix = 'zenfig-'): Effect.Effect<TempFile, SystemError> =>
-  Effect.gen(function* () {
-    const filePath = generateTempPath(prefix);
+  pipe(
+    Effect.sync(() => generateTempPath(prefix)),
+    Effect.flatMap((filePath) =>
+      pipe(
+        Effect.try({
+          try: () => {
+            // Write file with restrictive permissions (0600 = owner read/write only)
+            fs.writeFileSync(filePath, content, { mode: 0o600 });
+          },
+          catch: () => permissionDeniedError(filePath, 'write'),
+        }),
+        Effect.map(() => {
+          // Create cleanup function
+          const cleanup = (): Effect.Effect<void, never> =>
+            Effect.sync(() => {
+              try {
+                if (fs.existsSync(filePath)) {
+                  fs.unlinkSync(filePath);
+                }
+              } catch {
+                // Ignore cleanup errors
+              }
+            });
 
-    // Write file with restrictive permissions (0600 = owner read/write only)
-    yield* Effect.try({
-      try: () => {
-        fs.writeFileSync(filePath, content, { mode: 0o600 });
-      },
-      catch: () => permissionDeniedError(filePath, 'write'),
-    });
-
-    // Create cleanup function
-    const cleanup = (): Effect.Effect<void, never> =>
-      Effect.sync(() => {
-        try {
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        } catch {
-          // Ignore cleanup errors
-        }
-      });
-
-    return { path: filePath, cleanup };
-  });
+          return { path: filePath, cleanup };
+        })
+      )
+    )
+  );
 
 /**
  * Create a temp file containing JSON data
@@ -88,15 +93,21 @@ export const withTempFile = <A, E>(
   content: string,
   fn: (filePath: string) => Effect.Effect<A, E>
 ): Effect.Effect<A, E | SystemError> =>
-  Effect.gen(function* () {
-    const tempFile = yield* createTempFile(content);
-
-    try {
-      return yield* fn(tempFile.path);
-    } finally {
-      yield* tempFile.cleanup();
-    }
-  });
+  pipe(
+    createTempFile(content),
+    Effect.flatMap((tempFile) =>
+      pipe(
+        fn(tempFile.path),
+        Effect.tap(() => tempFile.cleanup()),
+        Effect.catchAll((error) =>
+          pipe(
+            tempFile.cleanup(),
+            Effect.flatMap(() => Effect.fail(error))
+          )
+        )
+      )
+    )
+  );
 
 /**
  * Execute a function with a JSON temp file, ensuring cleanup

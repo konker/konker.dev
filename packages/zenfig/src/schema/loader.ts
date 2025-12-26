@@ -5,6 +5,7 @@
  */
 import { type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -56,49 +57,55 @@ export const loadSchema = (
   schemaPath: string,
   exportName = 'ConfigSchema'
 ): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> =>
-  Effect.gen(function* () {
-    const absolutePath = path.resolve(schemaPath);
+  pipe(
+    Effect.sync(() => path.resolve(schemaPath)),
+    Effect.flatMap((absolutePath) =>
+      pipe(
+        fileExists(absolutePath),
+        Effect.flatMap((exists) => {
+          if (!exists) {
+            return Effect.fail(fileNotFoundError(absolutePath));
+          }
 
-    // Check file exists
-    const exists = yield* fileExists(absolutePath);
-    if (!exists) {
-      return yield* Effect.fail(fileNotFoundError(absolutePath));
-    }
+          // Import the module
+          // Using dynamic import with file URL for cross-platform compatibility
+          const fileUrl = pathToFileURL(absolutePath).href;
 
-    // Import the module
-    // Using dynamic import with file URL for cross-platform compatibility
-    const fileUrl = pathToFileURL(absolutePath).href;
+          return pipe(
+            Effect.tryPromise({
+              try: () => import(fileUrl),
+              catch: () => fileNotFoundError(absolutePath),
+            }),
+            Effect.flatMap((module: Record<string, unknown>) => {
+              // Extract the schema export
+              const schema = module[exportName];
+              if (!schema) {
+                // Find available exports for error message
+                const availableExports = Object.keys(module).filter((k) => k !== 'default' && k !== '__esModule');
+                return Effect.fail(
+                  fileNotFoundError(
+                    `Export '${exportName}' not found in ${absolutePath}. Available exports: ${availableExports.join(', ')}`
+                  )
+                );
+              }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const module: Record<string, unknown> = yield* Effect.tryPromise({
-      try: () => import(fileUrl),
-      catch: () => fileNotFoundError(absolutePath),
-    });
+              // Validate it's a TypeBox schema (has Kind property)
+              if (typeof schema !== 'object' || schema === null || !('type' in schema)) {
+                return Effect.fail(
+                  fileNotFoundError(`Export '${exportName}' is not a valid TypeBox schema`)
+                );
+              }
 
-    // Extract the schema export
-    const schema = module[exportName];
-    if (!schema) {
-      // Find available exports for error message
-      const availableExports = Object.keys(module).filter((k) => k !== 'default' && k !== '__esModule');
-      return yield* Effect.fail(
-        fileNotFoundError(
-          `Export '${exportName}' not found in ${absolutePath}. Available exports: ${availableExports.join(', ')}`
-        )
-      );
-    }
+              const typedSchema = schema as unknown as TSchema;
+              const schemaHash = computeSchemaHash(typedSchema);
 
-    // Validate it's a TypeBox schema (has Kind property)
-    if (typeof schema !== 'object' || schema === null || !('type' in schema)) {
-      return yield* Effect.fail(
-        fileNotFoundError(`Export '${exportName}' is not a valid TypeBox schema`)
-      );
-    }
-
-    const typedSchema = schema as unknown as TSchema;
-    const schemaHash = computeSchemaHash(typedSchema);
-
-    return { schema: typedSchema, schemaHash };
-  });
+              return Effect.succeed({ schema: typedSchema, schemaHash });
+            })
+          );
+        })
+      )
+    )
+  );
 
 /**
  * Load schema with fallback to default path

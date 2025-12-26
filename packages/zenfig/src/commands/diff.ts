@@ -6,6 +6,7 @@
 import chalk from 'chalk';
 import Table from 'cli-table3';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import {
@@ -62,61 +63,83 @@ export const executeDiff = (
   DiffResult,
   ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error
 > =>
-  Effect.gen(function* () {
-    const { service, sources = [], config } = options;
-
+  pipe(
     // 1. Load schema
-    const { schema } = yield* loadSchemaWithDefaults(config.schema, config.schemaExportName);
+    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+    Effect.flatMap(({ schema }) =>
+      // 2. Get provider
+      pipe(
+        getProvider(options.config.provider),
+        Effect.map((provider) => ({ schema, provider }))
+      )
+    ),
+    Effect.flatMap(({ schema, provider }) => {
+      const { service, sources = [], config } = options;
+      const allServices = [service, ...sources];
 
-    // 2. Get provider
-    const provider = yield* getProvider(config.provider);
+      // 3. Fetch stored values (flattened for comparison)
+      return pipe(
+        Effect.forEach(allServices, (svc) => {
+          const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+          return pipe(
+            provider.fetch(ctx),
+            Effect.flatMap((kv) => parseProviderKV(kv, schema)),
+            Effect.map((parsed) => [svc, parsed] as const)
+          );
+        }),
+        Effect.flatMap((storedByService) =>
+          pipe(
+            mergeConfigs(storedByService, {}),
+            Effect.map((mergedStored) => ({
+              mergedStored,
+              config,
+            }))
+          )
+        )
+      );
+    }),
+    Effect.flatMap(({ mergedStored, config }) => {
+      const flatStored = flatten(mergedStored.merged);
 
-    // 3. Fetch stored values (flattened for comparison)
-    const allServices = [service, ...sources];
-    const storedByService: Array<readonly [string, Record<string, unknown>]> = [];
+      // 4. Render config through Jsonnet
+      return pipe(
+        evaluateTemplate(
+          mergedStored.merged,
+          config.env,
+          config.jsonnet,
+          config.jsonnetTimeoutMs
+        ),
+        Effect.map((rendered) => ({
+          flatStored,
+          flatRendered: flatten(rendered),
+        }))
+      );
+    }),
+    Effect.map(({ flatStored, flatRendered }) => {
+      // 5. Compare
+      const allKeys = new Set([...Object.keys(flatStored), ...Object.keys(flatRendered)]);
+      const entries: Array<DiffEntry> = [];
 
-    for (const svc of allServices) {
-      const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-      const kv = yield* provider.fetch(ctx);
-      const parsed = yield* parseProviderKV(kv, schema);
-      storedByService.push([svc, parsed] as const);
-    }
+      for (const key of Array.from(allKeys).sort()) {
+        const stored = flatStored[key];
+        const renderedVal = flatRendered[key];
 
-    const mergedStored = yield* mergeConfigs(storedByService, {});
-    const flatStored = flatten(mergedStored.merged);
-
-    // 4. Render config through Jsonnet
-    const rendered = yield* evaluateTemplate(
-      mergedStored.merged,
-      config.env,
-      config.jsonnet,
-      config.jsonnetTimeoutMs
-    );
-    const flatRendered = flatten(rendered);
-
-    // 5. Compare
-    const allKeys = new Set([...Object.keys(flatStored), ...Object.keys(flatRendered)]);
-    const entries: Array<DiffEntry> = [];
-
-    for (const key of Array.from(allKeys).sort()) {
-      const stored = flatStored[key];
-      const renderedVal = flatRendered[key];
-
-      if (stored === undefined && renderedVal !== undefined) {
-        entries.push({ key, stored: undefined, rendered: renderedVal, status: 'added' });
-      } else if (stored !== undefined && renderedVal === undefined) {
-        entries.push({ key, stored, rendered: undefined, status: 'removed' });
-      } else if (JSON.stringify(stored) !== JSON.stringify(renderedVal)) {
-        entries.push({ key, stored, rendered: renderedVal, status: 'modified' });
-      } else {
-        entries.push({ key, stored, rendered: renderedVal, status: 'unchanged' });
+        if (stored === undefined && renderedVal !== undefined) {
+          entries.push({ key, stored: undefined, rendered: renderedVal, status: 'added' });
+        } else if (stored !== undefined && renderedVal === undefined) {
+          entries.push({ key, stored, rendered: undefined, status: 'removed' });
+        } else if (JSON.stringify(stored) !== JSON.stringify(renderedVal)) {
+          entries.push({ key, stored, rendered: renderedVal, status: 'modified' });
+        } else {
+          entries.push({ key, stored, rendered: renderedVal, status: 'unchanged' });
+        }
       }
-    }
 
-    const hasChanges = entries.some((e) => e.status !== 'unchanged');
+      const hasChanges = entries.some((e) => e.status !== 'unchanged');
 
-    return { entries, hasChanges };
-  });
+      return { entries, hasChanges };
+    })
+  );
 
 /**
  * Format diff result as table
@@ -185,18 +208,19 @@ export const runDiff = (
   boolean,
   ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error
 > =>
-  Effect.gen(function* () {
-    const result = yield* executeDiff(options);
+  pipe(
+    executeDiff(options),
+    Effect.map((result) => {
+      const showValues = options.unsafeShowValues || (options.showValues && process.stdout.isTTY);
+      const format = options.format ?? 'table';
 
-    const showValues = options.unsafeShowValues || (options.showValues && process.stdout.isTTY);
-    const format = options.format ?? 'table';
+      if (format === 'json') {
+        console.log(formatDiffJson(result.entries, showValues ?? false));
+      } else {
+        console.log(formatDiffTable(result.entries, showValues ?? false));
+      }
 
-    if (format === 'json') {
-      console.log(formatDiffJson(result.entries, showValues ?? false));
-    } else {
-      console.log(formatDiffTable(result.entries, showValues ?? false));
-    }
-
-    // Return true if there are differences (for exit code)
-    return result.hasChanges;
-  });
+      // Return true if there are differences (for exit code)
+      return result.hasChanges;
+    })
+  );

@@ -4,6 +4,7 @@
  * Default provider implementation using Chamber (AWS SSM Parameter Store)
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import { execa, type ExecaError } from 'execa';
 
 import {
@@ -96,72 +97,67 @@ const buildServicePath = (ctx: ProviderContext): string => {
  * Fetch all parameters for a service using chamber export
  */
 const fetch = (ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> =>
-  Effect.gen(function* () {
-    const servicePath = buildServicePath(ctx);
-
-    const result = yield* Effect.tryPromise({
+  pipe(
+    Effect.tryPromise({
       try: async () => {
+        const servicePath = buildServicePath(ctx);
         const { stdout } = await execa('chamber', ['export', servicePath, '--format', 'json']);
         return stdout;
       },
       catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx),
-    });
+    }),
+    Effect.flatMap((result) =>
+      // Parse the JSON output
+      Effect.try({
+        try: () => JSON.parse(result) as ChamberExportOutput,
+        catch: () => connectionFailedError('chamber', 'Invalid JSON output from chamber export'),
+      })
+    ),
+    Effect.map((parsed) => {
+      // Convert keys from SCREAMING_SNAKE_CASE to dot notation
+      // Chamber exports as uppercase env-style keys
+      // We need to convert back to canonical dot paths
+      // Note: This is a simplification - full implementation would need schema lookup
+      const kv: ProviderKV = {};
 
-    // Parse the JSON output
-    const parsed = yield* Effect.try({
-      try: () => JSON.parse(result) as ChamberExportOutput,
-      catch: () => connectionFailedError('chamber', 'Invalid JSON output from chamber export'),
-    });
+      for (const [key, value] of Object.entries(parsed)) {
+        // Chamber uses slash paths internally, convert to dots
+        // The key from export is usually the full path after service/env
+        const dotPath = slashToDotPath(key);
+        kv[dotPath] = value;
+      }
 
-    // Convert keys from SCREAMING_SNAKE_CASE to dot notation
-    // Chamber exports as uppercase env-style keys
-    // We need to convert back to canonical dot paths
-    // Note: This is a simplification - full implementation would need schema lookup
-    const kv: ProviderKV = {};
-
-    for (const [key, value] of Object.entries(parsed)) {
-      // Chamber uses slash paths internally, convert to dots
-      // The key from export is usually the full path after service/env
-      const dotPath = slashToDotPath(key);
-      kv[dotPath] = value;
-    }
-
-    return kv;
-  });
+      return kv;
+    })
+  );
 
 /**
  * Write a single parameter using chamber write
  */
 const upsert = (ctx: ProviderContext, keyPath: string, value: string): Effect.Effect<void, ProviderError> =>
-  Effect.gen(function* () {
-    const servicePath = buildServicePath(ctx);
-    const slashPath = dotToSlashPath(keyPath);
-
-    yield* Effect.tryPromise({
-      try: async () => {
-        // Chamber write: chamber write <service> <key> <value>
-        // The key should be the path after the service
-        await execa('chamber', ['write', servicePath, slashPath, value]);
-      },
-      catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx, keyPath),
-    });
+  Effect.tryPromise({
+    try: async () => {
+      const servicePath = buildServicePath(ctx);
+      const slashPath = dotToSlashPath(keyPath);
+      // Chamber write: chamber write <service> <key> <value>
+      // The key should be the path after the service
+      await execa('chamber', ['write', servicePath, slashPath, value]);
+    },
+    catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx, keyPath),
   });
 
 /**
  * Delete a single parameter using chamber delete
  */
 const deleteKey = (ctx: ProviderContext, keyPath: string): Effect.Effect<void, ProviderError> =>
-  Effect.gen(function* () {
-    const servicePath = buildServicePath(ctx);
-    const slashPath = dotToSlashPath(keyPath);
-
-    yield* Effect.tryPromise({
-      try: async () => {
-        // Chamber delete: chamber delete <service> <key>
-        await execa('chamber', ['delete', servicePath, slashPath]);
-      },
-      catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx, keyPath),
-    });
+  Effect.tryPromise({
+    try: async () => {
+      const servicePath = buildServicePath(ctx);
+      const slashPath = dotToSlashPath(keyPath);
+      // Chamber delete: chamber delete <service> <key>
+      await execa('chamber', ['delete', servicePath, slashPath]);
+    },
+    catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx, keyPath),
   });
 
 /**

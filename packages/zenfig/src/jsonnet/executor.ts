@@ -4,6 +4,7 @@
  * Executes Jsonnet templates with secrets passed via temp files
  */
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import { execa, type ExecaError } from 'execa';
 import * as fs from 'node:fs';
 
@@ -42,15 +43,12 @@ export type JsonnetOptions = {
  * Check if jsonnet binary is available
  */
 export const checkJsonnetBinary = (): Effect.Effect<boolean, SystemError> =>
-  Effect.gen(function* () {
-    const result = yield* Effect.tryPromise({
-      try: async () => {
-        await execa('which', ['jsonnet']);
-        return true;
-      },
-      catch: () => binaryNotFoundError('jsonnet'),
-    });
-    return result;
+  Effect.tryPromise({
+    try: async () => {
+      await execa('which', ['jsonnet']);
+      return true;
+    },
+    catch: () => binaryNotFoundError('jsonnet'),
   });
 
 // --------------------------------------------------------------------------
@@ -134,83 +132,102 @@ export const executeJsonnet = (
   input: JsonnetInput,
   options: JsonnetOptions
 ): Effect.Effect<Record<string, unknown>, JsonnetError | SystemError> =>
-  Effect.gen(function* () {
-    const { templatePath, timeoutMs = 30000 } = options;
+  pipe(
+    Effect.sync(() => {
+      const { templatePath } = options;
 
-    // Check template file exists
-    if (!fs.existsSync(templatePath)) {
-      return yield* Effect.fail(fileNotFoundError(templatePath));
-    }
+      // Check template file exists
+      if (!fs.existsSync(templatePath)) {
+        return { exists: false as const, templatePath };
+      }
 
-    // Execute with temp file for secrets
-    return yield* withJsonTempFile(input.secrets, (secretsPath) =>
-      Effect.gen(function* () {
-        // Build arguments
-        // Use --ext-code-file to pass secrets via temp file (safer than CLI args)
-        const args = [
-          '--ext-code-file',
-          `secrets=${secretsPath}`,
-          '--ext-str',
-          `env=${input.env}`,
-          templatePath,
-        ];
+      return { exists: true as const, templatePath };
+    }),
+    Effect.flatMap(({ exists, templatePath }) => {
+      if (!exists) {
+        return Effect.fail(fileNotFoundError(templatePath));
+      }
 
-        // Add defaults if provided
-        if (input.defaults) {
-          // For defaults, we could add another temp file, but for simplicity
-          // we'll pass as ext-code (small objects are OK)
-          args.unshift('--ext-code', `defaults=${JSON.stringify(input.defaults)}`);
-        }
+      const { timeoutMs = 30000 } = options;
 
-        // Execute jsonnet
-        const result = yield* Effect.tryPromise({
-          try: async () => {
-            const { stdout, stderr } = await execa('jsonnet', args, {
-              timeout: timeoutMs,
-              reject: true,
-            });
+      // Execute with temp file for secrets
+      return withJsonTempFile(input.secrets, (secretsPath) =>
+        pipe(
+          Effect.sync(() => {
+            // Build arguments
+            // Use --ext-code-file to pass secrets via temp file (safer than CLI args)
+            const args = [
+              '--ext-code-file',
+              `secrets=${secretsPath}`,
+              '--ext-str',
+              `env=${input.env}`,
+              templatePath,
+            ];
 
-            if (stderr && stderr.trim()) {
-              // Jsonnet may write warnings to stderr
-              console.error(`[zenfig] jsonnet warning: ${stderr}`);
+            // Add defaults if provided
+            if (input.defaults) {
+              // For defaults, we could add another temp file, but for simplicity
+              // we'll pass as ext-code (small objects are OK)
+              args.unshift('--ext-code', `defaults=${JSON.stringify(input.defaults)}`);
             }
 
-            return stdout;
-          },
-          catch: (error: unknown) => {
-            const execaError = error as ExecaError;
+            return args;
+          }),
+          Effect.flatMap((args) =>
+            Effect.tryPromise({
+              try: async () => {
+                const { stdout, stderr } = await execa('jsonnet', args, {
+                  timeout: timeoutMs,
+                  reject: true,
+                });
 
-            // Check for timeout
-            if (execaError.timedOut) {
-              return jsonnetRuntimeError(templatePath, `Execution timed out after ${timeoutMs}ms`);
-            }
+                if (stderr && stderr.trim()) {
+                  // Jsonnet may write warnings to stderr
+                  console.error(`[zenfig] jsonnet warning: ${stderr}`);
+                }
 
-            // Check for binary not found
-            if (execaError.code === 'ENOENT') {
-              return binaryNotFoundError('jsonnet');
-            }
+                return stdout;
+              },
+              catch: (error: unknown) => {
+                const execaError = error as ExecaError;
 
-            // Parse error from stderr
-            const stderrStr = String(execaError.stderr ?? execaError.message ?? 'Unknown error');
-            return classifyJsonnetError(stderrStr);
-          },
-        });
+                // Check for timeout
+                if (execaError.timedOut) {
+                  return jsonnetRuntimeError(templatePath, `Execution timed out after ${timeoutMs}ms`);
+                }
 
-        // Parse output as JSON
-        const parsed = yield* Effect.try({
-          try: () => JSON.parse(result) as unknown,
-          catch: () => jsonnetInvalidOutputError(`Invalid JSON: ${result.slice(0, 100)}`),
-        });
+                // Check for binary not found
+                if (execaError.code === 'ENOENT') {
+                  return binaryNotFoundError('jsonnet');
+                }
 
-        // Validate it's an object
-        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-          return yield* Effect.fail(jsonnetInvalidOutputError(typeof parsed));
-        }
+                // Parse error from stderr
+                const stderrStr = String(execaError.stderr ?? execaError.message ?? 'Unknown error');
+                return classifyJsonnetError(stderrStr);
+              },
+            })
+          ),
+          Effect.flatMap((result) =>
+            // Parse output as JSON
+            pipe(
+              Effect.try({
+                try: () => JSON.parse(result) as unknown,
+                catch: () => jsonnetInvalidOutputError(`Invalid JSON: ${result.slice(0, 100)}`),
+              }),
+              Effect.flatMap((parsed) => {
+                // Validate it's an object
+                if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+                  return Effect.fail(jsonnetInvalidOutputError(typeof parsed));
+                }
 
-        return parsed as Record<string, unknown>;
-      })
-    );
-  });
+                return Effect.succeed(parsed as Record<string, unknown>);
+              })
+            )
+          )
+        )
+      );
+    })
+  );
 
 /**
  * Evaluate a Jsonnet template and return the result

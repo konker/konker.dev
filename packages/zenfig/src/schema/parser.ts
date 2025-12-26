@@ -6,6 +6,7 @@
  */
 import { Kind, type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { invalidTypeError, type ValidationError } from '../errors.js';
 import { getTypeDescription, isOptionalSchema, unwrapOptional } from './resolver.js';
@@ -106,88 +107,92 @@ export const parseValue = (
   schema: TSchema,
   path: string,
   mode: ParseMode = 'auto'
-): Effect.Effect<ParsedValue, ValidationError> =>
-  Effect.gen(function* () {
-    // Handle mode overrides
-    if (mode !== 'auto') {
-      switch (mode) {
-        case 'string':
-          return value;
-        case 'int':
-          return yield* parseInteger(value, path);
-        case 'float':
-          return yield* parseNumber(value, path);
-        case 'bool':
-          return yield* parseBoolean(value, path);
-        case 'json':
-          return yield* parseJson(value, path, 'JSON');
+): Effect.Effect<ParsedValue, ValidationError> => {
+  // Handle mode overrides
+  if (mode !== 'auto') {
+    switch (mode) {
+      case 'string':
+        return Effect.succeed(value);
+      case 'int':
+        return parseInteger(value, path);
+      case 'float':
+        return parseNumber(value, path);
+      case 'bool':
+        return parseBoolean(value, path);
+      case 'json':
+        return parseJson(value, path, 'JSON');
+    }
+  }
+
+  // Unwrap optional
+  const unwrapped = unwrapOptional(schema);
+  const kind = unwrapped[Kind];
+
+  switch (kind) {
+    case 'String':
+      // Keep as string (no JSON parsing)
+      return Effect.succeed(value);
+
+    case 'Boolean':
+      return parseBoolean(value, path);
+
+    case 'Integer':
+      return parseInteger(value, path);
+
+    case 'Number':
+      return parseNumber(value, path);
+
+    case 'Array':
+      return parseJson(value, path, getTypeDescription(unwrapped));
+
+    case 'Object':
+      return parseJson(value, path, getTypeDescription(unwrapped));
+
+    case 'Literal': {
+      // For literals, parse based on the literal type
+      const literalValue = (unwrapped as TSchema & { const: unknown }).const;
+      if (typeof literalValue === 'string') {
+        return Effect.succeed(value);
       }
+      if (typeof literalValue === 'number') {
+        return parseNumber(value, path);
+      }
+      if (typeof literalValue === 'boolean') {
+        return parseBoolean(value, path);
+      }
+      return Effect.succeed(value);
     }
 
-    // Unwrap optional
-    const unwrapped = unwrapOptional(schema);
-    const kind = unwrapped[Kind];
-
-    switch (kind) {
-      case 'String':
-        // Keep as string (no JSON parsing)
-        return value;
-
-      case 'Boolean':
-        return yield* parseBoolean(value, path);
-
-      case 'Integer':
-        return yield* parseInteger(value, path);
-
-      case 'Number':
-        return yield* parseNumber(value, path);
-
-      case 'Array':
-        return yield* parseJson(value, path, getTypeDescription(unwrapped));
-
-      case 'Object':
-        return yield* parseJson(value, path, getTypeDescription(unwrapped));
-
-      case 'Literal': {
-        // For literals, parse based on the literal type
-        const literalValue = (unwrapped as TSchema & { const: unknown }).const;
-        if (typeof literalValue === 'string') {
-          return value;
-        }
-        if (typeof literalValue === 'number') {
-          return yield* parseNumber(value, path);
-        }
-        if (typeof literalValue === 'boolean') {
-          return yield* parseBoolean(value, path);
-        }
-        return value;
-      }
-
-      case 'Union': {
-        // Try each branch in order, use first that validates
-        const anyOf = (unwrapped as TSchema & { anyOf: Array<TSchema> }).anyOf;
-        for (const branch of anyOf) {
-          const result = yield* Effect.either(parseValue(value, branch, path, 'auto'));
-          if (result._tag === 'Right') {
-            return result.right;
+    case 'Union': {
+      // Try each branch in order, use first that validates
+      const anyOf = (unwrapped as TSchema & { anyOf: Array<TSchema> }).anyOf;
+      return pipe(
+        Effect.reduce(anyOf, null as ParsedValue | null, (acc, branch) => {
+          if (acc !== null) {
+            return Effect.succeed(acc);
           }
-        }
-        // None matched, return the string and let validation catch it
-        return value;
-      }
-
-      case 'Null':
-        // Null type - should only match the string "null"
-        if (value.toLowerCase() === 'null') {
-          return null;
-        }
-        return yield* Effect.fail(invalidTypeError(path, 'null', `"${value}"`));
-
-      default:
-        // Unknown type, keep as string
-        return value;
+          return pipe(
+            parseValue(value, branch, path, 'auto'),
+            Effect.map((parsed) => parsed as ParsedValue | null),
+            Effect.catchAll(() => Effect.succeed(null))
+          );
+        }),
+        Effect.map((result) => (result !== null ? result : value))
+      );
     }
-  });
+
+    case 'Null':
+      // Null type - should only match the string "null"
+      if (value.toLowerCase() === 'null') {
+        return Effect.succeed(null);
+      }
+      return Effect.fail(invalidTypeError(path, 'null', `"${value}"`));
+
+    default:
+      // Unknown type, keep as string
+      return Effect.succeed(value);
+  }
+};
 
 /**
  * Serialize a typed value back to a provider string
@@ -233,46 +238,63 @@ export const parseProviderKV = (
   kv: Record<string, string>,
   schema: TSchema
 ): Effect.Effect<Record<string, unknown>, ValidationError> =>
-  Effect.gen(function* () {
-    const result: Record<string, unknown> = {};
+  pipe(
+    Effect.forEach(Object.entries(kv), ([path, value]) =>
+      pipe(
+        Effect.sync(() => {
+          // Split path and navigate schema
+          const segments = path.split('.');
+          let currentSchema = schema;
 
-    for (const [path, value] of Object.entries(kv)) {
-      // Split path and build nested structure
-      const segments = path.split('.');
-      let current: Record<string, unknown> = result;
-      let currentSchema = schema;
+          for (let i = 0; i < segments.length; i++) {
+            const segment = segments[i]!;
 
-      for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i]!;
-        const isLast = i === segments.length - 1;
+            // Navigate schema
+            if (currentSchema[Kind] === 'Object' && 'properties' in currentSchema) {
+              const props = (currentSchema as TSchema & { properties: Record<string, TSchema> }).properties;
+              const propSchema = props[segment];
+              if (propSchema) {
+                currentSchema = propSchema;
+              }
+            }
 
-        // Navigate schema
-        if (currentSchema[Kind] === 'Object' && 'properties' in currentSchema) {
-          const props = (currentSchema as TSchema & { properties: Record<string, TSchema> }).properties;
-          const propSchema = props[segment];
-          if (propSchema) {
-            currentSchema = propSchema;
+            // Unwrap optional for navigation if not last
+            if (i < segments.length - 1 && isOptionalSchema(currentSchema)) {
+              currentSchema = unwrapOptional(currentSchema);
+            }
           }
-        }
 
-        if (isLast) {
-          // Parse and set the value
-          const parsed = yield* parseValue(value, currentSchema, path);
-          current[segment] = parsed;
-        } else {
-          // Create intermediate object if needed
-          if (!(segment in current) || typeof current[segment] !== 'object') {
-            current[segment] = {};
-          }
-          current = current[segment] as Record<string, unknown>;
+          return { path, segments, currentSchema };
+        }),
+        Effect.flatMap(({ path: keyPath, segments, currentSchema }) =>
+          pipe(
+            parseValue(value, currentSchema, keyPath),
+            Effect.map((parsed) => ({ segments, parsed }))
+          )
+        )
+      )
+    ),
+    Effect.map((results) => {
+      const result: Record<string, unknown> = {};
 
-          // Unwrap optional for navigation
-          if (isOptionalSchema(currentSchema)) {
-            currentSchema = unwrapOptional(currentSchema);
+      for (const { segments, parsed } of results) {
+        let current: Record<string, unknown> = result;
+
+        for (let i = 0; i < segments.length; i++) {
+          const segment = segments[i]!;
+          const isLast = i === segments.length - 1;
+
+          if (isLast) {
+            current[segment] = parsed;
+          } else {
+            if (!(segment in current) || typeof current[segment] !== 'object') {
+              current[segment] = {};
+            }
+            current = current[segment] as Record<string, unknown>;
           }
         }
       }
-    }
 
-    return result;
-  });
+      return result;
+    })
+  );

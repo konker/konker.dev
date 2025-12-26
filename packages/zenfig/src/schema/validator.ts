@@ -8,6 +8,7 @@ import type { ErrorObject, ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import { Kind, type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import {
   constraintViolationError,
@@ -189,59 +190,6 @@ const getFormatExample = (format: string): string | undefined => {
 // --------------------------------------------------------------------------
 
 /**
- * Validate a value against a TypeBox schema
- *
- * @param value - The value to validate
- * @param schema - The TypeBox schema
- * @returns Effect with validated value or ValidationError
- */
-export const validate = <T>(value: unknown, schema: TSchema): Effect.Effect<T, ValidationError> =>
-  Effect.gen(function* () {
-    const ajv = getAjv();
-
-    // Check for null if not explicitly allowed
-    if (value === null) {
-      // Check if null is allowed in the schema
-      const kind = schema[Kind];
-      if (kind !== 'Null' && kind !== 'Union') {
-        return yield* Effect.fail(nullNotAllowedError('(root)', getTypeDescription(schema)));
-      }
-    }
-
-    const validateFn = ajv.compile(schema);
-    const isValid = validateFn(value);
-
-    if (!isValid && validateFn.errors) {
-      // Get the most relevant error
-      const error = validateFn.errors[0];
-      if (error) {
-        // Get the value at the error path
-        const errorValue = getValueAtPath(value, error.instancePath);
-        return yield* Effect.fail(ajvErrorToValidationError(error, schema, errorValue));
-      }
-    }
-
-    return value as T;
-  });
-
-/**
- * Validate a value at a specific path against the resolved schema node
- *
- * @param value - The value to validate
- * @param schema - The root TypeBox schema
- * @param path - The dot-notation path
- */
-export const validateAtPath = (
-  value: unknown,
-  schema: TSchema,
-  path: string
-): Effect.Effect<unknown, ValidationError> =>
-  Effect.gen(function* () {
-    const resolved = yield* resolvePath(schema, path);
-    return yield* validate(value, resolved.schema);
-  });
-
-/**
  * Get value at a JSON path
  */
 const getValueAtPath = (value: unknown, jsonPath: string): unknown => {
@@ -265,6 +213,65 @@ const getValueAtPath = (value: unknown, jsonPath: string): unknown => {
 
   return current;
 };
+
+/**
+ * Validate a value against a TypeBox schema
+ *
+ * @param value - The value to validate
+ * @param schema - The TypeBox schema
+ * @returns Effect with validated value or ValidationError
+ */
+export const validate = <T>(value: unknown, schema: TSchema): Effect.Effect<T, ValidationError> =>
+  pipe(
+    Effect.sync(() => {
+      const ajv = getAjv();
+
+      // Check for null if not explicitly allowed
+      if (value === null) {
+        const kind = schema[Kind];
+        if (kind !== 'Null' && kind !== 'Union') {
+          return { nullError: true as const, schema };
+        }
+      }
+
+      const validateFn = ajv.compile(schema);
+      const isValid = validateFn(value);
+
+      return { nullError: false as const, isValid, validateFn, value };
+    }),
+    Effect.flatMap((result) => {
+      if (result.nullError) {
+        return Effect.fail(nullNotAllowedError('(root)', getTypeDescription(result.schema)));
+      }
+
+      if (!result.isValid && result.validateFn.errors) {
+        const error = result.validateFn.errors[0];
+        if (error) {
+          const errorValue = getValueAtPath(result.value, error.instancePath);
+          return Effect.fail(ajvErrorToValidationError(error, schema, errorValue));
+        }
+      }
+
+      return Effect.succeed(result.value as T);
+    })
+  );
+
+/**
+ * Validate a value at a specific path against the resolved schema node
+ *
+ * @param value - The value to validate
+ * @param schema - The root TypeBox schema
+ * @param path - The dot-notation path
+ */
+export const validateAtPath = (
+  value: unknown,
+  schema: TSchema,
+  path: string
+): Effect.Effect<unknown, ValidationError> =>
+  pipe(
+    resolvePath(schema, path),
+    Effect.flatMap((resolved) => validate(value, resolved.schema))
+  );
 
 /**
  * Validate an entire configuration object

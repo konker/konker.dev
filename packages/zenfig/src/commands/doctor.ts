@@ -5,6 +5,7 @@
  */
 import chalk from 'chalk';
 import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 import { execa } from 'execa';
 import * as fs from 'node:fs';
 
@@ -86,125 +87,53 @@ const checkFile = (path: string, description: string): Effect.Effect<CheckResult
  * Check if schema can be loaded
  */
 const checkSchema = (schemaPath: string, exportName: string): Effect.Effect<CheckResult, never> =>
-  Effect.gen(function* () {
-    const result = yield* Effect.either(loadSchemaWithDefaults(schemaPath, exportName));
+  pipe(
+    Effect.either(loadSchemaWithDefaults(schemaPath, exportName)),
+    Effect.map((result) => {
+      if (result._tag === 'Left') {
+        const errorDetails = 'context' in result.left ? result.left.context.problem : 'Unknown error';
+        return {
+          name: 'Schema loading',
+          status: 'error' as const,
+          message: `Failed to load schema from ${schemaPath}`,
+          details: errorDetails,
+        };
+      }
 
-    if (result._tag === 'Left') {
-      const errorDetails = 'context' in result.left ? result.left.context.problem : 'Unknown error';
       return {
         name: 'Schema loading',
-        status: 'error' as const,
-        message: `Failed to load schema from ${schemaPath}`,
-        details: errorDetails,
+        status: 'ok' as const,
+        message: `Successfully loaded '${exportName}' from ${schemaPath}`,
+        details: `Schema hash: ${result.right.schemaHash.slice(0, 16)}...`,
       };
-    }
-
-    return {
-      name: 'Schema loading',
-      status: 'ok' as const,
-      message: `Successfully loaded '${exportName}' from ${schemaPath}`,
-      details: `Schema hash: ${result.right.schemaHash.slice(0, 16)}...`,
-    };
-  });
+    })
+  );
 
 /**
  * Check provider connectivity (optional)
  */
 const checkProvider = (providerName: string): Effect.Effect<CheckResult, never> =>
-  Effect.gen(function* () {
-    const result = yield* Effect.either(getProvider(providerName));
+  pipe(
+    Effect.either(getProvider(providerName)),
+    Effect.map((result) => {
+      if (result._tag === 'Left') {
+        const errorDetails = 'context' in result.left ? result.left.context.problem : 'Unknown error';
+        return {
+          name: `Provider: ${providerName}`,
+          status: 'error' as const,
+          message: 'Provider not registered',
+          details: errorDetails,
+        };
+      }
 
-    if (result._tag === 'Left') {
-      const errorDetails = 'context' in result.left ? result.left.context.problem : 'Unknown error';
       return {
         name: `Provider: ${providerName}`,
-        status: 'error' as const,
-        message: 'Provider not registered',
-        details: errorDetails,
+        status: 'ok' as const,
+        message: 'Provider registered',
+        details: `Capabilities: ${JSON.stringify(result.right.capabilities)}`,
       };
-    }
-
-    return {
-      name: `Provider: ${providerName}`,
-      status: 'ok' as const,
-      message: 'Provider registered',
-      details: `Capabilities: ${JSON.stringify(result.right.capabilities)}`,
-    };
-  });
-
-// --------------------------------------------------------------------------
-// Doctor Command
-// --------------------------------------------------------------------------
-
-/**
- * Execute the doctor workflow
- */
-export const executeDoctor = (
-  options: DoctorOptions
-): Effect.Effect<DoctorResult, never> =>
-  Effect.gen(function* () {
-    const { config } = options;
-    const checks: Array<CheckResult> = [];
-
-    console.log(chalk.bold('\nZenfig Doctor\n'));
-    console.log('Checking prerequisites...\n');
-
-    // 1. Check jsonnet binary
-    const jsonnetCheck = yield* checkBinary('jsonnet');
-    checks.push(jsonnetCheck);
-    printCheck(jsonnetCheck);
-
-    // 2. Check chamber binary (if using chamber provider)
-    if (config.provider === 'chamber') {
-      const chamberCheck = yield* checkBinary('chamber');
-      checks.push(chamberCheck);
-      printCheck(chamberCheck);
-    }
-
-    // 3. Check schema file
-    const schemaFileCheck = yield* checkFile(config.schema, 'Schema file');
-    checks.push(schemaFileCheck);
-    printCheck(schemaFileCheck);
-
-    // 4. Check Jsonnet template file
-    const jsonnetFileCheck = yield* checkFile(config.jsonnet, 'Jsonnet template');
-    checks.push(jsonnetFileCheck);
-    printCheck(jsonnetFileCheck);
-
-    // 5. Check schema loading
-    if (schemaFileCheck.status === 'ok') {
-      const schemaLoadCheck = yield* checkSchema(config.schema, config.schemaExportName);
-      checks.push(schemaLoadCheck);
-      printCheck(schemaLoadCheck);
-    }
-
-    // 6. Check provider registration
-    const providerCheck = yield* checkProvider(config.provider);
-    checks.push(providerCheck);
-    printCheck(providerCheck);
-
-    // Summary
-    console.log('');
-    const errors = checks.filter((c) => c.status === 'error');
-    const warnings = checks.filter((c) => c.status === 'warn');
-    const passed = checks.filter((c) => c.status === 'ok');
-
-    if (errors.length === 0) {
-      console.log(chalk.green(`All ${passed.length} checks passed!`));
-      if (warnings.length > 0) {
-        console.log(chalk.yellow(`${warnings.length} warning(s)`));
-      }
-    } else {
-      console.log(chalk.red(`${errors.length} check(s) failed`));
-      console.log(chalk.yellow(`${warnings.length} warning(s)`));
-      console.log(chalk.green(`${passed.length} check(s) passed`));
-    }
-
-    return {
-      checks,
-      allPassed: errors.length === 0,
-    };
-  });
+    })
+  );
 
 /**
  * Print a check result
@@ -220,13 +149,126 @@ const printCheck = (check: CheckResult): void => {
   console.log('');
 };
 
+// --------------------------------------------------------------------------
+// Doctor Command
+// --------------------------------------------------------------------------
+
+/**
+ * Execute the doctor workflow
+ */
+export const executeDoctor = (
+  options: DoctorOptions
+): Effect.Effect<DoctorResult, never> =>
+  pipe(
+    Effect.sync(() => {
+      console.log(chalk.bold('\nZenfig Doctor\n'));
+      console.log('Checking prerequisites...\n');
+      return { config: options.config, checks: [] as Array<CheckResult> };
+    }),
+    Effect.flatMap(({ config, checks }) =>
+      // 1. Check jsonnet binary
+      pipe(
+        checkBinary('jsonnet'),
+        Effect.map((jsonnetCheck) => {
+          checks.push(jsonnetCheck);
+          printCheck(jsonnetCheck);
+          return { config, checks };
+        })
+      )
+    ),
+    Effect.flatMap(({ config, checks }) => {
+      // 2. Check chamber binary (if using chamber provider)
+      if (config.provider === 'chamber') {
+        return pipe(
+          checkBinary('chamber'),
+          Effect.map((chamberCheck) => {
+            checks.push(chamberCheck);
+            printCheck(chamberCheck);
+            return { config, checks };
+          })
+        );
+      }
+      return Effect.succeed({ config, checks });
+    }),
+    Effect.flatMap(({ config, checks }) =>
+      // 3. Check schema file
+      pipe(
+        checkFile(config.schema, 'Schema file'),
+        Effect.map((schemaFileCheck) => {
+          checks.push(schemaFileCheck);
+          printCheck(schemaFileCheck);
+          return { config, checks, schemaFileCheck };
+        })
+      )
+    ),
+    Effect.flatMap(({ config, checks, schemaFileCheck }) =>
+      // 4. Check Jsonnet template file
+      pipe(
+        checkFile(config.jsonnet, 'Jsonnet template'),
+        Effect.map((jsonnetFileCheck) => {
+          checks.push(jsonnetFileCheck);
+          printCheck(jsonnetFileCheck);
+          return { config, checks, schemaFileCheck };
+        })
+      )
+    ),
+    Effect.flatMap(({ config, checks, schemaFileCheck }) => {
+      // 5. Check schema loading
+      if (schemaFileCheck.status === 'ok') {
+        return pipe(
+          checkSchema(config.schema, config.schemaExportName),
+          Effect.map((schemaLoadCheck) => {
+            checks.push(schemaLoadCheck);
+            printCheck(schemaLoadCheck);
+            return { config, checks };
+          })
+        );
+      }
+      return Effect.succeed({ config, checks });
+    }),
+    Effect.flatMap(({ config, checks }) =>
+      // 6. Check provider registration
+      pipe(
+        checkProvider(config.provider),
+        Effect.map((providerCheck) => {
+          checks.push(providerCheck);
+          printCheck(providerCheck);
+          return checks;
+        })
+      )
+    ),
+    Effect.map((checks) => {
+      // Summary
+      console.log('');
+      const errors = checks.filter((c) => c.status === 'error');
+      const warnings = checks.filter((c) => c.status === 'warn');
+      const passed = checks.filter((c) => c.status === 'ok');
+
+      if (errors.length === 0) {
+        console.log(chalk.green(`All ${passed.length} checks passed!`));
+        if (warnings.length > 0) {
+          console.log(chalk.yellow(`${warnings.length} warning(s)`));
+        }
+      } else {
+        console.log(chalk.red(`${errors.length} check(s) failed`));
+        console.log(chalk.yellow(`${warnings.length} warning(s)`));
+        console.log(chalk.green(`${passed.length} check(s) passed`));
+      }
+
+      return {
+        checks,
+        allPassed: errors.length === 0,
+      };
+    })
+  );
+
 /**
  * Run doctor command
  */
 export const runDoctor = (
   options: DoctorOptions
 ): Effect.Effect<boolean, never> =>
-  Effect.gen(function* () {
-    const result = yield* executeDoctor(options);
-    return result.allPassed;
-  });
+  pipe(
+    executeDoctor(options),
+    Effect.map((result) => result.allPassed)
+  );
