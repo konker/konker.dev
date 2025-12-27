@@ -283,6 +283,11 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 ## 8. Implementation Requirements
 
+### Implementation Conventions
+
+- Follow the conventions used by other packages and apps in the monorepo (e.g., TypeScript config, Vitest config, linting, and project layout).
+- Use Effect.ts in line with other packages in the monorepo, and implement logic using pipe-based Effect composition only (no generator-based `Effect.gen`).
+
 ### Project Structure
 
 - `src/cli.ts`: CLI entry point using `commander` or `yargs`.
@@ -297,7 +302,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 #### Core Commands
 
-```bash
+````bash
 # Global options (available on all commands)
   --ci                        # Disable prompts; require explicit flags like --confirm
   --strict                    # Treat warnings as errors (e.g., unknown keys)
@@ -347,48 +352,73 @@ zenfig diff <service> [options]
   --no-cache                  # Disable cache even if configured
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
 
-# Delete configuration value
-zenfig delete <service> <key> [options]
+# List configuration keys
+zenfig list <service> [options]
   --provider <name>           # Provider name (default: chamber)
   --env <environment>         # Environment name (overrides NODE_ENV)
-  --confirm                   # Skip interactive confirmation
-  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
-
-# Save configuration snapshot
-zenfig snapshot save <service> [options]
-  --source <service>          # Additional sources (repeatable)
-  --provider <name>           # Provider name (default: chamber)
-  --env <environment>         # Environment name (overrides NODE_ENV)
-  --output <path>             # Output path (default: .zenfig/snapshots/)
-  --encrypt                   # Encrypt snapshot at rest (recommended)
-  --snapshot-key-file <path>  # Read encryption key from file (preferred over CLI args)
-  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
-
-# Restore configuration from snapshot
-zenfig snapshot restore <snapshot-file> [options]
-  --provider <name>           # Provider name (default: chamber)
-  --dry-run                   # Show diff without applying changes
-  --force-schema-mismatch     # Allow restore despite schema hash mismatch
-  --confirm                   # Skip interactive confirmation
-  --show-values               # Print secret values in diff output (TTY only)
+  --format <keys|table|json>  # Output format (default: keys)
+  --show-values               # Print secret values (TTY only; use --unsafe-show-values for CI)
   --unsafe-show-values        # Allow printing secrets even when stdout is not a TTY (dangerous)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
 
+Examples:
+
+```bash
+# List all keys (redacted values)
+zenfig list api --env prod
+
+# List keys with values in JSON format (local dev only)
+zenfig list api --env prod --format json --show-values
+````
+
+# Delete configuration value
+
+zenfig delete <service> <key> [options]
+--provider <name> # Provider name (default: chamber)
+--env <environment> # Environment name (overrides NODE_ENV)
+--confirm # Skip interactive confirmation
+--ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+
+# Save configuration snapshot
+
+zenfig snapshot save <service> [options]
+--source <service> # Additional sources (repeatable)
+--provider <name> # Provider name (default: chamber)
+--env <environment> # Environment name (overrides NODE_ENV)
+--output <path> # Output path (default: .zenfig/snapshots/)
+--encrypt # Encrypt snapshot at rest (recommended)
+--snapshot-key-file <path> # Read encryption key from file (preferred over CLI args)
+--ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+
+# Restore configuration from snapshot
+
+zenfig snapshot restore <snapshot-file> [options]
+--provider <name> # Provider name (default: chamber)
+--dry-run # Show diff without applying changes
+--force-schema-mismatch # Allow restore despite schema hash mismatch
+--confirm # Skip interactive confirmation
+--show-values # Print secret values in diff output (TTY only)
+--unsafe-show-values # Allow printing secrets even when stdout is not a TTY (dangerous)
+--ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+
 # Initialize Jsonnet template from schema
+
 zenfig init [options]
-  --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
-  --output <path>             # Output path (default: config.jsonnet)
-  --force                     # Overwrite existing file
-  --include-defaults          # Include schema defaults in template
+--schema <path> # Schema path (default: src/schema.ts)
+--schema-export-name <name> # Schema export name (default: ConfigSchema)
+--output <path> # Output path (default: config.jsonnet)
+--force # Overwrite existing file
+--include-defaults # Include schema defaults in template
 
 # Check local prerequisites and basic connectivity
+
 zenfig doctor [options]
-  --provider <name>           # Provider name (default: chamber)
-  --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
-  --jsonnet <path>            # Jsonnet template path (default: config.jsonnet)
-```
+--provider <name> # Provider name (default: chamber)
+--schema <path> # Schema path (default: src/schema.ts)
+--schema-export-name <name> # Schema export name (default: ConfigSchema)
+--jsonnet <path> # Jsonnet template path (default: config.jsonnet)
+
+````
 
 ### Environment Variable Precedence
 
@@ -433,7 +463,7 @@ Example:
   "cache": "5m",
   "jsonnetTimeoutMs": 30000
 }
-```
+````
 
 Rules:
 
@@ -1226,7 +1256,27 @@ Result: Shows differences between stored values (provider layer) and rendered co
 
 Exit code: 1 (differences found)
 
-6. **Delete configuration value**
+6. **List stored keys**
+
+```bash
+# List stored keys for a service
+zenfig list api --env prod --format table
+```
+
+Result: Shows stored keys (and values if `--show-values` is provided), redacted by default.
+
+```
+┌─────────────────┬───────────────────────────────┐
+│ Key             │ Stored (Provider)             │
+├─────────────────┼───────────────────────────────┤
+│ api.timeoutMs   │ <redacted>                    │
+│ database.url    │ <redacted>                    │
+│ feature.enableBeta │ <redacted>                 │
+│ redis.url       │ <redacted>                    │
+└─────────────────┴───────────────────────────────┘
+```
+
+7. **Delete configuration value**
 
 ```bash
 # Remove deprecated config key
@@ -1235,7 +1285,7 @@ zenfig delete api legacy.setting --env prod --confirm
 
 Result: Deletes `/zenfig/api/prod/legacy/setting`, logs deletion with timestamp.
 
-7. **Save configuration snapshot**
+8. **Save configuration snapshot**
 
 ```bash
 # Backup production config before major change
@@ -1244,7 +1294,7 @@ zenfig snapshot save api --source shared --env prod
 
 Result: Saves to `.zenfig/snapshots/api-prod-2024-01-15T10-30-00.json` with metadata.
 
-8. **Restore configuration from snapshot**
+9. **Restore configuration from snapshot**
 
 ```bash
 # Rollback to previous snapshot after failed deployment
@@ -1253,7 +1303,7 @@ zenfig snapshot restore .zenfig/snapshots/api-prod-2024-01-15T10-30-00.json --dr
 
 Result: Shows diff of what would change, requires `--confirm` to apply.
 
-9. **Upsert with stdin (secure)**
+10. **Upsert with stdin (secure)**
 
 ```bash
 # Set sensitive value without exposing in process list
