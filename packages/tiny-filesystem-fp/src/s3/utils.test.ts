@@ -1,3 +1,4 @@
+/* eslint-disable fp/no-this */
 import type * as s3Client from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import * as awsStorage from '@aws-sdk/lib-storage';
@@ -5,7 +6,7 @@ import { PromiseDependentWritableStream } from '@konker.dev/tiny-utils-fp/stream
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 import { Readable } from 'stream';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as unit from './utils.js';
 
@@ -41,10 +42,18 @@ describe('s3/utils', () => {
   });
 
   describe('UploadObjectEffect', () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
+
     it('should work as expected with Buffer input', async () => {
       const s3ClientInst = new S3Client({});
-      const mockUpload = { done: vi.fn() } as any;
-      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
+      const doneSpy = vi.fn();
+      const mockUpload = function () {
+        // @ts-ignore
+        this.done = doneSpy;
+      } as any;
+      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockImplementation(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const data = Buffer.from('test-data');
       const command = pipe(unit.UploadObjectEffect(s3ClientInst, params, data));
@@ -61,13 +70,17 @@ describe('s3/utils', () => {
           ContentLength: 9,
         },
       });
-      expect(mockUpload.done).toHaveBeenCalledTimes(1);
+      expect(doneSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should work as expected with string input', async () => {
       const s3ClientInst = new S3Client({});
-      const mockUpload = { done: vi.fn() } as any;
-      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
+      const doneSpy = vi.fn();
+      const mockUpload = function () {
+        // @ts-ignore
+        this.done = doneSpy;
+      } as any;
+      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockImplementation(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const data = 'test-data';
       const command = pipe(unit.UploadObjectEffect(s3ClientInst, params, data));
@@ -84,15 +97,23 @@ describe('s3/utils', () => {
           ContentLength: 9,
         },
       });
-      expect(mockUpload.done).toHaveBeenCalledTimes(1);
+      expect(doneSpy).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('UploadObjectWriteStreamEffect', () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
+
     it('should work as expected', async () => {
       const s3ClientInst = new S3Client({});
-      const mockUpload = { done: vi.fn() } as any;
-      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockReturnValue(mockUpload);
+      const doneSpy = vi.fn();
+      const mockUpload = function () {
+        // @ts-ignore
+        this.done = doneSpy;
+      } as any;
+      const uploadSpy = vi.spyOn(awsStorage, 'Upload').mockImplementation(mockUpload);
       const params: s3Client.PutObjectCommandInput = { Bucket: 'test-bucket', Key: 'test-key' };
       const command = pipe(unit.UploadObjectWriteStreamEffect(s3ClientInst, params));
       const actual = await Effect.runPromise(command);
@@ -108,7 +129,7 @@ describe('s3/utils', () => {
           Body: actual,
         },
       });
-      expect(mockUpload.done).toHaveBeenCalledTimes(1);
+      expect(doneSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

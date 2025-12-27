@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-cache-fp",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -84,30 +84,30 @@
   },
   "dependencies": {
     "@konker.dev/tiny-error-fp": "workspace:*",
-    "effect": "^3.17.14"
+    "effect": "^3.19.13"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@effect/language-service": "^0.41.0",
-    "@eslint/compat": "^1.4.0",
-    "@eslint/js": "^9.36.0",
-    "@gomomento/sdk": "^1.116.0",
-    "@konker.dev/common-config": "latest",
+    "@effect/language-service": "^0.62.5",
+    "@eslint/compat": "^2.0.0",
+    "@eslint/js": "^9.39.2",
+    "@gomomento/sdk": "^1.117.1",
+    "@konker.dev/common-config": "^0.7.0",
     "@konker.dev/momento-cache-client-effect": "workspace:*",
-    "@types/node": "^24.5.2",
-    "@vitest/coverage-istanbul": "^3.2.4",
-    "eslint": "^9.36.0",
+    "@types/node": "^25.0.3",
+    "@vitest/coverage-istanbul": "^4.0.16",
+    "eslint": "^9.39.2",
     "eslint-plugin-fp": "^2.3.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "leasot": "^14.4.0",
     "madge": "^8.0.0",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "type-coverage": "^2.29.7",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.1",
-    "vitest": "^3.2.4"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.1",
+    "vitest": "^4.0.16"
   },
   "scripts": {
     "test": "vitest run --coverage",

@@ -1,5 +1,5 @@
 import { baseConfig } from '@konker.dev/common-config/configs/vitest.config-base';
-import { coverageConfigDefaults, defineConfig } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   ...baseConfig,
@@ -7,7 +7,7 @@ export default defineConfig({
     ...baseConfig.test,
     coverage: {
       ...baseConfig.test.coverage,
-      exclude: ['src/test/fixtures/', 'src/examples/example1.ts', ...coverageConfigDefaults.exclude],
+      exclude: [...baseConfig.test.coverage.exclude, 'src/test/fixtures/', 'src/examples/example1.ts'],
     },
   },
 });
