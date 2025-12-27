@@ -5,7 +5,7 @@ import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { parseValue, serializeValue } from './parser.js';
+import { parseProviderKV, parseValue, serializeValue } from './parser.js';
 
 describe('parser', () => {
   describe('parseValue', () => {
@@ -92,10 +92,23 @@ describe('parser', () => {
     });
 
     describe('union schema', () => {
-      const schema = Type.Union([Type.String(), Type.Number()]);
-
       it('should try each type in order', async () => {
+        const schema = Type.Union([Type.String(), Type.Number()]);
         // String should be tried first
+        const result = await Effect.runPromise(parseValue('hello', schema, 'test'));
+        expect(result).toBe('hello');
+      });
+
+      it('should try next branch when first fails to parse', async () => {
+        // Union of Number and Boolean - "true" fails to parse as Number, but succeeds as Boolean
+        const schema = Type.Union([Type.Number(), Type.Boolean()]);
+        const result = await Effect.runPromise(parseValue('true', schema, 'test'));
+        expect(result).toBe(true);
+      });
+
+      it('should return null-based fallback when accumulator succeeds first', async () => {
+        // Test the case where first branch succeeds
+        const schema = Type.Union([Type.String()]);
         const result = await Effect.runPromise(parseValue('hello', schema, 'test'));
         expect(result).toBe('hello');
       });
@@ -138,6 +151,108 @@ describe('parser', () => {
         expect(result).toEqual({ key: 1 });
       });
     });
+
+    describe('object schema', () => {
+      const schema = Type.Object({ key: Type.Number() });
+
+      it('should parse JSON object strings', async () => {
+        const result = await Effect.runPromise(parseValue('{"key": 42}', schema, 'test'));
+        expect(result).toEqual({ key: 42 });
+      });
+
+      it('should reject invalid JSON', async () => {
+        await expect(Effect.runPromise(parseValue('not json', schema, 'test'))).rejects.toThrow();
+      });
+    });
+
+    describe('null schema', () => {
+      const schema = Type.Null();
+
+      it('should parse "null" string', async () => {
+        const result = await Effect.runPromise(parseValue('null', schema, 'test'));
+        expect(result).toBe(null);
+      });
+
+      it('should parse "NULL" case-insensitively', async () => {
+        const result = await Effect.runPromise(parseValue('NULL', schema, 'test'));
+        expect(result).toBe(null);
+      });
+
+      it('should reject non-null values', async () => {
+        await expect(Effect.runPromise(parseValue('something', schema, 'test'))).rejects.toThrow();
+      });
+    });
+
+    describe('literal schema', () => {
+      it('should parse string literal', async () => {
+        const schema = Type.Literal('hello');
+        const result = await Effect.runPromise(parseValue('hello', schema, 'test'));
+        expect(result).toBe('hello');
+      });
+
+      it('should parse number literal', async () => {
+        const schema = Type.Literal(42);
+        const result = await Effect.runPromise(parseValue('42', schema, 'test'));
+        expect(result).toBe(42);
+      });
+
+      it('should parse boolean literal', async () => {
+        const schema = Type.Literal(true);
+        const result = await Effect.runPromise(parseValue('true', schema, 'test'));
+        expect(result).toBe(true);
+      });
+
+      it('should handle null literal', async () => {
+        const schema = Type.Literal(null as never);
+        const result = await Effect.runPromise(parseValue('anything', schema, 'test'));
+        expect(result).toBe('anything');
+      });
+    });
+
+    describe('integer parsing edge cases', () => {
+      const schema = Type.Integer();
+
+      it('should reject Infinity', async () => {
+        await expect(Effect.runPromise(parseValue('Infinity', schema, 'test'))).rejects.toThrow();
+      });
+
+      it('should reject -Infinity', async () => {
+        await expect(Effect.runPromise(parseValue('-Infinity', schema, 'test'))).rejects.toThrow();
+      });
+
+      it('should handle whitespace around integers', async () => {
+        const result = await Effect.runPromise(parseValue('  42  ', schema, 'test'));
+        expect(result).toBe(42);
+      });
+
+      it('should handle very large numbers in scientific notation', async () => {
+        // 1e+100 parses as a number without decimals so it's technically an integer
+        // This is valid because Number("1e+100") is finite and isInteger
+        const result = await Effect.runPromise(parseValue('1e+100', schema, 'test'));
+        expect(result).toBe(1e100);
+      });
+    });
+
+    describe('number parsing edge cases', () => {
+      const schema = Type.Number();
+
+      it('should reject Infinity', async () => {
+        await expect(Effect.runPromise(parseValue('Infinity', schema, 'test'))).rejects.toThrow();
+      });
+
+      it('should reject -Infinity', async () => {
+        await expect(Effect.runPromise(parseValue('-Infinity', schema, 'test'))).rejects.toThrow();
+      });
+    });
+
+    describe('unknown schema type', () => {
+      it('should keep value as string for unknown types', async () => {
+        // Create a schema with an unknown kind
+        const unknownSchema = { [Symbol.for('TypeBox.Kind')]: 'UnknownType' } as any;
+        const result = await Effect.runPromise(parseValue('value', unknownSchema, 'test'));
+        expect(result).toBe('value');
+      });
+    });
   });
 
   describe('serializeValue', () => {
@@ -171,6 +286,210 @@ describe('parser', () => {
     it('should serialize objects as JSON', () => {
       const schema = Type.Object({ x: Type.Number() });
       expect(serializeValue({ x: 1 }, schema)).toBe('{"x":1}');
+    });
+
+    it('should serialize undefined as empty string', () => {
+      const schema = Type.String();
+      expect(serializeValue(undefined, schema)).toBe('');
+    });
+
+    it('should serialize integers', () => {
+      const schema = Type.Integer();
+      expect(serializeValue(42, schema)).toBe('42');
+    });
+
+    it('should serialize optional types', () => {
+      const schema = Type.Optional(Type.String());
+      expect(serializeValue('hello', schema)).toBe('hello');
+    });
+
+    it('should serialize unknown types as string', () => {
+      const unknownSchema = { [Symbol.for('TypeBox.Kind')]: 'UnknownType' } as any;
+      expect(serializeValue(42, unknownSchema)).toBe('42');
+    });
+
+    it('should serialize object values for unknown types as JSON', () => {
+      const unknownSchema = { [Symbol.for('TypeBox.Kind')]: 'UnknownType' } as any;
+      expect(serializeValue({ a: 1 }, unknownSchema)).toBe('{"a":1}');
+    });
+  });
+
+  describe('parseProviderKV', () => {
+    it('should parse flat key-value map into nested object', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+          port: Type.Integer(),
+        }),
+      });
+
+      const kv = {
+        'database.host': 'localhost',
+        'database.port': '5432',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        database: {
+          host: 'localhost',
+          port: 5432,
+        },
+      });
+    });
+
+    it('should handle deeply nested paths', async () => {
+      const schema = Type.Object({
+        level1: Type.Object({
+          level2: Type.Object({
+            value: Type.String(),
+          }),
+        }),
+      });
+
+      const kv = {
+        'level1.level2.value': 'deep',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        level1: {
+          level2: {
+            value: 'deep',
+          },
+        },
+      });
+    });
+
+    it('should handle optional fields', async () => {
+      const schema = Type.Object({
+        required: Type.String(),
+        optional: Type.Optional(Type.String()),
+      });
+
+      const kv = {
+        required: 'value',
+        optional: 'also-value',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        required: 'value',
+        optional: 'also-value',
+      });
+    });
+
+    it('should handle empty key-value map', async () => {
+      const schema = Type.Object({
+        value: Type.String(),
+      });
+
+      const result = await Effect.runPromise(parseProviderKV({}, schema));
+
+      expect(result).toEqual({});
+    });
+
+    it('should fail on invalid value for type', async () => {
+      const schema = Type.Object({
+        count: Type.Integer(),
+      });
+
+      const kv = {
+        count: 'not-a-number',
+      };
+
+      await expect(Effect.runPromise(parseProviderKV(kv, schema))).rejects.toThrow();
+    });
+
+    it('should handle multiple sibling keys', async () => {
+      const schema = Type.Object({
+        a: Type.String(),
+        b: Type.String(),
+        c: Type.String(),
+      });
+
+      const kv = {
+        a: 'valueA',
+        b: 'valueB',
+        c: 'valueC',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        a: 'valueA',
+        b: 'valueB',
+        c: 'valueC',
+      });
+    });
+
+    it('should overwrite intermediate objects if path conflicts', async () => {
+      const schema = Type.Object({
+        parent: Type.Object({
+          child: Type.String(),
+        }),
+      });
+
+      // Both paths go to the same parent object
+      const kv = {
+        'parent.child': 'value1',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        parent: {
+          child: 'value1',
+        },
+      });
+    });
+
+    it('should handle nested optional objects during navigation', async () => {
+      const schema = Type.Object({
+        outer: Type.Optional(
+          Type.Object({
+            inner: Type.String(),
+          })
+        ),
+      });
+
+      const kv = {
+        'outer.inner': 'value',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        outer: {
+          inner: 'value',
+        },
+      });
+    });
+
+    it('should handle deeply nested paths with intermediate objects', async () => {
+      const schema = Type.Object({
+        a: Type.Object({
+          b: Type.Object({
+            c: Type.String(),
+          }),
+        }),
+      });
+
+      const kv = {
+        'a.b.c': 'deep',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        a: {
+          b: {
+            c: 'deep',
+          },
+        },
+      });
     });
   });
 });

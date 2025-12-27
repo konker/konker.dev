@@ -3,7 +3,16 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { camelToScreamingSnake, envKeyToPath, flatten, pathToEnvKey, unflatten } from './flatten.js';
+import {
+  camelToScreamingSnake,
+  envKeyToPath,
+  flatten,
+  getSortedKeys,
+  pathToEnvKey,
+  screamingSnakeToCamel,
+  toEnvMap,
+  unflatten,
+} from './flatten.js';
 
 describe('flatten', () => {
   describe('flatten', () => {
@@ -179,6 +188,104 @@ describe('flatten', () => {
 
     it('should handle already uppercase', () => {
       expect(camelToScreamingSnake('API')).toBe('API');
+    });
+  });
+
+  describe('screamingSnakeToCamel', () => {
+    it('should convert SCREAMING_SNAKE_CASE to camelCase', () => {
+      expect(screamingSnakeToCamel('TIMEOUT_MS')).toBe('timeoutMs');
+      expect(screamingSnakeToCamel('ENABLE_BETA')).toBe('enableBeta');
+    });
+
+    it('should handle single word', () => {
+      expect(screamingSnakeToCamel('PORT')).toBe('port');
+    });
+
+    it('should handle multiple underscores', () => {
+      expect(screamingSnakeToCamel('MY_LONG_VARIABLE_NAME')).toBe('myLongVariableName');
+    });
+  });
+
+  describe('toEnvMap', () => {
+    it('should convert nested object to env map', () => {
+      const obj = {
+        database: {
+          host: 'localhost',
+          port: 5432,
+        },
+      };
+
+      const result = toEnvMap(obj);
+
+      expect(result).toEqual({
+        DATABASE_HOST: 'localhost',
+        DATABASE_PORT: 5432,
+      });
+    });
+
+    it('should handle camelCase keys', () => {
+      const obj = {
+        apiKey: 'secret',
+        timeoutMs: 5000,
+      };
+
+      const result = toEnvMap(obj);
+
+      expect(result).toEqual({
+        API_KEY: 'secret',
+        TIMEOUT_MS: 5000,
+      });
+    });
+
+    it('should handle custom separator', () => {
+      const obj = {
+        database: {
+          host: 'localhost',
+        },
+      };
+
+      const result = toEnvMap(obj, '__');
+
+      expect(result).toEqual({
+        DATABASE__HOST: 'localhost',
+      });
+    });
+
+    it('should handle empty object', () => {
+      const result = toEnvMap({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('getSortedKeys', () => {
+    it('should sort keys case-insensitively', () => {
+      const obj = {
+        Zebra: 1,
+        apple: 2,
+        BANANA: 3,
+      };
+
+      const result = getSortedKeys(obj);
+
+      expect(result).toEqual(['apple', 'BANANA', 'Zebra']);
+    });
+
+    it('should handle empty object', () => {
+      const result = getSortedKeys({});
+      expect(result).toEqual([]);
+    });
+
+    it('should handle keys with same lowercase', () => {
+      const obj = {
+        AAA: 1,
+        aaa: 2,
+        Aaa: 3,
+      };
+
+      const result = getSortedKeys(obj);
+
+      // All have same lowercase, order is stable
+      expect(result).toHaveLength(3);
     });
   });
 });

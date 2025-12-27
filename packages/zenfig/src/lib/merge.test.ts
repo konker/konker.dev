@@ -4,7 +4,7 @@
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
-import { getOverrides, getTypeMismatches, mergeConfigs, type MergeConflict } from './merge.js';
+import { formatConflicts, getOverrides, getTypeMismatches, mergeConfigs, type MergeConflict } from './merge.js';
 
 describe('merge', () => {
   describe('mergeConfigs', () => {
@@ -134,6 +134,130 @@ describe('merge', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]!.path).toBe('b');
+    });
+  });
+
+  describe('formatConflicts', () => {
+    it('should format conflicts with redacted values', () => {
+      const conflicts: ReadonlyArray<MergeConflict> = [
+        { path: 'password', sourceA: 'env', sourceB: 'file', valueA: 'secret1', valueB: 'secret2', type: 'override' },
+      ];
+
+      const result = formatConflicts(conflicts);
+
+      expect(result).toContain('[OVERRIDE]');
+      expect(result).toContain('password');
+      expect(result).toContain('<redacted>');
+      expect(result).not.toContain('secret1');
+      expect(result).not.toContain('secret2');
+    });
+
+    it('should format conflicts with visible values when redact is false', () => {
+      const conflicts: ReadonlyArray<MergeConflict> = [
+        { path: 'port', sourceA: 'env', sourceB: 'file', valueA: 3000, valueB: 5000, type: 'override' },
+      ];
+
+      const result = formatConflicts(conflicts, false);
+
+      expect(result).toContain('[OVERRIDE]');
+      expect(result).toContain('port');
+      expect(result).toContain('3000');
+      expect(result).toContain('5000');
+    });
+
+    it('should format type mismatch conflicts', () => {
+      const conflicts: ReadonlyArray<MergeConflict> = [
+        { path: 'value', sourceA: 's1', sourceB: 's2', valueA: 'string', valueB: 123, type: 'type-mismatch' },
+      ];
+
+      const result = formatConflicts(conflicts, false);
+
+      expect(result).toContain('[TYPE MISMATCH]');
+      expect(result).toContain('value');
+    });
+
+    it('should return empty string for empty conflicts', () => {
+      const result = formatConflicts([]);
+
+      expect(result).toBe('');
+    });
+
+    it('should format multiple conflicts', () => {
+      const conflicts: ReadonlyArray<MergeConflict> = [
+        { path: 'a', sourceA: 's1', sourceB: 's2', valueA: 1, valueB: 2, type: 'override' },
+        { path: 'b', sourceA: 's1', sourceB: 's2', valueA: 'x', valueB: 100, type: 'type-mismatch' },
+      ];
+
+      const result = formatConflicts(conflicts);
+      const lines = result.split('\n');
+
+      expect(lines).toHaveLength(2);
+    });
+  });
+
+  describe('mergeConfigs edge cases', () => {
+    it('should detect type mismatch between array and non-array', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { value: ['a', 'b'] }],
+        ['source2', { value: 'string' }],
+      ];
+
+      const result = await Effect.runPromise(mergeConfigs(sources));
+
+      expect(result.merged).toEqual({ value: 'string' });
+      const typeMismatches = getTypeMismatches(result.conflicts);
+      expect(typeMismatches).toHaveLength(1);
+      expect(typeMismatches[0]!.type).toBe('type-mismatch');
+    });
+
+    it('should detect type mismatch between non-array and array', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { value: 'string' }],
+        ['source2', { value: ['a', 'b'] }],
+      ];
+
+      const result = await Effect.runPromise(mergeConfigs(sources));
+
+      expect(result.merged).toEqual({ value: ['a', 'b'] });
+      const typeMismatches = getTypeMismatches(result.conflicts);
+      expect(typeMismatches).toHaveLength(1);
+    });
+
+    it('should not report conflict when values are the same', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { x: 42 }],
+        ['source2', { x: 42 }],
+      ];
+
+      const result = await Effect.runPromise(mergeConfigs(sources));
+
+      expect(result.merged).toEqual({ x: 42 });
+      expect(result.conflicts).toHaveLength(0);
+    });
+
+    it('should handle deeply nested conflicts', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { a: { b: { c: { d: 1 } } } }],
+        ['source2', { a: { b: { c: { d: 2 } } } }],
+      ];
+
+      const result = await Effect.runPromise(mergeConfigs(sources));
+
+      expect(result.merged).toEqual({ a: { b: { c: { d: 2 } } } });
+      expect(result.conflicts).toHaveLength(1);
+      expect(result.conflicts[0]!.path).toBe('a.b.c.d');
+    });
+
+    it('should handle type mismatch between null and other types', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { value: 123 }],
+        ['source2', { value: null }],
+      ];
+
+      const result = await Effect.runPromise(mergeConfigs(sources));
+
+      const typeMismatches = getTypeMismatches(result.conflicts);
+      expect(typeMismatches).toHaveLength(1);
     });
   });
 });
