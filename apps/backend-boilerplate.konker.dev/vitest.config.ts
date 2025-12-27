@@ -1,5 +1,5 @@
 import { baseConfig } from '@konker.dev/common-config/configs/vitest.config-base';
-import { coverageConfigDefaults, defineConfig } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   ...baseConfig,
@@ -8,7 +8,7 @@ export default defineConfig({
     coverage: {
       ...baseConfig.test.coverage,
       exclude: [
-        ...coverageConfigDefaults.exclude,
+        ...baseConfig.test.coverage.exclude,
         'sst.config.ts',
         'src/hono/hono-app.ts',
         'src/hono/hono-aws-serverless.ts',
