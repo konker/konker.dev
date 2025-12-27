@@ -1,14 +1,14 @@
-import { coverageConfigDefaults, type ViteUserConfig } from 'vitest/config';
+import { coverageConfigDefaults, defaultExclude, type ViteUserConfig } from 'vitest/config';
 
 export const baseConfig = {
   test: {
-    exclude: ['dist/'],
+    exclude: [...defaultExclude, 'dist/'],
     coverage: {
       thresholds: {
         100: true,
       },
       provider: 'istanbul', // or 'v8'
-      exclude: ['dist/', ...coverageConfigDefaults.exclude],
+      exclude: [...coverageConfigDefaults.exclude, 'dist/'],
     },
   },
 } as const satisfies ViteUserConfig;
