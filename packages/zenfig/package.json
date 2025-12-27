@@ -160,36 +160,36 @@
   "main": "dist/index.js",
   "dependencies": {
     "@konker.dev/tiny-error-fp": "workspace:*",
-    "@sinclair/typebox": "^0.34.33",
+    "@sinclair/typebox": "^0.34.45",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "chalk": "^5.4.1",
+    "chalk": "^5.6.2",
     "cli-table3": "^0.6.5",
-    "commander": "^13.1.0",
-    "effect": "^3.17.14",
-    "execa": "^9.5.2"
+    "commander": "^14.0.2",
+    "effect": "^3.19.13",
+    "execa": "^9.6.1"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@effect/language-service": "^0.41.0",
-    "@eslint/compat": "^1.4.0",
-    "@eslint/js": "^9.36.0",
-    "@konker.dev/common-config": "latest",
-    "@types/node": "^24.5.2",
-    "@vitest/coverage-istanbul": "^3.2.4",
-    "eslint": "^9.36.0",
+    "@effect/language-service": "^0.62.5",
+    "@eslint/compat": "^2.0.0",
+    "@eslint/js": "^9.39.2",
+    "@konker.dev/common-config": "^0.5.1",
+    "@types/node": "^25.0.3",
+    "@vitest/coverage-istanbul": "^4.0.16",
+    "eslint": "^9.39.2",
     "eslint-plugin-fp": "^2.3.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "leasot": "^14.4.0",
     "madge": "^8.0.0",
-    "prettier": "^3.6.2",
-    "tsx": "^4.20.6",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
     "type-coverage": "^2.29.7",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.1",
-    "vitest": "^3.2.4"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.1",
+    "vitest": "^4.0.16"
   },
   "scripts": {
     "test": "vitest run --coverage",
@@ -210,6 +210,6 @@
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/zenfig'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
-    "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
+    "cd": "echo TODO"
   }
 }
