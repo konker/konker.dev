@@ -56,6 +56,10 @@
       "types": "./dist/commands/init.d.ts",
       "import": "./dist/commands/init.js"
     },
+    "./commands/list": {
+      "types": "./dist/commands/list.d.ts",
+      "import": "./dist/commands/list.js"
+    },
     "./commands/snapshot": {
       "types": "./dist/commands/snapshot.d.ts",
       "import": "./dist/commands/snapshot.js"

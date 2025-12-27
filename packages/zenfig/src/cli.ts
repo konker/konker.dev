@@ -14,6 +14,7 @@ import { runDiff } from './commands/diff.js';
 import { runDoctor } from './commands/doctor.js';
 import { runExport } from './commands/export.js';
 import { runInit } from './commands/init.js';
+import { type ListFormat, runList } from './commands/list.js';
 import { runSnapshotRestore, runSnapshotSave } from './commands/snapshot.js';
 import { runUpsert } from './commands/upsert.js';
 import { runValidate } from './commands/validate.js';
@@ -236,6 +237,42 @@ program
               if (hasChanges) {
                 process.exit(EXIT_VALIDATION_ERROR);
               }
+            })
+          )
+        )
+      );
+    }
+  );
+
+// --------------------------------------------------------------------------
+// List Command
+// --------------------------------------------------------------------------
+
+program
+  .command('list <service>')
+  .description('List configuration keys for a service')
+  .option('--provider <name>', 'Provider name (default: chamber)')
+  .option('--env <environment>', 'Environment name')
+  .option('--format <keys|table|json>', 'Output format (default: keys)')
+  .option('--show-values', 'Print secret values (TTY only)')
+  .option('--unsafe-show-values', 'Allow printing secrets even when stdout is not a TTY')
+  .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
+  .action(
+    (service: string, options: CLIOptions & { format?: string; showValues?: boolean; unsafeShowValues?: boolean }) => {
+      runEffect(
+        pipe(
+          resolveConfig({
+            ...options,
+            ci: program.opts().ci,
+            strict: program.opts().strict,
+          }),
+          Effect.flatMap((config) =>
+            runList({
+              service,
+              format: options.format as ListFormat | undefined,
+              showValues: options.showValues,
+              unsafeShowValues: options.unsafeShowValues,
+              config,
             })
           )
         )
