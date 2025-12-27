@@ -3,12 +3,14 @@
  *
  * Dynamically loads TypeBox schemas from TypeScript files
  */
-import { type TSchema } from '@sinclair/typebox';
-import * as Effect from 'effect/Effect';
-import { pipe } from 'effect/Function';
+import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
+
+import { type TSchema } from '@sinclair/typebox';
+import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { fileNotFoundError, type SystemError, type ValidationError, type ZenfigError } from '../errors.js';
 
@@ -42,7 +44,6 @@ const fileExists = (filePath: string): Effect.Effect<boolean, never> =>
  * Compute SHA-256 hash of schema for change detection
  */
 export const computeSchemaHash = (schema: TSchema): string => {
-  const crypto = require('node:crypto') as typeof import('node:crypto');
   const schemaJson = JSON.stringify(schema);
   return `sha256:${crypto.createHash('sha256').update(schemaJson).digest('hex')}`;
 };
@@ -91,9 +92,7 @@ export const loadSchema = (
 
               // Validate it's a TypeBox schema (has Kind property)
               if (typeof schema !== 'object' || schema === null || !('type' in schema)) {
-                return Effect.fail(
-                  fileNotFoundError(`Export '${exportName}' is not a valid TypeBox schema`)
-                );
+                return Effect.fail(fileNotFoundError(`Export '${exportName}' is not a valid TypeBox schema`));
               }
 
               const typedSchema = schema as unknown as TSchema;

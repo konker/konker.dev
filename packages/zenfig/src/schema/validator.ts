@@ -3,10 +3,10 @@
  *
  * TypeBox + Ajv validation with detailed error messages
  */
-import Ajv from 'ajv';
-import type { ErrorObject, ValidateFunction } from 'ajv';
-import addFormats from 'ajv-formats';
 import { Kind, type TSchema } from '@sinclair/typebox';
+import type { ErrorObject, ValidateFunction } from 'ajv';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
@@ -34,7 +34,6 @@ type AjvInstance = {
  * - All formats enabled
  */
 const createAjv = (): AjvInstance => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
   const ajv = new (Ajv as any)({
     strict: true,
     allErrors: true,
@@ -43,7 +42,6 @@ const createAjv = (): AjvInstance => {
     verbose: true,
   }) as AjvInstance;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
   (addFormats as any)(ajv);
   return ajv;
 };
@@ -52,9 +50,7 @@ const createAjv = (): AjvInstance => {
 let ajvInstance: AjvInstance | undefined;
 
 const getAjv = (): AjvInstance => {
-  if (!ajvInstance) {
-    ajvInstance = createAjv();
-  }
+  ajvInstance ??= createAjv();
   return ajvInstance;
 };
 
@@ -65,11 +61,7 @@ const getAjv = (): AjvInstance => {
 /**
  * Convert Ajv error to Zenfig ValidationError
  */
-const ajvErrorToValidationError = (
-  error: ErrorObject,
-  schema: TSchema,
-  value: unknown
-): ValidationError => {
+const ajvErrorToValidationError = (error: ErrorObject, schema: TSchema, value: unknown): ValidationError => {
   const path = error.instancePath.replace(/^\//g, '').replace(/\//g, '.');
   const received = JSON.stringify(value).slice(0, 100);
 
@@ -137,7 +129,12 @@ const ajvErrorToValidationError = (
     case 'required': {
       const missingProperty = error.params?.missingProperty as string;
       const fullPath = path ? `${path}.${missingProperty}` : missingProperty;
-      return constraintViolationError(fullPath, 'required', 'undefined', `Missing required property: ${missingProperty}`);
+      return constraintViolationError(
+        fullPath,
+        'required',
+        'undefined',
+        `Missing required property: ${missingProperty}`
+      );
     }
 
     case 'additionalProperties': {

@@ -17,11 +17,11 @@ import {
 import {
   buildFullPath,
   dotToSlashPath,
-  slashToDotPath,
   type Provider,
   type ProviderCapabilities,
   type ProviderContext,
   type ProviderKV,
+  slashToDotPath,
 } from './Provider.js';
 import { registerProvider } from './registry.js';
 

@@ -33,7 +33,10 @@ export const flatten = (obj: Record<string, unknown>, prefix = ''): FlatObject =
 
     if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
       // Recurse into nested objects
-      Object.assign(result, flatten(value as Record<string, unknown>, path));
+      const nested = flatten(value as Record<string, unknown>, path);
+      for (const [nestedKey, nestedValue] of Object.entries(nested)) {
+        result[nestedKey] = nestedValue;
+      }
     } else {
       // Leaf value (including arrays)
       result[path] = value;
@@ -112,10 +115,7 @@ export const camelToScreamingSnake = (str: string): string => {
  * pathToEnvKey("feature.enableBeta") // "FEATURE_ENABLE_BETA"
  */
 export const pathToEnvKey = (path: string, separator = '_'): string => {
-  return path
-    .split('.')
-    .map(camelToScreamingSnake)
-    .join(separator);
+  return path.split('.').map(camelToScreamingSnake).join(separator);
 };
 
 /**

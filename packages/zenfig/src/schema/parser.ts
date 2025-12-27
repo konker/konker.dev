@@ -266,7 +266,7 @@ export const parseProviderKV = (
 
           return { path, segments, currentSchema };
         }),
-        Effect.flatMap(({ path: keyPath, segments, currentSchema }) =>
+        Effect.flatMap(({ currentSchema, path: keyPath, segments }) =>
           pipe(
             parseValue(value, currentSchema, keyPath),
             Effect.map((parsed) => ({ segments, parsed }))
@@ -277,7 +277,7 @@ export const parseProviderKV = (
     Effect.map((results) => {
       const result: Record<string, unknown> = {};
 
-      for (const { segments, parsed } of results) {
+      for (const { parsed, segments } of results) {
         let current: Record<string, unknown> = result;
 
         for (let i = 0; i < segments.length; i++) {

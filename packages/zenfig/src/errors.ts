@@ -8,6 +8,7 @@
  * - CLI (Command-line): CLI001-CLI003
  * - SYS (System): SYS001-SYS004
  */
+/* eslint-disable fp/no-class,fp/no-this */
 import * as Data from 'effect/Data';
 
 // --------------------------------------------------------------------------
@@ -204,7 +205,12 @@ export const formatViolationError = (
     },
   });
 
-export const constraintViolationError = (path: string, expected: string, received: string, problem: string): ValidationError =>
+export const constraintViolationError = (
+  path: string,
+  expected: string,
+  received: string,
+  problem: string
+): ValidationError =>
   new ValidationError({
     message: 'Value violates schema constraints',
     context: {
@@ -282,7 +288,8 @@ export const encryptionVerificationFailedError = (path: string): ProviderError =
       code: ErrorCode.PROV004,
       path,
       problem: 'Parameter may not be encrypted',
-      remediation: 'Manually update parameter type in AWS SSM console, or use --skip-encryption-check (not recommended)',
+      remediation:
+        'Manually update parameter type in AWS SSM console, or use --skip-encryption-check (not recommended)',
     },
   });
 

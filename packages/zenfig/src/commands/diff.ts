@@ -19,7 +19,7 @@ import {
 import { evaluateTemplate } from '../jsonnet/executor.js';
 import { flatten } from '../lib/flatten.js';
 import { mergeConfigs } from '../lib/merge.js';
-import { createRedactOptions, REDACTED, NOT_SET, REMOVED, redactValue } from '../lib/redact.js';
+import { createRedactOptions, NOT_SET, REDACTED, redactValue, REMOVED } from '../lib/redact.js';
 import { type ProviderContext } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -59,10 +59,7 @@ export type DiffResult = {
  */
 export const executeDiff = (
   options: DiffOptions
-): Effect.Effect<
-  DiffResult,
-  ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error
-> =>
+): Effect.Effect<DiffResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
   pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
@@ -73,8 +70,8 @@ export const executeDiff = (
         Effect.map((provider) => ({ schema, provider }))
       )
     ),
-    Effect.flatMap(({ schema, provider }) => {
-      const { service, sources = [], config } = options;
+    Effect.flatMap(({ provider, schema }) => {
+      const { config, service, sources = [] } = options;
       const allServices = [service, ...sources];
 
       // 3. Fetch stored values (flattened for comparison)
@@ -98,24 +95,19 @@ export const executeDiff = (
         )
       );
     }),
-    Effect.flatMap(({ mergedStored, config }) => {
+    Effect.flatMap(({ config, mergedStored }) => {
       const flatStored = flatten(mergedStored.merged);
 
       // 4. Render config through Jsonnet
       return pipe(
-        evaluateTemplate(
-          mergedStored.merged,
-          config.env,
-          config.jsonnet,
-          config.jsonnetTimeoutMs
-        ),
+        evaluateTemplate(mergedStored.merged, config.env, config.jsonnet, config.jsonnetTimeoutMs),
         Effect.map((rendered) => ({
           flatStored,
           flatRendered: flatten(rendered),
         }))
       );
     }),
-    Effect.map(({ flatStored, flatRendered }) => {
+    Effect.map(({ flatRendered, flatStored }) => {
       // 5. Compare
       const allKeys = new Set([...Object.keys(flatStored), ...Object.keys(flatRendered)]);
       const entries: Array<DiffEntry> = [];
@@ -204,14 +196,11 @@ const formatDiffJson = (entries: ReadonlyArray<DiffEntry>, showValues: boolean):
  */
 export const runDiff = (
   options: DiffOptions
-): Effect.Effect<
-  boolean,
-  ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error
-> =>
+): Effect.Effect<boolean, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
   pipe(
     executeDiff(options),
     Effect.map((result) => {
-      const showValues = options.unsafeShowValues || (options.showValues && process.stdout.isTTY);
+      const showValues = options.unsafeShowValues === true ? true : options.showValues && process.stdout.isTTY;
       const format = options.format ?? 'table';
 
       if (format === 'json') {

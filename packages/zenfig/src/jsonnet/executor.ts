@@ -3,19 +3,20 @@
  *
  * Executes Jsonnet templates with secrets passed via temp files
  */
+import * as fs from 'node:fs';
+
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 import { execa, type ExecaError } from 'execa';
-import * as fs from 'node:fs';
 
 import {
   binaryNotFoundError,
   fileNotFoundError,
+  type JsonnetError,
   jsonnetInvalidOutputError,
   jsonnetMissingVariableError,
   jsonnetRuntimeError,
   jsonnetSyntaxError,
-  type JsonnetError,
   type SystemError,
 } from '../errors.js';
 import { withJsonTempFile } from './tempFile.js';
@@ -76,17 +77,17 @@ const parseJsonnetError = (stderr: string): { location: string | undefined; mess
   let message = stderr;
 
   for (const line of lines) {
-    const locMatch = line.match(locationPattern);
+    const locMatch = locationPattern.exec(line);
     if (locMatch) {
       location = `${locMatch[1]}:${locMatch[2]}:${locMatch[3]}`;
     }
 
-    const runtimeMatch = line.match(runtimePattern);
+    const runtimeMatch = runtimePattern.exec(line);
     if (runtimeMatch) {
       message = runtimeMatch[1]!;
     }
 
-    const staticMatch = line.match(staticPattern);
+    const staticMatch = staticPattern.exec(line);
     if (staticMatch) {
       message = staticMatch[1]!;
     }
@@ -103,7 +104,7 @@ const classifyJsonnetError = (stderr: string): JsonnetError => {
 
   // Check for missing external variable
   if (message.includes('Undefined external variable') || message.includes('Unknown variable')) {
-    const varMatch = message.match(/variable[:\s]+["']?(\w+)["']?/);
+    const varMatch = /variable[:\s]+["']?(\w+)["']?/.exec(message);
     const varName = varMatch?.[1] ?? 'unknown';
     return jsonnetMissingVariableError(varName);
   }
@@ -156,13 +157,7 @@ export const executeJsonnet = (
           Effect.sync(() => {
             // Build arguments
             // Use --ext-code-file to pass secrets via temp file (safer than CLI args)
-            const args = [
-              '--ext-code-file',
-              `secrets=${secretsPath}`,
-              '--ext-str',
-              `env=${input.env}`,
-              templatePath,
-            ];
+            const args = ['--ext-code-file', `secrets=${secretsPath}`, '--ext-str', `env=${input.env}`, templatePath];
 
             // Add defaults if provided
             if (input.defaults) {
@@ -176,12 +171,12 @@ export const executeJsonnet = (
           Effect.flatMap((args) =>
             Effect.tryPromise({
               try: async () => {
-                const { stdout, stderr } = await execa('jsonnet', args, {
+                const { stderr, stdout } = await execa('jsonnet', args, {
                   timeout: timeoutMs,
                   reject: true,
                 });
 
-                if (stderr && stderr.trim()) {
+                if (stderr?.trim()) {
                   // Jsonnet may write warnings to stderr
                   console.error(`[zenfig] jsonnet warning: ${stderr}`);
                 }

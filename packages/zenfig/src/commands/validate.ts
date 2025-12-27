@@ -3,20 +3,15 @@
  *
  * Workflow: Input -> Parse -> Validate -> Report
  */
-import * as Effect from 'effect/Effect';
-import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 
+import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
+
 import { type ResolvedConfig } from '../config.js';
-import {
-  fileNotFoundError,
-  formatError,
-  type SystemError,
-  type ValidationError,
-  type ZenfigError,
-} from '../errors.js';
-import { detectFormat, parseEnvContent } from '../lib/format.js';
+import { fileNotFoundError, formatError, type SystemError, type ValidationError, type ZenfigError } from '../errors.js';
 import { unflatten } from '../lib/flatten.js';
+import { detectFormat, parseEnvContent } from '../lib/format.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { validateAll } from '../schema/validator.js';
 
@@ -90,7 +85,7 @@ export const executeValidate = (
         return Effect.succeed({ parsed, config: options.config });
       }
     }),
-    Effect.flatMap(({ parsed, config }) =>
+    Effect.flatMap(({ config, parsed }) =>
       // 5. Load schema
       pipe(
         loadSchemaWithDefaults(config.schema, config.schemaExportName),

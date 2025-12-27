@@ -51,7 +51,6 @@ export const isOptionalSchema = (schema: TSchema): boolean => {
  */
 export const unwrapOptional = (schema: TSchema): TSchema => {
   if (isOptionalSchema(schema) && 'anyOf' in schema) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     const anyOf = (schema as any).anyOf as Array<TSchema>;
     // Find the non-undefined type
     const nonUndefined = anyOf.find((s) => s[Kind] !== 'Undefined');
@@ -108,20 +107,13 @@ export const resolvePath = (schema: TSchema, keyPath: string): Effect.Effect<Res
       const canonicalSegments: Array<string> = [];
       let currentSchema = schema;
 
-      for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i]!;
-
+      for (const segment of segments) {
         // Unwrap optional if present
         currentSchema = unwrapOptional(currentSchema);
 
         if (!isObjectSchema(currentSchema)) {
           const partialPath = canonicalSegments.join('.');
-          return Effect.fail(
-            keyNotFoundError(
-              keyPath,
-              partialPath ? [`${partialPath} is not an object`] : undefined
-            )
-          );
+          return Effect.fail(keyNotFoundError(keyPath, partialPath ? [`${partialPath} is not an object`] : undefined));
         }
 
         const found = findProperty(currentSchema, segment);

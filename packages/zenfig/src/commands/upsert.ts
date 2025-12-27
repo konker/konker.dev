@@ -8,13 +8,13 @@ import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import {
+  encryptionVerificationFailedError,
   type ProviderError,
   type SystemError,
   type ValidationError,
   type ZenfigError,
-  encryptionVerificationFailedError,
 } from '../errors.js';
-import { type ProviderContext, EncryptionType } from '../providers/Provider.js';
+import { EncryptionType, type ProviderContext } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { type ParseMode, parseValue, serializeValue } from '../schema/parser.js';
@@ -82,9 +82,7 @@ export const executeUpsert = (
       const canonicalKey = resolved.canonicalPath;
 
       // 3. Get the value
-      const valueEffect = options.stdin
-        ? readFromStdin()
-        : Effect.succeed(options.value ?? '');
+      const valueEffect = options.stdin ? readFromStdin() : Effect.succeed(options.value ?? '');
 
       return pipe(
         valueEffect,
@@ -107,7 +105,7 @@ export const executeUpsert = (
         )
       );
     }),
-    Effect.flatMap(({ canonicalKey, validatedValue, resolvedSchema }) => {
+    Effect.flatMap(({ canonicalKey, resolvedSchema, validatedValue }) => {
       // 6. Serialize back to provider string format
       const serialized = serializeValue(validatedValue, resolvedSchema);
 
@@ -161,7 +159,9 @@ export const runUpsert = (
   pipe(
     executeUpsert(options),
     Effect.map((result) => {
-      console.log(`Successfully wrote ${result.canonicalKey} to ${options.config.ssmPrefix}/${options.service}/${options.config.env}`);
+      console.log(
+        `Successfully wrote ${result.canonicalKey} to ${options.config.ssmPrefix}/${options.service}/${options.config.env}`
+      );
 
       if (!result.encrypted) {
         console.warn('[zenfig] Warning: Value may not be encrypted as SecureString');

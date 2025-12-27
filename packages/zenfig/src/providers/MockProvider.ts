@@ -7,7 +7,14 @@ import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
 import { parameterNotFoundError, type ProviderError } from '../errors.js';
-import { type Provider, type ProviderCapabilities, type ProviderContext, type ProviderKV, EncryptionType, type EncryptionTypeValue } from './Provider.js';
+import {
+  EncryptionType,
+  type EncryptionTypeValue,
+  type Provider,
+  type ProviderCapabilities,
+  type ProviderContext,
+  type ProviderKV,
+} from './Provider.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -30,7 +37,9 @@ type MockStorage = Map<StorageKey, ProviderKV>;
 /**
  * Create a mock provider with optional initial data
  */
-export const createMockProvider = (initialData?: Record<string, ProviderKV>): Provider & { readonly storage: MockStorage } => {
+export const createMockProvider = (
+  initialData?: Record<string, ProviderKV>
+): Provider & { readonly storage: MockStorage } => {
   const storage: MockStorage = new Map();
 
   // Initialize with provided data
@@ -68,19 +77,21 @@ export const createMockProvider = (initialData?: Record<string, ProviderKV>): Pr
         const existing = storage.get(key);
         return { key, existing };
       }),
-      Effect.flatMap(({ key, existing }) => {
+      Effect.flatMap(({ existing, key }) => {
         if (!existing || !(keyPath in existing)) {
           return Effect.fail(parameterNotFoundError(keyPath, `${key}/${keyPath}`));
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
         const { [keyPath]: _, ...rest } = existing;
         storage.set(key, rest);
         return Effect.void;
       })
     );
 
-  const verifyEncryption = (_ctx: ProviderContext, _keyPath: string): Effect.Effect<EncryptionTypeValue, ProviderError> =>
-    Effect.succeed(EncryptionType.SECURE_STRING);
+  const verifyEncryption = (
+    _ctx: ProviderContext,
+    _keyPath: string
+  ): Effect.Effect<EncryptionTypeValue, ProviderError> => Effect.succeed(EncryptionType.SECURE_STRING);
 
   return {
     name: 'mock',

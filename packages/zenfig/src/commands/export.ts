@@ -3,6 +3,7 @@
  *
  * Workflow: Fetch -> Parse -> Merge -> Inject -> Template -> Validate -> Format
  */
+import { type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
@@ -15,8 +16,8 @@ import {
   type ZenfigError,
 } from '../errors.js';
 import { evaluateTemplate } from '../jsonnet/executor.js';
-import { formatConflicts, mergeConfigs, type MergeOptions, type MergeResult } from '../lib/merge.js';
 import { formatConfig } from '../lib/format.js';
+import { formatConflicts, mergeConfigs, type MergeOptions, type MergeResult } from '../lib/merge.js';
 import { type Provider, type ProviderContext, type ProviderKV } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -49,10 +50,8 @@ export type ExportResult = {
 /**
  * Fetch values from a provider for a single service
  */
-const fetchService = (
-  provider: Provider,
-  ctx: ProviderContext
-): Effect.Effect<ProviderKV, ProviderError> => provider.fetch(ctx);
+const fetchService = (provider: Provider, ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> =>
+  provider.fetch(ctx);
 
 /**
  * Fetch and parse values for multiple services
@@ -62,11 +61,8 @@ const fetchAllServices = (
   prefix: string,
   env: string,
   services: ReadonlyArray<string>,
-  rootSchema: import('@sinclair/typebox').TSchema
-): Effect.Effect<
-  ReadonlyArray<readonly [string, Record<string, unknown>]>,
-  ProviderError | ValidationError
-> =>
+  rootSchema: TSchema
+): Effect.Effect<ReadonlyArray<readonly [string, Record<string, unknown>]>, ProviderError | ValidationError> =>
   Effect.forEach(services, (service) => {
     const ctx: ProviderContext = { prefix, service, env };
     return pipe(
@@ -85,10 +81,7 @@ const fetchAllServices = (
  */
 export const executeExport = (
   options: ExportOptions
-): Effect.Effect<
-  ExportResult,
-  ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error
-> =>
+): Effect.Effect<ExportResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
   pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
@@ -99,8 +92,8 @@ export const executeExport = (
         Effect.map((provider) => ({ schema, provider }))
       )
     ),
-    Effect.flatMap(({ schema, provider }) => {
-      const { service, sources = [], config } = options;
+    Effect.flatMap(({ provider, schema }) => {
+      const { config, service, sources = [] } = options;
       const allServices = [service, ...sources];
 
       // 3-4. Fetch and parse all services
@@ -109,7 +102,7 @@ export const executeExport = (
         Effect.map((parsedServices) => ({ parsedServices, schema, config }))
       );
     }),
-    Effect.flatMap(({ parsedServices, schema, config }) => {
+    Effect.flatMap(({ config, parsedServices, schema }) => {
       // 5. Merge all sources
       const mergeOptions: MergeOptions = {
         strictMerge: options.strictMerge ?? config.strict,
@@ -131,15 +124,10 @@ export const executeExport = (
         })
       );
     }),
-    Effect.flatMap(({ mergeResult, schema, config, warnings }) =>
+    Effect.flatMap(({ config, mergeResult, schema, warnings }) =>
       // 6. Evaluate Jsonnet template
       pipe(
-        evaluateTemplate(
-          mergeResult.merged,
-          config.env,
-          config.jsonnet,
-          config.jsonnetTimeoutMs
-        ),
+        evaluateTemplate(mergeResult.merged, config.env, config.jsonnet, config.jsonnetTimeoutMs),
         Effect.flatMap((rendered) =>
           // 7. Validate against schema
           pipe(
@@ -154,7 +142,7 @@ export const executeExport = (
         )
       )
     ),
-    Effect.map(({ validated, mergeResult, config, warnings }) => {
+    Effect.map(({ config, mergeResult, validated, warnings }) => {
       // 8. Format output
       const formatted = formatConfig(validated, config.format, {
         separator: config.separator,
@@ -174,10 +162,7 @@ export const executeExport = (
  */
 export const runExport = (
   options: ExportOptions
-): Effect.Effect<
-  void,
-  ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error
-> =>
+): Effect.Effect<void, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
   pipe(
     executeExport(options),
     Effect.map((result) => {

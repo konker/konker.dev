@@ -79,7 +79,10 @@ export type Provider = {
    * Verify encryption type for a key (optional)
    * Only available if capabilities.encryptionVerification is true
    */
-  readonly verifyEncryption?: (ctx: ProviderContext, keyPath: string) => Effect.Effect<EncryptionTypeValue, ProviderError>;
+  readonly verifyEncryption?: (
+    ctx: ProviderContext,
+    keyPath: string
+  ) => Effect.Effect<EncryptionTypeValue, ProviderError>;
 };
 
 // --------------------------------------------------------------------------

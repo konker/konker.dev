@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable fp/no-unused-expression,fp/no-nil */
 /**
  * Zenfig CLI
  *

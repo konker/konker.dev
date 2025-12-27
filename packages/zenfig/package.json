@@ -32,17 +32,125 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./errors": {
-      "types": "./dist/errors.d.ts",
-      "import": "./dist/errors.js"
+    "./commands/delete": {
+      "types": "./dist/commands/delete.d.ts",
+      "import": "./dist/commands/delete.js"
+    },
+    "./commands/diff": {
+      "types": "./dist/commands/diff.d.ts",
+      "import": "./dist/commands/diff.js"
+    },
+    "./commands/doctor": {
+      "types": "./dist/commands/doctor.d.ts",
+      "import": "./dist/commands/doctor.js"
+    },
+    "./commands/export": {
+      "types": "./dist/commands/export.d.ts",
+      "import": "./dist/commands/export.js"
+    },
+    "./commands": {
+      "types": "./dist/commands/index.d.ts",
+      "import": "./dist/commands/index.js"
+    },
+    "./commands/init": {
+      "types": "./dist/commands/init.d.ts",
+      "import": "./dist/commands/init.js"
+    },
+    "./commands/snapshot": {
+      "types": "./dist/commands/snapshot.d.ts",
+      "import": "./dist/commands/snapshot.js"
+    },
+    "./commands/upsert": {
+      "types": "./dist/commands/upsert.d.ts",
+      "import": "./dist/commands/upsert.js"
+    },
+    "./commands/validate": {
+      "types": "./dist/commands/validate.d.ts",
+      "import": "./dist/commands/validate.js"
+    },
+    "./jsonnet/executor": {
+      "types": "./dist/jsonnet/executor.d.ts",
+      "import": "./dist/jsonnet/executor.js"
+    },
+    "./jsonnet": {
+      "types": "./dist/jsonnet/index.d.ts",
+      "import": "./dist/jsonnet/index.js"
+    },
+    "./jsonnet/tempFile": {
+      "types": "./dist/jsonnet/tempFile.d.ts",
+      "import": "./dist/jsonnet/tempFile.js"
+    },
+    "./lib/flatten": {
+      "types": "./dist/lib/flatten.d.ts",
+      "import": "./dist/lib/flatten.js"
+    },
+    "./lib/format": {
+      "types": "./dist/lib/format.d.ts",
+      "import": "./dist/lib/format.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./lib/merge": {
+      "types": "./dist/lib/merge.d.ts",
+      "import": "./dist/lib/merge.js"
+    },
+    "./lib/redact": {
+      "types": "./dist/lib/redact.d.ts",
+      "import": "./dist/lib/redact.js"
+    },
+    "./providers/ChamberProvider": {
+      "types": "./dist/providers/ChamberProvider.d.ts",
+      "import": "./dist/providers/ChamberProvider.js"
     },
     "./providers": {
       "types": "./dist/providers/index.d.ts",
       "import": "./dist/providers/index.js"
     },
+    "./providers/MockProvider": {
+      "types": "./dist/providers/MockProvider.d.ts",
+      "import": "./dist/providers/MockProvider.js"
+    },
+    "./providers/Provider": {
+      "types": "./dist/providers/Provider.d.ts",
+      "import": "./dist/providers/Provider.js"
+    },
+    "./providers/registry": {
+      "types": "./dist/providers/registry.d.ts",
+      "import": "./dist/providers/registry.js"
+    },
     "./schema": {
       "types": "./dist/schema/index.d.ts",
       "import": "./dist/schema/index.js"
+    },
+    "./schema/loader": {
+      "types": "./dist/schema/loader.d.ts",
+      "import": "./dist/schema/loader.js"
+    },
+    "./schema/parser": {
+      "types": "./dist/schema/parser.d.ts",
+      "import": "./dist/schema/parser.js"
+    },
+    "./schema/resolver": {
+      "types": "./dist/schema/resolver.d.ts",
+      "import": "./dist/schema/resolver.js"
+    },
+    "./schema/validator": {
+      "types": "./dist/schema/validator.d.ts",
+      "import": "./dist/schema/validator.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
     }
   },
   "files": [
@@ -93,7 +201,7 @@
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",
     "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
-    "exports-check": "attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
+    "exports-check": "NPM_CONFIG_CACHE=.npm-cache attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
     "prettier-fix": "pnpm run prettier-check --write",

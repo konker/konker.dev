@@ -1,8 +1,8 @@
 /**
  * MockProvider Tests
  */
-import { describe, expect, it, beforeEach } from 'vitest';
 import * as Effect from 'effect/Effect';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createMockProvider, mockProvider } from './MockProvider.js';
 import type { ProviderContext } from './Provider.js';

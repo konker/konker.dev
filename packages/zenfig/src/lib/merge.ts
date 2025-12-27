@@ -165,7 +165,7 @@ export const mergeConfigs = (
 
       return { merged, conflicts: allConflicts, lastSourceName };
     }),
-    Effect.flatMap(({ merged, conflicts }) => {
+    Effect.flatMap(({ conflicts, merged }) => {
       // Check for type mismatches in strict mode
       if (options.strictMerge) {
         const typeMismatches = conflicts.filter((c) => c.type === 'type-mismatch');

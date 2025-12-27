@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { flatten, unflatten, pathToEnvKey, envKeyToPath, camelToScreamingSnake } from './flatten.js';
+import { camelToScreamingSnake, envKeyToPath, flatten, pathToEnvKey, unflatten } from './flatten.js';
 
 describe('flatten', () => {
   describe('flatten', () => {

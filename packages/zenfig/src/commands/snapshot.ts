@@ -4,18 +4,19 @@
  * Save: Fetch -> Validate -> Store
  * Restore: Load -> Validate -> Diff -> Confirm -> Push
  */
-import * as Effect from 'effect/Effect';
-import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
+
+import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import {
   fileNotFoundError,
   permissionDeniedError,
-  snapshotSchemaMismatchError,
   type ProviderError,
+  snapshotSchemaMismatchError,
   type SystemError,
   type ValidationError,
   type ZenfigError,
@@ -147,8 +148,8 @@ export const executeSnapshotSave = (
         Effect.map((provider) => ({ schemaHash, provider }))
       )
     ),
-    Effect.flatMap(({ schemaHash, provider }) => {
-      const { service, sources = [], config } = options;
+    Effect.flatMap(({ provider, schemaHash }) => {
+      const { config, service, sources = [] } = options;
       const allServices = [service, ...sources];
 
       // 3. Fetch stored values per service
@@ -164,7 +165,7 @@ export const executeSnapshotSave = (
           const data: Record<string, ProviderKV> = {};
           let totalKeys = 0;
 
-          for (const { svc, kv } of results) {
+          for (const { kv, svc } of results) {
             data[svc] = kv;
             totalKeys += Object.keys(kv).length;
           }
@@ -173,7 +174,7 @@ export const executeSnapshotSave = (
         })
       );
     }),
-    Effect.flatMap(({ schemaHash, allServices, data, totalKeys, config }) => {
+    Effect.flatMap(({ allServices, config, data, schemaHash, totalKeys }) => {
       // 4. Build snapshot
       const snapshot: SnapshotV1 = {
         version: 1,
@@ -280,7 +281,9 @@ export const executeSnapshotRestore = (
           }
 
           if (snapshot.meta.schemaHash !== schemaHash) {
-            console.warn('[zenfig] Warning: Schema has changed since snapshot was created. Proceeding with --force-schema-mismatch.');
+            console.warn(
+              '[zenfig] Warning: Schema has changed since snapshot was created. Proceeding with --force-schema-mismatch.'
+            );
           }
 
           return Effect.succeed({ snapshot, schemaHash });
@@ -294,8 +297,8 @@ export const executeSnapshotRestore = (
         Effect.map((provider) => ({ snapshot, provider }))
       )
     ),
-    Effect.flatMap(({ snapshot, provider }) => {
-      const { config, dryRun = false, confirm = false } = options;
+    Effect.flatMap(({ provider, snapshot }) => {
+      const { config, confirm = false, dryRun = false } = options;
 
       // 5. Calculate changes
       return pipe(
@@ -309,7 +312,7 @@ export const executeSnapshotRestore = (
         Effect.map((results) => {
           const changes: Array<{ key: string; service: string; action: 'add' | 'update' }> = [];
 
-          for (const { svc, kv, currentKv } of results) {
+          for (const { currentKv, kv, svc } of results) {
             for (const [key, value] of Object.entries(kv)) {
               if (!(key in currentKv)) {
                 changes.push({ key, service: svc, action: 'add' });
@@ -323,68 +326,73 @@ export const executeSnapshotRestore = (
         })
       );
     }),
-    Effect.flatMap(({ snapshot, provider, changes, config, dryRun, confirm }): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
-      // 6. Show diff
-      console.log(`\nChanges to apply (${changes.length} keys):`);
-      for (const change of changes) {
-        const action = change.action === 'add' ? '[ADD]' : '[UPDATE]';
-        console.log(`  ${action} ${change.service}/${change.key}`);
-      }
+    Effect.flatMap(
+      ({
+        changes,
+        config,
+        confirm,
+        dryRun,
+        provider,
+        snapshot,
+      }): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
+        // 6. Show diff
+        console.log(`\nChanges to apply (${changes.length} keys):`);
+        for (const change of changes) {
+          const action = change.action === 'add' ? '[ADD]' : '[UPDATE]';
+          console.log(`  ${action} ${change.service}/${change.key}`);
+        }
 
-      if (changes.length === 0) {
-        console.log('No changes to apply.');
-        return Effect.succeed({ applied: false, changes: [] });
-      }
+        if (changes.length === 0) {
+          console.log('No changes to apply.');
+          return Effect.succeed({ applied: false, changes: [] });
+        }
 
-      if (dryRun) {
-        console.log('\nDry run - no changes applied.');
-        return Effect.succeed({ applied: false, changes });
-      }
+        if (dryRun) {
+          console.log('\nDry run - no changes applied.');
+          return Effect.succeed({ applied: false, changes });
+        }
 
-      // 7. Confirm
-      if (!confirm && !config.ci) {
+        // 7. Confirm
+        if (!confirm && !config.ci) {
+          return pipe(
+            promptConfirmation('\nApply these changes?'),
+            Effect.flatMap((confirmed): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
+              if (!confirmed) {
+                console.log('Restore cancelled.');
+                return Effect.succeed({ applied: false, changes });
+              }
+
+              // 8. Apply changes
+              return pipe(
+                Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
+                  const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+                  return Effect.forEach(Object.entries(kv), ([key, value]) => provider.upsert(ctx, key, value));
+                }),
+                Effect.map((): SnapshotRestoreResult => {
+                  console.log(`\nRestored ${changes.length} keys from snapshot.`);
+                  return { applied: true, changes };
+                })
+              );
+            })
+          );
+        } else if (!confirm && config.ci) {
+          console.error('Error: --confirm flag required in CI mode');
+          return Effect.succeed({ applied: false, changes });
+        }
+
+        // 8. Apply changes (with confirm flag)
         return pipe(
-          promptConfirmation('\nApply these changes?'),
-          Effect.flatMap((confirmed): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
-            if (!confirmed) {
-              console.log('Restore cancelled.');
-              return Effect.succeed({ applied: false, changes });
-            }
-
-            // 8. Apply changes
-            return pipe(
-              Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
-                const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-                return Effect.forEach(Object.entries(kv), ([key, value]) =>
-                  provider.upsert(ctx, key, value)
-                );
-              }),
-              Effect.map((): SnapshotRestoreResult => {
-                console.log(`\nRestored ${changes.length} keys from snapshot.`);
-                return { applied: true, changes };
-              })
-            );
+          Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
+            const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
+            return Effect.forEach(Object.entries(kv), ([key, value]) => provider.upsert(ctx, key, value));
+          }),
+          Effect.map((): SnapshotRestoreResult => {
+            console.log(`\nRestored ${changes.length} keys from snapshot.`);
+            return { applied: true, changes };
           })
         );
-      } else if (!confirm && config.ci) {
-        console.error('Error: --confirm flag required in CI mode');
-        return Effect.succeed({ applied: false, changes });
       }
-
-      // 8. Apply changes (with confirm flag)
-      return pipe(
-        Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
-          const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-          return Effect.forEach(Object.entries(kv), ([key, value]) =>
-            provider.upsert(ctx, key, value)
-          );
-        }),
-        Effect.map((): SnapshotRestoreResult => {
-          console.log(`\nRestored ${changes.length} keys from snapshot.`);
-          return { applied: true, changes };
-        })
-      );
-    })
+    )
   );
 
 /**

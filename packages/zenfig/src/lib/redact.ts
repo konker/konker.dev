@@ -29,7 +29,7 @@ export type RedactOptions = {
  * Redact a value if showValues is false
  */
 export const redactValue = (value: unknown, options: RedactOptions = {}): string => {
-  const { showValues = false, maxLength = 50 } = options;
+  const { maxLength = 50, showValues = false } = options;
 
   if (value === undefined) {
     return NOT_SET;
@@ -64,10 +64,7 @@ export const redactValue = (value: unknown, options: RedactOptions = {}): string
 /**
  * Redact all values in an object
  */
-export const redactObject = (
-  obj: Record<string, unknown>,
-  options: RedactOptions = {}
-): Record<string, string> => {
+export const redactObject = (obj: Record<string, unknown>, options: RedactOptions = {}): Record<string, string> => {
   const result: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(obj)) {

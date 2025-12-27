@@ -1,10 +1,10 @@
 /**
  * Merge Utilities Tests
  */
-import { describe, expect, it } from 'vitest';
 import * as Effect from 'effect/Effect';
+import { describe, expect, it } from 'vitest';
 
-import { mergeConfigs, type MergeConflict, getTypeMismatches, getOverrides } from './merge.js';
+import { getOverrides, getTypeMismatches, mergeConfigs, type MergeConflict } from './merge.js';
 
 describe('merge', () => {
   describe('mergeConfigs', () => {

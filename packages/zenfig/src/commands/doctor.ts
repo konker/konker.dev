@@ -3,11 +3,12 @@
  *
  * Check local prerequisites and basic connectivity
  */
+import * as fs from 'node:fs';
+
 import chalk from 'chalk';
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 import { execa } from 'execa';
-import * as fs from 'node:fs';
 
 import { type ResolvedConfig } from '../config.js';
 import { getProvider } from '../providers/registry.js';
@@ -139,7 +140,12 @@ const checkProvider = (providerName: string): Effect.Effect<CheckResult, never> 
  * Print a check result
  */
 const printCheck = (check: CheckResult): void => {
-  const icon = check.status === 'ok' ? chalk.green('\u2713') : check.status === 'warn' ? chalk.yellow('\u26A0') : chalk.red('\u2717');
+  const icon =
+    check.status === 'ok'
+      ? chalk.green('\u2713')
+      : check.status === 'warn'
+        ? chalk.yellow('\u26A0')
+        : chalk.red('\u2717');
 
   console.log(`${icon} ${check.name}`);
   console.log(`  ${check.message}`);
@@ -156,16 +162,14 @@ const printCheck = (check: CheckResult): void => {
 /**
  * Execute the doctor workflow
  */
-export const executeDoctor = (
-  options: DoctorOptions
-): Effect.Effect<DoctorResult, never> =>
+export const executeDoctor = (options: DoctorOptions): Effect.Effect<DoctorResult, never> =>
   pipe(
     Effect.sync(() => {
       console.log(chalk.bold('\nZenfig Doctor\n'));
       console.log('Checking prerequisites...\n');
       return { config: options.config, checks: [] as Array<CheckResult> };
     }),
-    Effect.flatMap(({ config, checks }) =>
+    Effect.flatMap(({ checks, config }) =>
       // 1. Check jsonnet binary
       pipe(
         checkBinary('jsonnet'),
@@ -176,7 +180,7 @@ export const executeDoctor = (
         })
       )
     ),
-    Effect.flatMap(({ config, checks }) => {
+    Effect.flatMap(({ checks, config }) => {
       // 2. Check chamber binary (if using chamber provider)
       if (config.provider === 'chamber') {
         return pipe(
@@ -190,7 +194,7 @@ export const executeDoctor = (
       }
       return Effect.succeed({ config, checks });
     }),
-    Effect.flatMap(({ config, checks }) =>
+    Effect.flatMap(({ checks, config }) =>
       // 3. Check schema file
       pipe(
         checkFile(config.schema, 'Schema file'),
@@ -201,7 +205,7 @@ export const executeDoctor = (
         })
       )
     ),
-    Effect.flatMap(({ config, checks, schemaFileCheck }) =>
+    Effect.flatMap(({ checks, config, schemaFileCheck }) =>
       // 4. Check Jsonnet template file
       pipe(
         checkFile(config.jsonnet, 'Jsonnet template'),
@@ -212,7 +216,7 @@ export const executeDoctor = (
         })
       )
     ),
-    Effect.flatMap(({ config, checks, schemaFileCheck }) => {
+    Effect.flatMap(({ checks, config, schemaFileCheck }) => {
       // 5. Check schema loading
       if (schemaFileCheck.status === 'ok') {
         return pipe(
@@ -226,7 +230,7 @@ export const executeDoctor = (
       }
       return Effect.succeed({ config, checks });
     }),
-    Effect.flatMap(({ config, checks }) =>
+    Effect.flatMap(({ checks, config }) =>
       // 6. Check provider registration
       pipe(
         checkProvider(config.provider),
@@ -265,9 +269,7 @@ export const executeDoctor = (
 /**
  * Run doctor command
  */
-export const runDoctor = (
-  options: DoctorOptions
-): Effect.Effect<boolean, never> =>
+export const runDoctor = (options: DoctorOptions): Effect.Effect<boolean, never> =>
   pipe(
     executeDoctor(options),
     Effect.map((result) => result.allPassed)

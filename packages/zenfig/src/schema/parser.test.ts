@@ -2,8 +2,8 @@
  * Schema Parser Tests
  */
 import { Type } from '@sinclair/typebox';
-import { describe, expect, it } from 'vitest';
 import * as Effect from 'effect/Effect';
+import { describe, expect, it } from 'vitest';
 
 import { parseValue, serializeValue } from './parser.js';
 

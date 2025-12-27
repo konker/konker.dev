@@ -7,8 +7,8 @@ import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
 import { connectionFailedError, type ProviderError } from '../errors.js';
-import { type Provider } from './Provider.js';
 import { mockProvider } from './MockProvider.js';
+import { type Provider } from './Provider.js';
 
 // --------------------------------------------------------------------------
 // Types

@@ -3,10 +3,11 @@
  *
  * Handles .zenfigrc.json loading and environment variable precedence
  */
-import * as Effect from 'effect/Effect';
-import { pipe } from 'effect/Function';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
+import * as Effect from 'effect/Effect';
+import { pipe } from 'effect/Function';
 
 // --------------------------------------------------------------------------
 // Types
@@ -162,14 +163,11 @@ export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<Resolv
     Effect.map((rcConfig) => {
       // Resolve env (special: also check NODE_ENV)
       const env =
-        cliOptions.env ??
-        getEnvVar('ZENFIG_ENV') ??
-        rcConfig?.env ??
-        getEnvVar('NODE_ENV') ??
-        DEFAULT_CONFIG.env;
+        cliOptions.env ?? getEnvVar('ZENFIG_ENV') ?? rcConfig?.env ?? getEnvVar('NODE_ENV') ?? DEFAULT_CONFIG.env;
 
       // Resolve other values
-      const provider = cliOptions.provider ?? getEnvVar('ZENFIG_PROVIDER') ?? rcConfig?.provider ?? DEFAULT_CONFIG.provider;
+      const provider =
+        cliOptions.provider ?? getEnvVar('ZENFIG_PROVIDER') ?? rcConfig?.provider ?? DEFAULT_CONFIG.provider;
 
       const ssmPrefix =
         cliOptions.ssmPrefix ?? getEnvVar('ZENFIG_SSM_PREFIX') ?? rcConfig?.ssmPrefix ?? DEFAULT_CONFIG.ssmPrefix;
@@ -197,7 +195,7 @@ export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<Resolv
       // Cache handling: --no-cache disables, otherwise use env or rc
       const cache = cliOptions.noCache
         ? undefined
-        : cliOptions.cache ?? getEnvVar('ZENFIG_CACHE') ?? rcConfig?.cache ?? DEFAULT_CONFIG.cache;
+        : (cliOptions.cache ?? getEnvVar('ZENFIG_CACHE') ?? rcConfig?.cache ?? DEFAULT_CONFIG.cache);
 
       const jsonnetTimeoutMs =
         cliOptions.jsonnetTimeout ??
