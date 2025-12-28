@@ -171,7 +171,8 @@
     "cli-table3": "^0.6.5",
     "commander": "^14.0.2",
     "effect": "^3.19.13",
-    "execa": "^9.6.1"
+    "execa": "^9.6.1",
+    "json5": "^2.2.3"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

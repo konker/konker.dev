@@ -26,9 +26,10 @@ pnpm run build
 
 ## Configure
 
-Zenfig reads configuration from `.zenfigrc.json` (searches current and parent directories) and environment variables.
+Zenfig reads configuration from `zenfigrc.json` or `zenfigrc.json5` (searches current and parent directories) and
+environment variables. Both files are parsed with JSON5, so comments and trailing commas are allowed.
 
-Example `.zenfigrc.json`:
+Example `zenfigrc.json`:
 
 ```json
 {

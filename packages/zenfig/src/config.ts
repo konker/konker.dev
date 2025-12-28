@@ -1,20 +1,21 @@
 /**
  * Configuration Loading
  *
- * Handles .zenfigrc.json loading and environment variable precedence
+ * Handles zenfigrc.json/zenfigrc.json5 loading and environment variable precedence
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
+import JSON5 from 'json5';
 
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
 
 /**
- * Zenfig configuration from .zenfigrc.json
+ * Zenfig configuration from zenfigrc.json/zenfigrc.json5
  */
 export type ZenfigRcConfig = {
   readonly env?: string;
@@ -112,8 +113,10 @@ const getEnvInt = (name: string): number | undefined => {
 // Config File Loading
 // --------------------------------------------------------------------------
 
+const RC_FILENAMES = ['zenfigrc.json5', 'zenfigrc.json'] as const;
+
 /**
- * Load .zenfigrc.json from the current directory or parent directories
+ * Load zenfigrc.json/zenfigrc.json5 from the current directory or parent directories
  */
 const loadRcFile = (startDir: string): Effect.Effect<ZenfigRcConfig | undefined, never> =>
   Effect.sync(() => {
@@ -121,14 +124,16 @@ const loadRcFile = (startDir: string): Effect.Effect<ZenfigRcConfig | undefined,
     const root = path.parse(currentDir).root;
 
     while (currentDir !== root) {
-      const rcPath = path.join(currentDir, '.zenfigrc.json');
-      try {
-        if (fs.existsSync(rcPath)) {
-          const content = fs.readFileSync(rcPath, 'utf-8');
-          return JSON.parse(content) as ZenfigRcConfig;
+      for (const fileName of RC_FILENAMES) {
+        const rcPath = path.join(currentDir, fileName);
+        try {
+          if (fs.existsSync(rcPath)) {
+            const content = fs.readFileSync(rcPath, 'utf-8');
+            return JSON5.parse(content) as ZenfigRcConfig;
+          }
+        } catch {
+          // Ignore parse errors, continue searching
         }
-      } catch {
-        // Ignore parse errors, continue searching
       }
       currentDir = path.dirname(currentDir);
     }
@@ -154,7 +159,7 @@ const isCIMode = (cliCi?: boolean): boolean => {
  * Resolve configuration with precedence:
  * 1. CLI flags (highest)
  * 2. Environment variables
- * 3. .zenfigrc.json
+ * 3. zenfigrc.json/zenfigrc.json5
  * 4. Defaults (lowest)
  */
 export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<ResolvedConfig, never> =>

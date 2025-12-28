@@ -199,8 +199,8 @@ describe('config', () => {
     });
   });
 
-  describe('resolveConfig with .zenfigrc.json', () => {
-    it('should load config from .zenfigrc.json', async () => {
+  describe('resolveConfig with zenfigrc.json/zenfigrc.json5', () => {
+    it('should load config from zenfigrc.json', async () => {
       const rcConfig = {
         env: 'staging',
         provider: 'ssm',
@@ -233,7 +233,39 @@ describe('config', () => {
       expect(result.jsonnetTimeoutMs).toBe(45000);
     });
 
-    it('should continue searching parent directories for .zenfigrc.json', async () => {
+    it('should load config from zenfigrc.json5 with JSON5 syntax', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(`{
+        // JSON5 comments allowed
+        env: 'staging',
+        provider: 'ssm',
+        ssmPrefix: '/app',
+        schema: 'config/schema.ts',
+        schemaExportName: 'AppSchema',
+        jsonnet: 'app.jsonnet',
+        sources: ['source1.json', 'source2.json'],
+        format: 'json',
+        separator: '__',
+        cache: '.zenfig-cache',
+        jsonnetTimeoutMs: 45000,
+      }`);
+
+      const result = await Effect.runPromise(resolveConfig());
+
+      expect(result.env).toBe('staging');
+      expect(result.provider).toBe('ssm');
+      expect(result.ssmPrefix).toBe('/app');
+      expect(result.schema).toBe('config/schema.ts');
+      expect(result.schemaExportName).toBe('AppSchema');
+      expect(result.jsonnet).toBe('app.jsonnet');
+      expect(result.sources).toEqual(['source1.json', 'source2.json']);
+      expect(result.format).toBe('json');
+      expect(result.separator).toBe('__');
+      expect(result.cache).toBe('.zenfig-cache');
+      expect(result.jsonnetTimeoutMs).toBe(45000);
+    });
+
+    it('should continue searching parent directories for zenfigrc.json', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
 
       const result = await Effect.runPromise(resolveConfig());
@@ -242,7 +274,7 @@ describe('config', () => {
       expect(result.env).toBe('dev');
     });
 
-    it('should handle parse errors in .zenfigrc.json gracefully', async () => {
+    it('should handle parse errors in zenfigrc.json gracefully', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('{ invalid json }');
 

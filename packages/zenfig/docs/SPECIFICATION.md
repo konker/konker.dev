@@ -426,7 +426,7 @@ Configuration values are resolved in the following order (highest to lowest prio
 
 1. CLI flags (e.g., `--env prod`)
 2. Environment variables (e.g., `ZENFIG_ENV`, `ZENFIG_SSM_PREFIX`)
-3. Config file (`.zenfigrc.json` in project root, if present)
+3. Config file (`zenfigrc.json` or `zenfigrc.json5` in project root, if present)
 4. Defaults (`NODE_ENV` for env, `/zenfig` for prefix, `dev` as fallback)
 
 Supported environment variables:
@@ -443,9 +443,10 @@ Supported environment variables:
 - `ZENFIG_SNAPSHOT_KEY`: Snapshot encryption key (avoid setting in shared shells/CI logs)
 - `NODE_ENV`: Fallback for environment name if `ZENFIG_ENV` not set
 
-### Config File (`.zenfigrc.json`)
+### Config File (`zenfigrc.json` / `zenfigrc.json5`)
 
-If present in the project root, `.zenfigrc.json` provides non-secret defaults for Zenfig.
+If present in the project root, `zenfigrc.json` or `zenfigrc.json5` provides non-secret defaults for Zenfig.
+Both are parsed with JSON5, so comments and trailing commas are allowed.
 
 Example:
 
@@ -467,8 +468,8 @@ Example:
 
 Rules:
 
-- `.zenfigrc.json` must not contain secrets.
-- CLI flags override environment variables, which override `.zenfigrc.json`, which override defaults.
+- `zenfigrc.json`/`zenfigrc.json5` must not contain secrets.
+- CLI flags override environment variables, which override `zenfigrc.json`/`zenfigrc.json5`, which override defaults.
 - Unknown keys should be ignored with a warning (or error in `--strict` mode).
 
 ### Validation Details
