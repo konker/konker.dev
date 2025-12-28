@@ -1,7 +1,7 @@
 /**
  * Schema Resolver Tests
  */
-import { Type } from '@sinclair/typebox';
+import { Kind, Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
@@ -49,6 +49,14 @@ describe('resolver', () => {
       expect(isOptionalSchema(Type.Boolean())).toBe(false);
       expect(isOptionalSchema(Type.Object({}))).toBe(false);
     });
+
+    it('should return true for optional schemas', () => {
+      const schema = {
+        [Kind]: 'Optional',
+        anyOf: [Type.String(), Type.Undefined()],
+      } as const;
+      expect(isOptionalSchema(schema as any)).toBe(true);
+    });
   });
 
   describe('unwrapOptional', () => {
@@ -56,6 +64,24 @@ describe('resolver', () => {
       const schema = Type.Optional(Type.String());
       const unwrapped = unwrapOptional(schema);
       expect(unwrapped).toHaveProperty('type', 'string');
+    });
+
+    it('should unwrap optional schemas with anyOf', () => {
+      const schema = {
+        [Kind]: 'Optional',
+        anyOf: [{ [Kind]: 'String' }, { [Kind]: 'Undefined' }],
+      } as const;
+      const unwrapped = unwrapOptional(schema as any);
+      expect(unwrapped[Kind]).toBe('String');
+    });
+
+    it('should return original schema when optional anyOf lacks non-undefined', () => {
+      const schema = {
+        [Kind]: 'Optional',
+        anyOf: [{ [Kind]: 'Undefined' }],
+      } as const;
+      const unwrapped = unwrapOptional(schema as any);
+      expect(unwrapped).toBe(schema);
     });
 
     it('should return same schema if not optional', () => {
@@ -121,6 +147,17 @@ describe('resolver', () => {
       const result = await Effect.runPromiseExit(resolvePath(TestSchema, '   '));
 
       expect(result._tag).toBe('Failure');
+    });
+
+    it('should fail when schema is not an object', async () => {
+      const schema = { [Kind]: 'String' } as const;
+
+      try {
+        await Effect.runPromise(resolvePath(schema as any, 'value'));
+        throw new Error('Expected resolvePath to fail');
+      } catch (error) {
+        expect((error as { context?: { availableKeys?: Array<string> } }).context?.availableKeys).toBeUndefined();
+      }
     });
 
     it('should fail for non-existent path', async () => {
@@ -218,6 +255,16 @@ describe('resolver', () => {
       expect(withDefaultPath?.hasDefault).toBe(true);
       expect(withDefaultPath?.defaultValue).toBe('hello');
       expect(withoutDefaultPath?.hasDefault).toBe(false);
+    });
+
+    it('should report defaults for non-object schemas', () => {
+      const schema = { [Kind]: 'String', default: 'hello' } as const;
+      const paths = getAllLeafPaths(schema as any, 'root');
+
+      expect(paths).toHaveLength(1);
+      expect(paths[0]?.path).toBe('root');
+      expect(paths[0]?.hasDefault).toBe(true);
+      expect(paths[0]?.defaultValue).toBe('hello');
     });
 
     it('should handle deeply nested schema', () => {
@@ -338,10 +385,23 @@ describe('resolver', () => {
       expect(description).toBeDefined();
     });
 
+    it('should describe optional schemas', () => {
+      const optionalSchema = {
+        [Kind]: 'Optional',
+        anyOf: [{ [Kind]: 'String' }, { [Kind]: 'Undefined' }],
+      } as const;
+      expect(getTypeDescription(optionalSchema as any)).toBe('optional string');
+    });
+
     it('should describe unknown types', () => {
       // Create a custom schema with an unknown kind
       const unknownSchema = { [Symbol.for('TypeBox.Kind')]: 'CustomType' } as any;
       expect(getTypeDescription(unknownSchema)).toBe('CustomType');
+    });
+
+    it('should return unknown when kind is missing', () => {
+      const unknownSchema = {} as any;
+      expect(getTypeDescription(unknownSchema)).toBe('unknown');
     });
   });
 });

@@ -375,6 +375,26 @@ describe('errors', () => {
       expect(formatted).toContain('Received: "8080"');
     });
 
+    it('should format error with problem and remediation', () => {
+      const error = invalidTypeError('db.port', 'integer', '"3.14"');
+      const formatted = formatError(error);
+
+      expect(formatted).toContain('Problem:');
+      expect(formatted).toContain('Remediation:');
+      expect(formatted).toContain('Provide a valid integer value');
+    });
+
+    it('should omit problem and remediation when absent', () => {
+      const error = new ValidationError({
+        message: 'Missing details',
+        context: { code: ErrorCode.VAL001, problem: '', remediation: '' },
+      });
+      const formatted = formatError(error);
+
+      expect(formatted).not.toContain('Problem:');
+      expect(formatted).not.toContain('Remediation:');
+    });
+
     it('should format error with available keys', () => {
       const error = keyNotFoundError('unknown.key', ['known.a', 'known.b', 'known.c']);
       const formatted = formatError(error);

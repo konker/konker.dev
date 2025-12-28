@@ -26,7 +26,10 @@ const needsQuoting = (value: string): boolean => {
   // - Contains spaces, #, =, newlines, or $
   // - Starts or ends with whitespace
   // - Is empty
-  if (value.length === 0) return false; // Empty string can be KEY= without quotes
+  if (value.length === 0) {
+    // Empty string can be KEY= without quotes
+    return false;
+  }
   if (value.startsWith(' ') || value.endsWith(' ')) return true;
   if (/[\s#=$\n]/.test(value)) return true;
   return false;

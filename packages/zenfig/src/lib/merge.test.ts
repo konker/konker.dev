@@ -71,6 +71,26 @@ describe('merge', () => {
       await expect(Effect.runPromise(mergeConfigs(sources, { strictMerge: true }))).rejects.toThrow();
     });
 
+    it('should include type names in strict merge errors', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { x: ['a'] }],
+        ['source2', { x: 'value' }],
+      ];
+
+      await expect(Effect.runPromise(mergeConfigs(sources, { strictMerge: true }))).rejects.toThrow('array');
+    });
+
+    it('should allow strict merge when there are no type mismatches', async () => {
+      const sources: ReadonlyArray<readonly [string, Record<string, unknown>]> = [
+        ['source1', { x: 1 }],
+        ['source2', { x: 2 }],
+      ];
+
+      const result = await Effect.runPromise(mergeConfigs(sources, { strictMerge: true }));
+
+      expect(result.merged).toEqual({ x: 2 });
+    });
+
     it('should handle empty input', async () => {
       const result = await Effect.runPromise(mergeConfigs([]));
 

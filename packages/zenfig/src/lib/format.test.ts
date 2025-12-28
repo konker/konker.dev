@@ -177,6 +177,17 @@ describe('format', () => {
       expect(result).toContain('KEY="trailing "');
     });
 
+    it('should allow empty string values without quotes', () => {
+      const data = {
+        empty: '',
+      };
+
+      const result = formatEnv(data);
+
+      expect(result).toContain('EMPTY=');
+      expect(result).not.toContain('EMPTY=""');
+    });
+
     it('should quote values with hash sign', () => {
       const data = {
         key: 'value#comment',

@@ -1,7 +1,7 @@
 /**
  * Schema Parser Tests
  */
-import { Type } from '@sinclair/typebox';
+import { Kind, Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
@@ -111,6 +111,21 @@ describe('parser', () => {
         const schema = Type.Union([Type.String()]);
         const result = await Effect.runPromise(parseValue('hello', schema, 'test'));
         expect(result).toBe('hello');
+      });
+
+      it('should fall back to raw string when no branches match', async () => {
+        const schema = Type.Union([Type.Integer(), Type.Boolean()]);
+        const result = await Effect.runPromise(parseValue('not-a-number', schema, 'test'));
+        expect(result).toBe('not-a-number');
+      });
+
+      it('should fall back to raw string for custom union schemas', async () => {
+        const schema = {
+          [Kind]: 'Union',
+          anyOf: [{ [Kind]: 'Integer' }, { [Kind]: 'Boolean' }],
+        } as const;
+        const result = await Effect.runPromise(parseValue('not-a-number', schema as any, 'test'));
+        expect(result).toBe('not-a-number');
       });
     });
 
@@ -230,6 +245,15 @@ describe('parser', () => {
         // This is valid because Number("1e+100") is finite and isInteger
         const result = await Effect.runPromise(parseValue('1e+100', schema, 'test'));
         expect(result).toBe(1e100);
+      });
+
+      it('should reject non-integer values without decimal point', async () => {
+        await expect(Effect.runPromise(parseValue('1e-1', schema, 'test'))).rejects.toThrow();
+      });
+
+      it('should reject non-integer values with custom integer schema', async () => {
+        const customSchema = { [Kind]: 'Integer' } as const;
+        await expect(Effect.runPromise(parseValue('1e-1', customSchema as any, 'test'))).rejects.toThrow();
       });
     });
 
@@ -464,6 +488,73 @@ describe('parser', () => {
       expect(result).toEqual({
         outer: {
           inner: 'value',
+        },
+      });
+    });
+
+    it('should unwrap optional schemas during navigation', async () => {
+      const optionalInner = {
+        [Kind]: 'Optional',
+        anyOf: [
+          {
+            [Kind]: 'Object',
+            properties: {
+              inner: { [Kind]: 'String' },
+            },
+          },
+          { [Kind]: 'Undefined' },
+        ],
+      } as const;
+      const schema = {
+        [Kind]: 'Object',
+        properties: {
+          outer: optionalInner,
+        },
+      } as never;
+      const kv = {
+        'outer.inner': 'value',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        outer: {
+          inner: 'value',
+        },
+      });
+    });
+
+    it('should parse paths even when schema is not an object', async () => {
+      const schema = { [Kind]: 'String' } as never;
+      const kv = {
+        'a.b': 'value',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        a: {
+          b: 'value',
+        },
+      });
+    });
+
+    it('should keep schema when path segment is missing', async () => {
+      const schema = {
+        [Kind]: 'Object',
+        properties: {
+          known: { [Kind]: 'String' },
+        },
+      } as never;
+      const kv = {
+        'unknown.value': '{}',
+      };
+
+      const result = await Effect.runPromise(parseProviderKV(kv, schema));
+
+      expect(result).toEqual({
+        unknown: {
+          value: {},
         },
       });
     });
