@@ -6,8 +6,11 @@
  * Configuration and secrets management tool
  */
 import { Command } from 'commander';
+import * as Cause from 'effect/Cause';
 import * as Effect from 'effect/Effect';
+import * as Exit from 'effect/Exit';
 import { pipe } from 'effect/Function';
+import * as Option from 'effect/Option';
 
 import { runDelete } from './commands/delete.js';
 import { runDiff } from './commands/diff.js';
@@ -20,6 +23,7 @@ import { runUpsert } from './commands/upsert.js';
 import { runValidate } from './commands/validate.js';
 import { type CLIOptions, resolveConfig } from './config.js';
 import { EXIT_VALIDATION_ERROR, formatError, type ZenfigErrorLike } from './errors.js';
+import './providers/index.js';
 
 // --------------------------------------------------------------------------
 // Error Handling
@@ -43,7 +47,29 @@ const handleError = (error: unknown): never => {
 };
 
 const runEffect = <A>(effect: Effect.Effect<A, unknown>): void => {
-  Effect.runPromise(effect).catch(handleError);
+  Effect.runPromiseExit(effect)
+    .then((exit) => {
+      if (Exit.isSuccess(exit)) {
+        return;
+      }
+
+      const causeOpt = Exit.causeOption(exit);
+      const failure = pipe(causeOpt, Option.flatMap(Cause.failureOption), Option.getOrUndefined);
+
+      if (failure) {
+        handleError(failure);
+        return;
+      }
+
+      const prettyCause = pipe(causeOpt, Option.map(Cause.pretty), Option.getOrUndefined);
+      if (prettyCause) {
+        console.error(prettyCause);
+        process.exit(EXIT_VALIDATION_ERROR);
+      }
+
+      handleError(new Error('Unknown error'));
+    })
+    .catch(handleError);
 };
 
 // --------------------------------------------------------------------------
