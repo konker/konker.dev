@@ -7,7 +7,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import * as Effect from 'effect/Effect';
+import * as Either from 'effect/Either';
 import { pipe } from 'effect/Function';
+import * as Schema from 'effect/Schema';
 import JSON5 from 'json5';
 
 // --------------------------------------------------------------------------
@@ -17,65 +19,76 @@ import JSON5 from 'json5';
 /**
  * Zenfig configuration from zenfigrc.json/zenfigrc.json5
  */
-export type ZenfigRcConfig = {
-  readonly env?: string;
-  readonly provider?: string;
-  readonly ssmPrefix?: string;
-  readonly schema?: string;
-  readonly schemaExportName?: string;
-  readonly jsonnet?: string;
-  readonly sources?: ReadonlyArray<string>;
-  readonly format?: 'env' | 'json';
-  readonly separator?: string;
-  readonly cache?: string;
-  readonly jsonnetTimeoutMs?: number;
-  readonly providerGuards?: ProviderGuardsConfig;
-};
+export const ProviderGuardsSchema = Schema.Record({ key: Schema.String, value: Schema.Unknown });
 
 /**
  * Provider guard configuration mapping
  */
-export type ProviderGuardsConfig = Record<string, unknown>;
+export type ProviderGuardsConfig = Schema.Schema.Type<typeof ProviderGuardsSchema>;
+
+export const ZenfigRcSchema = Schema.Struct({
+  env: Schema.optional(Schema.String),
+  provider: Schema.optional(Schema.String),
+  ssmPrefix: Schema.optional(Schema.String),
+  schema: Schema.optional(Schema.String),
+  schemaExportName: Schema.optional(Schema.String),
+  jsonnet: Schema.optional(Schema.String),
+  sources: Schema.optional(Schema.Array(Schema.String)),
+  format: Schema.optional(Schema.Union(Schema.Literal('env'), Schema.Literal('json'))),
+  separator: Schema.optional(Schema.String),
+  cache: Schema.optional(Schema.String),
+  jsonnetTimeoutMs: Schema.optional(Schema.Number),
+  providerGuards: Schema.optional(ProviderGuardsSchema),
+});
+
+/**
+ * Zenfig configuration from zenfigrc.json/zenfigrc.json5
+ */
+export type ZenfigRcConfig = Schema.Schema.Type<typeof ZenfigRcSchema>;
+
+export const ResolvedConfigSchema = Schema.Struct({
+  env: Schema.String,
+  provider: Schema.String,
+  ssmPrefix: Schema.String,
+  schema: Schema.String,
+  schemaExportName: Schema.String,
+  jsonnet: Schema.String,
+  sources: Schema.Array(Schema.String),
+  format: Schema.Union(Schema.Literal('env'), Schema.Literal('json')),
+  separator: Schema.String,
+  cache: Schema.optional(Schema.String),
+  jsonnetTimeoutMs: Schema.Number,
+  ci: Schema.Boolean,
+  strict: Schema.Boolean,
+  providerGuards: ProviderGuardsSchema,
+});
 
 /**
  * Resolved configuration with all values
  */
-export type ResolvedConfig = {
-  readonly env: string;
-  readonly provider: string;
-  readonly ssmPrefix: string;
-  readonly schema: string;
-  readonly schemaExportName: string;
-  readonly jsonnet: string;
-  readonly sources: ReadonlyArray<string>;
-  readonly format: 'env' | 'json';
-  readonly separator: string;
-  readonly cache: string | undefined;
-  readonly jsonnetTimeoutMs: number;
-  readonly ci: boolean;
-  readonly strict: boolean;
-  readonly providerGuards: ProviderGuardsConfig;
-};
+export type ResolvedConfig = Schema.Schema.Type<typeof ResolvedConfigSchema>;
+
+export const CLIOptionsSchema = Schema.Struct({
+  env: Schema.optional(Schema.String),
+  provider: Schema.optional(Schema.String),
+  ssmPrefix: Schema.optional(Schema.String),
+  schema: Schema.optional(Schema.String),
+  schemaExportName: Schema.optional(Schema.String),
+  jsonnet: Schema.optional(Schema.String),
+  source: Schema.optional(Schema.Array(Schema.String)),
+  format: Schema.optional(Schema.Union(Schema.Literal('env'), Schema.Literal('json'))),
+  separator: Schema.optional(Schema.String),
+  cache: Schema.optional(Schema.String),
+  noCache: Schema.optional(Schema.Boolean),
+  jsonnetTimeout: Schema.optional(Schema.Number),
+  ci: Schema.optional(Schema.Boolean),
+  strict: Schema.optional(Schema.Boolean),
+});
 
 /**
  * CLI options that override config
  */
-export type CLIOptions = {
-  readonly env?: string | undefined;
-  readonly provider?: string | undefined;
-  readonly ssmPrefix?: string | undefined;
-  readonly schema?: string | undefined;
-  readonly schemaExportName?: string | undefined;
-  readonly jsonnet?: string | undefined;
-  readonly source?: ReadonlyArray<string> | undefined;
-  readonly format?: 'env' | 'json' | undefined;
-  readonly separator?: string | undefined;
-  readonly cache?: string | undefined;
-  readonly noCache?: boolean | undefined;
-  readonly jsonnetTimeout?: number | undefined;
-  readonly ci?: boolean | undefined;
-  readonly strict?: boolean | undefined;
-};
+export type CLIOptions = Schema.Schema.Type<typeof CLIOptionsSchema>;
 
 // --------------------------------------------------------------------------
 // Defaults
@@ -119,14 +132,6 @@ function getEnvInt(name: string): number | undefined {
   return Number.isNaN(num) ? undefined : num;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function resolveProviderGuards(value: unknown): ProviderGuardsConfig {
-  return isRecord(value) ? value : {};
-}
-
 // --------------------------------------------------------------------------
 // Config File Loading
 // --------------------------------------------------------------------------
@@ -147,7 +152,11 @@ function loadRcFile(startDir: string): Effect.Effect<ZenfigRcConfig | undefined,
         try {
           if (fs.existsSync(rcPath)) {
             const content = fs.readFileSync(rcPath, 'utf-8');
-            return JSON5.parse(content) as ZenfigRcConfig;
+            const parsed = JSON5.parse(content);
+            const decoded = Schema.decodeUnknownEither(ZenfigRcSchema)(parsed);
+            if (Either.isRight(decoded)) {
+              return decoded.right;
+            }
           }
         } catch {
           // Ignore parse errors, continue searching
@@ -229,7 +238,7 @@ export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<Resolv
 
       const ci = isCIMode(cliOptions.ci);
       const strict = cliOptions.strict ?? false;
-      const providerGuards = resolveProviderGuards(rcConfig?.providerGuards);
+      const providerGuards = rcConfig?.providerGuards ?? DEFAULT_CONFIG.providerGuards;
 
       return {
         env,
