@@ -5,7 +5,7 @@ import * as fs from 'node:fs';
 
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { ErrorCode } from '../errors.js';
 import { createJsonTempFile, createTempFile, withJsonTempFile, withTempFile } from './tempFile.js';
@@ -81,6 +81,18 @@ describe('Temp File Handling', () => {
 
       // Cleanup should not throw
       await expect(Effect.runPromise(tempFile.cleanup())).resolves.toBeUndefined();
+    });
+
+    it('should fail when temp file cannot be written', async () => {
+      const exit = await Effect.runPromiseExit(createTempFile('content', 'nonexistent-dir/zenfig-'));
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.SYS003);
+        }
+      }
     });
   });
 
@@ -161,9 +173,7 @@ describe('Temp File Handling', () => {
     it('should propagate errors from the function', async () => {
       const testError = new Error('test error');
 
-      const exit = await Effect.runPromiseExit(
-        withTempFile('content', () => Effect.fail(testError))
-      );
+      const exit = await Effect.runPromiseExit(withTempFile('content', () => Effect.fail(testError)));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {

@@ -10,7 +10,11 @@ import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
+import { evaluateTemplate } from '../jsonnet/executor.js';
+import { REDACTED } from '../lib/redact.js';
 import { createMockProvider } from '../providers/MockProvider.js';
+import { getProvider } from '../providers/registry.js';
+import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { executeDiff, runDiff } from './diff.js';
 
 // Mock dependencies
@@ -25,10 +29,6 @@ vi.mock('../providers/registry.js', () => ({
 vi.mock('../jsonnet/executor.js', () => ({
   evaluateTemplate: vi.fn(),
 }));
-
-import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { getProvider } from '../providers/registry.js';
-import { evaluateTemplate } from '../jsonnet/executor.js';
 
 describe('Diff Command', () => {
   let tempDir: string;
@@ -76,9 +76,7 @@ describe('Diff Command', () => {
       },
     });
 
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-      Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' })
-    );
+    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
   });
 
@@ -296,6 +294,75 @@ describe('Diff Command', () => {
       // Check JSON format was output
       const lastCall = consoleSpy.mock.calls[0]?.[0];
       expect(() => JSON.parse(lastCall)).not.toThrow();
+    });
+
+    it('should redact values in JSON output when showValues is false', async () => {
+      await Effect.runPromise(
+        runDiff({
+          service: 'api',
+          format: 'json',
+          showValues: true,
+          _testEntries: [{ key: 'api.secret', stored: 'stored', rendered: 'rendered', status: 'modified' }],
+          config: defaultConfig,
+        })
+      );
+
+      const output = JSON.parse(String(consoleSpy.mock.calls[0]?.[0] ?? '[]'));
+      expect(output[0].stored).toBe(REDACTED);
+      expect(output[0].rendered).toBe(REDACTED);
+    });
+
+    it('should include values in JSON output when unsafeShowValues is true', async () => {
+      await Effect.runPromise(
+        runDiff({
+          service: 'api',
+          format: 'json',
+          unsafeShowValues: true,
+          _testEntries: [
+            { key: 'api.secret', stored: 'stored', rendered: 'rendered', status: 'modified' },
+            { key: 'api.missing', stored: undefined, rendered: undefined, status: 'removed' },
+          ],
+          config: defaultConfig,
+        })
+      );
+
+      const output = JSON.parse(String(consoleSpy.mock.calls[0]?.[0] ?? '[]'));
+      expect(output[0].stored).toBe('stored');
+      expect(output[0].rendered).toBe('rendered');
+      expect(output[1].stored).toBeNull();
+      expect(output[1].rendered).toBeNull();
+    });
+
+    it('should format added and removed statuses in table output', async () => {
+      await Effect.runPromise(
+        runDiff({
+          service: 'api',
+          _testEntries: [
+            { key: 'api.added', stored: undefined, rendered: 'new', status: 'added' },
+            { key: 'api.removed', stored: 'old', rendered: undefined, status: 'removed' },
+          ],
+          config: defaultConfig,
+        })
+      );
+
+      const output = String(consoleSpy.mock.calls[0]?.[0] ?? '');
+      expect(output).toContain('Added');
+      expect(output).toContain('Removed');
+    });
+
+    it('should fall back to raw status labels when unknown', async () => {
+      await Effect.runPromise(
+        runDiff({
+          service: 'api',
+          _testEntries: [
+            { key: 'api.mystery', stored: 'a', rendered: 'b', status: 'mystery' as unknown as 'modified' },
+          ],
+          config: defaultConfig,
+        })
+      );
+
+      const output = String(consoleSpy.mock.calls[0]?.[0] ?? '');
+      expect(output).toContain('mystery');
     });
   });
 });

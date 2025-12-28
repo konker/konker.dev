@@ -6,7 +6,12 @@ import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
+import { ValidationError } from '../errors.js';
+import { evaluateTemplate } from '../jsonnet/executor.js';
 import { createMockProvider } from '../providers/MockProvider.js';
+import { getProvider } from '../providers/registry.js';
+import { validate } from '../schema/index.js';
+import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { executeExport, runExport } from './export.js';
 
 // Mock dependencies
@@ -26,13 +31,7 @@ vi.mock('../schema/validator.js', () => ({
   validate: vi.fn(),
 }));
 
-import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { getProvider } from '../providers/registry.js';
-import { evaluateTemplate } from '../jsonnet/executor.js';
-import { validate } from '../schema/validator.js';
-
 describe('Export Command', () => {
-  let consoleSpy: ReturnType<typeof vi.spyOn>;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let stdoutWriteSpy: ReturnType<typeof vi.spyOn>;
   let mockProvider: ReturnType<typeof createMockProvider>;
@@ -76,13 +75,11 @@ describe('Export Command', () => {
       },
     });
 
-    consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
+    vi.spyOn(console, 'log').mockImplementation(vi.fn());
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(vi.fn());
 
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-      Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' })
-    );
+    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
     // Default: validate just passes through the value
@@ -221,9 +218,7 @@ describe('Export Command', () => {
       );
 
       // Mock validation failure
-      vi.mocked(validate).mockReturnValue(
-        Effect.fail(new Error('Validation failed'))
-      );
+      vi.mocked(validate).mockReturnValue(Effect.fail(new ValidationError({ message: 'Validation failed' } as never)));
 
       const exit = await Effect.runPromiseExit(
         executeExport({
@@ -301,9 +296,7 @@ describe('Export Command', () => {
         })
       );
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Warning')
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Warning'));
     });
   });
 });

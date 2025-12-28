@@ -1,13 +1,16 @@
 /**
  * Upsert Command Tests
  */
+import { Readable } from 'node:stream';
+
 import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
-import { ErrorCode } from '../errors.js';
 import { createMockProvider } from '../providers/MockProvider.js';
+import { getProvider } from '../providers/registry.js';
+import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { executeUpsert, runUpsert } from './upsert.js';
 
 // Mock dependencies
@@ -18,9 +21,6 @@ vi.mock('../schema/loader.js', () => ({
 vi.mock('../providers/registry.js', () => ({
   getProvider: vi.fn(),
 }));
-
-import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { getProvider } from '../providers/registry.js';
 
 describe('Upsert Command', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
@@ -60,9 +60,7 @@ describe('Upsert Command', () => {
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-      Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' })
-    );
+    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
   });
 
@@ -151,9 +149,7 @@ describe('Upsert Command', () => {
       );
 
       // Verify stored in provider
-      const stored = await Effect.runPromise(
-        mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' })
-      );
+      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBe('myhost.example.com');
     });
 
@@ -163,12 +159,65 @@ describe('Upsert Command', () => {
           service: 'api',
           key: 'database.port',
           value: '8080',
-          type: 'integer',
+          type: 'int',
           config: defaultConfig,
         })
       );
 
       expect(result.value).toBe(8080);
+    });
+
+    it('should read value from stdin when requested', async () => {
+      const stdinDescriptor = Object.getOwnPropertyDescriptor(process, 'stdin');
+      const mockStdin = Readable.from([Buffer.from('5432\n')]);
+      Object.defineProperty(process, 'stdin', { value: mockStdin });
+
+      try {
+        const result = await Effect.runPromise(
+          executeUpsert({
+            service: 'api',
+            key: 'database.port',
+            stdin: true,
+            config: defaultConfig,
+          })
+        );
+
+        expect(result.value).toBe(5432);
+      } finally {
+        if (stdinDescriptor) {
+          Object.defineProperty(process, 'stdin', stdinDescriptor);
+        }
+      }
+    });
+
+    it('should skip encryption verification when requested', async () => {
+      const verifySpy = vi.spyOn(mockProvider, 'verifyEncryption');
+
+      const result = await Effect.runPromise(
+        executeUpsert({
+          service: 'api',
+          key: 'database.host',
+          value: 'localhost',
+          skipEncryptionCheck: true,
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.encrypted).toBe(true);
+      expect(verifySpy).not.toHaveBeenCalled();
+    });
+
+    it('should default to empty string when value is missing', async () => {
+      const result = await Effect.runPromise(
+        executeUpsert({
+          service: 'api',
+          key: 'database.host',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.value).toBe('');
+      expect(result.serialized).toBe('');
     });
   });
 
@@ -183,16 +232,17 @@ describe('Upsert Command', () => {
         })
       );
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Successfully wrote database.host')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Successfully wrote database.host'));
     });
 
     it('should warn if value may not be encrypted', async () => {
       // Create a mock provider that reports not encrypted
-      const nonEncryptingProvider = createMockProvider();
-      nonEncryptingProvider.capabilities.encryptionVerification = true;
-      nonEncryptingProvider.verifyEncryption = () => Effect.succeed('String' as const);
+      const baseProvider = createMockProvider();
+      const nonEncryptingProvider = {
+        ...baseProvider,
+        capabilities: { ...baseProvider.capabilities, encryptionVerification: true },
+        verifyEncryption: () => Effect.succeed('String' as const),
+      };
 
       vi.mocked(getProvider).mockReturnValue(Effect.succeed(nonEncryptingProvider));
 
@@ -205,9 +255,7 @@ describe('Upsert Command', () => {
         })
       );
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: Value may not be encrypted')
-      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Warning: Value may not be encrypted'));
     });
   });
 });

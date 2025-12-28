@@ -5,11 +5,12 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { Type } from '@sinclair/typebox';
+import { Kind, Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
+import { ErrorCode } from '../errors.js';
 import { executeInit, runInit } from './init.js';
 
 // Mock schema loader
@@ -60,9 +61,7 @@ describe('Init Command', () => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-      Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' })
-    );
+    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
   });
 
   afterEach(() => {
@@ -138,9 +137,7 @@ describe('Init Command', () => {
 
       expect(result.created).toBe(false);
       expect(fs.readFileSync(outputPath, 'utf-8')).toBe('existing content');
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Output file already exists')
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Output file already exists'));
     });
 
     it('should overwrite existing file with force flag', async () => {
@@ -157,9 +154,7 @@ describe('Init Command', () => {
 
       expect(result.created).toBe(true);
       expect(fs.readFileSync(outputPath, 'utf-8')).not.toBe('existing content');
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Overwriting existing file')
-      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Overwriting existing file'));
     });
 
     it('should use default output path from config', async () => {
@@ -220,6 +215,131 @@ describe('Init Command', () => {
       // Optional properties may have conditional logic
       expect(content).toContain('enabled');
     });
+
+    it('should generate conditional blocks for optional objects', async () => {
+      const optionalSchema = {
+        [Kind]: 'Optional',
+        anyOf: [
+          Type.Undefined(),
+          Type.Object({
+            flag: Type.Boolean(),
+          }),
+        ],
+      } as const;
+
+      const schema = {
+        type: 'object',
+        properties: {
+          nested: optionalSchema,
+        },
+        required: [],
+        [Kind]: 'Object',
+      } as const;
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
+        Effect.succeed({ schema: schema as unknown as typeof testSchema, schemaHash: 'sha256:opt' })
+      );
+
+      const outputPath = path.join(tempDir, 'optional-object.jsonnet');
+      await Effect.runPromise(
+        executeInit({
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      const content = fs.readFileSync(outputPath, 'utf-8');
+      expect(content).toContain('if std.objectHas');
+      expect(content).toContain('nested:');
+    });
+
+    it('should annotate union types in generated output', async () => {
+      const schema = Type.Object({
+        unionValue: Type.Union([Type.String(), Type.Integer()]),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:union' }));
+
+      const outputPath = path.join(tempDir, 'union.jsonnet');
+      await Effect.runPromise(
+        executeInit({
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      const content = fs.readFileSync(outputPath, 'utf-8');
+      expect(content).toContain('// Union type');
+    });
+
+    it('should fail when schema is not an object', async () => {
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
+        Effect.succeed({ schema: Type.String(), schemaHash: 'sha256:bad' })
+      );
+
+      const outputPath = path.join(tempDir, 'config.jsonnet');
+      const exit = await Effect.runPromiseExit(
+        executeInit({
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+        }
+      }
+    });
+
+    it('should fail when output directory cannot be created', async () => {
+      const blockedPath = path.join(tempDir, 'blocked');
+      fs.writeFileSync(blockedPath, 'not a directory');
+
+      const outputPath = path.join(blockedPath, 'dir', 'config.jsonnet');
+      const exit = await Effect.runPromiseExit(
+        executeInit({
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.SYS003);
+        }
+      }
+    });
+
+    it('should fail when output file cannot be written', async () => {
+      const readonlyDir = path.join(tempDir, 'readonly');
+      fs.mkdirSync(readonlyDir, { recursive: true });
+      fs.chmodSync(readonlyDir, 0o500);
+
+      try {
+        const outputPath = path.join(readonlyDir, 'config.jsonnet');
+        const exit = await Effect.runPromiseExit(
+          executeInit({
+            output: outputPath,
+            config: defaultConfig,
+          })
+        );
+
+        expect(exit._tag).toBe('Failure');
+        if (exit._tag === 'Failure') {
+          const cause = exit.cause;
+          if (cause._tag === 'Fail') {
+            expect(cause.error.context.code).toBe(ErrorCode.SYS003);
+          }
+        }
+      } finally {
+        fs.chmodSync(readonlyDir, 0o700);
+      }
+    });
   });
 
   describe('runInit', () => {
@@ -261,9 +381,7 @@ describe('Init Command', () => {
         })
       );
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Generated')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Generated'));
     });
   });
 });

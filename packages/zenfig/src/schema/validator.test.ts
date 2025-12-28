@@ -235,9 +235,7 @@ describe('Schema Validator', () => {
           }),
         });
 
-        const result = await Effect.runPromise(
-          validate({ database: { host: 'localhost', port: 5432 } }, schema)
-        );
+        const result = await Effect.runPromise(validate({ database: { host: 'localhost', port: 5432 } }, schema));
 
         expect(result).toEqual({ database: { host: 'localhost', port: 5432 } });
       });
@@ -249,9 +247,7 @@ describe('Schema Validator', () => {
           }),
         });
 
-        const exit = await Effect.runPromiseExit(
-          validate({ database: { port: 'not a number' } }, schema)
-        );
+        const exit = await Effect.runPromiseExit(validate({ database: { port: 'not a number' } }, schema));
 
         expect(exit._tag).toBe('Failure');
         if (exit._tag === 'Failure') {
@@ -298,9 +294,7 @@ describe('Schema Validator', () => {
         email: Type.String({ format: 'email' }),
       });
 
-      const result = await Effect.runPromise(
-        validateAll({ name: 123, age: 'not a number', email: 'invalid' }, schema)
-      );
+      const result = await Effect.runPromise(validateAll({ name: 123, age: 'not a number', email: 'invalid' }, schema));
 
       expect(result.errors.length).toBeGreaterThan(0);
     });
@@ -311,9 +305,7 @@ describe('Schema Validator', () => {
         age: Type.Integer(),
       });
 
-      const result = await Effect.runPromise(
-        validateAll({ name: 'John', age: 30 }, schema)
-      );
+      const result = await Effect.runPromise(validateAll({ name: 'John', age: 30 }, schema));
 
       expect(result.errors).toEqual([]);
       expect(result.value).toEqual({ name: 'John', age: 30 });

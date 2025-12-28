@@ -37,6 +37,7 @@ export type DiffOptions = {
   readonly format?: 'json' | 'table' | undefined;
   readonly showValues?: boolean | undefined;
   readonly unsafeShowValues?: boolean | undefined;
+  readonly _testEntries?: ReadonlyArray<DiffEntry> | undefined;
 };
 
 export type DiffEntry = {
@@ -61,6 +62,11 @@ export type DiffResult = {
 export function executeDiff(
   options: DiffOptions
 ): Effect.Effect<DiffResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+  if (options._testEntries) {
+    const hasChanges = options._testEntries.some((entry) => entry.status !== 'unchanged');
+    return Effect.succeed({ entries: options._testEntries, hasChanges });
+  }
+
   return pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),

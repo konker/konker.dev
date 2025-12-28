@@ -38,6 +38,30 @@ describe('provider guards', () => {
     expect(getProviderGuardConfig('Chamber', guards)).toEqual({ region: 'us-east-1' });
   });
 
+  it('getProviderGuardConfig should return direct matches', () => {
+    const guards: ProviderGuardsConfig = {
+      mock: { env: 'dev' },
+    };
+
+    expect(getProviderGuardConfig('mock', guards)).toEqual({ env: 'dev' });
+  });
+
+  it('getProviderGuardConfig should match normalized provider names', () => {
+    const guards: ProviderGuardsConfig = {
+      chamber: { region: 'us-east-1' },
+    };
+
+    expect(getProviderGuardConfig('Chamber', guards)).toEqual({ region: 'us-east-1' });
+  });
+
+  it('checkProviderGuards should no-op when provider lacks guard hook', async () => {
+    const provider: Provider = {
+      ...baseProvider,
+    };
+
+    await expect(Effect.runPromise(checkProviderGuards(provider, ctx, {}))).resolves.toBeUndefined();
+  });
+
   it('checkProviderGuards should no-op when provider has no guard config', async () => {
     const provider: Provider = {
       ...baseProvider,

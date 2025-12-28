@@ -45,12 +45,14 @@ function checkBinary(name: string): Effect.Effect<CheckResult, never> {
   return Effect.promise(async () => {
     try {
       await execa('which', [name]);
-      const version = await execa(name, ['--version']).catch(() => ({ stdout: 'unknown' }));
+      const versionResult = await execa(name, ['--version']).catch(() => ({ stdout: '' }));
+      const versionLine = (String(versionResult.stdout ?? '').split('\n')[0] ?? '').trim();
+      const status: CheckResult['status'] = versionLine.length > 0 ? 'ok' : 'warn';
       return {
         name: `Binary: ${name}`,
-        status: 'ok' as const,
-        message: 'Found in PATH',
-        details: version.stdout.split('\n')[0],
+        status,
+        message: status === 'ok' ? 'Found in PATH' : 'Found in PATH (version unknown)',
+        details: status === 'ok' ? versionLine : 'unknown',
       };
     } catch {
       return {

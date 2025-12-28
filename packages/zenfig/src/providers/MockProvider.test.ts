@@ -165,9 +165,41 @@ describe('MockProvider', () => {
   });
 
   describe('checkGuards', () => {
+    it('should no-op when guards are empty', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, {}))).resolves.toBeUndefined();
+    });
+
+    it('should no-op when guards are undefined', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, undefined))).resolves.toBeUndefined();
+    });
+
+    it('should fail when guards are not an object', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, 'not-an-object'))).rejects.toThrowError();
+    });
+
+    it('should fail when guard values have invalid types', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, { prefix: 123 }))).rejects.toThrowError();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, { service: 456 }))).rejects.toThrowError();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, { env: 789 }))).rejects.toThrowError();
+    });
+
     it('should fail when guard values do not match context', async () => {
       const provider = createMockProvider();
       await expect(Effect.runPromise(provider.checkGuards!(ctx, { env: 'prod' }))).rejects.toThrowError();
+    });
+
+    it('should fail when prefix does not match', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, { prefix: '/other' }))).rejects.toThrowError();
+    });
+
+    it('should fail when service does not match', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, { service: 'other-service' }))).rejects.toThrowError();
     });
 
     it('should pass when guard values match context', async () => {

@@ -63,7 +63,8 @@ function getAjv(): AjvInstance {
  */
 function ajvErrorToValidationError(error: ErrorObject, schema: TSchema, value: unknown): ValidationError {
   const path = error.instancePath.replace(/^\//g, '').replace(/\//g, '.');
-  const received = JSON.stringify(value).slice(0, 100);
+  const receivedRaw = JSON.stringify(value);
+  const received = (receivedRaw ?? String(value)).slice(0, 100);
 
   switch (error.keyword) {
     case 'type': {

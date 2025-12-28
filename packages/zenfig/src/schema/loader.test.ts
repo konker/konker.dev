@@ -1,14 +1,13 @@
 /**
  * Schema Loader Tests
  */
-import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
 import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ErrorCode } from '../errors.js';
 import { computeSchemaHash, loadSchema, loadSchemaWithDefaults } from './loader.js';
@@ -109,6 +108,26 @@ describe('Schema Loader', () => {
       expect(result.schemaHash).toMatch(/^sha256:/);
       // TypeBox schemas have a 'type' property
       expect(result.schema.type).toBe('object');
+    });
+
+    it('should fail when module import throws', async () => {
+      const schemaContent = `
+        export const ConfigSchema =
+      `;
+
+      const schemaPath = path.join(tempDir, 'broken-schema.mjs');
+      fs.writeFileSync(schemaPath, schemaContent);
+      createdFiles.push(schemaPath);
+
+      const exit = await Effect.runPromiseExit(loadSchema(schemaPath, 'ConfigSchema'));
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+        }
+      }
     });
 
     it('should fail when export not found', async () => {

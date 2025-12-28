@@ -1,19 +1,14 @@
-/* eslint-disable fp/no-delete */
 /**
  * Provider Registry Tests
  */
+// Import ChamberProvider to trigger its side-effect registration
+import './ChamberProvider.js';
+
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
 
 import { ErrorCode } from '../errors.js';
-import {
-  getProvider,
-  getRegisteredProviders,
-  isProviderRegistered,
-  registerProvider,
-} from './registry.js';
-// Import ChamberProvider to trigger its side-effect registration
-import './ChamberProvider.js';
+import { getProvider, getRegisteredProviders, isProviderRegistered, registerProvider } from './registry.js';
 
 describe('Provider Registry', () => {
   describe('registerProvider', () => {

@@ -5,20 +5,19 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
 import { ErrorCode } from '../errors.js';
+import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { executeValidate, runValidate } from './validate.js';
 
 // Mock schema loader
 vi.mock('../schema/loader.js', () => ({
   loadSchemaWithDefaults: vi.fn(),
 }));
-
-import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { Type } from '@sinclair/typebox';
 
 describe('Validate Command', () => {
   let tempDir: string;
@@ -99,15 +98,10 @@ describe('Validate Command', () => {
         }),
       });
 
-      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-        Effect.succeed({ schema, schemaHash: 'sha256:abc' })
-      );
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
 
       const jsonPath = path.join(tempDir, 'valid.json');
-      fs.writeFileSync(
-        jsonPath,
-        JSON.stringify({ database: { host: 'localhost', port: 5432 } })
-      );
+      fs.writeFileSync(jsonPath, JSON.stringify({ database: { host: 'localhost', port: 5432 } }));
       createdFiles.push(jsonPath);
 
       const result = await Effect.runPromise(
@@ -129,15 +123,10 @@ describe('Validate Command', () => {
         }),
       });
 
-      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-        Effect.succeed({ schema, schemaHash: 'sha256:abc' })
-      );
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
 
       const jsonPath = path.join(tempDir, 'invalid.json');
-      fs.writeFileSync(
-        jsonPath,
-        JSON.stringify({ database: { port: 'not-a-number' } })
-      );
+      fs.writeFileSync(jsonPath, JSON.stringify({ database: { port: 'not-a-number' } }));
       createdFiles.push(jsonPath);
 
       const result = await Effect.runPromise(
@@ -159,9 +148,7 @@ describe('Validate Command', () => {
         DATABASE_HOST: Type.String(),
       });
 
-      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-        Effect.succeed({ schema, schemaHash: 'sha256:abc' })
-      );
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
 
       const envPath = path.join(tempDir, 'config.env');
       fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\n');
@@ -199,9 +186,7 @@ describe('Validate Command', () => {
         key: Type.String(),
       });
 
-      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-        Effect.succeed({ schema, schemaHash: 'sha256:abc' })
-      );
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
 
       const jsonPath = path.join(tempDir, 'config.json');
       fs.writeFileSync(jsonPath, JSON.stringify({ key: 'value' }));
@@ -217,15 +202,61 @@ describe('Validate Command', () => {
 
       expect(result.valid).toBe(true);
     });
+
+    it('should fail when format cannot be detected', async () => {
+      const textPath = path.join(tempDir, 'config.txt');
+      fs.writeFileSync(textPath, 'foo=bar\n');
+      createdFiles.push(textPath);
+
+      const exit = await Effect.runPromiseExit(
+        executeValidate({
+          file: textPath,
+          config: defaultConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+        }
+      }
+    });
+
+    it('should fail when file cannot be read', async () => {
+      const jsonPath = path.join(tempDir, 'unreadable.json');
+      fs.writeFileSync(jsonPath, JSON.stringify({ key: 'value' }));
+      createdFiles.push(jsonPath);
+
+      fs.chmodSync(jsonPath, 0o000);
+      try {
+        const exit = await Effect.runPromiseExit(
+          executeValidate({
+            file: jsonPath,
+            format: 'json',
+            config: defaultConfig,
+          })
+        );
+
+        expect(exit._tag).toBe('Failure');
+        if (exit._tag === 'Failure') {
+          const cause = exit.cause;
+          if (cause._tag === 'Fail') {
+            expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          }
+        }
+      } finally {
+        fs.chmodSync(jsonPath, 0o600);
+      }
+    });
   });
 
   describe('runValidate', () => {
     it('should print success message for valid file', async () => {
       const schema = Type.Object({ key: Type.String() });
 
-      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-        Effect.succeed({ schema, schemaHash: 'sha256:abc' })
-      );
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
 
       const jsonPath = path.join(tempDir, 'valid.json');
       fs.writeFileSync(jsonPath, JSON.stringify({ key: 'value' }));
@@ -246,9 +277,7 @@ describe('Validate Command', () => {
     it('should print error message for invalid file', async () => {
       const schema = Type.Object({ required: Type.String() });
 
-      vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-        Effect.succeed({ schema, schemaHash: 'sha256:abc' })
-      );
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
 
       const jsonPath = path.join(tempDir, 'invalid.json');
       fs.writeFileSync(jsonPath, JSON.stringify({}));

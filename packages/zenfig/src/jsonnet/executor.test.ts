@@ -80,10 +80,7 @@ describe('Jsonnet Executor', () => {
   describe('executeJsonnet', () => {
     it('should fail when template file does not exist', async () => {
       const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath: '/nonexistent/template.jsonnet' }
-        )
+        executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath: '/nonexistent/template.jsonnet' })
       );
 
       expect(exit._tag).toBe('Failure');
@@ -108,10 +105,7 @@ describe('Jsonnet Executor', () => {
       } as never);
 
       const result = await Effect.runPromise(
-        executeJsonnet(
-          { secrets: { secret: 'value' }, env: 'dev' },
-          { templatePath }
-        )
+        executeJsonnet({ secrets: { secret: 'value' }, env: 'dev' }, { templatePath })
       );
 
       expect(result).toEqual({ key: 'value' });
@@ -128,12 +122,7 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      await Effect.runPromise(
-        executeJsonnet(
-          { secrets: { dbPassword: 'secret123' }, env: 'prod' },
-          { templatePath }
-        )
-      );
+      await Effect.runPromise(executeJsonnet({ secrets: { dbPassword: 'secret123' }, env: 'prod' }, { templatePath }));
 
       expect(execa).toHaveBeenCalledWith(
         'jsonnet',
@@ -159,21 +148,33 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      await Effect.runPromise(
-        executeJsonnet(
-          { secrets: {}, env: 'dev', defaults: { timeout: 30 } },
-          { templatePath }
-        )
-      );
+      await Effect.runPromise(executeJsonnet({ secrets: {}, env: 'dev', defaults: { timeout: 30 } }, { templatePath }));
 
       expect(execa).toHaveBeenCalledWith(
         'jsonnet',
-        expect.arrayContaining([
-          '--ext-code',
-          expect.stringContaining('defaults='),
-        ]),
+        expect.arrayContaining(['--ext-code', expect.stringContaining('defaults=')]),
         expect.any(Object)
       );
+    });
+
+    it('should log stderr warnings from jsonnet', async () => {
+      const templatePath = path.join(tempDir, 'config.jsonnet');
+      fs.writeFileSync(templatePath, '{}');
+      createdFiles.push(templatePath);
+
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
+
+      vi.mocked(execa).mockResolvedValueOnce({
+        stdout: '{}',
+        stderr: 'WARNING: something',
+        exitCode: 0,
+      } as never);
+
+      await Effect.runPromise(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('jsonnet warning'));
+
+      consoleErrorSpy.mockRestore();
     });
 
     it('should use custom timeout', async () => {
@@ -187,18 +188,9 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      await Effect.runPromise(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath, timeoutMs: 60000 }
-        )
-      );
+      await Effect.runPromise(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath, timeoutMs: 60000 }));
 
-      expect(execa).toHaveBeenCalledWith(
-        'jsonnet',
-        expect.any(Array),
-        expect.objectContaining({ timeout: 60000 })
-      );
+      expect(execa).toHaveBeenCalledWith('jsonnet', expect.any(Array), expect.objectContaining({ timeout: 60000 }));
     });
 
     it('should fail with runtime error for timeout', async () => {
@@ -211,10 +203,7 @@ describe('Jsonnet Executor', () => {
       vi.mocked(execa).mockRejectedValueOnce(timeoutError);
 
       const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath, timeoutMs: 100 }
-        )
+        executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath, timeoutMs: 100 })
       );
 
       expect(exit._tag).toBe('Failure');
@@ -235,12 +224,7 @@ describe('Jsonnet Executor', () => {
       enoentError.code = 'ENOENT';
       vi.mocked(execa).mockRejectedValueOnce(enoentError);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -260,12 +244,7 @@ describe('Jsonnet Executor', () => {
       syntaxError.stderr = 'STATIC ERROR: config.jsonnet:1:5 Expected } but got ,';
       vi.mocked(execa).mockRejectedValueOnce(syntaxError);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -285,18 +264,34 @@ describe('Jsonnet Executor', () => {
       varError.stderr = 'Undefined external variable: myVar';
       vi.mocked(execa).mockRejectedValueOnce(varError);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
           expect(cause.error.context.code).toBe(ErrorCode.JSON004);
+        }
+      }
+    });
+
+    it('should default to unknown variable name when not provided', async () => {
+      const templatePath = path.join(tempDir, 'config.jsonnet');
+      fs.writeFileSync(templatePath, '{}');
+      createdFiles.push(templatePath);
+
+      const varError = new Error('Undefined external variable') as Error & { stderr?: string };
+      varError.stderr = 'Undefined external variable';
+      vi.mocked(execa).mockRejectedValueOnce(varError);
+
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.JSON004);
+          expect(cause.error.context.problem).toContain('unknown');
         }
       }
     });
@@ -310,12 +305,26 @@ describe('Jsonnet Executor', () => {
       runtimeError.stderr = 'RUNTIME ERROR: Division by zero';
       vi.mocked(execa).mockRejectedValueOnce(runtimeError);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.JSON002);
+        }
+      }
+    });
+
+    it('should classify errors when stderr is missing', async () => {
+      const templatePath = path.join(tempDir, 'config.jsonnet');
+      fs.writeFileSync(templatePath, '{}');
+      createdFiles.push(templatePath);
+
+      const runtimeError = new Error('RUNTIME ERROR: Missing data');
+      vi.mocked(execa).mockRejectedValueOnce(runtimeError);
+
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -337,12 +346,7 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -364,12 +368,7 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -391,12 +390,7 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -418,12 +412,7 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      const exit = await Effect.runPromiseExit(
-        executeJsonnet(
-          { secrets: {}, env: 'dev' },
-          { templatePath }
-        )
-      );
+      const exit = await Effect.runPromiseExit(executeJsonnet({ secrets: {}, env: 'dev' }, { templatePath }));
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure') {
@@ -447,9 +436,7 @@ describe('Jsonnet Executor', () => {
         exitCode: 0,
       } as never);
 
-      const result = await Effect.runPromise(
-        evaluateTemplate({ secret: 'value' }, 'prod', templatePath)
-      );
+      const result = await Effect.runPromise(evaluateTemplate({ secret: 'value' }, 'prod', templatePath));
 
       expect(result).toEqual({ result: 'success' });
     });
@@ -467,11 +454,7 @@ describe('Jsonnet Executor', () => {
 
       await Effect.runPromise(evaluateTemplate({}, 'dev', templatePath));
 
-      expect(execa).toHaveBeenCalledWith(
-        'jsonnet',
-        expect.any(Array),
-        expect.objectContaining({ timeout: 30000 })
-      );
+      expect(execa).toHaveBeenCalledWith('jsonnet', expect.any(Array), expect.objectContaining({ timeout: 30000 }));
     });
 
     it('should use custom timeout when provided', async () => {
@@ -487,11 +470,7 @@ describe('Jsonnet Executor', () => {
 
       await Effect.runPromise(evaluateTemplate({}, 'dev', templatePath, 5000));
 
-      expect(execa).toHaveBeenCalledWith(
-        'jsonnet',
-        expect.any(Array),
-        expect.objectContaining({ timeout: 5000 })
-      );
+      expect(execa).toHaveBeenCalledWith('jsonnet', expect.any(Array), expect.objectContaining({ timeout: 5000 }));
     });
   });
 });

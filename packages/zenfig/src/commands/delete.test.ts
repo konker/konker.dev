@@ -2,13 +2,21 @@
 /**
  * Delete Command Tests
  */
+import { createInterface } from 'node:readline';
+
 import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
 import { createMockProvider } from '../providers/MockProvider.js';
+import { getProvider } from '../providers/registry.js';
+import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { executeDelete, runDelete } from './delete.js';
+
+vi.mock('node:readline', () => ({
+  createInterface: vi.fn(),
+}));
 
 // Mock dependencies
 vi.mock('../schema/loader.js', () => ({
@@ -18,9 +26,6 @@ vi.mock('../schema/loader.js', () => ({
 vi.mock('../providers/registry.js', () => ({
   getProvider: vi.fn(),
 }));
-
-import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { getProvider } from '../providers/registry.js';
 
 describe('Delete Command', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
@@ -69,9 +74,12 @@ describe('Delete Command', () => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-      Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' })
-    );
+    vi.mocked(createInterface).mockReturnValue({
+      question: (_message: string, cb: (answer: string) => void) => cb('y'),
+      close: vi.fn(),
+    } as unknown as ReturnType<typeof createInterface>);
+
+    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
   });
 
@@ -95,9 +103,7 @@ describe('Delete Command', () => {
       expect(result.deleted).toBe(true);
 
       // Verify key was deleted
-      const stored = await Effect.runPromise(
-        mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' })
-      );
+      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBeUndefined();
     });
 
@@ -122,9 +128,7 @@ describe('Delete Command', () => {
       );
 
       expect(result.canonicalKey).toBe('unknown.key');
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Key 'unknown.key' not found in schema")
-      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Key 'unknown.key' not found in schema"));
     });
 
     it('should require confirm flag in CI mode', async () => {
@@ -140,9 +144,7 @@ describe('Delete Command', () => {
       );
 
       expect(result.deleted).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--confirm flag required in CI mode')
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('--confirm flag required in CI mode'));
     });
 
     it('should delete in CI mode with confirm flag', async () => {
@@ -172,9 +174,78 @@ describe('Delete Command', () => {
         })
       );
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/Deleted: database\.host by testuser/)
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringMatching(/Deleted: database\.host by testuser/));
+    });
+
+    it('should fall back to USERNAME when USER is not set', async () => {
+      delete process.env.USER;
+      process.env.USERNAME = 'altuser';
+
+      await Effect.runPromise(
+        executeDelete({
+          service: 'api',
+          key: 'database.host',
+          confirm: true,
+          config: defaultConfig,
+        })
       );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringMatching(/Deleted: database\.host by altuser/));
+    });
+
+    it('should use unknown when no user info is available', async () => {
+      delete process.env.USER;
+
+      delete process.env.USERNAME;
+
+      await Effect.runPromise(
+        executeDelete({
+          service: 'api',
+          key: 'database.host',
+          confirm: true,
+          config: defaultConfig,
+        })
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringMatching(/Deleted: database\.host by unknown/));
+    });
+
+    it('should cancel deletion when prompt declines', async () => {
+      vi.mocked(createInterface).mockReturnValueOnce({
+        question: (_message: string, cb: (answer: string) => void) => cb('n'),
+        close: vi.fn(),
+      } as unknown as ReturnType<typeof createInterface>);
+
+      const result = await Effect.runPromise(
+        executeDelete({
+          service: 'api',
+          key: 'database.host',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.deleted).toBe(false);
+      expect(consoleSpy).toHaveBeenCalledWith('Deletion cancelled.');
+
+      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      expect(stored['database.host']).toBe('localhost');
+    });
+
+    it('should delete when prompt confirms', async () => {
+      vi.mocked(createInterface).mockReturnValueOnce({
+        question: (_message: string, cb: (answer: string) => void) => cb('y'),
+        close: vi.fn(),
+      } as unknown as ReturnType<typeof createInterface>);
+
+      const result = await Effect.runPromise(
+        executeDelete({
+          service: 'api',
+          key: 'database.host',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.deleted).toBe(true);
     });
   });
 
@@ -190,9 +261,7 @@ describe('Delete Command', () => {
       );
 
       expect(result).toBe(true);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Successfully deleted database.host')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Successfully deleted database.host'));
     });
 
     it('should return false when not deleted', async () => {

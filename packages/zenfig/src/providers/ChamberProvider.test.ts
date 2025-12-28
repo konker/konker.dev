@@ -267,6 +267,37 @@ describe('ChamberProvider', () => {
       }
     });
 
+    it('should fail with connection error when stderr is missing', async () => {
+      const error = new Error('No stderr provided');
+      vi.mocked(execa).mockRejectedValueOnce(error);
+
+      const exit = await Effect.runPromiseExit(chamberProvider.fetch(ctx));
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.PROV001);
+        }
+      }
+    });
+
+    it('should treat ParameterNotFound as connection error when keyPath is unknown', async () => {
+      const error = new Error('ParameterNotFound') as Error & { stderr: string };
+      error.stderr = 'ParameterNotFound: Parameter /zenfig/test-service/dev/api/key does not exist';
+      vi.mocked(execa).mockRejectedValueOnce(error);
+
+      const exit = await Effect.runPromiseExit(chamberProvider.fetch(ctx));
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.PROV001);
+        }
+      }
+    });
+
     it('should fail with authentication error for "not authorized" in fetch (no keyPath)', async () => {
       // Fetch does not pass keyPath, so "not authorized" returns PROV002 instead of PROV005
       const error = new Error('not authorized') as Error & { stderr: string };
