@@ -166,6 +166,8 @@ type ProviderKV = Record<string, string>;
 
 interface Provider {
   name: string;
+  // Optional provider-specific guard check; should run before any provider operation.
+  checkGuards?(ctx: ProviderContext, guards?: unknown): Promise<void>;
   fetch(ctx: ProviderContext): Promise<ProviderKV>;
   upsert(ctx: ProviderContext, keyPath: string, value: string): Promise<void>;
   delete(ctx: ProviderContext, keyPath: string): Promise<void>;
@@ -462,7 +464,13 @@ Example:
   "format": "env",
   "separator": "_",
   "cache": "5m",
-  "jsonnetTimeoutMs": 30000
+  "jsonnetTimeoutMs": 30000,
+  "providerGuards": {
+    "chamber": {
+      "accountId": "123456789012",
+      "region": "us-east-1"
+    }
+  }
 }
 ````
 
@@ -471,6 +479,47 @@ Rules:
 - `zenfigrc.json`/`zenfigrc.json5` must not contain secrets.
 - CLI flags override environment variables, which override `zenfigrc.json`/`zenfigrc.json5`, which override defaults.
 - Unknown keys should be ignored with a warning (or error in `--strict` mode).
+
+#### Provider Guards
+
+`providerGuards` is an optional, provider-extensible mechanism to prevent accidental reads/writes against the wrong
+account, region, or environment. Provider implementations own both the config shape for their guard entries and the
+logic for evaluating them. Zenfig passes the provider-scoped guard config through as-is and does not interpret or
+validate guard contents at the core level.
+
+Recommended shape:
+
+```json
+{
+  "providerGuards": {
+    "<provider>": {
+      "...": "provider-specific guard values"
+    }
+  }
+}
+```
+
+AWS example (for `chamber`/SSM providers):
+
+```json
+{
+  "providerGuards": {
+    "chamber": {
+      "accountId": "123456789012",
+      "region": "us-east-1"
+    }
+  }
+}
+```
+
+Guidelines:
+
+- Guards are optional and ignored by providers that do not implement them.
+- Providers should error with a clear message when a guard mismatch is detected (e.g., account or region mismatch).
+- Providers are responsible for defining guard config types and for performing the guard checks before any provider
+  operation.
+- Implementations should allow an explicit override for emergency use (e.g., a CLI flag or env var such as
+  `ZENFIG_IGNORE_PROVIDER_GUARDS=1`), but the default behavior should be to fail fast.
 
 ### Validation Details
 
