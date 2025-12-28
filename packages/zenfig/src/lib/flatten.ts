@@ -25,7 +25,7 @@ export type FlatObject = Record<string, unknown>;
  * flatten({ database: { url: "postgres://..." } })
  * // Returns: { "database.url": "postgres://..." }
  */
-export const flatten = (obj: Record<string, unknown>, prefix = ''): FlatObject => {
+export function flatten(obj: Record<string, unknown>, prefix = ''): FlatObject {
   const result: FlatObject = {};
 
   for (const [key, value] of Object.entries(obj)) {
@@ -44,7 +44,7 @@ export const flatten = (obj: Record<string, unknown>, prefix = ''): FlatObject =
   }
 
   return result;
-};
+}
 
 /**
  * Unflatten a flat object with dot-notation paths to nested structure
@@ -56,7 +56,7 @@ export const flatten = (obj: Record<string, unknown>, prefix = ''): FlatObject =
  * unflatten({ "database.url": "postgres://..." })
  * // Returns: { database: { url: "postgres://..." } }
  */
-export const unflatten = (obj: FlatObject): Record<string, unknown> => {
+export function unflatten(obj: FlatObject): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   for (const [path, value] of Object.entries(obj)) {
@@ -79,7 +79,7 @@ export const unflatten = (obj: FlatObject): Record<string, unknown> => {
   }
 
   return result;
-};
+}
 
 // --------------------------------------------------------------------------
 // Key Conversion
@@ -93,14 +93,14 @@ export const unflatten = (obj: FlatObject): Record<string, unknown> => {
  * camelToScreamingSnake("enableBeta") // "ENABLE_BETA"
  * camelToScreamingSnake("API") // "API"
  */
-export const camelToScreamingSnake = (str: string): string => {
+export function camelToScreamingSnake(str: string): string {
   // Insert underscore before uppercase letters (except at start)
   // Handle consecutive uppercase (e.g., "APIKey" -> "API_KEY")
   return str
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
     .replace(/([a-z\d])([A-Z])/g, '$1_$2')
     .toUpperCase();
-};
+}
 
 /**
  * Convert a dot-notation path to an environment variable key
@@ -114,9 +114,9 @@ export const camelToScreamingSnake = (str: string): string => {
  * pathToEnvKey("api.timeoutMs") // "API_TIMEOUT_MS"
  * pathToEnvKey("feature.enableBeta") // "FEATURE_ENABLE_BETA"
  */
-export const pathToEnvKey = (path: string, separator = '_'): string => {
+export function pathToEnvKey(path: string, separator = '_'): string {
   return path.split('.').map(camelToScreamingSnake).join(separator);
-};
+}
 
 /**
  * Convert SCREAMING_SNAKE_CASE to camelCase
@@ -125,9 +125,9 @@ export const pathToEnvKey = (path: string, separator = '_'): string => {
  * screamingSnakeToCamel("TIMEOUT_MS") // "timeoutMs"
  * screamingSnakeToCamel("ENABLE_BETA") // "enableBeta"
  */
-export const screamingSnakeToCamel = (str: string): string => {
+export function screamingSnakeToCamel(str: string): string {
   return str.toLowerCase().replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
-};
+}
 
 /**
  * Convert an environment variable key to a dot-notation path
@@ -140,7 +140,7 @@ export const screamingSnakeToCamel = (str: string): string => {
  * @param separator - Key separator (default: "_")
  * @returns Dot-notation path (e.g., "database.url")
  */
-export const envKeyToPath = (envKey: string, separator = '_'): string => {
+export function envKeyToPath(envKey: string, separator = '_'): string {
   // Split by separator (but be careful with consecutive underscores that were part of the word)
   // This is imperfect - we recommend matching against schema instead
   return envKey
@@ -148,7 +148,7 @@ export const envKeyToPath = (envKey: string, separator = '_'): string => {
     .split(separator)
     .map((part, i) => (i === 0 ? part : part))
     .join('.');
-};
+}
 
 // --------------------------------------------------------------------------
 // Batch Operations
@@ -161,7 +161,7 @@ export const envKeyToPath = (envKey: string, separator = '_'): string => {
  * @param separator - Key separator (default: "_")
  * @returns Flat object with SCREAMING_SNAKE_CASE keys
  */
-export const toEnvMap = (obj: Record<string, unknown>, separator = '_'): Record<string, unknown> => {
+export function toEnvMap(obj: Record<string, unknown>, separator = '_'): Record<string, unknown> {
   const flat = flatten(obj);
   const result: Record<string, unknown> = {};
 
@@ -171,10 +171,11 @@ export const toEnvMap = (obj: Record<string, unknown>, separator = '_'): Record<
   }
 
   return result;
-};
+}
 
 /**
  * Get sorted keys from a flat object (case-insensitive sort)
  */
-export const getSortedKeys = (obj: FlatObject): ReadonlyArray<string> =>
-  Object.keys(obj).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+export function getSortedKeys(obj: FlatObject): ReadonlyArray<string> {
+  return Object.keys(obj).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+}

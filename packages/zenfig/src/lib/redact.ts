@@ -28,7 +28,7 @@ export type RedactOptions = {
 /**
  * Redact a value if showValues is false
  */
-export const redactValue = (value: unknown, options: RedactOptions = {}): string => {
+export function redactValue(value: unknown, options: RedactOptions = {}): string {
   const { maxLength = 50, showValues = false } = options;
 
   if (value === undefined) {
@@ -59,12 +59,12 @@ export const redactValue = (value: unknown, options: RedactOptions = {}): string
   }
 
   return str;
-};
+}
 
 /**
  * Redact all values in an object
  */
-export const redactObject = (obj: Record<string, unknown>, options: RedactOptions = {}): Record<string, string> => {
+export function redactObject(obj: Record<string, unknown>, options: RedactOptions = {}): Record<string, string> {
   const result: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(obj)) {
@@ -72,12 +72,12 @@ export const redactObject = (obj: Record<string, unknown>, options: RedactOption
   }
 
   return result;
-};
+}
 
 /**
  * Check if showing values is safe (TTY check)
  */
-export const isSafeToShowValues = (showValues: boolean, unsafeShowValues: boolean): boolean => {
+export function isSafeToShowValues(showValues: boolean, unsafeShowValues: boolean): boolean {
   if (unsafeShowValues) {
     return true;
   }
@@ -87,16 +87,18 @@ export const isSafeToShowValues = (showValues: boolean, unsafeShowValues: boolea
   }
 
   return false;
-};
+}
 
 /**
  * Create redact options from CLI flags
  */
-export const createRedactOptions = (
+export function createRedactOptions(
   showValues?: boolean,
   unsafeShowValues?: boolean,
   maxLength?: number
-): RedactOptions => ({
-  showValues: isSafeToShowValues(showValues ?? false, unsafeShowValues ?? false),
-  maxLength: maxLength ?? 50,
-});
+): RedactOptions {
+  return {
+    showValues: isSafeToShowValues(showValues ?? false, unsafeShowValues ?? false),
+    maxLength: maxLength ?? 50,
+  };
+}

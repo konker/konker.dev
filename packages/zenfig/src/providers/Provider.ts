@@ -98,33 +98,37 @@ export type Provider = {
  * Convert canonical dot path to SSM slash path
  * Example: "database.url" -> "database/url"
  */
-export const dotToSlashPath = (dotPath: string): string => dotPath.replace(/\./g, '/');
+export function dotToSlashPath(dotPath: string): string {
+  return dotPath.replace(/\./g, '/');
+}
 
 /**
  * Convert SSM slash path to canonical dot path
  * Example: "database/url" -> "database.url"
  */
-export const slashToDotPath = (slashPath: string): string => slashPath.replace(/\//g, '.');
+export function slashToDotPath(slashPath: string): string {
+  return slashPath.replace(/\//g, '.');
+}
 
 /**
  * Build the full SSM parameter path
  * Example: buildFullPath({ prefix: "/zenfig", service: "api", env: "prod" }, "database.url")
  *          -> "/zenfig/api/prod/database/url"
  */
-export const buildFullPath = (ctx: ProviderContext, keyPath: string): string => {
+export function buildFullPath(ctx: ProviderContext, keyPath: string): string {
   const slashKeyPath = dotToSlashPath(keyPath);
   return `${ctx.prefix}/${ctx.service}/${ctx.env}/${slashKeyPath}`;
-};
+}
 
 /**
  * Extract the key path from a full SSM parameter path
  * Example: extractKeyPath("/zenfig/api/prod/database/url", { prefix: "/zenfig", service: "api", env: "prod" })
  *          -> "database.url"
  */
-export const extractKeyPath = (fullPath: string, ctx: ProviderContext): string => {
+export function extractKeyPath(fullPath: string, ctx: ProviderContext): string {
   const basePrefix = `${ctx.prefix}/${ctx.service}/${ctx.env}/`;
   if (fullPath.startsWith(basePrefix)) {
     return slashToDotPath(fullPath.slice(basePrefix.length));
   }
   return slashToDotPath(fullPath);
-};
+}

@@ -30,8 +30,8 @@ export type SchemaLoadResult = {
 /**
  * Check if a file exists and is readable
  */
-const fileExists = (filePath: string): Effect.Effect<boolean, never> =>
-  Effect.sync(() => {
+function fileExists(filePath: string): Effect.Effect<boolean, never> {
+  return Effect.sync(() => {
     try {
       fs.accessSync(filePath, fs.constants.R_OK);
       return true;
@@ -39,14 +39,15 @@ const fileExists = (filePath: string): Effect.Effect<boolean, never> =>
       return false;
     }
   });
+}
 
 /**
  * Compute SHA-256 hash of schema for change detection
  */
-export const computeSchemaHash = (schema: TSchema): string => {
+export function computeSchemaHash(schema: TSchema): string {
   const schemaJson = JSON.stringify(schema);
   return `sha256:${crypto.createHash('sha256').update(schemaJson).digest('hex')}`;
-};
+}
 
 /**
  * Load a TypeBox schema from a TypeScript file
@@ -54,11 +55,11 @@ export const computeSchemaHash = (schema: TSchema): string => {
  * @param schemaPath - Path to the schema file
  * @param exportName - Name of the export (default: "ConfigSchema")
  */
-export const loadSchema = (
+export function loadSchema(
   schemaPath: string,
   exportName = 'ConfigSchema'
-): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> {
+  return pipe(
     Effect.sync(() => path.resolve(schemaPath)),
     Effect.flatMap((absolutePath) =>
       pipe(
@@ -105,15 +106,16 @@ export const loadSchema = (
       )
     )
   );
+}
 
 /**
  * Load schema with fallback to default path
  */
-export const loadSchemaWithDefaults = (
+export function loadSchemaWithDefaults(
   schemaPath?: string,
   exportName?: string
-): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> => {
+): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> {
   const resolvedPath = schemaPath ?? 'src/schema.ts';
   const resolvedExportName = exportName ?? 'ConfigSchema';
   return loadSchema(resolvedPath, resolvedExportName);
-};
+}

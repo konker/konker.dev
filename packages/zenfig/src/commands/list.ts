@@ -40,17 +40,17 @@ export type ListResult = {
 /**
  * Format list result as simple key list (one per line)
  */
-export const formatListKeys = (keys: ReadonlyArray<string>): string => {
+export function formatListKeys(keys: ReadonlyArray<string>): string {
   if (keys.length === 0) {
     return 'No keys found.';
   }
   return keys.join('\n');
-};
+}
 
 /**
  * Format list result as table
  */
-export const formatListTable = (kv: ProviderKV, keys: ReadonlyArray<string>, showValues: boolean): string => {
+export function formatListTable(kv: ProviderKV, keys: ReadonlyArray<string>, showValues: boolean): string {
   if (keys.length === 0) {
     return 'No keys found.';
   }
@@ -69,12 +69,12 @@ export const formatListTable = (kv: ProviderKV, keys: ReadonlyArray<string>, sho
   }
 
   return table.toString();
-};
+}
 
 /**
  * Format list result as JSON
  */
-export const formatListJson = (kv: ProviderKV, keys: ReadonlyArray<string>, showValues: boolean): string => {
+export function formatListJson(kv: ProviderKV, keys: ReadonlyArray<string>, showValues: boolean): string {
   if (keys.length === 0) {
     return '{}';
   }
@@ -88,7 +88,7 @@ export const formatListJson = (kv: ProviderKV, keys: ReadonlyArray<string>, show
   }
 
   return JSON.stringify(output, null, 2);
-};
+}
 
 // --------------------------------------------------------------------------
 // List Command
@@ -97,8 +97,8 @@ export const formatListJson = (kv: ProviderKV, keys: ReadonlyArray<string>, show
 /**
  * Execute the list workflow
  */
-export const executeList = (options: ListOptions): Effect.Effect<ListResult, ProviderError> =>
-  pipe(
+export function executeList(options: ListOptions): Effect.Effect<ListResult, ProviderError> {
+  return pipe(
     // 1. Get provider
     getProvider(options.config.provider),
     Effect.flatMap((provider) => {
@@ -124,12 +124,13 @@ export const executeList = (options: ListOptions): Effect.Effect<ListResult, Pro
       );
     })
   );
+}
 
 /**
  * Run list and print results
  */
-export const runList = (options: ListOptions): Effect.Effect<void, ProviderError> =>
-  pipe(
+export function runList(options: ListOptions): Effect.Effect<void, ProviderError> {
+  return pipe(
     executeList(options),
     Effect.map((result) => {
       const showValues = options.unsafeShowValues === true ? true : options.showValues && process.stdout.isTTY;
@@ -149,3 +150,4 @@ export const runList = (options: ListOptions): Effect.Effect<void, ProviderError
       }
     })
   );
+}

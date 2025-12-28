@@ -33,7 +33,7 @@ type AjvInstance = {
  * - No type coercion (strict parsing)
  * - All formats enabled
  */
-const createAjv = (): AjvInstance => {
+function createAjv(): AjvInstance {
   const ajv = new (Ajv as any)({
     strict: true,
     allErrors: true,
@@ -44,15 +44,15 @@ const createAjv = (): AjvInstance => {
 
   (addFormats as any)(ajv);
   return ajv;
-};
+}
 
 // Singleton Ajv instance (cached for performance)
 let ajvInstance: AjvInstance | undefined;
 
-const getAjv = (): AjvInstance => {
+function getAjv(): AjvInstance {
   ajvInstance ??= createAjv();
   return ajvInstance;
-};
+}
 
 // --------------------------------------------------------------------------
 // Error Conversion
@@ -61,7 +61,7 @@ const getAjv = (): AjvInstance => {
 /**
  * Convert Ajv error to Zenfig ValidationError
  */
-const ajvErrorToValidationError = (error: ErrorObject, schema: TSchema, value: unknown): ValidationError => {
+function ajvErrorToValidationError(error: ErrorObject, schema: TSchema, value: unknown): ValidationError {
   const path = error.instancePath.replace(/^\//g, '').replace(/\//g, '.');
   const received = JSON.stringify(value).slice(0, 100);
 
@@ -151,12 +151,12 @@ const ajvErrorToValidationError = (error: ErrorObject, schema: TSchema, value: u
         error.message ?? 'Validation failed'
       );
   }
-};
+}
 
 /**
  * Get example value for a format
  */
-const getFormatExample = (format: string): string | undefined => {
+function getFormatExample(format: string): string | undefined {
   switch (format) {
     case 'uri':
     case 'url':
@@ -180,7 +180,7 @@ const getFormatExample = (format: string): string | undefined => {
     default:
       return undefined;
   }
-};
+}
 
 // --------------------------------------------------------------------------
 // Validation Functions
@@ -189,7 +189,7 @@ const getFormatExample = (format: string): string | undefined => {
 /**
  * Get value at a JSON path
  */
-const getValueAtPath = (value: unknown, jsonPath: string): unknown => {
+function getValueAtPath(value: unknown, jsonPath: string): unknown {
   if (!jsonPath || jsonPath === '') {
     return value;
   }
@@ -209,7 +209,7 @@ const getValueAtPath = (value: unknown, jsonPath: string): unknown => {
   }
 
   return current;
-};
+}
 
 /**
  * Validate a value against a TypeBox schema
@@ -218,8 +218,8 @@ const getValueAtPath = (value: unknown, jsonPath: string): unknown => {
  * @param schema - The TypeBox schema
  * @returns Effect with validated value or ValidationError
  */
-export const validate = <T>(value: unknown, schema: TSchema): Effect.Effect<T, ValidationError> =>
-  pipe(
+export function validate<T>(value: unknown, schema: TSchema): Effect.Effect<T, ValidationError> {
+  return pipe(
     Effect.sync(() => {
       const ajv = getAjv();
 
@@ -252,6 +252,7 @@ export const validate = <T>(value: unknown, schema: TSchema): Effect.Effect<T, V
       return Effect.succeed(result.value as T);
     })
   );
+}
 
 /**
  * Validate a value at a specific path against the resolved schema node
@@ -260,25 +261,22 @@ export const validate = <T>(value: unknown, schema: TSchema): Effect.Effect<T, V
  * @param schema - The root TypeBox schema
  * @param path - The dot-notation path
  */
-export const validateAtPath = (
-  value: unknown,
-  schema: TSchema,
-  path: string
-): Effect.Effect<unknown, ValidationError> =>
-  pipe(
+export function validateAtPath(value: unknown, schema: TSchema, path: string): Effect.Effect<unknown, ValidationError> {
+  return pipe(
     resolvePath(schema, path),
     Effect.flatMap((resolved) => validate(value, resolved.schema))
   );
+}
 
 /**
  * Validate an entire configuration object
  * Returns all errors, not just the first one
  */
-export const validateAll = (
+export function validateAll(
   value: unknown,
   schema: TSchema
-): Effect.Effect<{ readonly value: unknown; readonly errors: ReadonlyArray<ValidationError> }, never> =>
-  Effect.sync(() => {
+): Effect.Effect<{ readonly value: unknown; readonly errors: ReadonlyArray<ValidationError> }, never> {
+  return Effect.sync(() => {
     const ajv = getAjv();
     const validateFn = ajv.compile(schema);
     const isValid = validateFn(value);
@@ -294,10 +292,11 @@ export const validateAll = (
 
     return { value, errors };
   });
+}
 
 /**
  * Clear the Ajv cache (useful for testing)
  */
-export const clearValidatorCache = (): void => {
+export function clearValidatorCache(): void {
   ajvInstance = undefined;
-};
+}

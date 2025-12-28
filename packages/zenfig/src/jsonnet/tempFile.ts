@@ -28,11 +28,11 @@ export type TempFile = {
 /**
  * Generate a unique temp file path
  */
-const generateTempPath = (prefix = 'zenfig-'): string => {
+function generateTempPath(prefix = 'zenfig-'): string {
   const tmpDir = os.tmpdir();
   const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
   return path.join(tmpDir, `${prefix}${uniqueId}.json`);
-};
+}
 
 /**
  * Create a secure temp file with the given content
@@ -41,8 +41,8 @@ const generateTempPath = (prefix = 'zenfig-'): string => {
  * @param prefix - File name prefix (default: "zenfig-")
  * @returns TempFile with path and cleanup function
  */
-export const createTempFile = (content: string, prefix = 'zenfig-'): Effect.Effect<TempFile, SystemError> =>
-  pipe(
+export function createTempFile(content: string, prefix = 'zenfig-'): Effect.Effect<TempFile, SystemError> {
+  return pipe(
     Effect.sync(() => generateTempPath(prefix)),
     Effect.flatMap((filePath) =>
       pipe(
@@ -71,6 +71,7 @@ export const createTempFile = (content: string, prefix = 'zenfig-'): Effect.Effe
       )
     )
   );
+}
 
 /**
  * Create a temp file containing JSON data
@@ -79,10 +80,10 @@ export const createTempFile = (content: string, prefix = 'zenfig-'): Effect.Effe
  * @param prefix - File name prefix
  * @returns TempFile with path and cleanup function
  */
-export const createJsonTempFile = (data: unknown, prefix = 'zenfig-'): Effect.Effect<TempFile, SystemError> => {
+export function createJsonTempFile(data: unknown, prefix = 'zenfig-'): Effect.Effect<TempFile, SystemError> {
   const content = JSON.stringify(data, null, 2);
   return createTempFile(content, prefix);
-};
+}
 
 /**
  * Execute a function with a temp file, ensuring cleanup
@@ -90,11 +91,11 @@ export const createJsonTempFile = (data: unknown, prefix = 'zenfig-'): Effect.Ef
  * @param content - Content to write to temp file
  * @param fn - Function to execute with the temp file path
  */
-export const withTempFile = <A, E>(
+export function withTempFile<A, E>(
   content: string,
   fn: (filePath: string) => Effect.Effect<A, E>
-): Effect.Effect<A, E | SystemError> =>
-  pipe(
+): Effect.Effect<A, E | SystemError> {
+  return pipe(
     createTempFile(content),
     Effect.flatMap((tempFile) =>
       pipe(
@@ -109,6 +110,7 @@ export const withTempFile = <A, E>(
       )
     )
   );
+}
 
 /**
  * Execute a function with a JSON temp file, ensuring cleanup
@@ -116,10 +118,10 @@ export const withTempFile = <A, E>(
  * @param data - Data to serialize to JSON
  * @param fn - Function to execute with the temp file path
  */
-export const withJsonTempFile = <A, E>(
+export function withJsonTempFile<A, E>(
   data: unknown,
   fn: (filePath: string) => Effect.Effect<A, E>
-): Effect.Effect<A, E | SystemError> => {
+): Effect.Effect<A, E | SystemError> {
   const content = JSON.stringify(data, null, 2);
   return withTempFile(content, fn);
-};
+}

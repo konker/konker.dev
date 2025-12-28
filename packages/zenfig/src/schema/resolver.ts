@@ -35,21 +35,21 @@ export type SchemaKeyInfo = {
 /**
  * Check if schema is a TypeBox object schema
  */
-export const isObjectSchema = (schema: TSchema): schema is TObject => {
+export function isObjectSchema(schema: TSchema): schema is TObject {
   return schema[Kind] === 'Object' && 'properties' in schema;
-};
+}
 
 /**
  * Check if schema is an optional type
  */
-export const isOptionalSchema = (schema: TSchema): boolean => {
+export function isOptionalSchema(schema: TSchema): boolean {
   return schema[Kind] === 'Optional';
-};
+}
 
 /**
  * Get the inner schema from optional wrapper
  */
-export const unwrapOptional = (schema: TSchema): TSchema => {
+export function unwrapOptional(schema: TSchema): TSchema {
   if (isOptionalSchema(schema) && 'anyOf' in schema) {
     const anyOf = (schema as any).anyOf as Array<TSchema>;
     // Find the non-undefined type
@@ -57,7 +57,7 @@ export const unwrapOptional = (schema: TSchema): TSchema => {
     return nonUndefined ?? schema;
   }
   return schema;
-};
+}
 
 // --------------------------------------------------------------------------
 // Path Resolution
@@ -67,10 +67,10 @@ export const unwrapOptional = (schema: TSchema): TSchema => {
  * Find a property in an object schema (case-insensitive)
  * Returns the canonical property name and schema, or undefined
  */
-const findProperty = (
+function findProperty(
   objectSchema: TObject,
   segment: string
-): { readonly propertyName: string; readonly schema: TSchema } | undefined => {
+): { readonly propertyName: string; readonly schema: TSchema } | undefined {
   const lowerSegment = segment.toLowerCase();
   const properties = objectSchema.properties;
 
@@ -81,7 +81,7 @@ const findProperty = (
   }
 
   return undefined;
-};
+}
 
 /**
  * Resolve a dot-notation path to a schema node
@@ -90,8 +90,8 @@ const findProperty = (
  * @param keyPath - Dot-notation path (e.g., "database.url" or "API.TimeoutMS")
  * @returns Resolved path with canonical casing and schema node
  */
-export const resolvePath = (schema: TSchema, keyPath: string): Effect.Effect<ResolvedPath, ValidationError> =>
-  pipe(
+export function resolvePath(schema: TSchema, keyPath: string): Effect.Effect<ResolvedPath, ValidationError> {
+  return pipe(
     Effect.sync(() => {
       if (!keyPath || keyPath.trim() === '') {
         return { valid: false as const, error: keyNotFoundError('(empty path)') };
@@ -135,16 +135,18 @@ export const resolvePath = (schema: TSchema, keyPath: string): Effect.Effect<Res
       });
     })
   );
+}
 
 /**
  * Canonicalize a key path using the schema
  * Returns the path with correct casing from schema
  */
-export const canonicalizePath = (schema: TSchema, keyPath: string): Effect.Effect<string, ValidationError> =>
-  pipe(
+export function canonicalizePath(schema: TSchema, keyPath: string): Effect.Effect<string, ValidationError> {
+  return pipe(
     resolvePath(schema, keyPath),
     Effect.map((result) => result.canonicalPath)
   );
+}
 
 // --------------------------------------------------------------------------
 // Schema Enumeration
@@ -154,7 +156,7 @@ export const canonicalizePath = (schema: TSchema, keyPath: string): Effect.Effec
  * Get all leaf paths in a schema
  * Returns paths to all non-object terminal nodes
  */
-export const getAllLeafPaths = (schema: TSchema, prefix = ''): ReadonlyArray<SchemaKeyInfo> => {
+export function getAllLeafPaths(schema: TSchema, prefix = ''): ReadonlyArray<SchemaKeyInfo> {
   const unwrapped = unwrapOptional(schema);
 
   if (!isObjectSchema(unwrapped)) {
@@ -193,12 +195,12 @@ export const getAllLeafPaths = (schema: TSchema, prefix = ''): ReadonlyArray<Sch
   }
 
   return results;
-};
+}
 
 /**
  * Get human-readable type description from schema
  */
-export const getTypeDescription = (schema: TSchema): string => {
+export function getTypeDescription(schema: TSchema): string {
   const kind = schema[Kind];
 
   switch (kind) {
@@ -231,4 +233,4 @@ export const getTypeDescription = (schema: TSchema): string => {
     default:
       return kind ?? 'unknown';
   }
-};
+}

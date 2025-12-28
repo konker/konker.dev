@@ -102,25 +102,30 @@ const DEFAULT_CONFIG: ResolvedConfig = {
 // Environment Variables
 // --------------------------------------------------------------------------
 
-const getEnvVar = (name: string): string | undefined => process.env[name];
+function getEnvVar(name: string): string | undefined {
+  return process.env[name];
+}
 
-const getEnvBool = (name: string): boolean | undefined => {
+function getEnvBool(name: string): boolean | undefined {
   const value = getEnvVar(name);
   if (value === undefined) return undefined;
   return value === '1' || value.toLowerCase() === 'true';
-};
+}
 
-const getEnvInt = (name: string): number | undefined => {
+function getEnvInt(name: string): number | undefined {
   const value = getEnvVar(name);
   if (value === undefined) return undefined;
   const num = parseInt(value, 10);
   return Number.isNaN(num) ? undefined : num;
-};
+}
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
-const resolveProviderGuards = (value: unknown): ProviderGuardsConfig => (isRecord(value) ? value : {});
+function resolveProviderGuards(value: unknown): ProviderGuardsConfig {
+  return isRecord(value) ? value : {};
+}
 
 // --------------------------------------------------------------------------
 // Config File Loading
@@ -131,8 +136,8 @@ const RC_FILENAMES = ['zenfigrc.json5', 'zenfigrc.json'] as const;
 /**
  * Load zenfigrc.json/zenfigrc.json5 from the current directory or parent directories
  */
-const loadRcFile = (startDir: string): Effect.Effect<ZenfigRcConfig | undefined, never> =>
-  Effect.sync(() => {
+function loadRcFile(startDir: string): Effect.Effect<ZenfigRcConfig | undefined, never> {
+  return Effect.sync(() => {
     let currentDir = startDir;
     const root = path.parse(currentDir).root;
 
@@ -153,6 +158,7 @@ const loadRcFile = (startDir: string): Effect.Effect<ZenfigRcConfig | undefined,
 
     return undefined;
   });
+}
 
 // --------------------------------------------------------------------------
 // Config Resolution
@@ -161,12 +167,12 @@ const loadRcFile = (startDir: string): Effect.Effect<ZenfigRcConfig | undefined,
 /**
  * Check if running in CI mode
  */
-const isCIMode = (cliCi?: boolean): boolean => {
+function isCIMode(cliCi?: boolean): boolean {
   if (cliCi !== undefined) return cliCi;
   if (getEnvBool('ZENFIG_CI')) return true;
   if (!process.stdin.isTTY) return true;
   return false;
-};
+}
 
 /**
  * Resolve configuration with precedence:
@@ -175,8 +181,8 @@ const isCIMode = (cliCi?: boolean): boolean => {
  * 3. zenfigrc.json/zenfigrc.json5
  * 4. Defaults (lowest)
  */
-export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<ResolvedConfig, never> =>
-  pipe(
+export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<ResolvedConfig, never> {
+  return pipe(
     loadRcFile(process.cwd()),
     Effect.map((rcConfig) => {
       // Resolve env (special: also check NODE_ENV)
@@ -243,24 +249,27 @@ export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<Resolv
       };
     })
   );
+}
 
 /**
  * Merge CLI options into resolved config
  */
-export const mergeCliOptions = (config: ResolvedConfig, cliOptions: CLIOptions): ResolvedConfig => ({
-  ...config,
-  env: cliOptions.env ?? config.env,
-  provider: cliOptions.provider ?? config.provider,
-  ssmPrefix: cliOptions.ssmPrefix ?? config.ssmPrefix,
-  schema: cliOptions.schema ?? config.schema,
-  schemaExportName: cliOptions.schemaExportName ?? config.schemaExportName,
-  jsonnet: cliOptions.jsonnet ?? config.jsonnet,
-  sources: cliOptions.source ?? config.sources,
-  format: cliOptions.format ?? config.format,
-  separator: cliOptions.separator ?? config.separator,
-  cache: cliOptions.noCache ? undefined : (cliOptions.cache ?? config.cache),
-  jsonnetTimeoutMs: cliOptions.jsonnetTimeout ?? config.jsonnetTimeoutMs,
-  ci: cliOptions.ci ?? config.ci,
-  strict: cliOptions.strict ?? config.strict,
-  providerGuards: config.providerGuards,
-});
+export function mergeCliOptions(config: ResolvedConfig, cliOptions: CLIOptions): ResolvedConfig {
+  return {
+    ...config,
+    env: cliOptions.env ?? config.env,
+    provider: cliOptions.provider ?? config.provider,
+    ssmPrefix: cliOptions.ssmPrefix ?? config.ssmPrefix,
+    schema: cliOptions.schema ?? config.schema,
+    schemaExportName: cliOptions.schemaExportName ?? config.schemaExportName,
+    jsonnet: cliOptions.jsonnet ?? config.jsonnet,
+    sources: cliOptions.source ?? config.sources,
+    format: cliOptions.format ?? config.format,
+    separator: cliOptions.separator ?? config.separator,
+    cache: cliOptions.noCache ? undefined : (cliOptions.cache ?? config.cache),
+    jsonnetTimeoutMs: cliOptions.jsonnetTimeout ?? config.jsonnetTimeoutMs,
+    ci: cliOptions.ci ?? config.ci,
+    strict: cliOptions.strict ?? config.strict,
+    providerGuards: config.providerGuards,
+  };
+}

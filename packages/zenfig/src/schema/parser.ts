@@ -27,18 +27,18 @@ export type ParseMode = 'auto' | 'string' | 'int' | 'float' | 'bool' | 'json';
  * Parse a string as a boolean
  * Accepts: "true", "false" (case-insensitive)
  */
-const parseBoolean = (value: string, path: string): Effect.Effect<boolean, ValidationError> => {
+function parseBoolean(value: string, path: string): Effect.Effect<boolean, ValidationError> {
   const lower = value.toLowerCase();
   if (lower === 'true') return Effect.succeed(true);
   if (lower === 'false') return Effect.succeed(false);
   return Effect.fail(invalidTypeError(path, 'boolean (true/false)', `"${value}"`));
-};
+}
 
 /**
  * Parse a string as an integer
  * Rejects decimals, NaN, Infinity
  */
-const parseInteger = (value: string, path: string): Effect.Effect<number, ValidationError> => {
+function parseInteger(value: string, path: string): Effect.Effect<number, ValidationError> {
   const trimmed = value.trim();
 
   // Check for decimal point
@@ -61,13 +61,13 @@ const parseInteger = (value: string, path: string): Effect.Effect<number, Valida
   }
 
   return Effect.succeed(num);
-};
+}
 
 /**
  * Parse a string as a number (float)
  * Rejects NaN, Infinity
  */
-const parseNumber = (value: string, path: string): Effect.Effect<number, ValidationError> => {
+function parseNumber(value: string, path: string): Effect.Effect<number, ValidationError> {
   const num = Number(value.trim());
 
   if (Number.isNaN(num)) {
@@ -79,16 +79,17 @@ const parseNumber = (value: string, path: string): Effect.Effect<number, Validat
   }
 
   return Effect.succeed(num);
-};
+}
 
 /**
  * Parse a string as JSON (for arrays and objects)
  */
-const parseJson = (value: string, path: string, expectedType: string): Effect.Effect<unknown, ValidationError> =>
-  Effect.try({
+function parseJson(value: string, path: string, expectedType: string): Effect.Effect<unknown, ValidationError> {
+  return Effect.try({
     try: () => JSON.parse(value),
     catch: () => invalidTypeError(path, expectedType, `"${value}" (invalid JSON)`),
   });
+}
 
 // --------------------------------------------------------------------------
 // Schema-Directed Parsing
@@ -102,12 +103,12 @@ const parseJson = (value: string, path: string, expectedType: string): Effect.Ef
  * @param path - The key path (for error messages)
  * @param mode - Optional parse mode override
  */
-export const parseValue = (
+export function parseValue(
   value: string,
   schema: TSchema,
   path: string,
   mode: ParseMode = 'auto'
-): Effect.Effect<ParsedValue, ValidationError> => {
+): Effect.Effect<ParsedValue, ValidationError> {
   // Handle mode overrides
   if (mode !== 'auto') {
     switch (mode) {
@@ -192,7 +193,7 @@ export const parseValue = (
       // Unknown type, keep as string
       return Effect.succeed(value);
   }
-};
+}
 
 /**
  * Serialize a typed value back to a provider string
@@ -200,7 +201,7 @@ export const parseValue = (
  * @param value - The typed value to serialize
  * @param schema - The TypeBox schema
  */
-export const serializeValue = (value: unknown, schema: TSchema): string => {
+export function serializeValue(value: unknown, schema: TSchema): string {
   if (value === null || value === undefined) {
     return '';
   }
@@ -226,7 +227,7 @@ export const serializeValue = (value: unknown, schema: TSchema): string => {
     default:
       return typeof value === 'object' ? JSON.stringify(value) : String(value);
   }
-};
+}
 
 /**
  * Parse a flat key-value map into a nested typed object using the schema
@@ -234,11 +235,11 @@ export const serializeValue = (value: unknown, schema: TSchema): string => {
  * @param kv - Flat map of canonical dot paths to string values
  * @param schema - The TypeBox schema
  */
-export const parseProviderKV = (
+export function parseProviderKV(
   kv: Record<string, string>,
   schema: TSchema
-): Effect.Effect<Record<string, unknown>, ValidationError> =>
-  pipe(
+): Effect.Effect<Record<string, unknown>, ValidationError> {
+  return pipe(
     Effect.forEach(Object.entries(kv), ([path, value]) =>
       pipe(
         Effect.sync(() => {
@@ -298,3 +299,4 @@ export const parseProviderKV = (
       return result;
     })
   );
+}

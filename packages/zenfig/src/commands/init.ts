@@ -44,12 +44,12 @@ export type InitResult = {
 /**
  * Generate Jsonnet code for accessing a schema path
  */
-const generatePathAccess = (
+function generatePathAccess(
   path: string,
   hasDefault: boolean,
   defaultValue: unknown,
   includeDefaults: boolean
-): string => {
+): string {
   const segments = path.split('.');
   const accessor = `s.${segments.join('.')}`;
 
@@ -63,12 +63,12 @@ const generatePathAccess = (
   }
 
   return accessor;
-};
+}
 
 /**
  * Generate Jsonnet object structure from schema
  */
-const generateJsonnetObject = (schema: TSchema, includeDefaults: boolean, indent = 2, path = ''): string => {
+function generateJsonnetObject(schema: TSchema, includeDefaults: boolean, indent = 2, path = ''): string {
   const unwrapped = unwrapOptional(schema);
   const spaces = ' '.repeat(indent);
 
@@ -125,12 +125,12 @@ const generateJsonnetObject = (schema: TSchema, includeDefaults: boolean, indent
   lines.push(`${' '.repeat(indent - 2)}}`);
 
   return lines.join('\n');
-};
+}
 
 /**
  * Generate complete Jsonnet template
  */
-const generateJsonnetTemplate = (schema: TSchema, includeDefaults: boolean): string => {
+function generateJsonnetTemplate(schema: TSchema, includeDefaults: boolean): string {
   const lines: Array<string> = [];
 
   lines.push('local s = std.extVar("secrets");');
@@ -142,7 +142,7 @@ const generateJsonnetTemplate = (schema: TSchema, includeDefaults: boolean): str
   lines.push('');
 
   return lines.join('\n');
-};
+}
 
 // --------------------------------------------------------------------------
 // Init Command
@@ -151,10 +151,10 @@ const generateJsonnetTemplate = (schema: TSchema, includeDefaults: boolean): str
 /**
  * Execute the init workflow
  */
-export const executeInit = (
+export function executeInit(
   options: InitOptions
-): Effect.Effect<InitResult, SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<InitResult, SystemError | ValidationError | ZenfigError> {
+  return pipe(
     Effect.sync(() => {
       const { config, force = false, output } = options;
       const outputPath = output ?? config.jsonnet;
@@ -226,12 +226,14 @@ export const executeInit = (
       }
     )
   );
+}
 
 /**
  * Run init command
  */
-export const runInit = (options: InitOptions): Effect.Effect<boolean, SystemError | ValidationError | ZenfigError> =>
-  pipe(
+export function runInit(options: InitOptions): Effect.Effect<boolean, SystemError | ValidationError | ZenfigError> {
+  return pipe(
     executeInit(options),
     Effect.map((result) => result.created)
   );
+}

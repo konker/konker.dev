@@ -30,15 +30,15 @@ const registry: ProviderRegistry = new Map();
 /**
  * Register a provider factory
  */
-export const registerProvider = (name: string, factory: ProviderFactory): void => {
+export function registerProvider(name: string, factory: ProviderFactory): void {
   registry.set(name.toLowerCase(), factory);
-};
+}
 
 /**
  * Get a provider by name
  */
-export const getProvider = (name: string): Effect.Effect<Provider, ProviderError> =>
-  pipe(
+export function getProvider(name: string): Effect.Effect<Provider, ProviderError> {
+  return pipe(
     Effect.sync(() => registry.get(name.toLowerCase())),
     Effect.flatMap((factory) => {
       if (!factory) {
@@ -47,16 +47,21 @@ export const getProvider = (name: string): Effect.Effect<Provider, ProviderError
       return Effect.succeed(factory());
     })
   );
+}
 
 /**
  * Get list of registered provider names
  */
-export const getRegisteredProviders = (): ReadonlyArray<string> => Array.from(registry.keys());
+export function getRegisteredProviders(): ReadonlyArray<string> {
+  return Array.from(registry.keys());
+}
 
 /**
  * Check if a provider is registered
  */
-export const isProviderRegistered = (name: string): boolean => registry.has(name.toLowerCase());
+export function isProviderRegistered(name: string): boolean {
+  return registry.has(name.toLowerCase());
+}
 
 // --------------------------------------------------------------------------
 // Default Providers

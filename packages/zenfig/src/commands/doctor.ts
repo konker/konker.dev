@@ -41,8 +41,8 @@ export type DoctorResult = {
 /**
  * Check if a binary exists in PATH
  */
-const checkBinary = (name: string): Effect.Effect<CheckResult, never> =>
-  Effect.promise(async () => {
+function checkBinary(name: string): Effect.Effect<CheckResult, never> {
+  return Effect.promise(async () => {
     try {
       await execa('which', [name]);
       const version = await execa(name, ['--version']).catch(() => ({ stdout: 'unknown' }));
@@ -61,12 +61,13 @@ const checkBinary = (name: string): Effect.Effect<CheckResult, never> =>
       };
     }
   });
+}
 
 /**
  * Check if a file exists and is readable
  */
-const checkFile = (path: string, description: string): Effect.Effect<CheckResult, never> =>
-  Effect.sync(() => {
+function checkFile(path: string, description: string): Effect.Effect<CheckResult, never> {
+  return Effect.sync(() => {
     try {
       fs.accessSync(path, fs.constants.R_OK);
       return {
@@ -83,12 +84,13 @@ const checkFile = (path: string, description: string): Effect.Effect<CheckResult
       };
     }
   });
+}
 
 /**
  * Check if schema can be loaded
  */
-const checkSchema = (schemaPath: string, exportName: string): Effect.Effect<CheckResult, never> =>
-  pipe(
+function checkSchema(schemaPath: string, exportName: string): Effect.Effect<CheckResult, never> {
+  return pipe(
     Effect.either(loadSchemaWithDefaults(schemaPath, exportName)),
     Effect.map((result) => {
       if (result._tag === 'Left') {
@@ -109,12 +111,13 @@ const checkSchema = (schemaPath: string, exportName: string): Effect.Effect<Chec
       };
     })
   );
+}
 
 /**
  * Check provider connectivity (optional)
  */
-const checkProvider = (providerName: string): Effect.Effect<CheckResult, never> =>
-  pipe(
+function checkProvider(providerName: string): Effect.Effect<CheckResult, never> {
+  return pipe(
     Effect.either(getProvider(providerName)),
     Effect.map((result) => {
       if (result._tag === 'Left') {
@@ -135,11 +138,12 @@ const checkProvider = (providerName: string): Effect.Effect<CheckResult, never> 
       };
     })
   );
+}
 
 /**
  * Print a check result
  */
-const printCheck = (check: CheckResult): void => {
+function printCheck(check: CheckResult): void {
   const icon =
     check.status === 'ok'
       ? chalk.green('\u2713')
@@ -153,7 +157,7 @@ const printCheck = (check: CheckResult): void => {
     console.log(chalk.dim(`  ${check.details}`));
   }
   console.log('');
-};
+}
 
 // --------------------------------------------------------------------------
 // Doctor Command
@@ -162,8 +166,8 @@ const printCheck = (check: CheckResult): void => {
 /**
  * Execute the doctor workflow
  */
-export const executeDoctor = (options: DoctorOptions): Effect.Effect<DoctorResult, never> =>
-  pipe(
+export function executeDoctor(options: DoctorOptions): Effect.Effect<DoctorResult, never> {
+  return pipe(
     Effect.sync(() => {
       console.log(chalk.bold('\nZenfig Doctor\n'));
       console.log('Checking prerequisites...\n');
@@ -265,12 +269,14 @@ export const executeDoctor = (options: DoctorOptions): Effect.Effect<DoctorResul
       };
     })
   );
+}
 
 /**
  * Run doctor command
  */
-export const runDoctor = (options: DoctorOptions): Effect.Effect<boolean, never> =>
-  pipe(
+export function runDoctor(options: DoctorOptions): Effect.Effect<boolean, never> {
+  return pipe(
     executeDoctor(options),
     Effect.map((result) => result.allPassed)
   );
+}

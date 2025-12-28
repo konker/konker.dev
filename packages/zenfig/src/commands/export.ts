@@ -51,21 +51,22 @@ export type ExportResult = {
 /**
  * Fetch values from a provider for a single service
  */
-const fetchService = (provider: Provider, ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> =>
-  provider.fetch(ctx);
+function fetchService(provider: Provider, ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> {
+  return provider.fetch(ctx);
+}
 
 /**
  * Fetch and parse values for multiple services
  */
-const fetchAllServices = (
+function fetchAllServices(
   provider: Provider,
   prefix: string,
   env: string,
   services: ReadonlyArray<string>,
   rootSchema: TSchema,
   providerGuards: ResolvedConfig['providerGuards']
-): Effect.Effect<ReadonlyArray<readonly [string, Record<string, unknown>]>, ProviderError | ValidationError> =>
-  Effect.forEach(services, (service) => {
+): Effect.Effect<ReadonlyArray<readonly [string, Record<string, unknown>]>, ProviderError | ValidationError> {
+  return Effect.forEach(services, (service) => {
     const ctx: ProviderContext = { prefix, service, env };
     return pipe(
       checkProviderGuards(provider, ctx, providerGuards),
@@ -74,6 +75,7 @@ const fetchAllServices = (
       Effect.map((parsed) => [service, parsed] as const)
     );
   });
+}
 
 // --------------------------------------------------------------------------
 // Export Command
@@ -82,10 +84,10 @@ const fetchAllServices = (
 /**
  * Execute the export workflow
  */
-export const executeExport = (
+export function executeExport(
   options: ExportOptions
-): Effect.Effect<ExportResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
-  pipe(
+): Effect.Effect<ExportResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+  return pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
     Effect.flatMap(({ schema }) =>
@@ -159,14 +161,15 @@ export const executeExport = (
       };
     })
   );
+}
 
 /**
  * Run export and write to stdout
  */
-export const runExport = (
+export function runExport(
   options: ExportOptions
-): Effect.Effect<void, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
-  pipe(
+): Effect.Effect<void, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+  return pipe(
     executeExport(options),
     Effect.map((result) => {
       // Print warnings to stderr
@@ -178,3 +181,4 @@ export const runExport = (
       process.stdout.write(result.formatted);
     })
   );
+}

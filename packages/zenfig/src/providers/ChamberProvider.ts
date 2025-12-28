@@ -45,16 +45,17 @@ type ErrorWithCode = {
   readonly code?: string;
 };
 
-const isErrorWithCode = (error: unknown): error is ErrorWithCode =>
-  typeof error === 'object' && error !== null && 'code' in error;
+function isErrorWithCode(error: unknown): error is ErrorWithCode {
+  return typeof error === 'object' && error !== null && 'code' in error;
+}
 
-const readEnvValue = (value: string | undefined): string | undefined => {
+function readEnvValue(value: string | undefined): string | undefined {
   if (!value) return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
-};
+}
 
-const parseChamberGuards = (guards?: unknown): Effect.Effect<ChamberProviderGuards | undefined, ProviderError> => {
+function parseChamberGuards(guards?: unknown): Effect.Effect<ChamberProviderGuards | undefined, ProviderError> {
   if (guards === undefined) {
     return Effect.succeed(undefined);
   }
@@ -64,9 +65,9 @@ const parseChamberGuards = (guards?: unknown): Effect.Effect<ChamberProviderGuar
     Effect.mapError((error) => providerGuardMismatchError('chamber', ParseResult.TreeFormatter.formatErrorSync(error))),
     Effect.map((decoded) => (decoded.accountId || decoded.region ? decoded : undefined))
   );
-};
+}
 
-const describeAwsCliError = (error: unknown): string => {
+function describeAwsCliError(error: unknown): string {
   if (isErrorWithCode(error) && error.code === 'ENOENT') {
     return 'AWS CLI not found in PATH';
   }
@@ -74,13 +75,10 @@ const describeAwsCliError = (error: unknown): string => {
     return error.message;
   }
   return String(error);
-};
+}
 
-const resolveAwsCliValue = (
-  args: ReadonlyArray<string>,
-  failureMessage: string
-): Effect.Effect<string, ProviderError> =>
-  pipe(
+function resolveAwsCliValue(args: ReadonlyArray<string>, failureMessage: string): Effect.Effect<string, ProviderError> {
+  return pipe(
     Effect.tryPromise({
       try: async () => {
         const { stdout } = await execa('aws', args);
@@ -96,8 +94,9 @@ const resolveAwsCliValue = (
       return Effect.succeed(value);
     })
   );
+}
 
-const resolveAwsAccountId = (): Effect.Effect<string, ProviderError> => {
+function resolveAwsAccountId(): Effect.Effect<string, ProviderError> {
   const envAccountId = readEnvValue(process.env.AWS_ACCOUNT_ID);
   if (envAccountId) {
     return Effect.succeed(envAccountId);
@@ -107,22 +106,22 @@ const resolveAwsAccountId = (): Effect.Effect<string, ProviderError> => {
     ['sts', 'get-caller-identity', '--query', 'Account', '--output', 'text'],
     'Unable to resolve AWS account ID for provider guards'
   );
-};
+}
 
-const resolveAwsRegion = (): Effect.Effect<string, ProviderError> => {
+function resolveAwsRegion(): Effect.Effect<string, ProviderError> {
   const envRegion = readEnvValue(process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION);
   if (envRegion) {
     return Effect.succeed(envRegion);
   }
 
   return resolveAwsCliValue(['configure', 'get', 'region'], 'Unable to resolve AWS region for provider guards');
-};
+}
 
 // --------------------------------------------------------------------------
 // Error Classification
 // --------------------------------------------------------------------------
 
-const classifyChamberError = (error: ExecaError, ctx: ProviderContext, keyPath?: string): ProviderError => {
+function classifyChamberError(error: ExecaError, ctx: ProviderContext, keyPath?: string): ProviderError {
   const stderrRaw = error.stderr ?? error.message ?? '';
   const stderr = String(stderrRaw);
 
@@ -159,7 +158,7 @@ const classifyChamberError = (error: ExecaError, ctx: ProviderContext, keyPath?:
 
   // Default to connection error
   return connectionFailedError('chamber', stderr);
-};
+}
 
 // --------------------------------------------------------------------------
 // Chamber Provider Implementation
@@ -174,14 +173,14 @@ const capabilities: ProviderCapabilities = {
 /**
  * Build the chamber service path: prefix/service/env
  */
-const buildServicePath = (ctx: ProviderContext): string => {
+function buildServicePath(ctx: ProviderContext): string {
   // Remove leading slash from prefix if present for chamber
   const prefix = ctx.prefix.startsWith('/') ? ctx.prefix.slice(1) : ctx.prefix;
   return `${prefix}/${ctx.service}/${ctx.env}`;
-};
+}
 
-const checkGuards = (ctx: ProviderContext, guards?: unknown): Effect.Effect<void, ProviderError> =>
-  pipe(
+function checkGuards(ctx: ProviderContext, guards?: unknown): Effect.Effect<void, ProviderError> {
+  return pipe(
     parseChamberGuards(guards),
     Effect.flatMap((parsed) => {
       if (!parsed) {
@@ -215,12 +214,13 @@ const checkGuards = (ctx: ProviderContext, guards?: unknown): Effect.Effect<void
       );
     })
   );
+}
 
 /**
  * Fetch all parameters for a service using chamber export
  */
-const fetch = (ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> =>
-  pipe(
+function fetch(ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> {
+  return pipe(
     Effect.tryPromise({
       try: async () => {
         const servicePath = buildServicePath(ctx);
@@ -253,12 +253,13 @@ const fetch = (ctx: ProviderContext): Effect.Effect<ProviderKV, ProviderError> =
       return kv;
     })
   );
+}
 
 /**
  * Write a single parameter using chamber write
  */
-const upsert = (ctx: ProviderContext, keyPath: string, value: string): Effect.Effect<void, ProviderError> =>
-  Effect.tryPromise({
+function upsert(ctx: ProviderContext, keyPath: string, value: string): Effect.Effect<void, ProviderError> {
+  return Effect.tryPromise({
     try: async () => {
       const servicePath = buildServicePath(ctx);
       const slashPath = dotToSlashPath(keyPath);
@@ -268,12 +269,13 @@ const upsert = (ctx: ProviderContext, keyPath: string, value: string): Effect.Ef
     },
     catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx, keyPath),
   });
+}
 
 /**
  * Delete a single parameter using chamber delete
  */
-const deleteKey = (ctx: ProviderContext, keyPath: string): Effect.Effect<void, ProviderError> =>
-  Effect.tryPromise({
+function deleteKey(ctx: ProviderContext, keyPath: string): Effect.Effect<void, ProviderError> {
+  return Effect.tryPromise({
     try: async () => {
       const servicePath = buildServicePath(ctx);
       const slashPath = dotToSlashPath(keyPath);
@@ -282,6 +284,7 @@ const deleteKey = (ctx: ProviderContext, keyPath: string): Effect.Effect<void, P
     },
     catch: (error: unknown) => classifyChamberError(error as ExecaError, ctx, keyPath),
   });
+}
 
 /**
  * The Chamber provider instance

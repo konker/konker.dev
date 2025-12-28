@@ -36,10 +36,11 @@ type MockProviderGuards = {
   readonly env?: string;
 };
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
-const parseMockGuards = (guards?: unknown): Effect.Effect<MockProviderGuards | undefined, ProviderError> => {
+function parseMockGuards(guards?: unknown): Effect.Effect<MockProviderGuards | undefined, ProviderError> {
   if (guards === undefined) {
     return Effect.succeed(undefined);
   }
@@ -73,7 +74,7 @@ const parseMockGuards = (guards?: unknown): Effect.Effect<MockProviderGuards | u
   }
 
   return Effect.succeed(parsed);
-};
+}
 
 // --------------------------------------------------------------------------
 // Factory
@@ -82,9 +83,9 @@ const parseMockGuards = (guards?: unknown): Effect.Effect<MockProviderGuards | u
 /**
  * Create a mock provider with optional initial data
  */
-export const createMockProvider = (
+export function createMockProvider(
   initialData?: Record<string, ProviderKV>
-): Provider & { readonly storage: MockStorage } => {
+): Provider & { readonly storage: MockStorage } {
   const storage: MockStorage = new Map();
 
   // Initialize with provided data
@@ -176,7 +177,7 @@ export const createMockProvider = (
     checkGuards,
     storage,
   };
-};
+}
 
 /**
  * Default mock provider instance (empty storage)

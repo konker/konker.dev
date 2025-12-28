@@ -39,8 +39,8 @@ export type DeleteResult = {
 /**
  * Prompt for confirmation
  */
-const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
-  Effect.promise(async () => {
+function promptConfirmation(message: string): Effect.Effect<boolean, never> {
+  return Effect.promise(async () => {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
@@ -53,6 +53,7 @@ const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
       });
     });
   });
+}
 
 // --------------------------------------------------------------------------
 // Delete Command
@@ -61,10 +62,10 @@ const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
 /**
  * Execute the delete workflow
  */
-export const executeDelete = (
+export function executeDelete(
   options: DeleteOptions
-): Effect.Effect<DeleteResult, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  pipe(
+): Effect.Effect<DeleteResult, ProviderError | ValidationError | SystemError | ZenfigError> {
+  return pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
     Effect.flatMap(({ schema }) =>
@@ -140,14 +141,15 @@ export const executeDelete = (
       );
     })
   );
+}
 
 /**
  * Run delete and print result
  */
-export const runDelete = (
+export function runDelete(
   options: DeleteOptions
-): Effect.Effect<boolean, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  pipe(
+): Effect.Effect<boolean, ProviderError | ValidationError | SystemError | ZenfigError> {
+  return pipe(
     executeDelete(options),
     Effect.map((result) => {
       if (result.deleted) {
@@ -156,3 +158,4 @@ export const runDelete = (
       return result.deleted;
     })
   );
+}

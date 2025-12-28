@@ -71,7 +71,7 @@ export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];
 // --------------------------------------------------------------------------
 // Error Code to Exit Code Mapping
 // --------------------------------------------------------------------------
-export const errorCodeToExitCode = (code: ErrorCodeType): ExitCode => {
+export function errorCodeToExitCode(code: ErrorCodeType): ExitCode {
   switch (code) {
     case ErrorCode.CLI001:
     case ErrorCode.CLI002:
@@ -97,7 +97,7 @@ export const errorCodeToExitCode = (code: ErrorCodeType): ExitCode => {
     default:
       return EXIT_VALIDATION_ERROR;
   }
-};
+}
 
 // --------------------------------------------------------------------------
 // Base Error Types
@@ -177,8 +177,8 @@ export class SystemError extends Data.TaggedError('SystemError')<{
 // --------------------------------------------------------------------------
 
 // Validation Errors
-export const invalidTypeError = (path: string, expected: string, received: string): ValidationError =>
-  new ValidationError({
+export function invalidTypeError(path: string, expected: string, received: string): ValidationError {
+  return new ValidationError({
     message: 'Value does not match expected type',
     context: {
       code: ErrorCode.VAL001,
@@ -189,14 +189,15 @@ export const invalidTypeError = (path: string, expected: string, received: strin
       remediation: `Provide a valid ${expected} value`,
     },
   });
+}
 
-export const formatViolationError = (
+export function formatViolationError(
   path: string,
   expected: string,
   received: string,
   example?: string
-): ValidationError =>
-  new ValidationError({
+): ValidationError {
+  return new ValidationError({
     message: 'Value does not match required format',
     context: {
       code: ErrorCode.VAL002,
@@ -208,14 +209,15 @@ export const formatViolationError = (
       example,
     },
   });
+}
 
-export const constraintViolationError = (
+export function constraintViolationError(
   path: string,
   expected: string,
   received: string,
   problem: string
-): ValidationError =>
-  new ValidationError({
+): ValidationError {
+  return new ValidationError({
     message: 'Value violates schema constraints',
     context: {
       code: ErrorCode.VAL003,
@@ -226,9 +228,10 @@ export const constraintViolationError = (
       remediation: `Provide a value that satisfies the constraint: ${expected}`,
     },
   });
+}
 
-export const keyNotFoundError = (path: string, availableKeys?: ReadonlyArray<string>): ValidationError =>
-  new ValidationError({
+export function keyNotFoundError(path: string, availableKeys?: ReadonlyArray<string>): ValidationError {
+  return new ValidationError({
     message: 'Key path does not exist in schema',
     context: {
       code: ErrorCode.VAL004,
@@ -238,9 +241,10 @@ export const keyNotFoundError = (path: string, availableKeys?: ReadonlyArray<str
       availableKeys,
     },
   });
+}
 
-export const nullNotAllowedError = (path: string, expected: string): ValidationError =>
-  new ValidationError({
+export function nullNotAllowedError(path: string, expected: string): ValidationError {
+  return new ValidationError({
     message: 'Null value not permitted for this key',
     context: {
       code: ErrorCode.VAL005,
@@ -251,10 +255,11 @@ export const nullNotAllowedError = (path: string, expected: string): ValidationE
       remediation: 'Provide a non-null value or use Type.Union([Type.Null(), ...]) in schema',
     },
   });
+}
 
 // Provider Errors
-export const connectionFailedError = (provider: string, details?: string): ProviderError =>
-  new ProviderError({
+export function connectionFailedError(provider: string, details?: string): ProviderError {
+  return new ProviderError({
     message: 'Failed to connect to provider',
     context: {
       code: ErrorCode.PROV001,
@@ -262,9 +267,10 @@ export const connectionFailedError = (provider: string, details?: string): Provi
       remediation: `Check network connectivity, verify AWS credentials (for chamber/SSM), check provider binary is in PATH`,
     },
   });
+}
 
-export const authenticationFailedError = (provider: string, details?: string): ProviderError =>
-  new ProviderError({
+export function authenticationFailedError(provider: string, details?: string): ProviderError {
+  return new ProviderError({
     message: 'Provider authentication failed',
     context: {
       code: ErrorCode.PROV002,
@@ -273,9 +279,10 @@ export const authenticationFailedError = (provider: string, details?: string): P
         'For AWS: Check AWS_PROFILE, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY. Verify IAM permissions (ssm:GetParameters, ssm:PutParameter, ssm:DeleteParameter). Check region configuration.',
     },
   });
+}
 
-export const parameterNotFoundError = (path: string, fullPath: string): ProviderError =>
-  new ProviderError({
+export function parameterNotFoundError(path: string, fullPath: string): ProviderError {
+  return new ProviderError({
     message: 'SSM parameter does not exist',
     context: {
       code: ErrorCode.PROV003,
@@ -284,9 +291,10 @@ export const parameterNotFoundError = (path: string, fullPath: string): Provider
       remediation: 'Verify parameter path, check --env flag matches expected environment',
     },
   });
+}
 
-export const encryptionVerificationFailedError = (path: string): ProviderError =>
-  new ProviderError({
+export function encryptionVerificationFailedError(path: string): ProviderError {
+  return new ProviderError({
     message: 'Parameter is not encrypted as SecureString',
     context: {
       code: ErrorCode.PROV004,
@@ -296,9 +304,10 @@ export const encryptionVerificationFailedError = (path: string): ProviderError =
         'Manually update parameter type in AWS SSM console, or use --skip-encryption-check (not recommended)',
     },
   });
+}
 
-export const writePermissionDeniedError = (path: string, details?: string): ProviderError =>
-  new ProviderError({
+export function writePermissionDeniedError(path: string, details?: string): ProviderError {
+  return new ProviderError({
     message: 'Insufficient permissions to write parameter',
     context: {
       code: ErrorCode.PROV005,
@@ -308,9 +317,10 @@ export const writePermissionDeniedError = (path: string, details?: string): Prov
         'Check IAM policy includes ssm:PutParameter action, verify resource ARN matches target parameter path',
     },
   });
+}
 
-export const providerGuardMismatchError = (provider: string, details: string): ProviderError =>
-  new ProviderError({
+export function providerGuardMismatchError(provider: string, details: string): ProviderError {
+  return new ProviderError({
     message: 'Provider guard check failed',
     context: {
       code: ErrorCode.PROV006,
@@ -318,10 +328,11 @@ export const providerGuardMismatchError = (provider: string, details: string): P
       remediation: 'Verify providerGuards configuration, or set ZENFIG_IGNORE_PROVIDER_GUARDS=1 for emergency override',
     },
   });
+}
 
 // Jsonnet Errors
-export const jsonnetSyntaxError = (location: string, problem: string): JsonnetError =>
-  new JsonnetError({
+export function jsonnetSyntaxError(location: string, problem: string): JsonnetError {
+  return new JsonnetError({
     message: 'Jsonnet template has syntax error',
     context: {
       code: ErrorCode.JSON001,
@@ -330,9 +341,10 @@ export const jsonnetSyntaxError = (location: string, problem: string): JsonnetEr
       remediation: 'Fix syntax error in Jsonnet template',
     },
   });
+}
 
-export const jsonnetRuntimeError = (location: string, problem: string): JsonnetError =>
-  new JsonnetError({
+export function jsonnetRuntimeError(location: string, problem: string): JsonnetError {
+  return new JsonnetError({
     message: 'Jsonnet template failed during evaluation',
     context: {
       code: ErrorCode.JSON002,
@@ -341,9 +353,10 @@ export const jsonnetRuntimeError = (location: string, problem: string): JsonnetE
       remediation: 'Check logic in Jsonnet template',
     },
   });
+}
 
-export const jsonnetInvalidOutputError = (received: string): JsonnetError =>
-  new JsonnetError({
+export function jsonnetInvalidOutputError(received: string): JsonnetError {
+  return new JsonnetError({
     message: 'Jsonnet did not return a valid object',
     context: {
       code: ErrorCode.JSON003,
@@ -353,9 +366,10 @@ export const jsonnetInvalidOutputError = (received: string): JsonnetError =>
       remediation: 'Ensure Jsonnet returns { ... } object structure',
     },
   });
+}
 
-export const jsonnetMissingVariableError = (variable: string): JsonnetError =>
-  new JsonnetError({
+export function jsonnetMissingVariableError(variable: string): JsonnetError {
+  return new JsonnetError({
     message: 'Required external variable not provided',
     context: {
       code: ErrorCode.JSON004,
@@ -363,10 +377,11 @@ export const jsonnetMissingVariableError = (variable: string): JsonnetError =>
       remediation: 'Ensure secrets and env are passed via --ext-code, check temp file creation succeeded',
     },
   });
+}
 
 // CLI Errors
-export const invalidFlagError = (flag: string): CLIError =>
-  new CLIError({
+export function invalidFlagError(flag: string): CLIError {
+  return new CLIError({
     message: 'Unknown or invalid command-line flag',
     context: {
       code: ErrorCode.CLI001,
@@ -374,9 +389,10 @@ export const invalidFlagError = (flag: string): CLIError =>
       remediation: 'Run zenfig <command> --help for available flags',
     },
   });
+}
 
-export const missingRequiredArgumentError = (argument: string, command: string): CLIError =>
-  new CLIError({
+export function missingRequiredArgumentError(argument: string, command: string): CLIError {
+  return new CLIError({
     message: 'Required argument not provided',
     context: {
       code: ErrorCode.CLI002,
@@ -384,9 +400,10 @@ export const missingRequiredArgumentError = (argument: string, command: string):
       remediation: `Check command syntax: zenfig ${command} --help`,
     },
   });
+}
 
-export const conflictingFlagsError = (flags: ReadonlyArray<string>): CLIError =>
-  new CLIError({
+export function conflictingFlagsError(flags: ReadonlyArray<string>): CLIError {
+  return new CLIError({
     message: 'Incompatible flags used together',
     context: {
       code: ErrorCode.CLI003,
@@ -394,10 +411,11 @@ export const conflictingFlagsError = (flags: ReadonlyArray<string>): CLIError =>
       remediation: 'Use only one of the conflicting flags',
     },
   });
+}
 
 // System Errors
-export const binaryNotFoundError = (binary: string): SystemError =>
-  new SystemError({
+export function binaryNotFoundError(binary: string): SystemError {
+  return new SystemError({
     message: 'Required binary not found in PATH',
     context: {
       code: ErrorCode.SYS001,
@@ -410,9 +428,10 @@ export const binaryNotFoundError = (binary: string): SystemError =>
             : `Install ${binary} and ensure it is in PATH`,
     },
   });
+}
 
-export const fileNotFoundError = (path: string): SystemError =>
-  new SystemError({
+export function fileNotFoundError(path: string): SystemError {
+  return new SystemError({
     message: 'Required file does not exist',
     context: {
       code: ErrorCode.SYS002,
@@ -421,9 +440,10 @@ export const fileNotFoundError = (path: string): SystemError =>
       remediation: 'Check file path is correct, verify file permissions (readable)',
     },
   });
+}
 
-export const permissionDeniedError = (path: string, operation: string): SystemError =>
-  new SystemError({
+export function permissionDeniedError(path: string, operation: string): SystemError {
+  return new SystemError({
     message: 'Insufficient filesystem permissions',
     context: {
       code: ErrorCode.SYS003,
@@ -432,9 +452,10 @@ export const permissionDeniedError = (path: string, operation: string): SystemEr
       remediation: 'Check file/directory permissions',
     },
   });
+}
 
-export const snapshotSchemaMismatchError = (expectedHash: string, actualHash: string): SystemError =>
-  new SystemError({
+export function snapshotSchemaMismatchError(expectedHash: string, actualHash: string): SystemError {
+  return new SystemError({
     message: 'Snapshot schema hash does not match current schema',
     context: {
       code: ErrorCode.SYS004,
@@ -445,13 +466,14 @@ export const snapshotSchemaMismatchError = (expectedHash: string, actualHash: st
         'Review schema changes since snapshot was created, use --force-schema-mismatch to restore anyway (may cause validation errors), or regenerate snapshot with current schema',
     },
   });
+}
 
 // --------------------------------------------------------------------------
 // Error Formatting
 // --------------------------------------------------------------------------
 export type ZenfigErrorLike = ZenfigError | ValidationError | ProviderError | JsonnetError | CLIError | SystemError;
 
-export const formatError = (error: ZenfigErrorLike): string => {
+export function formatError(error: ZenfigErrorLike): string {
   const { context, message } = error;
   const lines: Array<string> = [];
 
@@ -496,4 +518,4 @@ export const formatError = (error: ZenfigErrorLike): string => {
   }
 
   return lines.join('\n');
-};
+}

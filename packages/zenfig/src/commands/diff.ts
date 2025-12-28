@@ -58,10 +58,10 @@ export type DiffResult = {
 /**
  * Execute the diff workflow
  */
-export const executeDiff = (
+export function executeDiff(
   options: DiffOptions
-): Effect.Effect<DiffResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
-  pipe(
+): Effect.Effect<DiffResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+  return pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
     Effect.flatMap(({ schema }) =>
@@ -134,11 +134,12 @@ export const executeDiff = (
       return { entries, hasChanges };
     })
   );
+}
 
 /**
  * Format diff result as table
  */
-const formatDiffTable = (entries: ReadonlyArray<DiffEntry>, showValues: boolean): string => {
+function formatDiffTable(entries: ReadonlyArray<DiffEntry>, showValues: boolean): string {
   const changedEntries = entries.filter((e) => e.status !== 'unchanged');
 
   if (changedEntries.length === 0) {
@@ -175,12 +176,12 @@ const formatDiffTable = (entries: ReadonlyArray<DiffEntry>, showValues: boolean)
   }
 
   return table.toString();
-};
+}
 
 /**
  * Format diff result as JSON
  */
-const formatDiffJson = (entries: ReadonlyArray<DiffEntry>, showValues: boolean): string => {
+function formatDiffJson(entries: ReadonlyArray<DiffEntry>, showValues: boolean): string {
   const changedEntries = entries.filter((e) => e.status !== 'unchanged');
 
   const output = changedEntries.map((entry) => ({
@@ -191,15 +192,15 @@ const formatDiffJson = (entries: ReadonlyArray<DiffEntry>, showValues: boolean):
   }));
 
   return JSON.stringify(output, null, 2);
-};
+}
 
 /**
  * Run diff and print results
  */
-export const runDiff = (
+export function runDiff(
   options: DiffOptions
-): Effect.Effect<boolean, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> =>
-  pipe(
+): Effect.Effect<boolean, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+  return pipe(
     executeDiff(options),
     Effect.map((result) => {
       const showValues = options.unsafeShowValues === true ? true : options.showValues && process.stdout.isTTY;
@@ -215,3 +216,4 @@ export const runDiff = (
       return result.hasChanges;
     })
   );
+}

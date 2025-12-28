@@ -38,10 +38,10 @@ export type ValidateResult = {
 /**
  * Execute the validate workflow
  */
-export const executeValidate = (
+export function executeValidate(
   options: ValidateOptions
-): Effect.Effect<ValidateResult, SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<ValidateResult, SystemError | ValidationError | ZenfigError> {
+  return pipe(
     Effect.sync(() => {
       // 1. Check file exists
       if (!fs.existsSync(options.file)) {
@@ -103,14 +103,15 @@ export const executeValidate = (
       )
     )
   );
+}
 
 /**
  * Run validate and print results
  */
-export const runValidate = (
+export function runValidate(
   options: ValidateOptions
-): Effect.Effect<boolean, SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<boolean, SystemError | ValidationError | ZenfigError> {
+  return pipe(
     executeValidate(options),
     Effect.map((result) => {
       if (result.valid) {
@@ -129,3 +130,4 @@ export const runValidate = (
       return false;
     })
   );
+}

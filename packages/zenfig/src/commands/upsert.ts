@@ -50,14 +50,15 @@ export type UpsertResult = {
 /**
  * Read value from stdin
  */
-const readFromStdin = (): Effect.Effect<string, never> =>
-  Effect.promise(async () => {
+function readFromStdin(): Effect.Effect<string, never> {
+  return Effect.promise(async () => {
     const chunks: Array<Buffer> = [];
     for await (const chunk of process.stdin) {
       chunks.push(chunk as Buffer);
     }
     return Buffer.concat(chunks).toString('utf-8').trim();
   });
+}
 
 // --------------------------------------------------------------------------
 // Upsert Command
@@ -66,10 +67,10 @@ const readFromStdin = (): Effect.Effect<string, never> =>
 /**
  * Execute the upsert workflow
  */
-export const executeUpsert = (
+export function executeUpsert(
   options: UpsertOptions
-): Effect.Effect<UpsertResult, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  pipe(
+): Effect.Effect<UpsertResult, ProviderError | ValidationError | SystemError | ZenfigError> {
+  return pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
     Effect.flatMap(({ schema }) =>
@@ -151,14 +152,15 @@ export const executeUpsert = (
       );
     })
   );
+}
 
 /**
  * Run upsert and print result
  */
-export const runUpsert = (
+export function runUpsert(
   options: UpsertOptions
-): Effect.Effect<void, ProviderError | ValidationError | SystemError | ZenfigError> =>
-  pipe(
+): Effect.Effect<void, ProviderError | ValidationError | SystemError | ZenfigError> {
+  return pipe(
     executeUpsert(options),
     Effect.map((result) => {
       console.log(
@@ -170,3 +172,4 @@ export const runUpsert = (
       }
     })
   );
+}

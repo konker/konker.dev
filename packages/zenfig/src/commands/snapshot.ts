@@ -80,17 +80,18 @@ export type SnapshotRestoreResult = {
 // Helper Functions
 // --------------------------------------------------------------------------
 
-const ensureDirectoryExists = (filePath: string): Effect.Effect<void, SystemError> =>
-  Effect.try({
+function ensureDirectoryExists(filePath: string): Effect.Effect<void, SystemError> {
+  return Effect.try({
     try: () => {
       const dir = path.dirname(filePath);
       fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
     },
     catch: () => permissionDeniedError(filePath, 'create directory'),
   });
+}
 
-const checkGitIgnore = (dir: string): Effect.Effect<boolean, never> =>
-  Effect.sync(() => {
+function checkGitIgnore(dir: string): Effect.Effect<boolean, never> {
+  return Effect.sync(() => {
     // Check if directory is in a git repo and if .gitignore covers it
     try {
       // Simple check: look for .gitignore in parent directories
@@ -113,9 +114,10 @@ const checkGitIgnore = (dir: string): Effect.Effect<boolean, never> =>
       return false;
     }
   });
+}
 
-const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
-  Effect.promise(async () => {
+function promptConfirmation(message: string): Effect.Effect<boolean, never> {
+  return Effect.promise(async () => {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
@@ -128,6 +130,7 @@ const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
       });
     });
   });
+}
 
 // --------------------------------------------------------------------------
 // Snapshot Save
@@ -136,10 +139,10 @@ const promptConfirmation = (message: string): Effect.Effect<boolean, never> =>
 /**
  * Save a snapshot of stored values
  */
-export const executeSnapshotSave = (
+export function executeSnapshotSave(
   options: SnapshotSaveOptions
-): Effect.Effect<SnapshotSaveResult, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<SnapshotSaveResult, ProviderError | SystemError | ValidationError | ZenfigError> {
+  return pipe(
     // 1. Load schema for hash
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
     Effect.flatMap(({ schemaHash }) =>
@@ -231,6 +234,7 @@ export const executeSnapshotSave = (
       );
     })
   );
+}
 
 // --------------------------------------------------------------------------
 // Snapshot Restore
@@ -239,10 +243,10 @@ export const executeSnapshotSave = (
 /**
  * Restore a snapshot
  */
-export const executeSnapshotRestore = (
+export function executeSnapshotRestore(
   options: SnapshotRestoreOptions
-): Effect.Effect<SnapshotRestoreResult, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<SnapshotRestoreResult, ProviderError | SystemError | ValidationError | ZenfigError> {
+  return pipe(
     // 1. Load snapshot file
     Effect.sync(() => {
       if (!fs.existsSync(options.snapshotFile)) {
@@ -407,27 +411,30 @@ export const executeSnapshotRestore = (
       }
     )
   );
+}
 
 /**
  * Run snapshot save
  */
-export const runSnapshotSave = (
+export function runSnapshotSave(
   options: SnapshotSaveOptions
-): Effect.Effect<void, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<void, ProviderError | SystemError | ValidationError | ZenfigError> {
+  return pipe(
     executeSnapshotSave(options),
     Effect.map((result) => {
       console.log(`Saved ${result.keyCount} keys from ${result.services.length} service(s)`);
     })
   );
+}
 
 /**
  * Run snapshot restore
  */
-export const runSnapshotRestore = (
+export function runSnapshotRestore(
   options: SnapshotRestoreOptions
-): Effect.Effect<boolean, ProviderError | SystemError | ValidationError | ZenfigError> =>
-  pipe(
+): Effect.Effect<boolean, ProviderError | SystemError | ValidationError | ZenfigError> {
+  return pipe(
     executeSnapshotRestore(options),
     Effect.map((result) => result.applied)
   );
+}

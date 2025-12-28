@@ -33,14 +33,15 @@ export type MergeOptions = {
 // Type Checking
 // --------------------------------------------------------------------------
 
-const isObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
-const getTypeName = (value: unknown): string => {
+function getTypeName(value: unknown): string {
   if (value === null) return 'null';
   if (Array.isArray(value)) return 'array';
   return typeof value;
-};
+}
 
 // --------------------------------------------------------------------------
 // Deep Merge
@@ -55,13 +56,13 @@ const getTypeName = (value: unknown): string => {
  * @param sourceOverlay - Name of overlay source (for conflict reporting)
  * @param pathPrefix - Current path prefix (for nested paths)
  */
-const deepMergeWithConflicts = (
+function deepMergeWithConflicts(
   base: Record<string, unknown>,
   overlay: Record<string, unknown>,
   sourceBase: string,
   sourceOverlay: string,
   pathPrefix = ''
-): MergeResult<Record<string, unknown>> => {
+): MergeResult<Record<string, unknown>> {
   const conflicts: Array<MergeConflict> = [];
   const result: Record<string, unknown> = { ...base };
 
@@ -128,7 +129,7 @@ const deepMergeWithConflicts = (
   }
 
   return { merged: result, conflicts };
-};
+}
 
 /**
  * Merge multiple configuration objects in order
@@ -136,11 +137,11 @@ const deepMergeWithConflicts = (
  * @param sources - Array of [sourceName, sourceObject] pairs
  * @param options - Merge options
  */
-export const mergeConfigs = (
+export function mergeConfigs(
   sources: ReadonlyArray<readonly [string, Record<string, unknown>]>,
   options: MergeOptions = {}
-): Effect.Effect<MergeResult<Record<string, unknown>>, Error> =>
-  pipe(
+): Effect.Effect<MergeResult<Record<string, unknown>>, Error> {
+  return pipe(
     Effect.sync(() => {
       if (sources.length === 0) {
         return { merged: {} as Record<string, unknown>, conflicts: [] as Array<MergeConflict>, lastSourceName: '' };
@@ -181,23 +182,26 @@ export const mergeConfigs = (
       return Effect.succeed({ merged, conflicts });
     })
   );
+}
 
 /**
  * Filter conflicts to only include type mismatches
  */
-export const getTypeMismatches = (conflicts: ReadonlyArray<MergeConflict>): ReadonlyArray<MergeConflict> =>
-  conflicts.filter((c) => c.type === 'type-mismatch');
+export function getTypeMismatches(conflicts: ReadonlyArray<MergeConflict>): ReadonlyArray<MergeConflict> {
+  return conflicts.filter((c) => c.type === 'type-mismatch');
+}
 
 /**
  * Filter conflicts to only include overrides
  */
-export const getOverrides = (conflicts: ReadonlyArray<MergeConflict>): ReadonlyArray<MergeConflict> =>
-  conflicts.filter((c) => c.type === 'override');
+export function getOverrides(conflicts: ReadonlyArray<MergeConflict>): ReadonlyArray<MergeConflict> {
+  return conflicts.filter((c) => c.type === 'override');
+}
 
 /**
  * Format conflicts for logging
  */
-export const formatConflicts = (conflicts: ReadonlyArray<MergeConflict>, redact = true): string => {
+export function formatConflicts(conflicts: ReadonlyArray<MergeConflict>, redact = true): string {
   if (conflicts.length === 0) return '';
 
   const lines = conflicts.map((c) => {
@@ -208,4 +212,4 @@ export const formatConflicts = (conflicts: ReadonlyArray<MergeConflict>, redact 
   });
 
   return lines.join('\n');
-};
+}

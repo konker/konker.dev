@@ -21,7 +21,7 @@ export type FormatOptions = {
 /**
  * Check if a string needs quoting in .env format
  */
-const needsQuoting = (value: string): boolean => {
+function needsQuoting(value: string): boolean {
   // Needs quoting if:
   // - Contains spaces, #, =, newlines, or $
   // - Starts or ends with whitespace
@@ -33,22 +33,22 @@ const needsQuoting = (value: string): boolean => {
   if (value.startsWith(' ') || value.endsWith(' ')) return true;
   if (/[\s#=$\n]/.test(value)) return true;
   return false;
-};
+}
 
 /**
  * Escape a string for double-quoted .env value
  */
-const escapeEnvValue = (value: string): string => {
+function escapeEnvValue(value: string): string {
   return value
     .replace(/\\/g, '\\\\') // Backslash first
     .replace(/"/g, '\\"') // Quotes
     .replace(/\n/g, '\\n'); // Newlines
-};
+}
 
 /**
  * Serialize a value for .env format
  */
-const serializeEnvValue = (value: unknown): string | undefined => {
+function serializeEnvValue(value: unknown): string | undefined {
   if (value === undefined) {
     // Omit undefined values
     return undefined;
@@ -82,7 +82,7 @@ const serializeEnvValue = (value: unknown): string | undefined => {
   }
 
   return String(value);
-};
+}
 
 // --------------------------------------------------------------------------
 // Format Functions
@@ -95,7 +95,7 @@ const serializeEnvValue = (value: unknown): string | undefined => {
  * @param options - Format options
  * @returns .env file content as string
  */
-export const formatEnv = (config: Record<string, unknown>, options: FormatOptions = {}): string => {
+export function formatEnv(config: Record<string, unknown>, options: FormatOptions = {}): string {
   const separator = options.separator ?? '_';
   const sortKeys = options.sortKeys ?? true;
 
@@ -119,7 +119,7 @@ export const formatEnv = (config: Record<string, unknown>, options: FormatOption
   const lines = keys.map((key) => `${key}=${envMap[key]}`);
 
   return lines.join('\n') + (lines.length > 0 ? '\n' : '');
-};
+}
 
 /**
  * Format a configuration object as JSON content
@@ -128,9 +128,9 @@ export const formatEnv = (config: Record<string, unknown>, options: FormatOption
  * @param pretty - Whether to pretty-print (default: true)
  * @returns JSON content as string
  */
-export const formatJson = (config: Record<string, unknown>, pretty = true): string => {
+export function formatJson(config: Record<string, unknown>, pretty = true): string {
   return pretty ? JSON.stringify(config, null, 2) + '\n' : JSON.stringify(config) + '\n';
-};
+}
 
 /**
  * Format a configuration object in the specified format
@@ -140,18 +140,18 @@ export const formatJson = (config: Record<string, unknown>, pretty = true): stri
  * @param options - Format options
  * @returns Formatted content as string
  */
-export const formatConfig = (
+export function formatConfig(
   config: Record<string, unknown>,
   format: 'env' | 'json',
   options: FormatOptions = {}
-): string => {
+): string {
   switch (format) {
     case 'env':
       return formatEnv(config, options);
     case 'json':
       return formatJson(config);
   }
-};
+}
 
 // --------------------------------------------------------------------------
 // Parse Functions (for validate command)
@@ -163,7 +163,7 @@ export const formatConfig = (
  * @param content - .env file content
  * @returns Flat key-value map
  */
-export const parseEnvContent = (content: string): Record<string, string> => {
+export function parseEnvContent(content: string): Record<string, string> {
   const result: Record<string, string> = {};
   const lines = content.split('\n');
 
@@ -195,12 +195,12 @@ export const parseEnvContent = (content: string): Record<string, string> => {
   }
 
   return result;
-};
+}
 
 /**
  * Detect file format from content
  */
-export const detectFormat = (content: string): 'env' | 'json' | 'unknown' => {
+export function detectFormat(content: string): 'env' | 'json' | 'unknown' {
   const trimmed = content.trim();
 
   // Check for JSON
@@ -220,4 +220,4 @@ export const detectFormat = (content: string): 'env' | 'json' | 'unknown' => {
   }
 
   return 'unknown';
-};
+}

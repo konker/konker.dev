@@ -13,22 +13,24 @@ import { type Provider, type ProviderContext } from './Provider.js';
 // Helpers
 // --------------------------------------------------------------------------
 
-const normalizeProviderName = (name: string): string => name.toLowerCase();
+function normalizeProviderName(name: string): string {
+  return name.toLowerCase();
+}
 
-const isGuardOverrideEnabled = (value: string | undefined): boolean => {
+function isGuardOverrideEnabled(value: string | undefined): boolean {
   if (!value) return false;
   const normalized = value.trim().toLowerCase();
   return normalized === '1' || normalized === 'true';
-};
+}
 
 // --------------------------------------------------------------------------
 // Guard Resolution
 // --------------------------------------------------------------------------
 
-export const getProviderGuardConfig = (
+export function getProviderGuardConfig(
   providerName: string,
   providerGuards: ProviderGuardsConfig
-): unknown | undefined => {
+): unknown | undefined {
   const direct = providerGuards[providerName];
   if (direct !== undefined) {
     return direct;
@@ -46,20 +48,21 @@ export const getProviderGuardConfig = (
   }
 
   return undefined;
-};
+}
 
 // --------------------------------------------------------------------------
 // Guard Invocation
 // --------------------------------------------------------------------------
 
-export const shouldIgnoreProviderGuards = (): boolean =>
-  isGuardOverrideEnabled(process.env.ZENFIG_IGNORE_PROVIDER_GUARDS);
+export function shouldIgnoreProviderGuards(): boolean {
+  return isGuardOverrideEnabled(process.env.ZENFIG_IGNORE_PROVIDER_GUARDS);
+}
 
-export const checkProviderGuards = (
+export function checkProviderGuards(
   provider: Provider,
   ctx: ProviderContext,
   providerGuards: ProviderGuardsConfig
-): Effect.Effect<void, ProviderError> => {
+): Effect.Effect<void, ProviderError> {
   if (!provider.checkGuards) {
     return Effect.void;
   }
@@ -74,4 +77,4 @@ export const checkProviderGuards = (
   }
 
   return provider.checkGuards(ctx, guardConfig);
-};
+}

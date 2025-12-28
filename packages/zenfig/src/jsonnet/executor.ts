@@ -43,14 +43,15 @@ export type JsonnetOptions = {
 /**
  * Check if jsonnet binary is available
  */
-export const checkJsonnetBinary = (): Effect.Effect<boolean, SystemError> =>
-  Effect.tryPromise({
+export function checkJsonnetBinary(): Effect.Effect<boolean, SystemError> {
+  return Effect.tryPromise({
     try: async () => {
       await execa('which', ['jsonnet']);
       return true;
     },
     catch: () => binaryNotFoundError('jsonnet'),
   });
+}
 
 // --------------------------------------------------------------------------
 // Error Parsing
@@ -59,7 +60,7 @@ export const checkJsonnetBinary = (): Effect.Effect<boolean, SystemError> =>
 /**
  * Parse Jsonnet error output to extract location and message
  */
-const parseJsonnetError = (stderr: string): { location: string | undefined; message: string } => {
+function parseJsonnetError(stderr: string): { location: string | undefined; message: string } {
   // Jsonnet errors typically look like:
   // RUNTIME ERROR: <message>
   //     <file>:<line>:<col>
@@ -94,12 +95,12 @@ const parseJsonnetError = (stderr: string): { location: string | undefined; mess
   }
 
   return { location, message };
-};
+}
 
 /**
  * Determine error type from Jsonnet error output
  */
-const classifyJsonnetError = (stderr: string): JsonnetError => {
+function classifyJsonnetError(stderr: string): JsonnetError {
   const { location, message } = parseJsonnetError(stderr);
 
   // Check for missing external variable
@@ -116,7 +117,7 @@ const classifyJsonnetError = (stderr: string): JsonnetError => {
 
   // Default to runtime error
   return jsonnetRuntimeError(location ?? 'unknown', message);
-};
+}
 
 // --------------------------------------------------------------------------
 // Execution
@@ -129,11 +130,11 @@ const classifyJsonnetError = (stderr: string): JsonnetError => {
  * @param options - Execution options
  * @returns Parsed JSON output from Jsonnet
  */
-export const executeJsonnet = (
+export function executeJsonnet(
   input: JsonnetInput,
   options: JsonnetOptions
-): Effect.Effect<Record<string, unknown>, JsonnetError | SystemError> =>
-  pipe(
+): Effect.Effect<Record<string, unknown>, JsonnetError | SystemError> {
+  return pipe(
     Effect.sync(() => {
       const { templatePath } = options;
 
@@ -223,15 +224,17 @@ export const executeJsonnet = (
       );
     })
   );
+}
 
 /**
  * Evaluate a Jsonnet template and return the result
  * This is the main entry point for the export workflow
  */
-export const evaluateTemplate = (
+export function evaluateTemplate(
   secrets: Record<string, unknown>,
   env: string,
   templatePath: string,
   timeoutMs = 30000
-): Effect.Effect<Record<string, unknown>, JsonnetError | SystemError> =>
-  executeJsonnet({ secrets, env }, { templatePath, timeoutMs });
+): Effect.Effect<Record<string, unknown>, JsonnetError | SystemError> {
+  return executeJsonnet({ secrets, env }, { templatePath, timeoutMs });
+}

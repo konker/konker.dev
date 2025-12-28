@@ -7,12 +7,11 @@ export default defineConfig({
     ...baseConfig.test,
     coverage: {
       ...baseConfig.test.coverage,
-      // Override thresholds for new package - to be increased as more tests are added
       thresholds: {
-        lines: 20,
-        functions: 14,
-        statements: 20,
-        branches: 20,
+        lines: 97,
+        functions: 97,
+        statements: 97,
+        branches: 97,
       },
     },
   },
