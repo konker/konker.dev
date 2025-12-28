@@ -10,6 +10,7 @@ import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import { type ProviderError, type SystemError, type ValidationError, type ZenfigError } from '../errors.js';
+import { checkProviderGuards } from '../providers/guards.js';
 import { type ProviderContext } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -122,7 +123,12 @@ export const executeDelete = (
       // 4. Get provider and delete
       return pipe(
         getProvider(config.provider),
-        Effect.flatMap((provider) => provider.delete(ctx, canonicalKey)),
+        Effect.flatMap((provider) =>
+          pipe(
+            checkProviderGuards(provider, ctx, config.providerGuards),
+            Effect.flatMap(() => provider.delete(ctx, canonicalKey))
+          )
+        ),
         Effect.map(() => {
           // 5. Audit log
           const timestamp = new Date().toISOString();

@@ -5,6 +5,8 @@
  */
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
+import * as ParseResult from 'effect/ParseResult';
+import * as Schema from 'effect/Schema';
 import { execa, type ExecaError } from 'execa';
 
 import {
@@ -12,6 +14,7 @@ import {
   connectionFailedError,
   parameterNotFoundError,
   type ProviderError,
+  providerGuardMismatchError,
   writePermissionDeniedError,
 } from '../errors.js';
 import {
@@ -30,6 +33,90 @@ import { registerProvider } from './registry.js';
 // --------------------------------------------------------------------------
 
 type ChamberExportOutput = Record<string, string>;
+
+const ChamberGuardsSchema = Schema.Struct({
+  accountId: Schema.optional(Schema.String),
+  region: Schema.optional(Schema.String),
+});
+
+type ChamberProviderGuards = Schema.Schema.Type<typeof ChamberGuardsSchema>;
+
+type ErrorWithCode = {
+  readonly code?: string;
+};
+
+const isErrorWithCode = (error: unknown): error is ErrorWithCode =>
+  typeof error === 'object' && error !== null && 'code' in error;
+
+const readEnvValue = (value: string | undefined): string | undefined => {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
+const parseChamberGuards = (guards?: unknown): Effect.Effect<ChamberProviderGuards | undefined, ProviderError> => {
+  if (guards === undefined) {
+    return Effect.succeed(undefined);
+  }
+
+  return pipe(
+    Schema.decodeUnknown(ChamberGuardsSchema)(guards),
+    Effect.mapError((error) => providerGuardMismatchError('chamber', ParseResult.TreeFormatter.formatErrorSync(error))),
+    Effect.map((decoded) => (decoded.accountId || decoded.region ? decoded : undefined))
+  );
+};
+
+const describeAwsCliError = (error: unknown): string => {
+  if (isErrorWithCode(error) && error.code === 'ENOENT') {
+    return 'AWS CLI not found in PATH';
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+};
+
+const resolveAwsCliValue = (
+  args: ReadonlyArray<string>,
+  failureMessage: string
+): Effect.Effect<string, ProviderError> =>
+  pipe(
+    Effect.tryPromise({
+      try: async () => {
+        const { stdout } = await execa('aws', args);
+        return stdout.trim();
+      },
+      catch: (error: unknown) =>
+        providerGuardMismatchError('chamber', `${failureMessage}: ${describeAwsCliError(error)}`),
+    }),
+    Effect.flatMap((value) => {
+      if (!value) {
+        return Effect.fail(providerGuardMismatchError('chamber', `${failureMessage}: empty AWS CLI response`));
+      }
+      return Effect.succeed(value);
+    })
+  );
+
+const resolveAwsAccountId = (): Effect.Effect<string, ProviderError> => {
+  const envAccountId = readEnvValue(process.env.AWS_ACCOUNT_ID);
+  if (envAccountId) {
+    return Effect.succeed(envAccountId);
+  }
+
+  return resolveAwsCliValue(
+    ['sts', 'get-caller-identity', '--query', 'Account', '--output', 'text'],
+    'Unable to resolve AWS account ID for provider guards'
+  );
+};
+
+const resolveAwsRegion = (): Effect.Effect<string, ProviderError> => {
+  const envRegion = readEnvValue(process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION);
+  if (envRegion) {
+    return Effect.succeed(envRegion);
+  }
+
+  return resolveAwsCliValue(['configure', 'get', 'region'], 'Unable to resolve AWS region for provider guards');
+};
 
 // --------------------------------------------------------------------------
 // Error Classification
@@ -92,6 +179,42 @@ const buildServicePath = (ctx: ProviderContext): string => {
   const prefix = ctx.prefix.startsWith('/') ? ctx.prefix.slice(1) : ctx.prefix;
   return `${prefix}/${ctx.service}/${ctx.env}`;
 };
+
+const checkGuards = (ctx: ProviderContext, guards?: unknown): Effect.Effect<void, ProviderError> =>
+  pipe(
+    parseChamberGuards(guards),
+    Effect.flatMap((parsed) => {
+      if (!parsed) {
+        return Effect.void;
+      }
+
+      const contextLabel = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const accountIdEffect = parsed.accountId ? resolveAwsAccountId() : Effect.succeed(undefined);
+      const regionEffect = parsed.region ? resolveAwsRegion() : Effect.succeed(undefined);
+
+      return pipe(
+        Effect.all({ accountId: accountIdEffect, region: regionEffect }),
+        Effect.flatMap(({ accountId, region }) => {
+          const mismatches: Array<string> = [];
+
+          if (parsed.accountId && accountId !== parsed.accountId) {
+            mismatches.push(`accountId expected '${parsed.accountId}' but got '${accountId}'`);
+          }
+          if (parsed.region && region !== parsed.region) {
+            mismatches.push(`region expected '${parsed.region}' but got '${region}'`);
+          }
+
+          if (mismatches.length > 0) {
+            return Effect.fail(
+              providerGuardMismatchError('chamber', `${mismatches.join('; ')} (context ${contextLabel})`)
+            );
+          }
+
+          return Effect.void;
+        })
+      );
+    })
+  );
 
 /**
  * Fetch all parameters for a service using chamber export
@@ -166,6 +289,7 @@ const deleteKey = (ctx: ProviderContext, keyPath: string): Effect.Effect<void, P
 export const chamberProvider: Provider = {
   name: 'chamber',
   capabilities,
+  checkGuards,
   fetch,
   upsert,
   delete: deleteKey,

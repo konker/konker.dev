@@ -6,7 +6,7 @@
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
-import { parameterNotFoundError, type ProviderError } from '../errors.js';
+import { parameterNotFoundError, type ProviderError, providerGuardMismatchError } from '../errors.js';
 import {
   EncryptionType,
   type EncryptionTypeValue,
@@ -29,6 +29,51 @@ type StorageKey = string;
  * In-memory storage
  */
 type MockStorage = Map<StorageKey, ProviderKV>;
+
+type MockProviderGuards = {
+  readonly prefix?: string;
+  readonly service?: string;
+  readonly env?: string;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const parseMockGuards = (guards?: unknown): Effect.Effect<MockProviderGuards | undefined, ProviderError> => {
+  if (guards === undefined) {
+    return Effect.succeed(undefined);
+  }
+
+  if (!isRecord(guards)) {
+    return Effect.fail(providerGuardMismatchError('mock', 'Invalid providerGuards config for mock provider'));
+  }
+
+  const prefixRaw = guards.prefix;
+  const serviceRaw = guards.service;
+  const envRaw = guards.env;
+
+  if (prefixRaw !== undefined && typeof prefixRaw !== 'string') {
+    return Effect.fail(providerGuardMismatchError('mock', 'providerGuards.prefix must be a string'));
+  }
+  if (serviceRaw !== undefined && typeof serviceRaw !== 'string') {
+    return Effect.fail(providerGuardMismatchError('mock', 'providerGuards.service must be a string'));
+  }
+  if (envRaw !== undefined && typeof envRaw !== 'string') {
+    return Effect.fail(providerGuardMismatchError('mock', 'providerGuards.env must be a string'));
+  }
+
+  const parsed: MockProviderGuards = {
+    ...(typeof prefixRaw === 'string' ? { prefix: prefixRaw } : {}),
+    ...(typeof serviceRaw === 'string' ? { service: serviceRaw } : {}),
+    ...(typeof envRaw === 'string' ? { env: envRaw } : {}),
+  };
+
+  if (Object.keys(parsed).length === 0) {
+    return Effect.succeed(undefined);
+  }
+
+  return Effect.succeed(parsed);
+};
 
 // --------------------------------------------------------------------------
 // Factory
@@ -93,6 +138,34 @@ export const createMockProvider = (
     _keyPath: string
   ): Effect.Effect<EncryptionTypeValue, ProviderError> => Effect.succeed(EncryptionType.SECURE_STRING);
 
+  const checkGuards = (ctx: ProviderContext, guards?: unknown): Effect.Effect<void, ProviderError> =>
+    pipe(
+      parseMockGuards(guards),
+      Effect.flatMap((parsed) => {
+        if (!parsed) {
+          return Effect.void;
+        }
+
+        const mismatches: Array<string> = [];
+
+        if (parsed.prefix && parsed.prefix !== ctx.prefix) {
+          mismatches.push(`prefix expected '${parsed.prefix}' but got '${ctx.prefix}'`);
+        }
+        if (parsed.service && parsed.service !== ctx.service) {
+          mismatches.push(`service expected '${parsed.service}' but got '${ctx.service}'`);
+        }
+        if (parsed.env && parsed.env !== ctx.env) {
+          mismatches.push(`env expected '${parsed.env}' but got '${ctx.env}'`);
+        }
+
+        if (mismatches.length > 0) {
+          return Effect.fail(providerGuardMismatchError('mock', mismatches.join('; ')));
+        }
+
+        return Effect.void;
+      })
+    );
+
   return {
     name: 'mock',
     capabilities,
@@ -100,6 +173,7 @@ export const createMockProvider = (
     upsert,
     delete: deleteKey,
     verifyEncryption,
+    checkGuards,
     storage,
   };
 };

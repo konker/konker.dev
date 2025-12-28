@@ -37,6 +37,7 @@ describe('List Command', () => {
     jsonnetTimeoutMs: 30000,
     ci: false,
     strict: false,
+    providerGuards: {},
   };
 
   let mockProvider: ReturnType<typeof createMockProvider>;

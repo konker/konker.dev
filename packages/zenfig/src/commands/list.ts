@@ -10,6 +10,7 @@ import { pipe } from 'effect/Function';
 import { type ResolvedConfig } from '../config.js';
 import { type ProviderError } from '../errors.js';
 import { type RedactOptions, redactValue } from '../lib/redact.js';
+import { checkProviderGuards } from '../providers/guards.js';
 import { type ProviderContext, type ProviderKV } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 
@@ -112,7 +113,8 @@ export const executeList = (options: ListOptions): Effect.Effect<ListResult, Pro
 
       // 3. Fetch stored values
       return pipe(
-        provider.fetch(ctx),
+        checkProviderGuards(provider, ctx, config.providerGuards),
+        Effect.flatMap(() => provider.fetch(ctx)),
         Effect.map((kv) => {
           // 4. Sort keys alphabetically (case-insensitive)
           const keys = Object.keys(kv).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));

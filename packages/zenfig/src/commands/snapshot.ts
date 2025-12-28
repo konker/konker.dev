@@ -21,6 +21,7 @@ import {
   type ValidationError,
   type ZenfigError,
 } from '../errors.js';
+import { checkProviderGuards } from '../providers/guards.js';
 import { type ProviderContext, type ProviderKV } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -157,7 +158,8 @@ export const executeSnapshotSave = (
         Effect.forEach(allServices, (svc) => {
           const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
           return pipe(
-            provider.fetch(ctx),
+            checkProviderGuards(provider, ctx, config.providerGuards),
+            Effect.flatMap(() => provider.fetch(ctx)),
             Effect.map((kv) => ({ svc, kv }))
           );
         }),
@@ -305,7 +307,8 @@ export const executeSnapshotRestore = (
         Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
           const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
           return pipe(
-            provider.fetch(ctx),
+            checkProviderGuards(provider, ctx, config.providerGuards),
+            Effect.flatMap(() => provider.fetch(ctx)),
             Effect.map((currentKv) => ({ svc, kv, currentKv }))
           );
         }),
@@ -366,7 +369,12 @@ export const executeSnapshotRestore = (
               return pipe(
                 Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
                   const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-                  return Effect.forEach(Object.entries(kv), ([key, value]) => provider.upsert(ctx, key, value));
+                  return pipe(
+                    checkProviderGuards(provider, ctx, config.providerGuards),
+                    Effect.flatMap(() =>
+                      Effect.forEach(Object.entries(kv), ([key, value]) => provider.upsert(ctx, key, value))
+                    )
+                  );
                 }),
                 Effect.map((): SnapshotRestoreResult => {
                   console.log(`\nRestored ${changes.length} keys from snapshot.`);
@@ -384,7 +392,12 @@ export const executeSnapshotRestore = (
         return pipe(
           Effect.forEach(Object.entries(snapshot.data), ([svc, kv]) => {
             const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
-            return Effect.forEach(Object.entries(kv), ([key, value]) => provider.upsert(ctx, key, value));
+            return pipe(
+              checkProviderGuards(provider, ctx, config.providerGuards),
+              Effect.flatMap(() =>
+                Effect.forEach(Object.entries(kv), ([key, value]) => provider.upsert(ctx, key, value))
+              )
+            );
           }),
           Effect.map((): SnapshotRestoreResult => {
             console.log(`\nRestored ${changes.length} keys from snapshot.`);

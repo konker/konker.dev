@@ -20,6 +20,7 @@ import { evaluateTemplate } from '../jsonnet/executor.js';
 import { flatten } from '../lib/flatten.js';
 import { mergeConfigs } from '../lib/merge.js';
 import { createRedactOptions, NOT_SET, REDACTED, redactValue, REMOVED } from '../lib/redact.js';
+import { checkProviderGuards } from '../providers/guards.js';
 import { type ProviderContext } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -79,7 +80,8 @@ export const executeDiff = (
         Effect.forEach(allServices, (svc) => {
           const ctx: ProviderContext = { prefix: config.ssmPrefix, service: svc, env: config.env };
           return pipe(
-            provider.fetch(ctx),
+            checkProviderGuards(provider, ctx, config.providerGuards),
+            Effect.flatMap(() => provider.fetch(ctx)),
             Effect.flatMap((kv) => parseProviderKV(kv, schema)),
             Effect.map((parsed) => [svc, parsed] as const)
           );

@@ -442,6 +442,7 @@ Supported environment variables:
 - `ZENFIG_JSONNET_TIMEOUT_MS`: Default Jsonnet timeout in ms
 - `ZENFIG_CACHE`: Default provider fetch cache duration (e.g., `5m`, `0` to disable)
 - `ZENFIG_CI`: If set (`1`/`true`), disable prompts and require explicit confirmation flags
+- `ZENFIG_IGNORE_PROVIDER_GUARDS`: If set (`1`/`true`), skip provider guard checks (emergency use)
 - `ZENFIG_SNAPSHOT_KEY`: Snapshot encryption key (avoid setting in shared shells/CI logs)
 - `NODE_ENV`: Fallback for environment name if `ZENFIG_ENV` not set
 

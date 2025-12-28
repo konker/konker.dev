@@ -18,6 +18,7 @@ import {
 import { evaluateTemplate } from '../jsonnet/executor.js';
 import { formatConfig } from '../lib/format.js';
 import { formatConflicts, mergeConfigs, type MergeOptions, type MergeResult } from '../lib/merge.js';
+import { checkProviderGuards } from '../providers/guards.js';
 import { type Provider, type ProviderContext, type ProviderKV } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -61,12 +62,14 @@ const fetchAllServices = (
   prefix: string,
   env: string,
   services: ReadonlyArray<string>,
-  rootSchema: TSchema
+  rootSchema: TSchema,
+  providerGuards: ResolvedConfig['providerGuards']
 ): Effect.Effect<ReadonlyArray<readonly [string, Record<string, unknown>]>, ProviderError | ValidationError> =>
   Effect.forEach(services, (service) => {
     const ctx: ProviderContext = { prefix, service, env };
     return pipe(
-      fetchService(provider, ctx),
+      checkProviderGuards(provider, ctx, providerGuards),
+      Effect.flatMap(() => fetchService(provider, ctx)),
       Effect.flatMap((kv) => parseProviderKV(kv, rootSchema)),
       Effect.map((parsed) => [service, parsed] as const)
     );
@@ -98,7 +101,7 @@ export const executeExport = (
 
       // 3-4. Fetch and parse all services
       return pipe(
-        fetchAllServices(provider, config.ssmPrefix, config.env, allServices, schema),
+        fetchAllServices(provider, config.ssmPrefix, config.env, allServices, schema, config.providerGuards),
         Effect.map((parsedServices) => ({ parsedServices, schema, config }))
       );
     }),

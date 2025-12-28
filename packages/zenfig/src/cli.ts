@@ -5,6 +5,8 @@
  *
  * Configuration and secrets management tool
  */
+import './providers/index.js';
+
 import { Command } from 'commander';
 import * as Cause from 'effect/Cause';
 import * as Effect from 'effect/Effect';
@@ -23,7 +25,6 @@ import { runUpsert } from './commands/upsert.js';
 import { runValidate } from './commands/validate.js';
 import { type CLIOptions, resolveConfig } from './config.js';
 import { EXIT_VALIDATION_ERROR, formatError, type ZenfigErrorLike } from './errors.js';
-import './providers/index.js';
 
 // --------------------------------------------------------------------------
 // Error Handling

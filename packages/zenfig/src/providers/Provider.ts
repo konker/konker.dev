@@ -57,6 +57,11 @@ export type Provider = {
   readonly capabilities: ProviderCapabilities;
 
   /**
+   * Optional provider-specific guard check
+   */
+  readonly checkGuards?: (ctx: ProviderContext, guards?: unknown) => Effect.Effect<void, ProviderError>;
+
+  /**
    * Fetch all key-value pairs for the given context
    * Returns canonical key paths (dot notation) mapped to string values
    */

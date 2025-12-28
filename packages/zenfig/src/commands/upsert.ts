@@ -14,6 +14,7 @@ import {
   type ValidationError,
   type ZenfigError,
 } from '../errors.js';
+import { checkProviderGuards } from '../providers/guards.js';
 import { EncryptionType, type ProviderContext } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
@@ -121,7 +122,8 @@ export const executeUpsert = (
         getProvider(config.provider),
         Effect.flatMap((provider) =>
           pipe(
-            provider.upsert(ctx, canonicalKey, serialized),
+            checkProviderGuards(provider, ctx, config.providerGuards),
+            Effect.flatMap(() => provider.upsert(ctx, canonicalKey, serialized)),
             Effect.flatMap(() => {
               // 8. Verify encryption if supported and not skipped
               if (!skipEncryptionCheck && provider.capabilities.encryptionVerification && provider.verifyEncryption) {

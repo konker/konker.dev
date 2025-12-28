@@ -3,7 +3,7 @@
  *
  * Error codes and types as defined in the specification:
  * - VAL (Validation): VAL001-VAL005
- * - PROV (Provider): PROV001-PROV005
+ * - PROV (Provider): PROV001-PROV006
  * - JSON (Jsonnet): JSON001-JSON004
  * - CLI (Command-line): CLI001-CLI003
  * - SYS (System): SYS001-SYS004
@@ -46,6 +46,7 @@ export const ErrorCode = {
   PROV003: 'PROV003', // Parameter Not Found
   PROV004: 'PROV004', // Encryption Verification Failed (Warning)
   PROV005: 'PROV005', // Write Permission Denied
+  PROV006: 'PROV006', // Provider Guard Mismatch
 
   // Jsonnet Errors
   JSON001: 'JSON001', // Syntax Error
@@ -86,6 +87,9 @@ export const errorCodeToExitCode = (code: ErrorCodeType): ExitCode => {
     case ErrorCode.PROV002:
     case ErrorCode.PROV005:
       return EXIT_AUTH_ERROR;
+
+    case ErrorCode.PROV006:
+      return EXIT_CONFIG_ERROR;
 
     case ErrorCode.SYS004:
       return EXIT_SCHEMA_MISMATCH;
@@ -302,6 +306,16 @@ export const writePermissionDeniedError = (path: string, details?: string): Prov
       problem: details ?? 'Write permission denied',
       remediation:
         'Check IAM policy includes ssm:PutParameter action, verify resource ARN matches target parameter path',
+    },
+  });
+
+export const providerGuardMismatchError = (provider: string, details: string): ProviderError =>
+  new ProviderError({
+    message: 'Provider guard check failed',
+    context: {
+      code: ErrorCode.PROV006,
+      problem: `Provider '${provider}': ${details}`,
+      remediation: 'Verify providerGuards configuration, or set ZENFIG_IGNORE_PROVIDER_GUARDS=1 for emergency override',
     },
   });
 

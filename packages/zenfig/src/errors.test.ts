@@ -35,6 +35,7 @@ import {
   parameterNotFoundError,
   permissionDeniedError,
   ProviderError,
+  providerGuardMismatchError,
   snapshotSchemaMismatchError,
   SystemError,
   ValidationError,
@@ -64,6 +65,10 @@ describe('errors', () => {
       expect(errorCodeToExitCode(ErrorCode.PROV001)).toBe(EXIT_AUTH_ERROR);
       expect(errorCodeToExitCode(ErrorCode.PROV002)).toBe(EXIT_AUTH_ERROR);
       expect(errorCodeToExitCode(ErrorCode.PROV005)).toBe(EXIT_AUTH_ERROR);
+    });
+
+    it('should map PROV006 to EXIT_CONFIG_ERROR', () => {
+      expect(errorCodeToExitCode(ErrorCode.PROV006)).toBe(EXIT_CONFIG_ERROR);
     });
 
     it('should default to EXIT_VALIDATION_ERROR', () => {
@@ -206,6 +211,14 @@ describe('errors', () => {
 
         expect(error.context.code).toBe(ErrorCode.PROV005);
         expect(error.context.problem).toBe('Write permission denied');
+      });
+
+      it('providerGuardMismatchError should create correct error', () => {
+        const error = providerGuardMismatchError('chamber', 'accountId mismatch');
+
+        expect(error.context.code).toBe(ErrorCode.PROV006);
+        expect(error.context.problem).toContain('chamber');
+        expect(error.context.problem).toContain('accountId mismatch');
       });
     });
 

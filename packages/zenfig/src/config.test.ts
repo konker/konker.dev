@@ -56,6 +56,7 @@ describe('config', () => {
       expect(result.cache).toBeUndefined();
       expect(result.jsonnetTimeoutMs).toBe(30000);
       expect(result.strict).toBe(false);
+      expect(result.providerGuards).toEqual({});
     });
   });
 
@@ -213,6 +214,12 @@ describe('config', () => {
         separator: '__',
         cache: '.zenfig-cache',
         jsonnetTimeoutMs: 45000,
+        providerGuards: {
+          chamber: {
+            accountId: '123456789012',
+            region: 'us-east-1',
+          },
+        },
       };
 
       vi.mocked(fs.existsSync).mockReturnValue(true);
@@ -231,6 +238,12 @@ describe('config', () => {
       expect(result.separator).toBe('__');
       expect(result.cache).toBe('.zenfig-cache');
       expect(result.jsonnetTimeoutMs).toBe(45000);
+      expect(result.providerGuards).toEqual({
+        chamber: {
+          accountId: '123456789012',
+          region: 'us-east-1',
+        },
+      });
     });
 
     it('should load config from zenfigrc.json5 with JSON5 syntax', async () => {
@@ -248,6 +261,12 @@ describe('config', () => {
         separator: '__',
         cache: '.zenfig-cache',
         jsonnetTimeoutMs: 45000,
+        providerGuards: {
+          chamber: {
+            accountId: '123456789012',
+            region: 'us-east-1',
+          },
+        },
       }`);
 
       const result = await Effect.runPromise(resolveConfig());
@@ -263,6 +282,12 @@ describe('config', () => {
       expect(result.separator).toBe('__');
       expect(result.cache).toBe('.zenfig-cache');
       expect(result.jsonnetTimeoutMs).toBe(45000);
+      expect(result.providerGuards).toEqual({
+        chamber: {
+          accountId: '123456789012',
+          region: 'us-east-1',
+        },
+      });
     });
 
     it('should continue searching parent directories for zenfigrc.json', async () => {
@@ -498,6 +523,7 @@ describe('config', () => {
       jsonnetTimeoutMs: 30000,
       ci: false,
       strict: false,
+      providerGuards: {},
     };
 
     it('should override env from CLI', () => {

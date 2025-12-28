@@ -29,7 +29,13 @@ export type ZenfigRcConfig = {
   readonly separator?: string;
   readonly cache?: string;
   readonly jsonnetTimeoutMs?: number;
+  readonly providerGuards?: ProviderGuardsConfig;
 };
+
+/**
+ * Provider guard configuration mapping
+ */
+export type ProviderGuardsConfig = Record<string, unknown>;
 
 /**
  * Resolved configuration with all values
@@ -48,6 +54,7 @@ export type ResolvedConfig = {
   readonly jsonnetTimeoutMs: number;
   readonly ci: boolean;
   readonly strict: boolean;
+  readonly providerGuards: ProviderGuardsConfig;
 };
 
 /**
@@ -88,6 +95,7 @@ const DEFAULT_CONFIG: ResolvedConfig = {
   jsonnetTimeoutMs: 30000,
   ci: false,
   strict: false,
+  providerGuards: {},
 };
 
 // --------------------------------------------------------------------------
@@ -108,6 +116,11 @@ const getEnvInt = (name: string): number | undefined => {
   const num = parseInt(value, 10);
   return Number.isNaN(num) ? undefined : num;
 };
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const resolveProviderGuards = (value: unknown): ProviderGuardsConfig => (isRecord(value) ? value : {});
 
 // --------------------------------------------------------------------------
 // Config File Loading
@@ -210,6 +223,7 @@ export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<Resolv
 
       const ci = isCIMode(cliOptions.ci);
       const strict = cliOptions.strict ?? false;
+      const providerGuards = resolveProviderGuards(rcConfig?.providerGuards);
 
       return {
         env,
@@ -225,6 +239,7 @@ export const resolveConfig = (cliOptions: CLIOptions = {}): Effect.Effect<Resolv
         jsonnetTimeoutMs,
         ci,
         strict,
+        providerGuards,
       };
     })
   );
@@ -247,4 +262,5 @@ export const mergeCliOptions = (config: ResolvedConfig, cliOptions: CLIOptions):
   jsonnetTimeoutMs: cliOptions.jsonnetTimeout ?? config.jsonnetTimeoutMs,
   ci: cliOptions.ci ?? config.ci,
   strict: cliOptions.strict ?? config.strict,
+  providerGuards: config.providerGuards,
 });

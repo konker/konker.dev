@@ -38,9 +38,20 @@ Example `zenfigrc.json`:
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
   "schemaExportName": "ConfigSchema",
-  "jsonnet": "config.jsonnet"
+  "jsonnet": "config.jsonnet",
+  "providerGuards": {
+    "chamber": {
+      "accountId": "123456789012",
+      "region": "us-east-1"
+    }
+  }
 }
 ```
+
+Provider guards are provider-specific safety checks that run before any provider operation. They can be bypassed with
+`ZENFIG_IGNORE_PROVIDER_GUARDS=1` for emergencies.
+For `chamber`, `accountId` is resolved from `AWS_ACCOUNT_ID` or `aws sts get-caller-identity`, and `region` is resolved
+from `AWS_REGION`/`AWS_DEFAULT_REGION` or `aws configure get region`.
 
 Environment overrides:
 
@@ -55,6 +66,7 @@ Environment overrides:
 - `ZENFIG_CACHE`
 - `ZENFIG_JSONNET_TIMEOUT_MS`
 - `ZENFIG_CI`
+- `ZENFIG_IGNORE_PROVIDER_GUARDS`
 
 ## Run
 

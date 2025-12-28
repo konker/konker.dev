@@ -163,4 +163,18 @@ describe('MockProvider', () => {
       expect(result).toBe('SecureString');
     });
   });
+
+  describe('checkGuards', () => {
+    it('should fail when guard values do not match context', async () => {
+      const provider = createMockProvider();
+      await expect(Effect.runPromise(provider.checkGuards!(ctx, { env: 'prod' }))).rejects.toThrowError();
+    });
+
+    it('should pass when guard values match context', async () => {
+      const provider = createMockProvider();
+      await expect(
+        Effect.runPromise(provider.checkGuards!(ctx, { env: 'dev', service: ctx.service }))
+      ).resolves.toBeUndefined();
+    });
+  });
 });
