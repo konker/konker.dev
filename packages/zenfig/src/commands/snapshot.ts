@@ -63,6 +63,8 @@ export type SnapshotRestoreOptions = {
   readonly showValues?: boolean | undefined;
   readonly unsafeShowValues?: boolean | undefined;
   readonly config: ResolvedConfig;
+  /** @internal For testing only - override the interactive prompt */
+  readonly _testPromptOverride?: ((message: string) => Effect.Effect<boolean, never>) | undefined;
 };
 
 export type SnapshotSaveResult = {
@@ -359,10 +361,13 @@ export function executeSnapshotRestore(
           return Effect.succeed({ applied: false, changes });
         }
 
+        // Use test override if provided, otherwise use real prompt
+        const promptFn = options._testPromptOverride ?? promptConfirmation;
+
         // 7. Confirm
         if (!confirm && !config.ci) {
           return pipe(
-            promptConfirmation('\nApply these changes?'),
+            promptFn('\nApply these changes?'),
             Effect.flatMap((confirmed): Effect.Effect<SnapshotRestoreResult, ProviderError> => {
               if (!confirmed) {
                 console.log('Restore cancelled.');
