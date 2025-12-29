@@ -221,6 +221,27 @@ describe('Schema Validator', () => {
           const cause = exit.cause;
           if (cause._tag === 'Fail') {
             expect(cause.error.context.code).toBe(ErrorCode.VAL003);
+            expect(cause.error.context.path).toBe('required');
+          }
+        }
+      });
+
+      it('should reject additional properties when disallowed', async () => {
+        const schema = Type.Object(
+          {
+            key: Type.String(),
+          },
+          { additionalProperties: false }
+        );
+
+        const exit = await Effect.runPromiseExit(validate({ key: 'value', extra: 'nope' }, schema));
+
+        expect(exit._tag).toBe('Failure');
+        if (exit._tag === 'Failure') {
+          const cause = exit.cause;
+          if (cause._tag === 'Fail') {
+            expect(cause.error.context.code).toBe(ErrorCode.VAL003);
+            expect(cause.error.context.path).toBe('extra');
           }
         }
       });
@@ -297,6 +318,40 @@ describe('Schema Validator', () => {
       const result = await Effect.runPromise(validateAll({ name: 123, age: 'not a number', email: 'invalid' }, schema));
 
       expect(result.errors.length).toBeGreaterThan(0);
+    });
+
+    it('should include required property errors', async () => {
+      const schema = Type.Object({
+        required: Type.String(),
+      });
+
+      const result = await Effect.runPromise(validateAll({}, schema));
+
+      const requiredError = result.errors.find((error) => error.context.path === 'required');
+      expect(requiredError?.context.code).toBe(ErrorCode.VAL003);
+    });
+
+    it('should include additionalProperties errors', async () => {
+      const schema = Type.Object(
+        {
+          key: Type.String(),
+        },
+        { additionalProperties: false }
+      );
+
+      const result = await Effect.runPromise(validateAll({ key: 'value', extra: 'nope' }, schema));
+
+      const extraError = result.errors.find((error) => error.context.path === 'extra');
+      expect(extraError?.context.code).toBe(ErrorCode.VAL003);
+    });
+
+    it('should map unknown constraint errors to generic validation errors', async () => {
+      const schema = Type.Array(Type.String(), { minItems: 2 });
+
+      const result = await Effect.runPromise(validateAll([], schema));
+
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0]?.context.code).toBe(ErrorCode.VAL003);
     });
 
     it('should return empty errors for valid data', async () => {

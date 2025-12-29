@@ -181,8 +181,7 @@ describe('Snapshot Commands', () => {
       expect(snapshot.data.shared).toBeDefined();
     });
 
-    // Disabled: This test hangs in CI due to process.chdir interaction.
-    it.skip('should use default path when output not specified', async () => {
+    it('should use default path when output not specified', async () => {
       // Create .zenfig/snapshots directory
       const snapshotsDir = path.join(tempDir, '.zenfig', 'snapshots');
       fs.mkdirSync(snapshotsDir, { recursive: true });
@@ -220,6 +219,22 @@ describe('Snapshot Commands', () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('.gitignore'));
     });
 
+    it('should skip warning when .gitignore covers .zenfig', async () => {
+      const outputPath = path.join(tempDir, 'snapshot.json');
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, '.zenfig\n');
+
+      await Effect.runPromise(
+        executeSnapshotSave({
+          service: 'api',
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      expect(consoleWarnSpy).not.toHaveBeenCalledWith(expect.stringContaining('.gitignore'));
+    });
+
     it('should warn when .gitignore is unreadable', async () => {
       const outputPath = path.join(tempDir, 'snapshot.json');
       const gitignorePath = path.join(tempDir, '.gitignore');
@@ -239,6 +254,62 @@ describe('Snapshot Commands', () => {
       }
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('.gitignore'));
+    });
+
+    it('should skip warning when .gitignore covers snapshots', async () => {
+      const outputPath = path.join(tempDir, 'snapshot.json');
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, '.zenfig/snapshots\n');
+
+      await Effect.runPromise(
+        executeSnapshotSave({
+          service: 'api',
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      expect(consoleWarnSpy).not.toHaveBeenCalledWith(expect.stringContaining('.gitignore'));
+    });
+
+    it('should warn when default path is not covered by gitignore', async () => {
+      const snapshotsDir = path.join(tempDir, '.zenfig', 'snapshots');
+      fs.mkdirSync(snapshotsDir, { recursive: true });
+
+      const originalCwd = process.cwd();
+      process.chdir(tempDir);
+
+      try {
+        await Effect.runPromise(
+          executeSnapshotSave({
+            service: 'api',
+            config: defaultConfig,
+          })
+        );
+      } finally {
+        process.chdir(originalCwd);
+      }
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('.gitignore'));
+    });
+
+    it('should fail when snapshot directory cannot be created', async () => {
+      const blockedPath = path.join(tempDir, 'no-dir');
+      fs.writeFileSync(blockedPath, 'not-a-directory');
+
+      const outputPath = path.join(blockedPath, 'snapshot.json');
+      const exit = await Effect.runPromiseExit(
+        executeSnapshotSave({
+          service: 'api',
+          output: outputPath,
+          config: defaultConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS003);
+      }
     });
 
     it('should fail when snapshot cannot be written', async () => {

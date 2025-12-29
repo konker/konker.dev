@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
 import { ErrorCode, SystemError, ZenfigError } from '../errors.js';
+import * as registry from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { executeDoctor, runDoctor } from './doctor.js';
 
@@ -123,6 +124,33 @@ describe('Doctor Command', () => {
       expect(result.allPassed).toBe(false);
     });
 
+    it('should warn when binary version cannot be determined', async () => {
+      vi.mocked(execa).mockImplementation((cmd, args) => {
+        const argList = Array.isArray(args) ? args : [];
+        if (cmd === 'which') {
+          return Promise.resolve({ stdout: `/usr/bin/${argList[0]}`, stderr: '' }) as never;
+        }
+        if (argList[0] === '--version') {
+          return Promise.reject(new Error('version missing')) as never;
+        }
+        return Promise.resolve({ stdout: '', stderr: '' }) as never;
+      });
+
+      const config: ResolvedConfig = {
+        ...defaultConfig,
+        schema: path.join(tempDir, 'schema.ts'),
+        jsonnet: path.join(tempDir, 'config.jsonnet'),
+      };
+
+      fs.writeFileSync(config.schema, 'export const ConfigSchema = {}');
+      fs.writeFileSync(config.jsonnet, '{}');
+
+      const result = await Effect.runPromise(executeDoctor({ config }));
+
+      const jsonnetCheck = result.checks.find((c) => c.name === 'Binary: jsonnet');
+      expect(jsonnetCheck?.status).toBe('warn');
+    });
+
     it('should check schema file exists', async () => {
       const config: ResolvedConfig = {
         ...defaultConfig,
@@ -187,6 +215,46 @@ describe('Doctor Command', () => {
 
       const providerCheck = result.checks.find((c) => c.name === 'Provider: mock');
       expect(providerCheck?.status).toBe('ok');
+    });
+
+    it('should report provider registration failure', async () => {
+      const config: ResolvedConfig = {
+        ...defaultConfig,
+        provider: 'missing',
+        schema: path.join(tempDir, 'schema.ts'),
+        jsonnet: path.join(tempDir, 'config.jsonnet'),
+      };
+
+      fs.writeFileSync(config.schema, 'export const ConfigSchema = {}');
+      fs.writeFileSync(config.jsonnet, '{}');
+
+      const result = await Effect.runPromise(executeDoctor({ config }));
+
+      const providerCheck = result.checks.find((c) => c.name === 'Provider: missing');
+      expect(providerCheck?.status).toBe('error');
+      expect(providerCheck?.message).toContain('Provider not registered');
+    });
+
+    it('should report provider registration failure without context details', async () => {
+      const getProviderSpy = vi.spyOn(registry, 'getProvider').mockReturnValue(Effect.fail(new Error('boom') as never));
+
+      const config: ResolvedConfig = {
+        ...defaultConfig,
+        provider: 'missing',
+        schema: path.join(tempDir, 'schema.ts'),
+        jsonnet: path.join(tempDir, 'config.jsonnet'),
+      };
+
+      fs.writeFileSync(config.schema, 'export const ConfigSchema = {}');
+      fs.writeFileSync(config.jsonnet, '{}');
+
+      const result = await Effect.runPromise(executeDoctor({ config }));
+
+      const providerCheck = result.checks.find((c) => c.name === 'Provider: missing');
+      expect(providerCheck?.status).toBe('error');
+      expect(providerCheck?.details).toBe('Unknown error');
+
+      getProviderSpy.mockRestore();
     });
 
     it('should report all passed when everything is ok', async () => {

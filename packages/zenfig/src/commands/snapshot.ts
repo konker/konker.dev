@@ -199,7 +199,7 @@ export function executeSnapshotSave(
 
       // 5. Determine output path
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const defaultPath = path.join('.zenfig', 'snapshots', `${options.service}-${config.env}-${timestamp}.json`);
+      const defaultPath = path.resolve('.zenfig', 'snapshots', `${options.service}-${config.env}-${timestamp}.json`);
       const outputPath = options.output ?? defaultPath;
 
       // 6. Ensure directory exists

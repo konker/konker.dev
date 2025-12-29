@@ -7,11 +7,12 @@ import * as path from 'node:path';
 
 import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
 import { ErrorCode } from '../errors.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
+import { parseProviderKV } from '../schema/parser.js';
 import { executeValidate, runValidate } from './validate.js';
 
 // Mock schema loader
@@ -19,11 +20,17 @@ vi.mock('../schema/loader.js', () => ({
   loadSchemaWithDefaults: vi.fn(),
 }));
 
+vi.mock('../schema/parser.js', async () => {
+  const actual = (await vi.importActual('../schema/parser.js')) as { parseProviderKV: typeof parseProviderKV };
+  return { ...actual, parseProviderKV: vi.fn(actual.parseProviderKV) };
+});
+
 describe('Validate Command', () => {
   let tempDir: string;
   const createdFiles: Array<string> = [];
   let consoleSpy: ReturnType<typeof vi.spyOn>;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let actualParseProviderKV: typeof parseProviderKV;
 
   const defaultConfig: ResolvedConfig = {
     env: 'dev',
@@ -47,6 +54,12 @@ describe('Validate Command', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zenfig-validate-test-'));
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
+    vi.mocked(parseProviderKV).mockImplementation(actualParseProviderKV);
+  });
+
+  beforeAll(async () => {
+    const actual = (await vi.importActual('../schema/parser.js')) as { parseProviderKV: typeof parseProviderKV };
+    actualParseProviderKV = actual.parseProviderKV;
   });
 
   afterEach(() => {
@@ -168,7 +181,102 @@ describe('Validate Command', () => {
       expect(result.warnings).toEqual([]);
     });
 
+    it('should warn on unknown env keys when not strict', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'config-unknown.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\nEXTRA_KEY=oops\n');
+      createdFiles.push(envPath);
+
+      const result = await Effect.runPromise(
+        executeValidate({
+          file: envPath,
+          format: 'env',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.warnings.length).toBeGreaterThan(0);
+    });
+
+    it('should fail on unknown env keys in strict mode', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'config-unknown-strict.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\nEXTRA_KEY=oops\n');
+      createdFiles.push(envPath);
+
+      const strictConfig: ResolvedConfig = { ...defaultConfig, strict: true };
+
+      const exit = await Effect.runPromiseExit(
+        executeValidate({
+          file: envPath,
+          format: 'env',
+          config: strictConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.VAL004);
+      }
+    });
+
+    it('should fail when parsed env keys include unknown entries in strict mode', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'config-strict.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\n');
+      createdFiles.push(envPath);
+
+      vi.mocked(parseProviderKV).mockReturnValueOnce(
+        Effect.succeed({
+          parsed: { database: { host: 'localhost' } },
+          unknownKeys: ['extra.path'],
+        })
+      );
+
+      const strictConfig: ResolvedConfig = { ...defaultConfig, strict: true };
+
+      const exit = await Effect.runPromiseExit(
+        executeValidate({
+          file: envPath,
+          format: 'env',
+          config: strictConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.VAL004);
+      }
+    });
+
     it('should fail for invalid JSON', async () => {
+      const schema = Type.Object({
+        key: Type.String(),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
       const jsonPath = path.join(tempDir, 'invalid-json.json');
       fs.writeFileSync(jsonPath, 'not valid json {{{');
       createdFiles.push(jsonPath);
@@ -235,6 +343,117 @@ describe('Validate Command', () => {
           expect(cause.error.context.code).toBe(ErrorCode.VAL004);
         }
       }
+    });
+
+    it('should warn on unknown env keys when not strict', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'unknown.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\nUNKNOWN_KEY=oops\n');
+      createdFiles.push(envPath);
+
+      const result = await Effect.runPromise(
+        executeValidate({
+          file: envPath,
+          format: 'env',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.warnings.length).toBeGreaterThan(0);
+    });
+
+    it('should fail on unknown env keys in strict mode', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'unknown-strict.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\nUNKNOWN_KEY=oops\n');
+      createdFiles.push(envPath);
+
+      const strictConfig: ResolvedConfig = { ...defaultConfig, strict: true };
+
+      const exit = await Effect.runPromiseExit(
+        executeValidate({
+          file: envPath,
+          format: 'env',
+          config: strictConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.VAL004);
+      }
+    });
+
+    it('should fail when parsed env values contain unknown keys in strict mode', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'unknown-parsed.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\n');
+      createdFiles.push(envPath);
+
+      vi.mocked(parseProviderKV).mockReturnValueOnce(
+        Effect.succeed({
+          parsed: { database: { host: 'localhost' } },
+          unknownKeys: ['database.extra'],
+        })
+      );
+
+      const strictConfig: ResolvedConfig = { ...defaultConfig, strict: true };
+
+      const exit = await Effect.runPromiseExit(
+        executeValidate({
+          file: envPath,
+          format: 'env',
+          config: strictConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.VAL004);
+      }
+    });
+
+    it('should allow non-object JSON to skip unknown key checks', async () => {
+      const schema = Type.Object({
+        key: Type.String(),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const jsonPath = path.join(tempDir, 'array.json');
+      fs.writeFileSync(jsonPath, JSON.stringify(['value']));
+      createdFiles.push(jsonPath);
+
+      const result = await Effect.runPromise(
+        executeValidate({
+          file: jsonPath,
+          format: 'json',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.valid).toBe(false);
     });
 
     it('should fail when format cannot be detected', async () => {
@@ -327,6 +546,30 @@ describe('Validate Command', () => {
 
       expect(result).toBe(false);
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Validation failed'));
+    });
+
+    it('should print warnings when unknown keys are present', async () => {
+      const schema = Type.Object({
+        database: Type.Object({
+          host: Type.String(),
+        }),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const envPath = path.join(tempDir, 'warn.env');
+      fs.writeFileSync(envPath, 'DATABASE_HOST=localhost\nEXTRA_KEY=oops\n');
+      createdFiles.push(envPath);
+
+      await Effect.runPromise(
+        runValidate({
+          file: envPath,
+          format: 'env',
+          config: defaultConfig,
+        })
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Warning'));
     });
   });
 });

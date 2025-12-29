@@ -7,14 +7,16 @@ import * as path from 'node:path';
 
 import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
+import { ErrorCode } from '../errors.js';
 import { evaluateTemplate } from '../jsonnet/executor.js';
 import { REDACTED } from '../lib/redact.js';
 import { createMockProvider } from '../providers/MockProvider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
+import { parseProviderKV } from '../schema/parser.js';
 import { executeDiff, runDiff } from './diff.js';
 
 // Mock dependencies
@@ -30,10 +32,17 @@ vi.mock('../jsonnet/executor.js', () => ({
   evaluateTemplate: vi.fn(),
 }));
 
+vi.mock('../schema/parser.js', async () => {
+  const actual = (await vi.importActual('../schema/parser.js')) as { parseProviderKV: typeof parseProviderKV };
+  return { ...actual, parseProviderKV: vi.fn(actual.parseProviderKV) };
+});
+
 describe('Diff Command', () => {
   let tempDir: string;
   let consoleSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let mockProvider: ReturnType<typeof createMockProvider>;
+  let actualParseProviderKV: typeof parseProviderKV;
 
   const defaultConfig: ResolvedConfig = {
     env: 'dev',
@@ -66,6 +75,7 @@ describe('Diff Command', () => {
     vi.resetAllMocks();
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zenfig-diff-test-'));
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
     const storageKey = '/zenfig/dev/api';
     mockProvider = createMockProvider({
@@ -78,6 +88,12 @@ describe('Diff Command', () => {
 
     vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
+    vi.mocked(parseProviderKV).mockImplementation(actualParseProviderKV);
+  });
+
+  beforeAll(async () => {
+    const actual = (await vi.importActual('../schema/parser.js')) as { parseProviderKV: typeof parseProviderKV };
+    actualParseProviderKV = actual.parseProviderKV;
   });
 
   afterEach(() => {
@@ -220,6 +236,73 @@ describe('Diff Command', () => {
       // Should have entries from both services
       expect(result.entries.some((e) => e.key === 'database.host')).toBe(true);
       expect(result.entries.some((e) => e.key === 'database.port')).toBe(true);
+    });
+
+    it('should warn on unknown keys when not strict', async () => {
+      const mockProviderWithUnknown = createMockProvider({
+        '/zenfig/dev/api': {
+          'database.host': 'localhost',
+          'unknown.key': 'oops',
+        },
+      });
+
+      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithUnknown));
+      vi.mocked(parseProviderKV).mockReturnValueOnce(
+        Effect.succeed({
+          parsed: { database: { host: 'localhost' } },
+          unknownKeys: ['unknown.key'],
+        })
+      );
+      vi.mocked(evaluateTemplate).mockReturnValue(
+        Effect.succeed({
+          database: { host: 'localhost', port: 5432 },
+          api: { timeout: 30000 },
+        })
+      );
+
+      const result = await Effect.runPromise(
+        executeDiff({
+          service: 'api',
+          config: defaultConfig,
+        })
+      );
+
+      expect(result.warnings.length).toBeGreaterThan(0);
+    });
+
+    it('should fail on unknown keys when strict', async () => {
+      const mockProviderWithUnknown = createMockProvider({
+        '/zenfig/dev/api': {
+          'database.host': 'localhost',
+          'unknown.key': 'oops',
+        },
+      });
+
+      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithUnknown));
+      vi.mocked(parseProviderKV).mockReturnValueOnce(
+        Effect.succeed({
+          parsed: { database: { host: 'localhost' } },
+          unknownKeys: ['unknown.key'],
+        })
+      );
+      vi.mocked(evaluateTemplate).mockReturnValue(
+        Effect.succeed({
+          database: { host: 'localhost', port: 5432 },
+          api: { timeout: 30000 },
+        })
+      );
+
+      const exit = await Effect.runPromiseExit(
+        executeDiff({
+          service: 'api',
+          config: { ...defaultConfig, strict: true },
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail' && 'context' in exit.cause.error) {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.VAL004);
+      }
     });
   });
 
@@ -367,6 +450,38 @@ describe('Diff Command', () => {
 
       const output = String(consoleSpy.mock.calls[0]?.[0] ?? '');
       expect(output).toContain('mystery');
+    });
+
+    it('should print warnings when unknown keys are present', async () => {
+      const mockProviderWithUnknown = createMockProvider({
+        '/zenfig/dev/api': {
+          'database.host': 'localhost',
+          'unknown.key': 'oops',
+        },
+      });
+
+      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithUnknown));
+      vi.mocked(parseProviderKV).mockReturnValueOnce(
+        Effect.succeed({
+          parsed: { database: { host: 'localhost' } },
+          unknownKeys: ['unknown.key'],
+        })
+      );
+      vi.mocked(evaluateTemplate).mockReturnValue(
+        Effect.succeed({
+          database: { host: 'localhost', port: 5432 },
+          api: { timeout: 30000 },
+        })
+      );
+
+      await Effect.runPromise(
+        runDiff({
+          service: 'api',
+          config: defaultConfig,
+        })
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Warning'));
     });
   });
 });

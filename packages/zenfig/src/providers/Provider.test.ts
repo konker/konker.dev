@@ -101,6 +101,15 @@ describe('Provider', () => {
       };
       expect(buildFullPath(ctxNoPrefix, 'database.url')).toBe('/prod/api/database/url');
     });
+
+    it('should trim trailing slashes in prefix', () => {
+      const ctxWithSlash: ProviderContext = {
+        prefix: '/zenfig/',
+        service: 'api',
+        env: 'prod',
+      };
+      expect(buildFullPath(ctxWithSlash, 'database.url')).toBe('/zenfig/prod/api/database/url');
+    });
   });
 
   describe('extractKeyPath', () => {
@@ -134,6 +143,24 @@ describe('Provider', () => {
         env: 'staging',
       };
       expect(extractKeyPath('/custom/staging/myapp/api/key', customCtx)).toBe('api.key');
+    });
+
+    it('should trim trailing slashes in prefix when extracting', () => {
+      const ctxWithSlash: ProviderContext = {
+        prefix: '/zenfig/',
+        service: 'api',
+        env: 'prod',
+      };
+      expect(extractKeyPath('/zenfig/prod/api/database/url', ctxWithSlash)).toBe('database.url');
+    });
+
+    it('should handle non-matching paths with trailing slash prefix', () => {
+      const ctxWithSlash: ProviderContext = {
+        prefix: '/zenfig/',
+        service: 'api',
+        env: 'prod',
+      };
+      expect(extractKeyPath('/other/path/value', ctxWithSlash)).toBe('.other.path.value');
     });
 
     it('should handle empty key path', () => {
