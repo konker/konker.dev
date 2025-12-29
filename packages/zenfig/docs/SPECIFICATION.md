@@ -7,7 +7,7 @@ Design and implement a CLI tool called **Zenfig** that orchestrates config provi
 ## 2. Technical Stack
 
 - **Runtime:** Node.js or Bun (TypeScript).
-- **Provider (default):** [Chamber](https://github.com/segmentio/chamber) via AWS SSM.
+- **Provider (default):** AWS SSM via the AWS SDK (`aws-ssm` provider).
 - **Configuration Templating:** [Go-Jsonnet](https://github.com/google/go-jsonnet).
 - **Validation:** [TypeBox](https://github.com/sinclairzx81/typebox) with Ajv.
 - **Process Management:** `execa` for calling system binaries.
@@ -20,14 +20,15 @@ Design and implement a CLI tool called **Zenfig** that orchestrates config provi
 
 Zenfig operates on two related but distinct layers of configuration data:
 
-1. **Stored values (provider layer):** Key/value strings persisted in the backing store (default: AWS SSM via Chamber) under a `<prefix>/<service>/<env>/...` hierarchy.
+1. **Stored values (provider layer):** Key/value strings persisted in the backing store (default: AWS SSM) under a `<prefix>/<service>/<env>/...` hierarchy.
 2. **Rendered config (runtime layer):** The final, schema-valid configuration object produced by evaluating `config.jsonnet` with fetched values plus logic/defaults.
 
 Zenfig uses a **canonical key path** for CLI and internal operations:
 
 - Canonical form: dot notation using schema property names, e.g. `api.timeoutMs`.
-- Input is case-insensitive (e.g. `API.TimeoutMS`), but Zenfig canonicalizes to the schema-defined property casing.
-- Dots are path separators; schema keys that literally contain `.` are not supported (must be modeled differently).
+- Input is case-sensitive; key segments must match the schema-defined property casing exactly.
+- Dots are path separators; schema keys that literally contain `.` or `/` are not supported (must be modeled differently).
+- Each key segment must match `^[A-Za-z0-9_-]+$` (no whitespace or other punctuation).
 
 Key path representations:
 
@@ -47,7 +48,7 @@ By default, Zenfig does not print secret values in logs or diffs unless explicit
 ### A. Export Workflow (Fetch -> Process -> Validate -> Output)
 
 1. **Fetch:** Retrieve stored values from the provider for the primary service and any `--source` services.
-   - Default (Chamber): `chamber export <prefix>/<service>/<env> --format json`
+   - Default (AWS SSM): `GetParametersByPath` under `<prefix>/<service>/<env>` (via AWS SDK).
    - Provider returns a flat map of canonical key paths to **string** values.
 2. **Parse + Merge:** Convert provider strings into typed values using the schema (schema-directed parsing) and deep-merge all sources.
 3. **Inject:** Pass the merged, typed `secrets` object into `go-jsonnet` as External Variables via temp file or stdin (not CLI args).
@@ -58,12 +59,12 @@ By default, Zenfig does not print secret values in logs or diffs unless explicit
 ### B. Upsert Workflow (Input -> Validate -> Push)
 
 1. **Input:** Accept a service name, key, and value (via CLI args or stdin for sensitive values).
-2. **Resolve:** Locate the target schema node using partial path resolution (dot notation; case-insensitive input, canonicalized to schema casing).
+2. **Resolve:** Locate the target schema node using partial path resolution (dot notation; case-sensitive input).
 3. **Parse + Validate:** Parse the input string into a typed value based on the resolved schema node, then validate with Ajv.
    - Strings are not auto-coerced to numbers/booleans; parsing is schema-directed.
    - Arrays/objects require JSON input (validated and then stored as minified JSON).
 4. **Serialize:** Convert the typed value back into the provider string encoding (see Stored value encoding).
-5. **Push:** If valid, execute provider `upsert` (default Chamber: `chamber write <prefix>/<service>/<env> <key-path> <value>`).
+5. **Push:** If valid, execute provider `upsert` (default AWS SSM: `PutParameter` to `<prefix>/<service>/<env>/<key-path>` with `SecureString`).
    - _Constraint:_ Use AWS SSM `SecureString` for all writes when supported by provider.
    - Verify encryption type post-write and warn if not SecureString.
 
@@ -92,7 +93,7 @@ Diff compares **stored values** (what’s in the provider) with the **rendered c
 1. **Input:** Accept service name and key path via CLI.
 2. **Validate:** Check key exists in schema (warn if not, but allow deletion).
 3. **Confirm:** Require `--confirm` flag or interactive `y/N` prompt for safety (no prompts in `--ci` / non-TTY mode).
-4. **Remove:** Execute provider `delete` (default Chamber: `chamber delete <prefix>/<service>/<env> <key-path>`).
+4. **Remove:** Execute provider `delete` (default AWS SSM: `DeleteParameter` on `<prefix>/<service>/<env>/<key-path>`).
 5. **Audit:** Log deletion with timestamp, user, and key to stderr (values are redacted by default).
 
 ### F. Snapshot Workflow
@@ -125,7 +126,7 @@ Snapshots store **provider-layer** values (strings) keyed by canonical dot paths
   "meta": {
     "timestamp": "2025-01-15T10:30:00.000Z",
     "env": "prod",
-    "provider": "chamber",
+    "provider": "aws-ssm",
     "ssmPrefix": "/zenfig",
     "schemaHash": "sha256:<hex>",
     "services": ["api", "shared", "overrides"]
@@ -142,7 +143,7 @@ If `--encrypt` is used, the on-disk snapshot must be encrypted at rest; the spec
 
 ### G. Doctor Workflow (Check -> Report)
 
-1. **Check binaries:** Verify `jsonnet` and the selected provider binary are available in `PATH`.
+1. **Check binaries:** Verify `jsonnet` is available in `PATH`.
 2. **Check files:** Verify schema and Jsonnet template paths exist and are readable.
 3. **Check schema loading:** Verify the schema file can be loaded and contains the configured export name.
 4. **Optional provider check:** If credentials are available, perform a read-only provider `fetch` and report counts only (never values).
@@ -186,18 +187,18 @@ enum EncryptionType {
 }
 ```
 
-### Default Provider: Chamber
+### Default Provider: AWS SSM (`aws-ssm`)
 
-- Implementation uses `chamber export`, `chamber write`, and `chamber delete`.
-- Chamber provider maps `ProviderContext` to a chamber “service” root of `<prefix>/<service>/<env>` and maps `keyPath` (`a.b.c`) to a parameter key path (`a/b/c`).
-- Chamber provider must never log secret values; only log key paths and high-level operation details.
+- Implementation uses AWS SDK SSM calls (`GetParametersByPath`, `PutParameter`, `DeleteParameter`).
+- Provider maps `ProviderContext` to an SSM path root of `<prefix>/<service>/<env>` and maps `keyPath` (`a.b.c`) to a parameter key path (`a/b/c`).
+- Provider must never log secret values; only log key paths and high-level operation details.
 - `secureWrite` is true (writes are `SecureString` by default).
 - `encryptionVerification` is true (can verify via AWS SSM API).
 - `transactions` is false (no atomic multi-key operations).
 
 ### Provider Registry
 
-- CLI accepts `--provider <name>` (default: `chamber`).
+- CLI accepts `--provider <name>` (default: `aws-ssm`).
 - Registry returns provider instance by name.
 - Additional provider examples (future): `aws-secretsmanager`, `vault`, `env`, `file`.
 
@@ -230,6 +231,8 @@ enum EncryptionType {
 - Default `prefix` is `/zenfig`, configurable via `--ssm-prefix` or `ZENFIG_SSM_PREFIX`.
 - `<env>` should be sourced from `--env`, `ZENFIG_ENV`, or `NODE_ENV`, with `dev` as a fallback.
 - `<key-path>` mirrors the schema path using `/` as a separator (e.g., `database/url`, `jwt/secret`).
+- Each key segment must match `^[A-Za-z0-9_-]+$`; no encoding is applied.
+- Service, env, and key segments are case-sensitive and must be used consistently.
 - Zenfig uses canonical dot paths in the CLI (`database.url`) and providers translate dot paths to backend naming (`database/url` for SSM).
 
 ---
@@ -298,7 +301,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 - `src/transformer.ts`: Flattens nested objects into `KEY_SUBKEY=value`.
 - `src/providers/Provider.ts`: Provider interface and types.
 - `src/providers/registry.ts`: Provider lookup and default selection.
-- `src/providers/ChamberProvider.ts`: Provider implementation using chamber.
+- `src/providers/AwsSsmProvider.ts`: Provider implementation using AWS SSM.
 
 ### CLI Interface
 
@@ -313,7 +316,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 zenfig export <service> [options]
   --source <service>          # Additional sources (repeatable)
   --format <env|json>         # Output format (default: env)
-  --provider <name>           # Provider name (default: chamber)
+  --provider <name>           # Provider name (default: aws-ssm)
   --jsonnet <path>            # Jsonnet template path (default: config.jsonnet)
   --jsonnet-timeout <ms>      # Kill jsonnet after timeout (default: 30000)
   --env <environment>         # Environment name (overrides NODE_ENV)
@@ -326,7 +329,7 @@ zenfig export <service> [options]
 
 # Upsert configuration value
 zenfig upsert <service> <key> [value] [options]
-  --provider <name>           # Provider name (default: chamber)
+  --provider <name>           # Provider name (default: aws-ssm)
   --env <environment>         # Environment name (overrides NODE_ENV)
   --stdin                     # Read value from stdin (for sensitive data)
   --type <auto|string|int|float|bool|json>  # How to parse input before validation (default: auto)
@@ -344,7 +347,7 @@ zenfig validate [options]
 zenfig diff <service> [options]
   --source <service>          # Additional sources (repeatable)
   --format <json|table>       # Output format (default: table)
-  --provider <name>           # Provider name (default: chamber)
+  --provider <name>           # Provider name (default: aws-ssm)
   --jsonnet <path>            # Jsonnet template path (default: config.jsonnet)
   --jsonnet-timeout <ms>      # Kill jsonnet after timeout (default: 30000)
   --env <environment>         # Environment name (overrides NODE_ENV)
@@ -356,7 +359,7 @@ zenfig diff <service> [options]
 
 # List configuration keys
 zenfig list <service> [options]
-  --provider <name>           # Provider name (default: chamber)
+  --provider <name>           # Provider name (default: aws-ssm)
   --env <environment>         # Environment name (overrides NODE_ENV)
   --format <keys|table|json>  # Output format (default: keys)
   --show-values               # Print secret values (TTY only; use --unsafe-show-values for CI)
@@ -376,7 +379,7 @@ zenfig list api --env prod --format json --show-values
 # Delete configuration value
 
 zenfig delete <service> <key> [options]
---provider <name> # Provider name (default: chamber)
+--provider <name> # Provider name (default: aws-ssm)
 --env <environment> # Environment name (overrides NODE_ENV)
 --confirm # Skip interactive confirmation
 --ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
@@ -385,7 +388,7 @@ zenfig delete <service> <key> [options]
 
 zenfig snapshot save <service> [options]
 --source <service> # Additional sources (repeatable)
---provider <name> # Provider name (default: chamber)
+--provider <name> # Provider name (default: aws-ssm)
 --env <environment> # Environment name (overrides NODE_ENV)
 --output <path> # Output path (default: .zenfig/snapshots/)
 --encrypt # Encrypt snapshot at rest (recommended)
@@ -395,7 +398,7 @@ zenfig snapshot save <service> [options]
 # Restore configuration from snapshot
 
 zenfig snapshot restore <snapshot-file> [options]
---provider <name> # Provider name (default: chamber)
+--provider <name> # Provider name (default: aws-ssm)
 --dry-run # Show diff without applying changes
 --force-schema-mismatch # Allow restore despite schema hash mismatch
 --confirm # Skip interactive confirmation
@@ -415,7 +418,7 @@ zenfig init [options]
 # Check local prerequisites and basic connectivity
 
 zenfig doctor [options]
---provider <name> # Provider name (default: chamber)
+--provider <name> # Provider name (default: aws-ssm)
 --schema <path> # Schema path (default: src/schema.ts)
 --schema-export-name <name> # Schema export name (default: ConfigSchema)
 --jsonnet <path> # Jsonnet template path (default: config.jsonnet)
@@ -456,7 +459,7 @@ Example:
 ```json
 {
   "env": "prod",
-  "provider": "chamber",
+  "provider": "aws-ssm",
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
   "schemaExportName": "ConfigSchema",
@@ -467,7 +470,7 @@ Example:
   "cache": "5m",
   "jsonnetTimeoutMs": 30000,
   "providerGuards": {
-    "chamber": {
+    "aws-ssm": {
       "accountId": "123456789012",
       "region": "us-east-1"
     }
@@ -500,12 +503,12 @@ Recommended shape:
 }
 ```
 
-AWS example (for `chamber`/SSM providers):
+AWS example (for `aws-ssm` provider):
 
 ```json
 {
   "providerGuards": {
-    "chamber": {
+    "aws-ssm": {
       "accountId": "123456789012",
       "region": "us-east-1"
     }
@@ -527,15 +530,16 @@ Guidelines:
 #### Partial Path Resolution
 
 - Keys use dot notation (e.g., `database.url`, `api.timeoutMs`).
-- Path resolution is case-insensitive for input, but Zenfig canonicalizes to the schema-defined property casing.
+- Path resolution is case-sensitive; input must match schema-defined property casing.
 - Schema paths are traversed recursively to find the target node and compute the canonical key path.
 - Algorithm:
   1. Split key by `.` into segments (e.g., `database.url` → `["database", "url"]`)
-  2. Starting from schema root, traverse each segment:
-     - If current node is `Type.Object`, look for a property whose name matches the segment (case-insensitive) and record the schema-defined property name for canonicalization
+  2. Reject any segment that does not match `^[A-Za-z0-9_-]+$`
+  3. Starting from schema root, traverse each segment:
+     - If current node is `Type.Object`, look for a property whose name matches the segment exactly
      - If segment not found, error: `Key 'database.url' not found in schema`
-  3. At final segment, extract the TypeBox type (e.g., `Type.String({ format: "uri" })`)
-  4. Validate value against extracted type using Ajv
+  4. At final segment, extract the TypeBox type (e.g., `Type.String({ format: "uri" })`)
+  5. Validate value against extracted type using Ajv
 - Example validation for `database.url`:
   ```ts
   // Schema: Type.Object({ database: Type.Object({ url: Type.String({ format: "uri" }) }) })
@@ -567,7 +571,7 @@ For `upsert`, `--type` can override parsing:
 
 Unknown keys (not present in schema) are treated as strings, included in `secrets`, and should emit a warning (or error in `--strict` mode).
 
-When parsing `.env` files (for `validate`), Zenfig must map `.env` keys back to schema paths by generating the expected `.env` key for each schema leaf path (using the same output formatting rules) and matching case-insensitively. This avoids ambiguous “reverse snake_case” heuristics.
+When parsing `.env` files (for `validate`), Zenfig must map `.env` keys back to schema paths by generating the expected `.env` key for each schema leaf path (using the same output formatting rules) and matching case-sensitively. This avoids ambiguous “reverse snake_case” heuristics.
 
 #### Strict Mode (`--strict`)
 
@@ -672,7 +676,7 @@ TAGS=["prod","api","v2"]
 
 ### Environment Support
 
-- **Local:** Must look for `jsonnet` and provider binaries in the system path.
+- **Local:** Must look for `jsonnet` in the system path; `aws-ssm` uses the AWS SDK (no provider binary).
 - **CI/CD:** Ensure the tool exits with `code 1` on any validation error to break the build.
 - **Non-interactive:** In `--ci` / `ZENFIG_CI=1` mode (or when stdin is not a TTY), never prompt; require explicit flags like `--confirm`.
 - **Logging:** Write logs to `stderr` so `stdout` can be redirected to files; never print secret values by default.
@@ -728,10 +732,10 @@ Core logic that must be tested:
 
 #### Integration Tests
 
-Test complete workflows with real binaries:
+Test complete workflows with real dependencies:
 
 1. **Export workflow:**
-   - Mock chamber/provider
+   - Mock aws-ssm provider
    - Real jsonnet execution
    - Full validation pipeline
    - Multiple output formats
@@ -772,7 +776,7 @@ Critical edge cases that must be covered:
    - Unicode: `"日本語"`
 
 3. **Special characters in keys:**
-   - Dots in key names (handled as path separators)
+   - Disallowed characters in key segments (`.` and `/`, whitespace, punctuation)
    - Uppercase vs lowercase normalization
    - Numeric key names: `"0"`, `"123"`
 
@@ -947,8 +951,8 @@ Validation Error [VAL005]: api.key
 **Remediation:**
 
 - Check network connectivity
-- Verify AWS credentials (for chamber/SSM)
-- Check provider binary is in PATH
+- Verify AWS credentials (for aws-ssm)
+- Check AWS region configuration and network access
 - Verify service exists
 
 #### PROV002: Authentication Failed
@@ -1067,7 +1071,7 @@ Jsonnet Error [JSON003]
 **Remediation:**
 
 - Install `jsonnet`: `brew install go-jsonnet` or build from source
-- Install `chamber`: `go install github.com/segmentio/chamber/v2@latest`
+- No provider binary required for `aws-ssm`
 - Verify binary is in PATH: `which jsonnet`
 
 #### SYS002: File Not Found
@@ -1661,8 +1665,9 @@ Remediation: Fix syntax error in schema file
 "Act as a Senior DevOps Engineer. Based on the Zenfig specification provided, generate a TypeScript implementation with the following requirements:
 
 1. **Core dependencies:**
-   - Use `execa` for shell command execution (jsonnet, chamber binaries)
+   - Use `execa` for shell command execution (jsonnet binary)
    - Use `@sinclair/typebox` and `ajv` for schema validation
+   - Use `@aws-sdk/client-ssm` for the default AWS SSM provider
    - Use `commander` for CLI interface
    - Use `chalk` for colored terminal output
    - Use `cli-table3` for table formatting (diff command)
@@ -1680,7 +1685,7 @@ Remediation: Fix syntax error in schema file
 
 3. **Provider interface:**
    - Implement pluggable provider system with registry
-   - Default Chamber provider with all methods (fetch, upsert, delete, verifyEncryption) using `ProviderContext`
+   - Default aws-ssm provider with all methods (fetch, upsert, delete, verifyEncryption) using `ProviderContext`
    - Support for mock provider for testing
 
 4. **Testing:**
