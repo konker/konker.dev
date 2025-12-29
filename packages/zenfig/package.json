@@ -4,7 +4,7 @@
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
-  "description": "CLI tool for configuration and secrets management using AWS SSM, Jsonnet, and TypeBox",
+  "description": "CLI tool for configuration and secrets management using AWS SSM and TypeBox",
   "homepage": "https://konker.dev/",
   "keywords": [
     "node",
@@ -12,7 +12,6 @@
     "config",
     "secrets",
     "ssm",
-    "jsonnet",
     "typebox",
     "typescript",
     "functional-programming",
@@ -35,14 +34,6 @@
       "types": "./dist/commands/delete.d.ts",
       "import": "./dist/commands/delete.js"
     },
-    "./commands/diff": {
-      "types": "./dist/commands/diff.d.ts",
-      "import": "./dist/commands/diff.js"
-    },
-    "./commands/doctor": {
-      "types": "./dist/commands/doctor.d.ts",
-      "import": "./dist/commands/doctor.js"
-    },
     "./commands/export": {
       "types": "./dist/commands/export.d.ts",
       "import": "./dist/commands/export.js"
@@ -50,10 +41,6 @@
     "./commands": {
       "types": "./dist/commands/index.d.ts",
       "import": "./dist/commands/index.js"
-    },
-    "./commands/init": {
-      "types": "./dist/commands/init.d.ts",
-      "import": "./dist/commands/init.js"
     },
     "./commands/list": {
       "types": "./dist/commands/list.d.ts",
@@ -70,18 +57,6 @@
     "./commands/validate": {
       "types": "./dist/commands/validate.d.ts",
       "import": "./dist/commands/validate.js"
-    },
-    "./jsonnet/executor": {
-      "types": "./dist/jsonnet/executor.d.ts",
-      "import": "./dist/jsonnet/executor.js"
-    },
-    "./jsonnet": {
-      "types": "./dist/jsonnet/index.d.ts",
-      "import": "./dist/jsonnet/index.js"
-    },
-    "./jsonnet/tempFile": {
-      "types": "./dist/jsonnet/tempFile.d.ts",
-      "import": "./dist/jsonnet/tempFile.js"
     },
     "./lib/flatten": {
       "types": "./dist/lib/flatten.d.ts",
@@ -166,9 +141,9 @@
   ],
   "main": "dist/index.js",
   "dependencies": {
-    "@konker.dev/tiny-error-fp": "workspace:*",
     "@aws-sdk/client-ssm": "^3.777.0",
     "@aws-sdk/client-sts": "^3.777.0",
+    "@konker.dev/tiny-error-fp": "workspace:*",
     "@sinclair/typebox": "^0.34.45",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
@@ -176,7 +151,6 @@
     "cli-table3": "^0.6.5",
     "commander": "^14.0.2",
     "effect": "^3.19.13",
-    "execa": "^9.6.1",
     "json5": "^2.2.3"
   },
   "devDependencies": {

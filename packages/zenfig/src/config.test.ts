@@ -49,12 +49,10 @@ describe('config', () => {
       expect(result.ssmPrefix).toBe('/zenfig');
       expect(result.schema).toBe('src/schema.ts');
       expect(result.schemaExportName).toBe('ConfigSchema');
-      expect(result.jsonnet).toBe('config.jsonnet');
       expect(result.sources).toEqual([]);
       expect(result.format).toBe('env');
       expect(result.separator).toBe('_');
       expect(result.cache).toBeUndefined();
-      expect(result.jsonnetTimeoutMs).toBe(30000);
       expect(result.strict).toBe(false);
       expect(result.providerGuards).toEqual({});
     });
@@ -125,15 +123,6 @@ describe('config', () => {
       expect(result.schemaExportName).toBe('MySchema');
     });
 
-    it('should use ZENFIG_JSONNET when set', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
-      process.env.ZENFIG_JSONNET = 'custom.jsonnet';
-
-      const result = await Effect.runPromise(resolveConfig());
-
-      expect(result.jsonnet).toBe('custom.jsonnet');
-    });
-
     it('should use ZENFIG_FORMAT when set', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       process.env.ZENFIG_FORMAT = 'json';
@@ -150,24 +139,6 @@ describe('config', () => {
       const result = await Effect.runPromise(resolveConfig());
 
       expect(result.cache).toBe('.cache/zenfig');
-    });
-
-    it('should use ZENFIG_JSONNET_TIMEOUT_MS when set with valid integer', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
-      process.env.ZENFIG_JSONNET_TIMEOUT_MS = '60000';
-
-      const result = await Effect.runPromise(resolveConfig());
-
-      expect(result.jsonnetTimeoutMs).toBe(60000);
-    });
-
-    it('should ignore ZENFIG_JSONNET_TIMEOUT_MS when not a valid integer', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
-      process.env.ZENFIG_JSONNET_TIMEOUT_MS = 'invalid';
-
-      const result = await Effect.runPromise(resolveConfig());
-
-      expect(result.jsonnetTimeoutMs).toBe(30000); // default
     });
 
     it('should use ZENFIG_CI when set to true', async () => {
@@ -208,12 +179,10 @@ describe('config', () => {
         ssmPrefix: '/app',
         schema: 'config/schema.ts',
         schemaExportName: 'AppSchema',
-        jsonnet: 'app.jsonnet',
         sources: ['source1.json', 'source2.json'],
         format: 'json' as const,
         separator: '__',
         cache: '.zenfig-cache',
-        jsonnetTimeoutMs: 45000,
         providerGuards: {
           'aws-ssm': {
             accountId: '123456789012',
@@ -232,12 +201,10 @@ describe('config', () => {
       expect(result.ssmPrefix).toBe('/app');
       expect(result.schema).toBe('config/schema.ts');
       expect(result.schemaExportName).toBe('AppSchema');
-      expect(result.jsonnet).toBe('app.jsonnet');
       expect(result.sources).toEqual(['source1.json', 'source2.json']);
       expect(result.format).toBe('json');
       expect(result.separator).toBe('__');
       expect(result.cache).toBe('.zenfig-cache');
-      expect(result.jsonnetTimeoutMs).toBe(45000);
       expect(result.providerGuards).toEqual({
         'aws-ssm': {
           accountId: '123456789012',
@@ -255,12 +222,10 @@ describe('config', () => {
         ssmPrefix: '/app',
         schema: 'config/schema.ts',
         schemaExportName: 'AppSchema',
-        jsonnet: 'app.jsonnet',
         sources: ['source1.json', 'source2.json'],
         format: 'json',
         separator: '__',
         cache: '.zenfig-cache',
-        jsonnetTimeoutMs: 45000,
         providerGuards: {
           'aws-ssm': {
             accountId: '123456789012',
@@ -276,12 +241,10 @@ describe('config', () => {
       expect(result.ssmPrefix).toBe('/app');
       expect(result.schema).toBe('config/schema.ts');
       expect(result.schemaExportName).toBe('AppSchema');
-      expect(result.jsonnet).toBe('app.jsonnet');
       expect(result.sources).toEqual(['source1.json', 'source2.json']);
       expect(result.format).toBe('json');
       expect(result.separator).toBe('__');
       expect(result.cache).toBe('.zenfig-cache');
-      expect(result.jsonnetTimeoutMs).toBe(45000);
       expect(result.providerGuards).toEqual({
         'aws-ssm': {
           accountId: '123456789012',
@@ -376,18 +339,6 @@ describe('config', () => {
       expect(result.schemaExportName).toBe('CLISchema');
     });
 
-    it('should use CLI jsonnet option', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
-
-      const cliOptions: CLIOptions = {
-        jsonnet: 'cli.jsonnet',
-      };
-
-      const result = await Effect.runPromise(resolveConfig(cliOptions));
-
-      expect(result.jsonnet).toBe('cli.jsonnet');
-    });
-
     it('should use CLI format option', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
 
@@ -435,18 +386,6 @@ describe('config', () => {
       const result = await Effect.runPromise(resolveConfig(cliOptions));
 
       expect(result.cache).toBeUndefined();
-    });
-
-    it('should use CLI jsonnetTimeout option', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
-
-      const cliOptions: CLIOptions = {
-        jsonnetTimeout: 90000,
-      };
-
-      const result = await Effect.runPromise(resolveConfig(cliOptions));
-
-      expect(result.jsonnetTimeoutMs).toBe(90000);
     });
 
     it('should use CLI ci option', async () => {
@@ -515,12 +454,10 @@ describe('config', () => {
       ssmPrefix: '/zenfig',
       schema: 'src/schema.ts',
       schemaExportName: 'ConfigSchema',
-      jsonnet: 'config.jsonnet',
       sources: [],
       format: 'env',
       separator: '_',
       cache: undefined,
-      jsonnetTimeoutMs: 30000,
       ci: false,
       strict: false,
       providerGuards: {},
@@ -551,11 +488,6 @@ describe('config', () => {
       expect(result.schemaExportName).toBe('Custom');
     });
 
-    it('should override jsonnet from CLI', () => {
-      const result = mergeCliOptions(baseConfig, { jsonnet: 'custom.jsonnet' });
-      expect(result.jsonnet).toBe('custom.jsonnet');
-    });
-
     it('should override sources from CLI', () => {
       const result = mergeCliOptions(baseConfig, { source: ['a.json', 'b.json'] });
       expect(result.sources).toEqual(['a.json', 'b.json']);
@@ -580,11 +512,6 @@ describe('config', () => {
       const configWithCache = { ...baseConfig, cache: '.existing-cache' };
       const result = mergeCliOptions(configWithCache, { noCache: true });
       expect(result.cache).toBeUndefined();
-    });
-
-    it('should override jsonnetTimeoutMs from CLI', () => {
-      const result = mergeCliOptions(baseConfig, { jsonnetTimeout: 60000 });
-      expect(result.jsonnetTimeoutMs).toBe(60000);
     });
 
     it('should override ci from CLI', () => {

@@ -38,12 +38,10 @@ describe('Validate Command', () => {
     ssmPrefix: '/zenfig',
     schema: 'src/schema.ts',
     schemaExportName: 'ConfigSchema',
-    jsonnet: 'config.jsonnet',
     sources: [],
     format: 'env',
     separator: '_',
     cache: undefined,
-    jsonnetTimeoutMs: 30000,
     ci: false,
     strict: false,
     providerGuards: {},
@@ -98,7 +96,7 @@ describe('Validate Command', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -472,7 +470,7 @@ describe('Validate Command', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -496,7 +494,7 @@ describe('Validate Command', () => {
         if (exit._tag === 'Failure') {
           const cause = exit.cause;
           if (cause._tag === 'Fail') {
-            expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+            expect(cause.error.context.code).toBe(ErrorCode.SYS001);
           }
         }
       } finally {

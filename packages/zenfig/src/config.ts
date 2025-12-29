@@ -32,12 +32,10 @@ export const ZenfigRcSchema = Schema.Struct({
   ssmPrefix: Schema.optional(Schema.String),
   schema: Schema.optional(Schema.String),
   schemaExportName: Schema.optional(Schema.String),
-  jsonnet: Schema.optional(Schema.String),
   sources: Schema.optional(Schema.Array(Schema.String)),
   format: Schema.optional(Schema.Union(Schema.Literal('env'), Schema.Literal('json'))),
   separator: Schema.optional(Schema.String),
   cache: Schema.optional(Schema.String),
-  jsonnetTimeoutMs: Schema.optional(Schema.Number),
   providerGuards: Schema.optional(ProviderGuardsSchema),
 });
 
@@ -52,12 +50,10 @@ export const ResolvedConfigSchema = Schema.Struct({
   ssmPrefix: Schema.String,
   schema: Schema.String,
   schemaExportName: Schema.String,
-  jsonnet: Schema.String,
   sources: Schema.Array(Schema.String),
   format: Schema.Union(Schema.Literal('env'), Schema.Literal('json')),
   separator: Schema.String,
   cache: Schema.optional(Schema.String),
-  jsonnetTimeoutMs: Schema.Number,
   ci: Schema.Boolean,
   strict: Schema.Boolean,
   providerGuards: ProviderGuardsSchema,
@@ -74,13 +70,11 @@ export const CLIOptionsSchema = Schema.Struct({
   ssmPrefix: Schema.optional(Schema.String),
   schema: Schema.optional(Schema.String),
   schemaExportName: Schema.optional(Schema.String),
-  jsonnet: Schema.optional(Schema.String),
   source: Schema.optional(Schema.Array(Schema.String)),
   format: Schema.optional(Schema.Union(Schema.Literal('env'), Schema.Literal('json'))),
   separator: Schema.optional(Schema.String),
   cache: Schema.optional(Schema.String),
   noCache: Schema.optional(Schema.Boolean),
-  jsonnetTimeout: Schema.optional(Schema.Number),
   ci: Schema.optional(Schema.Boolean),
   strict: Schema.optional(Schema.Boolean),
 });
@@ -100,12 +94,10 @@ const DEFAULT_CONFIG: ResolvedConfig = {
   ssmPrefix: '/zenfig',
   schema: 'src/schema.ts',
   schemaExportName: 'ConfigSchema',
-  jsonnet: 'config.jsonnet',
   sources: [],
   format: 'env',
   separator: '_',
   cache: undefined,
-  jsonnetTimeoutMs: 30000,
   ci: false,
   strict: false,
   providerGuards: {},
@@ -123,13 +115,6 @@ function getEnvBool(name: string): boolean | undefined {
   const value = getEnvVar(name);
   if (value === undefined) return undefined;
   return value === '1' || value.toLowerCase() === 'true';
-}
-
-function getEnvInt(name: string): number | undefined {
-  const value = getEnvVar(name);
-  if (value === undefined) return undefined;
-  const num = parseInt(value, 10);
-  return Number.isNaN(num) ? undefined : num;
 }
 
 // --------------------------------------------------------------------------
@@ -213,8 +198,6 @@ export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<Resolv
         rcConfig?.schemaExportName ??
         DEFAULT_CONFIG.schemaExportName;
 
-      const jsonnet = cliOptions.jsonnet ?? getEnvVar('ZENFIG_JSONNET') ?? rcConfig?.jsonnet ?? DEFAULT_CONFIG.jsonnet;
-
       const sources = cliOptions.source ?? rcConfig?.sources ?? DEFAULT_CONFIG.sources;
 
       const format =
@@ -230,12 +213,6 @@ export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<Resolv
         ? undefined
         : (cliOptions.cache ?? getEnvVar('ZENFIG_CACHE') ?? rcConfig?.cache ?? DEFAULT_CONFIG.cache);
 
-      const jsonnetTimeoutMs =
-        cliOptions.jsonnetTimeout ??
-        getEnvInt('ZENFIG_JSONNET_TIMEOUT_MS') ??
-        rcConfig?.jsonnetTimeoutMs ??
-        DEFAULT_CONFIG.jsonnetTimeoutMs;
-
       const ci = isCIMode(cliOptions.ci);
       const strict = cliOptions.strict ?? false;
       const providerGuards = rcConfig?.providerGuards ?? DEFAULT_CONFIG.providerGuards;
@@ -246,12 +223,10 @@ export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<Resolv
         ssmPrefix,
         schema,
         schemaExportName,
-        jsonnet,
         sources,
         format,
         separator,
         cache,
-        jsonnetTimeoutMs,
         ci,
         strict,
         providerGuards,
@@ -271,12 +246,10 @@ export function mergeCliOptions(config: ResolvedConfig, cliOptions: CLIOptions):
     ssmPrefix: cliOptions.ssmPrefix ?? config.ssmPrefix,
     schema: cliOptions.schema ?? config.schema,
     schemaExportName: cliOptions.schemaExportName ?? config.schemaExportName,
-    jsonnet: cliOptions.jsonnet ?? config.jsonnet,
     sources: cliOptions.source ?? config.sources,
     format: cliOptions.format ?? config.format,
     separator: cliOptions.separator ?? config.separator,
     cache: cliOptions.noCache ? undefined : (cliOptions.cache ?? config.cache),
-    jsonnetTimeoutMs: cliOptions.jsonnetTimeout ?? config.jsonnetTimeoutMs,
     ci: cliOptions.ci ?? config.ci,
     strict: cliOptions.strict ?? config.strict,
     providerGuards: config.providerGuards,

@@ -4,9 +4,8 @@
  * Error codes and types as defined in the specification:
  * - VAL (Validation): VAL001-VAL005
  * - PROV (Provider): PROV001-PROV006
- * - JSON (Jsonnet): JSON001-JSON004
  * - CLI (Command-line): CLI001-CLI003
- * - SYS (System): SYS001-SYS004
+ * - SYS (System): SYS001-SYS003
  */
 /* eslint-disable fp/no-class,fp/no-this */
 import * as Data from 'effect/Data';
@@ -48,22 +47,15 @@ export const ErrorCode = {
   PROV005: 'PROV005', // Write Permission Denied
   PROV006: 'PROV006', // Provider Guard Mismatch
 
-  // Jsonnet Errors
-  JSON001: 'JSON001', // Syntax Error
-  JSON002: 'JSON002', // Runtime Error
-  JSON003: 'JSON003', // Invalid Output
-  JSON004: 'JSON004', // Missing External Variable
-
   // CLI Errors
   CLI001: 'CLI001', // Invalid Flag
   CLI002: 'CLI002', // Missing Required Argument
   CLI003: 'CLI003', // Conflicting Flags
 
   // System Errors
-  SYS001: 'SYS001', // Binary Not Found
-  SYS002: 'SYS002', // File Not Found
-  SYS003: 'SYS003', // Permission Denied
-  SYS004: 'SYS004', // Snapshot Schema Mismatch
+  SYS001: 'SYS001', // File Not Found
+  SYS002: 'SYS002', // Permission Denied
+  SYS003: 'SYS003', // Snapshot Schema Mismatch
 } as const;
 
 export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -80,7 +72,6 @@ export function errorCodeToExitCode(code: ErrorCodeType): ExitCode {
 
     case ErrorCode.SYS001:
     case ErrorCode.SYS002:
-    case ErrorCode.SYS003:
       return EXIT_FILE_ERROR;
 
     case ErrorCode.PROV001:
@@ -91,7 +82,7 @@ export function errorCodeToExitCode(code: ErrorCodeType): ExitCode {
     case ErrorCode.PROV006:
       return EXIT_CONFIG_ERROR;
 
-    case ErrorCode.SYS004:
+    case ErrorCode.SYS003:
       return EXIT_SCHEMA_MISMATCH;
 
     default:
@@ -110,7 +101,7 @@ export type ZenfigErrorContext = {
   readonly problem?: string | undefined;
   readonly remediation?: string | undefined;
   readonly example?: string | undefined;
-  readonly location?: string | undefined; // For Jsonnet errors: file:line:col
+  readonly location?: string | undefined; // Optional location info (file:line:col)
   readonly availableKeys?: ReadonlyArray<string> | undefined;
 };
 
@@ -137,15 +128,6 @@ export class ValidationError extends Data.TaggedError('ValidationError')<{
 }
 
 export class ProviderError extends Data.TaggedError('ProviderError')<{
-  readonly message: string;
-  readonly context: ZenfigErrorContext;
-}> {
-  get exitCode(): ExitCode {
-    return errorCodeToExitCode(this.context.code);
-  }
-}
-
-export class JsonnetError extends Data.TaggedError('JsonnetError')<{
   readonly message: string;
   readonly context: ZenfigErrorContext;
 }> {
@@ -355,55 +337,6 @@ export function providerGuardMismatchError(provider: string, details: string): P
   });
 }
 
-// Jsonnet Errors
-export function jsonnetSyntaxError(location: string, problem: string): JsonnetError {
-  return new JsonnetError({
-    message: 'Jsonnet template has syntax error',
-    context: {
-      code: ErrorCode.JSON001,
-      location,
-      problem,
-      remediation: 'Fix syntax error in Jsonnet template',
-    },
-  });
-}
-
-export function jsonnetRuntimeError(location: string, problem: string): JsonnetError {
-  return new JsonnetError({
-    message: 'Jsonnet template failed during evaluation',
-    context: {
-      code: ErrorCode.JSON002,
-      location,
-      problem,
-      remediation: 'Check logic in Jsonnet template',
-    },
-  });
-}
-
-export function jsonnetInvalidOutputError(received: string): JsonnetError {
-  return new JsonnetError({
-    message: 'Jsonnet did not return a valid object',
-    context: {
-      code: ErrorCode.JSON003,
-      expected: 'JSON object',
-      received,
-      problem: 'Jsonnet must evaluate to an object, not a primitive',
-      remediation: 'Ensure Jsonnet returns { ... } object structure',
-    },
-  });
-}
-
-export function jsonnetMissingVariableError(variable: string): JsonnetError {
-  return new JsonnetError({
-    message: 'Required external variable not provided',
-    context: {
-      code: ErrorCode.JSON004,
-      problem: `Missing external variable: ${variable}`,
-      remediation: 'Ensure secrets and env are passed via --ext-code, check temp file creation succeeded',
-    },
-  });
-}
-
 // CLI Errors
 export function invalidFlagError(flag: string): CLIError {
   return new CLIError({
@@ -439,25 +372,11 @@ export function conflictingFlagsError(flags: ReadonlyArray<string>): CLIError {
 }
 
 // System Errors
-export function binaryNotFoundError(binary: string): SystemError {
-  return new SystemError({
-    message: 'Required binary not found in PATH',
-    context: {
-      code: ErrorCode.SYS001,
-      problem: `Binary not found: ${binary}`,
-      remediation:
-        binary === 'jsonnet'
-          ? 'Install jsonnet: brew install go-jsonnet or build from source'
-          : `Install ${binary} and ensure it is in PATH`,
-    },
-  });
-}
-
 export function fileNotFoundError(path: string): SystemError {
   return new SystemError({
     message: 'Required file does not exist',
     context: {
-      code: ErrorCode.SYS002,
+      code: ErrorCode.SYS001,
       path,
       problem: `File not found: ${path}`,
       remediation: 'Check file path is correct, verify file permissions (readable)',
@@ -469,7 +388,7 @@ export function permissionDeniedError(path: string, operation: string): SystemEr
   return new SystemError({
     message: 'Insufficient filesystem permissions',
     context: {
-      code: ErrorCode.SYS003,
+      code: ErrorCode.SYS002,
       path,
       problem: `Permission denied for ${operation}: ${path}`,
       remediation: 'Check file/directory permissions',
@@ -481,7 +400,7 @@ export function snapshotSchemaMismatchError(expectedHash: string, actualHash: st
   return new SystemError({
     message: 'Snapshot schema hash does not match current schema',
     context: {
-      code: ErrorCode.SYS004,
+      code: ErrorCode.SYS003,
       expected: expectedHash,
       received: actualHash,
       problem: 'Schema has changed since snapshot was created',
@@ -494,7 +413,7 @@ export function snapshotSchemaMismatchError(expectedHash: string, actualHash: st
 // --------------------------------------------------------------------------
 // Error Formatting
 // --------------------------------------------------------------------------
-export type ZenfigErrorLike = ZenfigError | ValidationError | ProviderError | JsonnetError | CLIError | SystemError;
+export type ZenfigErrorLike = ZenfigError | ValidationError | ProviderError | CLIError | SystemError;
 
 export function formatError(error: ZenfigErrorLike): string {
   const { context, message } = error;

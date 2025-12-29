@@ -7,7 +7,6 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 
 import { type ResolvedConfig } from '../config.js';
 import { ErrorCode, ValidationError } from '../errors.js';
-import { evaluateTemplate } from '../jsonnet/executor.js';
 import { createMockProvider } from '../providers/MockProvider.js';
 import { getProvider } from '../providers/registry.js';
 import { validate } from '../schema/index.js';
@@ -22,10 +21,6 @@ vi.mock('../schema/loader.js', () => ({
 
 vi.mock('../providers/registry.js', () => ({
   getProvider: vi.fn(),
-}));
-
-vi.mock('../jsonnet/executor.js', () => ({
-  evaluateTemplate: vi.fn(),
 }));
 
 vi.mock('../schema/validator.js', () => ({
@@ -49,12 +44,10 @@ describe('Export Command', () => {
     ssmPrefix: '/zenfig',
     schema: 'src/schema.ts',
     schemaExportName: 'ConfigSchema',
-    jsonnet: 'config.jsonnet',
     sources: [],
     format: 'env',
     separator: '_',
     cache: undefined,
-    jsonnetTimeoutMs: 30000,
     ci: false,
     strict: false,
     providerGuards: {},
@@ -105,13 +98,6 @@ describe('Export Command', () => {
 
   describe('executeExport', () => {
     it('should export configuration from provider', async () => {
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 5432 },
-          api: { timeout: 30000 },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -126,12 +112,6 @@ describe('Export Command', () => {
     });
 
     it('should format output as env', async () => {
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 5432 },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -144,12 +124,6 @@ describe('Export Command', () => {
     });
 
     it('should format output as JSON', async () => {
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 5432 },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -173,12 +147,6 @@ describe('Export Command', () => {
       });
 
       vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithSources));
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'api-host', port: 5432 },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -203,12 +171,6 @@ describe('Export Command', () => {
       });
 
       vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithConflicts));
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'api-host' },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -223,13 +185,6 @@ describe('Export Command', () => {
     });
 
     it('should validate output against schema', async () => {
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 'not-a-number' },
-          api: { timeout: 30000 },
-        })
-      );
-
       // Mock validation failure
       vi.mocked(validate).mockReturnValue(Effect.fail(new ValidationError({ message: 'Validation failed' } as never)));
 
@@ -258,13 +213,6 @@ describe('Export Command', () => {
           unknownKeys: ['unknown.key'],
         })
       );
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 5432 },
-          api: { timeout: 30000 },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -290,13 +238,6 @@ describe('Export Command', () => {
           unknownKeys: ['unknown.key'],
         })
       );
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 5432 },
-          api: { timeout: 30000 },
-        })
-      );
-
       const exit = await Effect.runPromiseExit(
         executeExport({
           service: 'api',
@@ -311,12 +252,6 @@ describe('Export Command', () => {
     });
 
     it('should use custom separator', async () => {
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost' },
-        })
-      );
-
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
@@ -330,12 +265,6 @@ describe('Export Command', () => {
 
   describe('runExport', () => {
     it('should write formatted output to stdout', async () => {
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'localhost', port: 5432 },
-        })
-      );
-
       await Effect.runPromise(
         runExport({
           service: 'api',
@@ -346,6 +275,7 @@ describe('Export Command', () => {
       expect(stdoutWriteSpy).toHaveBeenCalled();
       const output = stdoutWriteSpy.mock.calls[0]?.[0];
       expect(JSON.parse(output)).toEqual({
+        api: { timeout: 30000 },
         database: { host: 'localhost', port: 5432 },
       });
     });
@@ -361,12 +291,6 @@ describe('Export Command', () => {
       });
 
       vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithConflicts));
-      vi.mocked(evaluateTemplate).mockReturnValue(
-        Effect.succeed({
-          database: { host: 'api-host' },
-        })
-      );
-
       await Effect.runPromise(
         runExport({
           service: 'api',

@@ -1,12 +1,11 @@
 # Zenfig
 
-CLI tool for configuration and secrets management using AWS SSM, Jsonnet, and TypeBox.
+CLI tool for configuration and secrets management using AWS SSM and TypeBox.
 
 ## Prerequisites
 
 - Node.js 18+ (or a compatible runtime)
 - pnpm
-- jsonnet CLI on PATH
 - AWS credentials and region configuration for the default `aws-ssm` provider
 
 ## Setup
@@ -37,7 +36,6 @@ Example `zenfigrc.json`:
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
   "schemaExportName": "ConfigSchema",
-  "jsonnet": "config.jsonnet",
   "providerGuards": {
     "aws-ssm": {
       "accountId": "123456789012",
@@ -59,11 +57,9 @@ Environment overrides:
 - `ZENFIG_SSM_PREFIX`
 - `ZENFIG_SCHEMA`
 - `ZENFIG_SCHEMA_EXPORT_NAME`
-- `ZENFIG_JSONNET`
 - `ZENFIG_FORMAT`
 - `ZENFIG_SEPARATOR`
 - `ZENFIG_CACHE`
-- `ZENFIG_JSONNET_TIMEOUT_MS`
 - `ZENFIG_CI`
 - `ZENFIG_IGNORE_PROVIDER_GUARDS`
 

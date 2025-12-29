@@ -1,7 +1,7 @@
 /**
  * Export Command
  *
- * Workflow: Fetch -> Parse -> Merge -> Inject -> Template -> Validate -> Format
+ * Workflow: Fetch -> Parse -> Merge -> Validate -> Format
  */
 import { type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
@@ -9,14 +9,12 @@ import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import {
-  type JsonnetError,
   type ProviderError,
   type SystemError,
   unknownKeysError,
   type ValidationError,
   type ZenfigError,
 } from '../errors.js';
-import { evaluateTemplate } from '../jsonnet/executor.js';
 import { formatConfig } from '../lib/format.js';
 import { formatConflicts, mergeConfigs, type MergeOptions, type MergeResult } from '../lib/merge.js';
 import { checkProviderGuards } from '../providers/guards.js';
@@ -105,7 +103,7 @@ function fetchAllServices(
  */
 export function executeExport(
   options: ExportOptions
-): Effect.Effect<ExportResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+): Effect.Effect<ExportResult, ProviderError | ValidationError | SystemError | ZenfigError | Error> {
   return pipe(
     // 1. Load schema
     loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
@@ -161,21 +159,15 @@ export function executeExport(
       );
     }),
     Effect.flatMap(({ config, mergeResult, schema, warnings }) =>
-      // 6. Evaluate Jsonnet template
+      // 6. Validate against schema
       pipe(
-        evaluateTemplate(mergeResult.merged, config.env, config.jsonnet, config.jsonnetTimeoutMs),
-        Effect.flatMap((rendered) =>
-          // 7. Validate against schema
-          pipe(
-            validate<Record<string, unknown>>(rendered, schema),
-            Effect.map((validated) => ({
-              validated,
-              mergeResult,
-              config,
-              warnings,
-            }))
-          )
-        )
+        validate<Record<string, unknown>>(mergeResult.merged, schema),
+        Effect.map((validated) => ({
+          validated,
+          mergeResult,
+          config,
+          warnings,
+        }))
       )
     ),
     Effect.map(({ config, mergeResult, validated, warnings }) => {
@@ -199,7 +191,7 @@ export function executeExport(
  */
 export function runExport(
   options: ExportOptions
-): Effect.Effect<void, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+): Effect.Effect<void, ProviderError | ValidationError | SystemError | ZenfigError | Error> {
   return pipe(
     executeExport(options),
     Effect.map((result) => {

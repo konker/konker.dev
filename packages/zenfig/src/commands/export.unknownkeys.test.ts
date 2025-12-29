@@ -17,10 +17,6 @@ vi.mock('../providers/registry.js', () => ({
   getProvider: vi.fn(),
 }));
 
-vi.mock('../jsonnet/executor.js', () => ({
-  evaluateTemplate: vi.fn(),
-}));
-
 vi.mock('../schema/index.js', () => ({
   validate: vi.fn(),
 }));
@@ -36,12 +32,10 @@ describe('Export Command Unknown Keys', () => {
     ssmPrefix: '/zenfig',
     schema: 'src/schema.ts',
     schemaExportName: 'ConfigSchema',
-    jsonnet: 'config.jsonnet',
     sources: [],
     format: 'env',
     separator: '_',
     cache: undefined,
-    jsonnetTimeoutMs: 30000,
     ci: false,
     strict: false,
     providerGuards: {},
@@ -62,7 +56,6 @@ describe('Export Command Unknown Keys', () => {
     const { executeExport } = await import('./export.js');
     const { loadSchemaWithDefaults } = await import('../schema/loader.js');
     const { getProvider } = await import('../providers/registry.js');
-    const { evaluateTemplate } = await import('../jsonnet/executor.js');
     const { validate } = await import('../schema/index.js');
     const { parseProviderKV } = await import('../schema/parser.js');
 
@@ -75,11 +68,6 @@ describe('Export Command Unknown Keys', () => {
 
     vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
-    vi.mocked(evaluateTemplate).mockReturnValue(
-      Effect.succeed({
-        database: { host: 'localhost' },
-      })
-    );
     vi.mocked(validate).mockImplementation((value: unknown) => Effect.succeed(value));
     vi.mocked(parseProviderKV).mockReturnValue(
       Effect.succeed({
@@ -102,7 +90,6 @@ describe('Export Command Unknown Keys', () => {
     const { executeExport } = await import('./export.js');
     const { loadSchemaWithDefaults } = await import('../schema/loader.js');
     const { getProvider } = await import('../providers/registry.js');
-    const { evaluateTemplate } = await import('../jsonnet/executor.js');
     const { validate } = await import('../schema/index.js');
     const { parseProviderKV } = await import('../schema/parser.js');
 
@@ -115,11 +102,6 @@ describe('Export Command Unknown Keys', () => {
 
     vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
     vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
-    vi.mocked(evaluateTemplate).mockReturnValue(
-      Effect.succeed({
-        database: { host: 'localhost' },
-      })
-    );
     vi.mocked(validate).mockImplementation((value: unknown) => Effect.succeed(value));
     vi.mocked(parseProviderKV).mockReturnValue(
       Effect.succeed({

@@ -78,7 +78,7 @@ describe('Schema Loader', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -125,7 +125,7 @@ describe('Schema Loader', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -146,7 +146,7 @@ describe('Schema Loader', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -167,7 +167,7 @@ describe('Schema Loader', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });

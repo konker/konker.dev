@@ -38,7 +38,7 @@ function createAjv(): AjvInstance {
     strict: true,
     allErrors: true,
     coerceTypes: false, // Important: no implicit coercion
-    useDefaults: false, // We handle defaults in Jsonnet
+    useDefaults: false, // Defaults must be provided by stored values
     verbose: true,
   }) as AjvInstance;
 

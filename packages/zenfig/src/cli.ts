@@ -15,10 +15,7 @@ import { pipe } from 'effect/Function';
 import * as Option from 'effect/Option';
 
 import { runDelete } from './commands/delete.js';
-import { runDiff } from './commands/diff.js';
-import { runDoctor } from './commands/doctor.js';
 import { runExport } from './commands/export.js';
-import { runInit } from './commands/init.js';
 import { type ListFormat, runList } from './commands/list.js';
 import { runSnapshotRestore, runSnapshotSave } from './commands/snapshot.js';
 import { runUpsert } from './commands/upsert.js';
@@ -96,8 +93,6 @@ program
   .option('--source <service>', 'Additional sources (repeatable)', (val, prev: Array<string>) => [...prev, val], [])
   .option('--format <env|json>', 'Output format (default: env)')
   .option('--provider <name>', 'Provider name (default: aws-ssm)')
-  .option('--jsonnet <path>', 'Jsonnet template path (default: config.jsonnet)')
-  .option('--jsonnet-timeout <ms>', 'Kill jsonnet after timeout (default: 30000)', parseInt)
   .option('--env <environment>', 'Environment name')
   .option('--separator <char>', 'Env key separator (default: _)')
   .option('--strict-merge', 'Fail on type conflicts during merge')
@@ -215,61 +210,6 @@ program
       )
     );
   });
-
-// --------------------------------------------------------------------------
-// Diff Command
-// --------------------------------------------------------------------------
-
-program
-  .command('diff <service>')
-  .description('Show diff between stored values and rendered config')
-  .option('--source <service>', 'Additional sources (repeatable)', (val, prev: Array<string>) => [...prev, val], [])
-  .option('--format <json|table>', 'Output format (default: table)')
-  .option('--provider <name>', 'Provider name (default: aws-ssm)')
-  .option('--jsonnet <path>', 'Jsonnet template path')
-  .option('--jsonnet-timeout <ms>', 'Kill jsonnet after timeout', parseInt)
-  .option('--env <environment>', 'Environment name')
-  .option('--show-values', 'Print secret values (TTY only)')
-  .option('--unsafe-show-values', 'Allow printing secrets even when stdout is not a TTY')
-  .option('--cache <duration>', 'Cache provider fetches')
-  .option('--no-cache', 'Disable cache')
-  .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
-  .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
-  .action(
-    (
-      service: string,
-      options: CLIOptions & { source?: Array<string>; showValues?: boolean; unsafeShowValues?: boolean }
-    ) => {
-      runEffect(
-        pipe(
-          resolveConfig({
-            ...options,
-            source: options.source,
-            ci: program.opts().ci,
-            strict: program.opts().strict,
-          }),
-          Effect.flatMap((config) =>
-            runDiff({
-              service,
-              sources: options.source,
-              config,
-              format: options.format as 'json' | 'table' | undefined,
-              showValues: options.showValues,
-              unsafeShowValues: options.unsafeShowValues,
-            })
-          ),
-          Effect.tap((hasChanges) =>
-            Effect.sync(() => {
-              if (hasChanges) {
-                process.exit(EXIT_VALIDATION_ERROR);
-              }
-            })
-          )
-        )
-      );
-    }
-  );
 
 // --------------------------------------------------------------------------
 // List Command
@@ -431,69 +371,6 @@ snapshotCmd
       );
     }
   );
-
-// --------------------------------------------------------------------------
-// Init Command
-// --------------------------------------------------------------------------
-
-program
-  .command('init')
-  .description('Initialize Jsonnet template from schema')
-  .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
-  .option('--output <path>', 'Output path (default: config.jsonnet)')
-  .option('--force', 'Overwrite existing file')
-  .option('--include-defaults', 'Include schema defaults in template')
-  .action((options: CLIOptions & { output?: string; force?: boolean; includeDefaults?: boolean }) => {
-    runEffect(
-      pipe(
-        resolveConfig({
-          ...options,
-          ci: program.opts().ci,
-          strict: program.opts().strict,
-        }),
-        Effect.flatMap((config) =>
-          runInit({
-            output: options.output,
-            force: options.force,
-            includeDefaults: options.includeDefaults,
-            config,
-          })
-        )
-      )
-    );
-  });
-
-// --------------------------------------------------------------------------
-// Doctor Command
-// --------------------------------------------------------------------------
-
-program
-  .command('doctor')
-  .description('Check local prerequisites and basic connectivity')
-  .option('--provider <name>', 'Provider name (default: aws-ssm)')
-  .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
-  .option('--jsonnet <path>', 'Jsonnet template path')
-  .action((options: CLIOptions) => {
-    runEffect(
-      pipe(
-        resolveConfig({
-          ...options,
-          ci: program.opts().ci,
-          strict: program.opts().strict,
-        }),
-        Effect.flatMap((config) => runDoctor({ config })),
-        Effect.tap((passed) =>
-          Effect.sync(() => {
-            if (!passed) {
-              process.exit(EXIT_VALIDATION_ERROR);
-            }
-          })
-        )
-      )
-    );
-  });
 
 // --------------------------------------------------------------------------
 // Parse and Run

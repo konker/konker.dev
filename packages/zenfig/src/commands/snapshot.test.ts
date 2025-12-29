@@ -43,12 +43,10 @@ describe('Snapshot Commands', () => {
     ssmPrefix: '/zenfig',
     schema: 'src/schema.ts',
     schemaExportName: 'ConfigSchema',
-    jsonnet: 'config.jsonnet',
     sources: [],
     format: 'env',
     separator: '_',
     cache: undefined,
-    jsonnetTimeoutMs: 30000,
     ci: false,
     strict: false,
     providerGuards: {},
@@ -308,7 +306,7 @@ describe('Snapshot Commands', () => {
 
       expect(exit._tag).toBe('Failure');
       if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
-        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS003);
+        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS002);
       }
     });
 
@@ -331,7 +329,7 @@ describe('Snapshot Commands', () => {
         if (exit._tag === 'Failure') {
           const cause = exit.cause;
           if (cause._tag === 'Fail') {
-            expect(cause.error.context.code).toBe(ErrorCode.SYS003);
+            expect(cause.error.context.code).toBe(ErrorCode.SYS002);
           }
         }
       } finally {
@@ -367,7 +365,7 @@ describe('Snapshot Commands', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -387,7 +385,7 @@ describe('Snapshot Commands', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -414,7 +412,7 @@ describe('Snapshot Commands', () => {
         if (exit._tag === 'Failure') {
           const cause = exit.cause;
           if (cause._tag === 'Fail') {
-            expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+            expect(cause.error.context.code).toBe(ErrorCode.SYS001);
           }
         }
       } finally {
@@ -453,7 +451,7 @@ describe('Snapshot Commands', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS002);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       }
     });
@@ -665,7 +663,7 @@ describe('Snapshot Commands', () => {
       if (exit._tag === 'Failure') {
         const cause = exit.cause;
         if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS004);
+          expect(cause.error.context.code).toBe(ErrorCode.SYS003);
         }
       }
     });
