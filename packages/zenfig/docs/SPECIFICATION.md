@@ -1,5 +1,127 @@
 # Specification: Zenfig Configuration & Secrets Management Tool
 
+<!-- TOC -->
+
+- [Specification: Zenfig Configuration & Secrets Management Tool](#specification-zenfig-configuration--secrets-management-tool)
+  - [1. Goal](#1-goal)
+  - [2. Technical Stack](#2-technical-stack)
+  - [3. Core Workflow](#3-core-workflow)
+    - [Core Concepts (Layers, Paths, and Values)](#core-concepts-layers-paths-and-values)
+    - [A. Export Workflow (Fetch -> Process -> Validate -> Output)](#a-export-workflow-fetch---process---validate---output)
+    - [B. Upsert Workflow (Input -> Validate -> Push)](#b-upsert-workflow-input---validate---push)
+    - [C. Diff Workflow (Fetch -> Render -> Compare -> Report)](#c-diff-workflow-fetch---render---compare---report)
+    - [D. Validate Workflow (Input -> Parse -> Validate)](#d-validate-workflow-input---parse---validate)
+    - [E. Delete Workflow (Input -> Validate -> Confirm -> Remove)](#e-delete-workflow-input---validate---confirm---remove)
+    - [F. Snapshot Workflow](#f-snapshot-workflow)
+      - [Save (Fetch Stored -> Validate -> Store)](#save-fetch-stored---validate---store)
+      - [Restore (Load -> Validate -> Diff -> Confirm -> Push)](#restore-load---validate---diff---confirm---push)
+      - [Snapshot File Format (v1)](#snapshot-file-format-v1)
+    - [G. Doctor Workflow (Check -> Report)](#g-doctor-workflow-check---report)
+  - [4. Provider Model (Pluggable)](#4-provider-model-pluggable)
+    - [Provider Interface](#provider-interface)
+    - [Default Provider: AWS SSM (`aws-ssm`)](#default-provider-aws-ssm-aws-ssm)
+    - [Provider Registry](#provider-registry)
+    - [Encryption Verification](#encryption-verification)
+  - [5. Configuration Contract](#5-configuration-contract)
+    - [Jsonnet Inputs](#jsonnet-inputs)
+    - [Jsonnet Output](#jsonnet-output)
+  - [6. SSM Naming Convention](#6-ssm-naming-convention)
+  - [7. Multi-Source Composition](#7-multi-source-composition)
+    - [CLI Input](#cli-input)
+    - [Merge Semantics](#merge-semantics)
+    - [Merge Conflict Behavior](#merge-conflict-behavior)
+    - [Jsonnet Contract](#jsonnet-contract)
+  - [8. Implementation Requirements](#8-implementation-requirements)
+    - [Implementation Conventions](#implementation-conventions)
+    - [Project Structure](#project-structure)
+    - [CLI Interface](#cli-interface)
+      - [Core Commands](#core-commands)
+      - [Examples](#examples)
+    - [Environment Variable Precedence](#environment-variable-precedence)
+    - [Config File (`zenfigrc.json` / `zenfigrc.json5`)](#config-file-zenfigrcjson--zenfigrcjson5)
+      - [Provider Guards](#provider-guards)
+    - [Validation Details](#validation-details)
+      - [Partial Path Resolution](#partial-path-resolution)
+      - [Schema-Directed Value Parsing](#schema-directed-value-parsing)
+      - [Strict Mode (`--strict`)](#strict-mode---strict)
+      - [Error Messages](#error-messages)
+    - [Output Formatting](#output-formatting)
+      - [.env Format Rules](#env-format-rules)
+      - [Null and Undefined Handling](#null-and-undefined-handling)
+    - [Jsonnet Execution](#jsonnet-execution)
+    - [Environment Support](#environment-support)
+    - [Security Requirements](#security-requirements)
+    - [Style Guidelines](#style-guidelines)
+    - [Testing Strategy](#testing-strategy)
+      - [Unit Tests (Vitest)](#unit-tests-vitest)
+      - [Integration Tests](#integration-tests)
+      - [Edge Case Tests](#edge-case-tests)
+      - [Contract Tests](#contract-tests)
+      - [Test Coverage Requirements](#test-coverage-requirements)
+    - [Documentation](#documentation)
+    - [Exit Codes](#exit-codes)
+  - [9. Error Catalog](#9-error-catalog)
+    - [Error Code Structure](#error-code-structure)
+    - [Validation Errors (VAL)](#validation-errors-val)
+      - [VAL001: Invalid Type](#val001-invalid-type)
+      - [VAL002: Format Violation](#val002-format-violation)
+      - [VAL003: Constraint Violation](#val003-constraint-violation)
+      - [VAL004: Key Not Found](#val004-key-not-found)
+      - [VAL005: Null Not Allowed](#val005-null-not-allowed)
+    - [Provider Errors (PROV)](#provider-errors-prov)
+      - [PROV001: Connection Failed](#prov001-connection-failed)
+      - [PROV002: Authentication Failed](#prov002-authentication-failed)
+      - [PROV003: Parameter Not Found](#prov003-parameter-not-found)
+      - [PROV004: Encryption Verification Failed](#prov004-encryption-verification-failed)
+      - [PROV005: Write Permission Denied](#prov005-write-permission-denied)
+    - [Jsonnet Errors (JSON)](#jsonnet-errors-json)
+      - [JSON001: Syntax Error](#json001-syntax-error)
+      - [JSON002: Runtime Error](#json002-runtime-error)
+      - [JSON003: Invalid Output](#json003-invalid-output)
+      - [JSON004: Missing External Variable](#json004-missing-external-variable)
+    - [CLI Errors (CLI)](#cli-errors-cli)
+      - [CLI001: Invalid Flag](#cli001-invalid-flag)
+      - [CLI002: Missing Required Argument](#cli002-missing-required-argument)
+      - [CLI003: Conflicting Flags](#cli003-conflicting-flags)
+    - [System Errors (SYS)](#system-errors-sys)
+      - [SYS001: Binary Not Found](#sys001-binary-not-found)
+      - [SYS002: File Not Found](#sys002-file-not-found)
+      - [SYS003: Permission Denied](#sys003-permission-denied)
+      - [SYS004: Snapshot Schema Mismatch](#sys004-snapshot-schema-mismatch)
+  - [10. Performance Characteristics](#10-performance-characteristics)
+    - [Operational Limits](#operational-limits)
+    - [Expected Latency](#expected-latency)
+    - [Rate Limiting](#rate-limiting)
+    - [Caching Strategy](#caching-strategy)
+    - [Optimization Recommendations](#optimization-recommendations)
+    - [Memory Usage](#memory-usage)
+    - [Disk Usage](#disk-usage)
+  - [11. Concrete Usage Example](#11-concrete-usage-example)
+    - [Example Files](#example-files)
+    - [SSM State (Initial)](#ssm-state-initial)
+    - [Steps](#steps)
+    - [Parsed Secrets (per source)](#parsed-secrets-per-source)
+    - [Merged Secrets (Jsonnet Order: api + shared + overrides)](#merged-secrets-jsonnet-order-api--shared--overrides)
+    - [Output (format json)](#output-format-json)
+    - [Output (format env)](#output-format-env)
+  - [12. Init Command Specification](#12-init-command-specification)
+    - [Basic Usage](#basic-usage)
+    - [Input Schema Example](#input-schema-example)
+    - [Generated Identity Jsonnet (Default)](#generated-identity-jsonnet-default)
+    - [Edge Cases and Behaviors](#edge-cases-and-behaviors)
+      - [1. Output File Already Exists](#1-output-file-already-exists)
+      - [2. Include Schema Defaults](#2-include-schema-defaults)
+      - [3. Optional Fields](#3-optional-fields)
+      - [4. Arrays in Schema](#4-arrays-in-schema)
+      - [5. Union Types](#5-union-types)
+      - [6. Nested Objects (Deep)](#6-nested-objects-deep)
+      - [7. Schema File Not Found](#7-schema-file-not-found)
+      - [8. Schema Export Name Mismatch](#8-schema-export-name-mismatch)
+      - [9. Output Directory Doesn't Exist](#9-output-directory-doesnt-exist)
+      - [10. Schema Validation](#10-schema-validation)
+  - [13. Implementation Prompt for LLM](#13-implementation-prompt-for-llm)
+  <!-- TOC -->
+
 ## 1. Goal
 
 Design and implement a CLI tool called **Zenfig** that orchestrates config providers, Jsonnet, and TypeBox. It ensures that application configurations are logic-driven, securely retrieved, and strictly validated before reaching the runtime environment.
@@ -20,7 +142,7 @@ Design and implement a CLI tool called **Zenfig** that orchestrates config provi
 
 Zenfig operates on two related but distinct layers of configuration data:
 
-1. **Stored values (provider layer):** Key/value strings persisted in the backing store (default: AWS SSM) under a `<prefix>/<service>/<env>/...` hierarchy.
+1. **Stored values (provider layer):** Key/value strings persisted in the backing store (default: AWS SSM) under a `<prefix>/<env>/<service>/...` hierarchy.
 2. **Rendered config (runtime layer):** The final, schema-valid configuration object produced by evaluating `config.jsonnet` with fetched values plus logic/defaults.
 
 Zenfig uses a **canonical key path** for CLI and internal operations:
@@ -33,7 +155,7 @@ Zenfig uses a **canonical key path** for CLI and internal operations:
 Key path representations:
 
 - **Canonical (dot):** `api.timeoutMs`
-- **SSM key-path (slash):** `api/timeoutMs` (used in `<prefix>/<service>/<env>/<key-path>`)
+- **SSM key-path (slash):** `api/timeoutMs` (used in `<prefix>/<env>/<service>/<key-path>`)
 - **`.env` key:** `API_TIMEOUT_MS` by default (uppercase + snake_case; separator configurable)
 
 Stored value encoding (provider strings) is schema-directed:
@@ -48,7 +170,7 @@ By default, Zenfig does not print secret values in logs or diffs unless explicit
 ### A. Export Workflow (Fetch -> Process -> Validate -> Output)
 
 1. **Fetch:** Retrieve stored values from the provider for the primary service and any `--source` services.
-   - Default (AWS SSM): `GetParametersByPath` under `<prefix>/<service>/<env>` (via AWS SDK).
+   - Default (AWS SSM): `GetParametersByPath` under `<prefix>/<env>/<service>` (via AWS SDK).
    - Provider returns a flat map of canonical key paths to **string** values.
 2. **Parse + Merge:** Convert provider strings into typed values using the schema (schema-directed parsing) and deep-merge all sources.
 3. **Inject:** Pass the merged, typed `secrets` object into `go-jsonnet` as External Variables via temp file or stdin (not CLI args).
@@ -64,7 +186,7 @@ By default, Zenfig does not print secret values in logs or diffs unless explicit
    - Strings are not auto-coerced to numbers/booleans; parsing is schema-directed.
    - Arrays/objects require JSON input (validated and then stored as minified JSON).
 4. **Serialize:** Convert the typed value back into the provider string encoding (see Stored value encoding).
-5. **Push:** If valid, execute provider `upsert` (default AWS SSM: `PutParameter` to `<prefix>/<service>/<env>/<key-path>` with `SecureString`).
+5. **Push:** If valid, execute provider `upsert` (default AWS SSM: `PutParameter` to `<prefix>/<env>/<service>/<key-path>` with `SecureString`).
    - _Constraint:_ Use AWS SSM `SecureString` for all writes when supported by provider.
    - Verify encryption type post-write and warn if not SecureString.
 
@@ -93,7 +215,7 @@ Diff compares **stored values** (what’s in the provider) with the **rendered c
 1. **Input:** Accept service name and key path via CLI.
 2. **Validate:** Check key exists in schema (warn if not, but allow deletion).
 3. **Confirm:** Require `--confirm` flag or interactive `y/N` prompt for safety (no prompts in `--ci` / non-TTY mode).
-4. **Remove:** Execute provider `delete` (default AWS SSM: `DeleteParameter` on `<prefix>/<service>/<env>/<key-path>`).
+4. **Remove:** Execute provider `delete` (default AWS SSM: `DeleteParameter` on `<prefix>/<env>/<service>/<key-path>`).
 5. **Audit:** Log deletion with timestamp, user, and key to stderr (values are redacted by default).
 
 ### F. Snapshot Workflow
@@ -190,7 +312,7 @@ enum EncryptionType {
 ### Default Provider: AWS SSM (`aws-ssm`)
 
 - Implementation uses AWS SDK SSM calls (`GetParametersByPath`, `PutParameter`, `DeleteParameter`).
-- Provider maps `ProviderContext` to an SSM path root of `<prefix>/<service>/<env>` and maps `keyPath` (`a.b.c`) to a parameter key path (`a/b/c`).
+- Provider maps `ProviderContext` to an SSM path root of `<prefix>/<env>/<service>` and maps `keyPath` (`a.b.c`) to a parameter key path (`a/b/c`).
 - Provider must never log secret values; only log key paths and high-level operation details.
 - `secureWrite` is true (writes are `SecureString` by default).
 - `encryptionVerification` is true (can verify via AWS SSM API).
@@ -227,7 +349,7 @@ enum EncryptionType {
 
 ## 6. SSM Naming Convention
 
-- Parameter name format: `<prefix>/<service>/<env>/<key-path>`.
+- Parameter name format: `<prefix>/<env>/<service>/<key-path>`.
 - Default `prefix` is `/zenfig`, configurable via `--ssm-prefix` or `ZENFIG_SSM_PREFIX`.
 - `<env>` should be sourced from `--env`, `ZENFIG_ENV`, or `NODE_ENV`, with `dev` as a fallback.
 - `<key-path>` mirrors the schema path using `/` as a separator (e.g., `database/url`, `jwt/secret`).
@@ -244,7 +366,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 ### CLI Input
 
 - `zenfig export <service> [--source <service>]...` to include additional services.
-- Each source resolves to `<prefix>/<service>/<env>/...` and is fetched independently.
+- Each source resolves to `<prefix>/<env>/<service>/...` and is fetched independently.
 
 ### Merge Semantics
 
@@ -253,11 +375,11 @@ Zenfig may compose multiple SSM roots into a single config output.
 - Precedence order is: primary `<service>` first, then each `--source` in the order provided.
   - Example: `zenfig export api --source shared --source overrides`
     - SSM paths fetched (with `--env prod` and default prefix `/zenfig`):
-      - `/zenfig/api/prod/database/url = postgres://api-main`
-      - `/zenfig/api/prod/feature/enableBeta = false`
-      - `/zenfig/shared/prod/database/url = postgres://shared`
-      - `/zenfig/shared/prod/redis/url = redis://shared`
-      - `/zenfig/overrides/prod/feature/enableBeta = true`
+      - `/zenfig/prod/api/database/url = postgres://api-main`
+      - `/zenfig/prod/api/feature/enableBeta = false`
+      - `/zenfig/prod/shared/database/url = postgres://shared`
+      - `/zenfig/prod/shared/redis/url = redis://shared`
+      - `/zenfig/prod/overrides/feature/enableBeta = true`
     - Parsed secrets objects (per source, after schema-directed parsing + unflattening):
       - `api`: `{"database":{"url":"postgres://api-main"},"feature":{"enableBeta":false}}`
       - `shared`: `{"database":{"url":"postgres://shared"},"redis":{"url":"redis://shared"}}`
@@ -295,7 +417,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 ### Project Structure
 
-- `src/cli.ts`: CLI entry point using `commander` or `yargs`.
+- `src/cli.ts`: CLI entry point using `commander`.
 - `src/schema.ts`: Exported TypeBox schema (the "Source of Truth").
 - `src/engine.ts`: Orchestrates provider, Jsonnet evaluation, and validation.
 - `src/transformer.ts`: Flattens nested objects into `KEY_SUBKEY=value`.
@@ -307,7 +429,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 #### Core Commands
 
-````bash
+```bash
 # Global options (available on all commands)
   --ci                        # Disable prompts; require explicit flags like --confirm
   --strict                    # Treat warnings as errors (e.g., unknown keys)
@@ -365,8 +487,9 @@ zenfig list <service> [options]
   --show-values               # Print secret values (TTY only; use --unsafe-show-values for CI)
   --unsafe-show-values        # Allow printing secrets even when stdout is not a TTY (dangerous)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+```
 
-Examples:
+#### Examples
 
 ```bash
 # List all keys (redacted values)
@@ -374,7 +497,7 @@ zenfig list api --env prod
 
 # List keys with values in JSON format (local dev only)
 zenfig list api --env prod --format json --show-values
-````
+
 
 # Delete configuration value
 
@@ -422,8 +545,7 @@ zenfig doctor [options]
 --schema <path> # Schema path (default: src/schema.ts)
 --schema-export-name <name> # Schema export name (default: ConfigSchema)
 --jsonnet <path> # Jsonnet template path (default: config.jsonnet)
-
-````
+```
 
 ### Environment Variable Precedence
 
@@ -476,7 +598,7 @@ Example:
     }
   }
 }
-````
+```
 
 Rules:
 
@@ -969,7 +1091,7 @@ Validation Error [VAL005]: api.key
 **Message:** `SSM parameter does not exist`
 **Remediation:**
 
-- Verify parameter path: `<prefix>/<service>/<env>/<key>`
+- Verify parameter path: `<prefix>/<env>/<service>/<key>`
 - Check `--env` flag matches expected environment
 - Use `aws ssm get-parameters-by-path` to list available parameters
 
@@ -1251,11 +1373,11 @@ local databaseUrl = s.database.url + "?application_name=api";
 
 ### SSM State (Initial)
 
-- `/zenfig/api/prod/database/url = postgres://api-main`
-- `/zenfig/api/prod/feature/enableBeta = false`
-- `/zenfig/shared/prod/redis/url = redis://shared`
-- `/zenfig/shared/prod/api/timeoutMs = 60000`
-- `/zenfig/overrides/prod/feature/enableBeta = true`
+- `/zenfig/prod/api/database/url = postgres://api-main`
+- `/zenfig/prod/api/feature/enableBeta = false`
+- `/zenfig/prod/shared/redis/url = redis://shared`
+- `/zenfig/prod/shared/api/timeoutMs = 60000`
+- `/zenfig/prod/overrides/feature/enableBeta = true`
 
 ### Steps
 
@@ -1265,7 +1387,7 @@ local databaseUrl = s.database.url + "?application_name=api";
 zenfig upsert api api.timeoutMs 6500 --env prod
 ```
 
-Result: writes `/zenfig/api/prod/api/timeoutMs = 6500` (validated as `Type.Integer({ minimum: 1 })`).
+Result: writes `/zenfig/prod/api/api/timeoutMs = 6500` (validated as `Type.Integer({ minimum: 1 })`).
 
 2. **Upsert invalid value**
 
@@ -1338,7 +1460,7 @@ Result: Shows stored keys (and values if `--show-values` is provided), redacted 
 zenfig delete api legacy.setting --env prod --confirm
 ```
 
-Result: Deletes `/zenfig/api/prod/legacy/setting`, logs deletion with timestamp.
+Result: Deletes `/zenfig/prod/api/legacy/setting`, logs deletion with timestamp.
 
 8. **Save configuration snapshot**
 
@@ -1365,7 +1487,7 @@ Result: Shows diff of what would change, requires `--confirm` to apply.
 echo "supersecret" | zenfig upsert api jwt.secret --stdin --env prod
 ```
 
-Result: Writes `/zenfig/api/prod/jwt/secret` as SecureString, verifies encryption.
+Result: Writes `/zenfig/prod/api/jwt/secret` as SecureString, verifies encryption.
 
 ### Parsed Secrets (per source)
 
