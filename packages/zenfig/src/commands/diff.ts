@@ -13,6 +13,7 @@ import {
   type JsonnetError,
   type ProviderError,
   type SystemError,
+  unknownKeysError,
   type ValidationError,
   type ZenfigError,
 } from '../errors.js';
@@ -50,6 +51,7 @@ export type DiffEntry = {
 export type DiffResult = {
   readonly entries: ReadonlyArray<DiffEntry>;
   readonly hasChanges: boolean;
+  readonly warnings: ReadonlyArray<string>;
 };
 
 // --------------------------------------------------------------------------
@@ -64,7 +66,7 @@ export function executeDiff(
 ): Effect.Effect<DiffResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
   if (options._testEntries) {
     const hasChanges = options._testEntries.some((entry) => entry.status !== 'unchanged');
-    return Effect.succeed({ entries: options._testEntries, hasChanges });
+    return Effect.succeed({ entries: options._testEntries, hasChanges, warnings: [] });
   }
 
   return pipe(
@@ -89,21 +91,43 @@ export function executeDiff(
             checkProviderGuards(provider, ctx, config.providerGuards),
             Effect.flatMap(() => provider.fetch(ctx)),
             Effect.flatMap((kv) => parseProviderKV(kv, schema)),
-            Effect.map((parsed) => [svc, parsed] as const)
+            Effect.map((result) => ({
+              service: svc,
+              parsed: result.parsed,
+              unknownKeys: result.unknownKeys,
+            }))
           );
         }),
-        Effect.flatMap((storedByService) =>
-          pipe(
-            mergeConfigs(storedByService, {}),
+        Effect.flatMap((storedByService) => {
+          const unknownKeys = storedByService
+            .filter((entry) => entry.unknownKeys.length > 0)
+            .map((entry) => ({ service: entry.service, keys: entry.unknownKeys }));
+
+          if (unknownKeys.length > 0 && config.strict) {
+            const flattened = unknownKeys.flatMap((entry) => entry.keys.map((key) => `${entry.service}:${key}`));
+            return Effect.fail(unknownKeysError(flattened));
+          }
+
+          const warnings =
+            unknownKeys.length > 0
+              ? unknownKeys.map((entry) => `Unknown keys for service '${entry.service}': ${entry.keys.join(', ')}`)
+              : [];
+
+          return pipe(
+            mergeConfigs(
+              storedByService.map((entry) => [entry.service, entry.parsed] as const),
+              {}
+            ),
             Effect.map((mergedStored) => ({
               mergedStored,
               config,
+              warnings,
             }))
-          )
-        )
+          );
+        })
       );
     }),
-    Effect.flatMap(({ config, mergedStored }) => {
+    Effect.flatMap(({ config, mergedStored, warnings }) => {
       const flatStored = flatten(mergedStored.merged);
 
       // 4. Render config through Jsonnet
@@ -112,10 +136,11 @@ export function executeDiff(
         Effect.map((rendered) => ({
           flatStored,
           flatRendered: flatten(rendered),
+          warnings,
         }))
       );
     }),
-    Effect.map(({ flatRendered, flatStored }) => {
+    Effect.map(({ flatRendered, flatStored, warnings }) => {
       // 5. Compare
       const allKeys = new Set([...Object.keys(flatStored), ...Object.keys(flatRendered)]);
       const entries: Array<DiffEntry> = [];
@@ -137,7 +162,7 @@ export function executeDiff(
 
       const hasChanges = entries.some((e) => e.status !== 'unchanged');
 
-      return { entries, hasChanges };
+      return { entries, hasChanges, warnings };
     })
   );
 }
@@ -209,6 +234,10 @@ export function runDiff(
   return pipe(
     executeDiff(options),
     Effect.map((result) => {
+      for (const warning of result.warnings) {
+        console.error(`[zenfig] Warning: ${warning}`);
+      }
+
       const showValues = options.unsafeShowValues === true ? true : options.showValues && process.stdout.isTTY;
       const format = options.format ?? 'table';
 

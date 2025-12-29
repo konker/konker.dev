@@ -33,7 +33,7 @@ describe('MockProvider', () => {
     });
 
     it('should create provider with initial data', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       const provider = createMockProvider({
         [storageKey]: {
           'database.host': 'localhost',

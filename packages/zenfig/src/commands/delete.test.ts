@@ -62,7 +62,7 @@ describe('Delete Command', () => {
     vi.resetAllMocks();
     process.env = { ...originalEnv };
 
-    const storageKey = '/zenfig/api/dev';
+    const storageKey = '/zenfig/dev/api';
     mockProvider = createMockProvider({
       [storageKey]: {
         'database.host': 'localhost',
@@ -110,7 +110,7 @@ describe('Delete Command', () => {
     it('should warn for key not in schema but still delete', async () => {
       // Add an extra key that exists in provider but not in schema
       const mockProviderWithUnknownKey = createMockProvider({
-        '/zenfig/api/dev': {
+        '/zenfig/dev/api': {
           'database.host': 'localhost',
           'database.port': '5432',
           'unknown.key': 'some-value',

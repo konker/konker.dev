@@ -65,7 +65,7 @@ describe('Snapshot Commands', () => {
     vi.resetAllMocks();
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zenfig-snapshot-test-'));
 
-    const storageKey = '/zenfig/api/dev';
+    const storageKey = '/zenfig/dev/api';
     mockProvider = createMockProvider({
       [storageKey]: {
         'database.host': 'localhost',
@@ -153,10 +153,10 @@ describe('Snapshot Commands', () => {
 
     it('should save multiple services when sources specified', async () => {
       const mockProviderWithSources = createMockProvider({
-        '/zenfig/api/dev': {
+        '/zenfig/dev/api': {
           'database.host': 'localhost',
         },
-        '/zenfig/shared/dev': {
+        '/zenfig/dev/shared': {
           'database.port': '5432',
         },
       });

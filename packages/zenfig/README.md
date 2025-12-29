@@ -1,14 +1,13 @@
 # Zenfig
 
-CLI tool for configuration and secrets management using AWS SSM (via Chamber), Jsonnet, and TypeBox.
+CLI tool for configuration and secrets management using AWS SSM, Jsonnet, and TypeBox.
 
 ## Prerequisites
 
 - Node.js 18+ (or a compatible runtime)
 - pnpm
 - jsonnet CLI on PATH
-- chamber CLI on PATH (required for the default `chamber` provider)
-- AWS credentials if you use the `chamber` provider
+- AWS credentials and region configuration for the default `aws-ssm` provider
 
 ## Setup
 
@@ -34,13 +33,13 @@ Example `zenfigrc.json`:
 ```json
 {
   "env": "dev",
-  "provider": "chamber",
+  "provider": "aws-ssm",
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
   "schemaExportName": "ConfigSchema",
   "jsonnet": "config.jsonnet",
   "providerGuards": {
-    "chamber": {
+    "aws-ssm": {
       "accountId": "123456789012",
       "region": "us-east-1"
     }
@@ -50,8 +49,8 @@ Example `zenfigrc.json`:
 
 Provider guards are provider-specific safety checks that run before any provider operation. They can be bypassed with
 `ZENFIG_IGNORE_PROVIDER_GUARDS=1` for emergencies.
-For `chamber`, `accountId` is resolved from `AWS_ACCOUNT_ID` or `aws sts get-caller-identity`, and `region` is resolved
-from `AWS_REGION`/`AWS_DEFAULT_REGION` or `aws configure get region`.
+For `aws-ssm`, `accountId` is resolved from `AWS_ACCOUNT_ID` or STS `GetCallerIdentity`, and `region` is resolved
+from `AWS_REGION`/`AWS_DEFAULT_REGION` or the AWS SDK client configuration.
 
 Environment overrides:
 

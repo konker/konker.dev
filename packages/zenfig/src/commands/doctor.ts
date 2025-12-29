@@ -186,22 +186,8 @@ export function executeDoctor(options: DoctorOptions): Effect.Effect<DoctorResul
         })
       )
     ),
-    Effect.flatMap(({ checks, config }) => {
-      // 2. Check chamber binary (if using chamber provider)
-      if (config.provider === 'chamber') {
-        return pipe(
-          checkBinary('chamber'),
-          Effect.map((chamberCheck) => {
-            checks.push(chamberCheck);
-            printCheck(chamberCheck);
-            return { config, checks };
-          })
-        );
-      }
-      return Effect.succeed({ config, checks });
-    }),
     Effect.flatMap(({ checks, config }) =>
-      // 3. Check schema file
+      // 2. Check schema file
       pipe(
         checkFile(config.schema, 'Schema file'),
         Effect.map((schemaFileCheck) => {
@@ -212,7 +198,7 @@ export function executeDoctor(options: DoctorOptions): Effect.Effect<DoctorResul
       )
     ),
     Effect.flatMap(({ checks, config, schemaFileCheck }) =>
-      // 4. Check Jsonnet template file
+      // 3. Check Jsonnet template file
       pipe(
         checkFile(config.jsonnet, 'Jsonnet template'),
         Effect.map((jsonnetFileCheck) => {
@@ -223,7 +209,7 @@ export function executeDoctor(options: DoctorOptions): Effect.Effect<DoctorResul
       )
     ),
     Effect.flatMap(({ checks, config, schemaFileCheck }) => {
-      // 5. Check schema loading
+      // 4. Check schema loading
       if (schemaFileCheck.status === 'ok') {
         return pipe(
           checkSchema(config.schema, config.schemaExportName),
@@ -237,7 +223,7 @@ export function executeDoctor(options: DoctorOptions): Effect.Effect<DoctorResul
       return Effect.succeed({ config, checks });
     }),
     Effect.flatMap(({ checks, config }) =>
-      // 6. Check provider registration
+      // 5. Check provider registration
       pipe(
         checkProvider(config.provider),
         Effect.map((providerCheck) => {

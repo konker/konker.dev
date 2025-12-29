@@ -354,12 +354,13 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         database: {
           host: 'localhost',
           port: 5432,
         },
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should handle deeply nested paths', async () => {
@@ -377,13 +378,14 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         level1: {
           level2: {
             value: 'deep',
           },
         },
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should handle optional fields', async () => {
@@ -399,10 +401,11 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         required: 'value',
         optional: 'also-value',
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should handle empty key-value map', async () => {
@@ -412,7 +415,8 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV({}, schema));
 
-      expect(result).toEqual({});
+      expect(result.parsed).toEqual({});
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should fail on invalid value for type', async () => {
@@ -422,6 +426,18 @@ describe('parser', () => {
 
       const kv = {
         count: 'not-a-number',
+      };
+
+      await expect(Effect.runPromise(parseProviderKV(kv, schema))).rejects.toThrow();
+    });
+
+    it('should fail on invalid key segments', async () => {
+      const schema = Type.Object({
+        key: Type.String(),
+      });
+
+      const kv = {
+        'bad/key': 'value',
       };
 
       await expect(Effect.runPromise(parseProviderKV(kv, schema))).rejects.toThrow();
@@ -442,11 +458,12 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         a: 'valueA',
         b: 'valueB',
         c: 'valueC',
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should overwrite intermediate objects if path conflicts', async () => {
@@ -463,11 +480,12 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         parent: {
           child: 'value1',
         },
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should handle nested optional objects during navigation', async () => {
@@ -485,11 +503,12 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         outer: {
           inner: 'value',
         },
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should unwrap optional schemas during navigation', async () => {
@@ -517,11 +536,12 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         outer: {
           inner: 'value',
         },
       });
+      expect(result.unknownKeys).toEqual([]);
     });
 
     it('should parse paths even when schema is not an object', async () => {
@@ -532,11 +552,12 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         a: {
           b: 'value',
         },
       });
+      expect(result.unknownKeys).toEqual(['a.b']);
     });
 
     it('should keep schema when path segment is missing', async () => {
@@ -552,11 +573,12 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         unknown: {
-          value: {},
+          value: '{}',
         },
       });
+      expect(result.unknownKeys).toEqual(['unknown.value']);
     });
 
     it('should handle deeply nested paths with intermediate objects', async () => {
@@ -574,13 +596,14 @@ describe('parser', () => {
 
       const result = await Effect.runPromise(parseProviderKV(kv, schema));
 
-      expect(result).toEqual({
+      expect(result.parsed).toEqual({
         a: {
           b: {
             c: 'deep',
           },
         },
       });
+      expect(result.unknownKeys).toEqual([]);
     });
   });
 });

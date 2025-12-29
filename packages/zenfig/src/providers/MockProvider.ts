@@ -21,7 +21,7 @@ import {
 // --------------------------------------------------------------------------
 
 /**
- * Storage key format: "prefix/service/env"
+ * Storage key format: "prefix/env/service"
  */
 type StorageKey = string;
 
@@ -95,7 +95,7 @@ export function createMockProvider(
     }
   }
 
-  const getStorageKey = (ctx: ProviderContext): StorageKey => `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+  const getStorageKey = (ctx: ProviderContext): StorageKey => `${ctx.prefix}/${ctx.env}/${ctx.service}`;
 
   const capabilities: ProviderCapabilities = {
     secureWrite: true,

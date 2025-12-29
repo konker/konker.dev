@@ -66,7 +66,7 @@ describe('Export Command', () => {
   beforeEach(() => {
     vi.resetAllMocks();
 
-    const storageKey = '/zenfig/api/dev';
+    const storageKey = '/zenfig/dev/api';
     mockProvider = createMockProvider({
       [storageKey]: {
         'database.host': 'localhost',
@@ -151,10 +151,10 @@ describe('Export Command', () => {
 
     it('should merge multiple sources', async () => {
       const mockProviderWithSources = createMockProvider({
-        '/zenfig/api/dev': {
+        '/zenfig/dev/api': {
           'database.host': 'api-host',
         },
-        '/zenfig/shared/dev': {
+        '/zenfig/dev/shared': {
           'database.port': '5432',
         },
       });
@@ -181,10 +181,10 @@ describe('Export Command', () => {
 
     it('should detect merge conflicts', async () => {
       const mockProviderWithConflicts = createMockProvider({
-        '/zenfig/api/dev': {
+        '/zenfig/dev/api': {
           'database.host': 'api-host',
         },
-        '/zenfig/shared/dev': {
+        '/zenfig/dev/shared': {
           'database.host': 'shared-host', // Same key, different value
         },
       });
@@ -272,10 +272,10 @@ describe('Export Command', () => {
 
     it('should print warnings to stderr', async () => {
       const mockProviderWithConflicts = createMockProvider({
-        '/zenfig/api/dev': {
+        '/zenfig/dev/api': {
           'database.host': 'api-host',
         },
-        '/zenfig/shared/dev': {
+        '/zenfig/dev/shared': {
           'database.host': 'shared-host',
         },
       });

@@ -164,7 +164,7 @@ export function runUpsert(
     executeUpsert(options),
     Effect.map((result) => {
       console.log(
-        `Successfully wrote ${result.canonicalKey} to ${options.config.ssmPrefix}/${options.service}/${options.config.env}`
+        `Successfully wrote ${result.canonicalKey} to ${options.config.ssmPrefix}/${options.config.env}/${options.service}`
       );
 
       if (!result.encrypted) {

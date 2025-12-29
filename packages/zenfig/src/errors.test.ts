@@ -23,6 +23,7 @@ import {
   formatError,
   formatViolationError,
   invalidFlagError,
+  invalidKeyPathError,
   invalidTypeError,
   JsonnetError,
   jsonnetInvalidOutputError,
@@ -38,6 +39,7 @@ import {
   providerGuardMismatchError,
   snapshotSchemaMismatchError,
   SystemError,
+  unknownKeysError,
   ValidationError,
   writePermissionDeniedError,
   ZenfigError,
@@ -144,6 +146,23 @@ describe('errors', () => {
         expect(error.context.availableKeys).toBeUndefined();
       });
 
+      it('invalidKeyPathError should create correct error', () => {
+        const error = invalidKeyPathError('bad/key', "Invalid key segment '/'");
+
+        expect(error.context.code).toBe(ErrorCode.VAL004);
+        expect(error.context.path).toBe('bad/key');
+        expect(error.context.problem).toContain('Invalid key segment');
+      });
+
+      it('unknownKeysError should create correct error', () => {
+        const error = unknownKeysError(['unknown.a', 'unknown.b']);
+
+        expect(error.context.code).toBe(ErrorCode.VAL004);
+        expect(error.context.path).toBe('unknown.a');
+        expect(error.context.problem).toContain('unknown.a');
+        expect(error.context.problem).toContain('unknown.b');
+      });
+
       it('nullNotAllowedError should create correct error', () => {
         const error = nullNotAllowedError('name', 'string');
 
@@ -156,14 +175,14 @@ describe('errors', () => {
 
     describe('provider errors', () => {
       it('connectionFailedError should create correct error', () => {
-        const error = connectionFailedError('chamber', 'Network timeout');
+        const error = connectionFailedError('aws-ssm', 'Network timeout');
 
         expect(error.context.code).toBe(ErrorCode.PROV001);
         expect(error.context.problem).toBe('Network timeout');
       });
 
       it('connectionFailedError should use default message', () => {
-        const error = connectionFailedError('ssm');
+        const error = connectionFailedError('aws-ssm');
 
         expect(error.context.code).toBe(ErrorCode.PROV001);
         expect(error.context.problem).toContain('ssm');
@@ -177,18 +196,18 @@ describe('errors', () => {
       });
 
       it('authenticationFailedError should use default message', () => {
-        const error = authenticationFailedError('chamber');
+        const error = authenticationFailedError('aws-ssm');
 
         expect(error.context.code).toBe(ErrorCode.PROV002);
-        expect(error.context.problem).toContain('chamber');
+        expect(error.context.problem).toContain('aws-ssm');
       });
 
       it('parameterNotFoundError should create correct error', () => {
-        const error = parameterNotFoundError('db.password', '/zenfig/api/prod/db/password');
+        const error = parameterNotFoundError('db.password', '/zenfig/prod/api/db/password');
 
         expect(error.context.code).toBe(ErrorCode.PROV003);
         expect(error.context.path).toBe('db.password');
-        expect(error.context.problem).toContain('/zenfig/api/prod/db/password');
+        expect(error.context.problem).toContain('/zenfig/prod/api/db/password');
       });
 
       it('encryptionVerificationFailedError should create correct error', () => {
@@ -214,10 +233,10 @@ describe('errors', () => {
       });
 
       it('providerGuardMismatchError should create correct error', () => {
-        const error = providerGuardMismatchError('chamber', 'accountId mismatch');
+        const error = providerGuardMismatchError('aws-ssm', 'accountId mismatch');
 
         expect(error.context.code).toBe(ErrorCode.PROV006);
-        expect(error.context.problem).toContain('chamber');
+        expect(error.context.problem).toContain('aws-ssm');
         expect(error.context.problem).toContain('accountId mismatch');
       });
     });
@@ -287,14 +306,6 @@ describe('errors', () => {
         expect(error.context.code).toBe(ErrorCode.SYS001);
         expect(error.context.problem).toContain('jsonnet');
         expect(error.context.remediation).toContain('go-jsonnet');
-      });
-
-      it('binaryNotFoundError should create correct error for chamber', () => {
-        const error = binaryNotFoundError('chamber');
-
-        expect(error.context.code).toBe(ErrorCode.SYS001);
-        expect(error.context.problem).toContain('chamber');
-        expect(error.context.remediation).toContain('chamber');
       });
 
       it('binaryNotFoundError should create correct error for other binaries', () => {
@@ -428,7 +439,7 @@ describe('errors', () => {
     });
 
     it('should format error without path', () => {
-      const error = connectionFailedError('chamber');
+      const error = connectionFailedError('aws-ssm');
       const formatted = formatError(error);
 
       expect(formatted).toContain('Provider Error [PROV001]');

@@ -1,8 +1,8 @@
 /**
  * Provider Registry Tests
  */
-// Import ChamberProvider to trigger its side-effect registration
-import './ChamberProvider.js';
+// Import AwsSsmProvider to trigger its side-effect registration
+import './AwsSsmProvider.js';
 
 import * as Effect from 'effect/Effect';
 import { describe, expect, it } from 'vitest';
@@ -49,10 +49,10 @@ describe('Provider Registry', () => {
       expect(provider.name).toBe('mock');
     });
 
-    it('should return chamber provider', async () => {
-      const provider = await Effect.runPromise(getProvider('chamber'));
+    it('should return aws-ssm provider', async () => {
+      const provider = await Effect.runPromise(getProvider('aws-ssm'));
 
-      expect(provider.name).toBe('chamber');
+      expect(provider.name).toBe('aws-ssm');
     });
 
     it('should be case-insensitive', async () => {
@@ -81,7 +81,7 @@ describe('Provider Registry', () => {
       const providers = getRegisteredProviders();
 
       expect(providers).toContain('mock');
-      expect(providers).toContain('chamber');
+      expect(providers).toContain('aws-ssm');
     });
 
     it('should return lowercase names', () => {
@@ -96,7 +96,7 @@ describe('Provider Registry', () => {
   describe('isProviderRegistered', () => {
     it('should return true for registered providers', () => {
       expect(isProviderRegistered('mock')).toBe(true);
-      expect(isProviderRegistered('chamber')).toBe(true);
+      expect(isProviderRegistered('aws-ssm')).toBe(true);
     });
 
     it('should return false for unregistered providers', () => {
@@ -105,7 +105,7 @@ describe('Provider Registry', () => {
 
     it('should be case-insensitive', () => {
       expect(isProviderRegistered('Mock')).toBe(true);
-      expect(isProviderRegistered('CHAMBER')).toBe(true);
+      expect(isProviderRegistered('AWS-SSM')).toBe(true);
     });
   });
 });

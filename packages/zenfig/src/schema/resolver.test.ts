@@ -125,10 +125,10 @@ describe('resolver', () => {
       expect(result.segments).toEqual(['database', 'connection', 'timeout']);
     });
 
-    it('should resolve path case-insensitively', async () => {
-      const result = await Effect.runPromise(resolvePath(TestSchema, 'DATABASE.HOST'));
+    it('should fail for case-mismatched path', async () => {
+      const result = await Effect.runPromiseExit(resolvePath(TestSchema, 'DATABASE.HOST'));
 
-      expect(result.canonicalPath).toBe('database.host');
+      expect(result._tag).toBe('Failure');
     });
 
     it('should resolve path through optional', async () => {
@@ -177,6 +177,12 @@ describe('resolver', () => {
 
       expect(result._tag).toBe('Failure');
     });
+
+    it('should fail for invalid key segment characters', async () => {
+      const result = await Effect.runPromiseExit(resolvePath(TestSchema, 'database/host'));
+
+      expect(result._tag).toBe('Failure');
+    });
   });
 
   describe('canonicalizePath', () => {
@@ -186,8 +192,8 @@ describe('resolver', () => {
       }),
     });
 
-    it('should return canonical path with correct casing', async () => {
-      const result = await Effect.runPromise(canonicalizePath(TestSchema, 'database.host'));
+    it('should return canonical path when casing matches', async () => {
+      const result = await Effect.runPromise(canonicalizePath(TestSchema, 'Database.Host'));
 
       expect(result).toBe('Database.Host');
     });

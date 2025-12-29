@@ -243,6 +243,31 @@ export function keyNotFoundError(path: string, availableKeys?: ReadonlyArray<str
   });
 }
 
+export function invalidKeyPathError(path: string, problem: string): ValidationError {
+  return new ValidationError({
+    message: 'Invalid key path',
+    context: {
+      code: ErrorCode.VAL004,
+      path,
+      problem,
+      remediation: 'Use dot notation with segments matching ^[A-Za-z0-9_-]+$',
+    },
+  });
+}
+
+export function unknownKeysError(keys: ReadonlyArray<string>): ValidationError {
+  const sample = keys[0] ?? '(unknown)';
+  return new ValidationError({
+    message: 'Unknown keys not allowed in strict mode',
+    context: {
+      code: ErrorCode.VAL004,
+      path: sample,
+      problem: `Unknown keys: ${keys.join(', ')}`,
+      remediation: 'Remove unknown keys or update the schema',
+    },
+  });
+}
+
 export function nullNotAllowedError(path: string, expected: string): ValidationError {
   return new ValidationError({
     message: 'Null value not permitted for this key',
@@ -264,7 +289,7 @@ export function connectionFailedError(provider: string, details?: string): Provi
     context: {
       code: ErrorCode.PROV001,
       problem: details ?? `Could not connect to ${provider}`,
-      remediation: `Check network connectivity, verify AWS credentials (for chamber/SSM), check provider binary is in PATH`,
+      remediation: 'Check network connectivity, verify AWS credentials, and ensure region is configured',
     },
   });
 }
@@ -423,9 +448,7 @@ export function binaryNotFoundError(binary: string): SystemError {
       remediation:
         binary === 'jsonnet'
           ? 'Install jsonnet: brew install go-jsonnet or build from source'
-          : binary === 'chamber'
-            ? 'Install chamber: go install github.com/segmentio/chamber/v2@latest'
-            : `Install ${binary} and ensure it is in PATH`,
+          : `Install ${binary} and ensure it is in PATH`,
     },
   });
 }

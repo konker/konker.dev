@@ -45,7 +45,7 @@ describe('config', () => {
       const result = await Effect.runPromise(resolveConfig());
 
       expect(result.env).toBe('dev');
-      expect(result.provider).toBe('chamber');
+      expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/zenfig');
       expect(result.schema).toBe('src/schema.ts');
       expect(result.schemaExportName).toBe('ConfigSchema');
@@ -91,11 +91,11 @@ describe('config', () => {
 
     it('should use ZENFIG_PROVIDER when set', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
-      process.env.ZENFIG_PROVIDER = 'ssm';
+      process.env.ZENFIG_PROVIDER = 'aws-ssm';
 
       const result = await Effect.runPromise(resolveConfig());
 
-      expect(result.provider).toBe('ssm');
+      expect(result.provider).toBe('aws-ssm');
     });
 
     it('should use ZENFIG_SSM_PREFIX when set', async () => {
@@ -204,7 +204,7 @@ describe('config', () => {
     it('should load config from zenfigrc.json', async () => {
       const rcConfig = {
         env: 'staging',
-        provider: 'ssm',
+        provider: 'aws-ssm',
         ssmPrefix: '/app',
         schema: 'config/schema.ts',
         schemaExportName: 'AppSchema',
@@ -215,7 +215,7 @@ describe('config', () => {
         cache: '.zenfig-cache',
         jsonnetTimeoutMs: 45000,
         providerGuards: {
-          chamber: {
+          'aws-ssm': {
             accountId: '123456789012',
             region: 'us-east-1',
           },
@@ -228,7 +228,7 @@ describe('config', () => {
       const result = await Effect.runPromise(resolveConfig());
 
       expect(result.env).toBe('staging');
-      expect(result.provider).toBe('ssm');
+      expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/app');
       expect(result.schema).toBe('config/schema.ts');
       expect(result.schemaExportName).toBe('AppSchema');
@@ -239,7 +239,7 @@ describe('config', () => {
       expect(result.cache).toBe('.zenfig-cache');
       expect(result.jsonnetTimeoutMs).toBe(45000);
       expect(result.providerGuards).toEqual({
-        chamber: {
+        'aws-ssm': {
           accountId: '123456789012',
           region: 'us-east-1',
         },
@@ -251,7 +251,7 @@ describe('config', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(`{
         // JSON5 comments allowed
         env: 'staging',
-        provider: 'ssm',
+        provider: 'aws-ssm',
         ssmPrefix: '/app',
         schema: 'config/schema.ts',
         schemaExportName: 'AppSchema',
@@ -262,7 +262,7 @@ describe('config', () => {
         cache: '.zenfig-cache',
         jsonnetTimeoutMs: 45000,
         providerGuards: {
-          chamber: {
+          'aws-ssm': {
             accountId: '123456789012',
             region: 'us-east-1',
           },
@@ -272,7 +272,7 @@ describe('config', () => {
       const result = await Effect.runPromise(resolveConfig());
 
       expect(result.env).toBe('staging');
-      expect(result.provider).toBe('ssm');
+      expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/app');
       expect(result.schema).toBe('config/schema.ts');
       expect(result.schemaExportName).toBe('AppSchema');
@@ -283,7 +283,7 @@ describe('config', () => {
       expect(result.cache).toBe('.zenfig-cache');
       expect(result.jsonnetTimeoutMs).toBe(45000);
       expect(result.providerGuards).toEqual({
-        chamber: {
+        'aws-ssm': {
           accountId: '123456789012',
           region: 'us-east-1',
         },
@@ -511,7 +511,7 @@ describe('config', () => {
   describe('mergeCliOptions', () => {
     const baseConfig: ResolvedConfig = {
       env: 'dev',
-      provider: 'chamber',
+      provider: 'aws-ssm',
       ssmPrefix: '/zenfig',
       schema: 'src/schema.ts',
       schemaExportName: 'ConfigSchema',
@@ -532,8 +532,8 @@ describe('config', () => {
     });
 
     it('should override provider from CLI', () => {
-      const result = mergeCliOptions(baseConfig, { provider: 'ssm' });
-      expect(result.provider).toBe('ssm');
+      const result = mergeCliOptions(baseConfig, { provider: 'aws-ssm' });
+      expect(result.provider).toBe('aws-ssm');
     });
 
     it('should override ssmPrefix from CLI', () => {

@@ -64,4 +64,4 @@ export function isProviderRegistered(name: string): boolean {
 // Register mock provider
 registerProvider('mock', () => mockProvider);
 
-// Note: ChamberProvider will be registered separately in ChamberProvider.ts
+// Note: AwsSsmProvider will be registered separately in AwsSsmProvider.ts

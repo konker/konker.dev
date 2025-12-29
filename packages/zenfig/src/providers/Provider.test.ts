@@ -73,15 +73,15 @@ describe('Provider', () => {
     };
 
     it('should build full path for simple key', () => {
-      expect(buildFullPath(ctx, 'database.url')).toBe('/zenfig/api/prod/database/url');
+      expect(buildFullPath(ctx, 'database.url')).toBe('/zenfig/prod/api/database/url');
     });
 
     it('should build full path for nested key', () => {
-      expect(buildFullPath(ctx, 'database.connection.url')).toBe('/zenfig/api/prod/database/connection/url');
+      expect(buildFullPath(ctx, 'database.connection.url')).toBe('/zenfig/prod/api/database/connection/url');
     });
 
     it('should build full path for single segment key', () => {
-      expect(buildFullPath(ctx, 'timeout')).toBe('/zenfig/api/prod/timeout');
+      expect(buildFullPath(ctx, 'timeout')).toBe('/zenfig/prod/api/timeout');
     });
 
     it('should handle different context values', () => {
@@ -90,7 +90,7 @@ describe('Provider', () => {
         service: 'myapp',
         env: 'staging',
       };
-      expect(buildFullPath(customCtx, 'api.key')).toBe('/custom/myapp/staging/api/key');
+      expect(buildFullPath(customCtx, 'api.key')).toBe('/custom/staging/myapp/api/key');
     });
 
     it('should handle context with empty prefix', () => {
@@ -99,7 +99,7 @@ describe('Provider', () => {
         service: 'api',
         env: 'prod',
       };
-      expect(buildFullPath(ctxNoPrefix, 'database.url')).toBe('/api/prod/database/url');
+      expect(buildFullPath(ctxNoPrefix, 'database.url')).toBe('/prod/api/database/url');
     });
   });
 
@@ -111,15 +111,15 @@ describe('Provider', () => {
     };
 
     it('should extract key path from full path', () => {
-      expect(extractKeyPath('/zenfig/api/prod/database/url', ctx)).toBe('database.url');
+      expect(extractKeyPath('/zenfig/prod/api/database/url', ctx)).toBe('database.url');
     });
 
     it('should extract nested key path', () => {
-      expect(extractKeyPath('/zenfig/api/prod/database/connection/url', ctx)).toBe('database.connection.url');
+      expect(extractKeyPath('/zenfig/prod/api/database/connection/url', ctx)).toBe('database.connection.url');
     });
 
     it('should extract single segment key path', () => {
-      expect(extractKeyPath('/zenfig/api/prod/timeout', ctx)).toBe('timeout');
+      expect(extractKeyPath('/zenfig/prod/api/timeout', ctx)).toBe('timeout');
     });
 
     it('should handle path that does not match prefix', () => {
@@ -133,11 +133,11 @@ describe('Provider', () => {
         service: 'myapp',
         env: 'staging',
       };
-      expect(extractKeyPath('/custom/myapp/staging/api/key', customCtx)).toBe('api.key');
+      expect(extractKeyPath('/custom/staging/myapp/api/key', customCtx)).toBe('api.key');
     });
 
     it('should handle empty key path', () => {
-      expect(extractKeyPath('/zenfig/api/prod/', ctx)).toBe('');
+      expect(extractKeyPath('/zenfig/prod/api/', ctx)).toBe('');
     });
   });
 });

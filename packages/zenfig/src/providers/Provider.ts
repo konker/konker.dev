@@ -1,7 +1,7 @@
 /**
  * Provider Interface
  *
- * Defines the contract for configuration providers (Chamber, AWS Secrets Manager, Vault, etc.)
+ * Defines the contract for configuration providers (AWS SSM, AWS Secrets Manager, Vault, etc.)
  */
 import type { Effect } from 'effect';
 
@@ -113,20 +113,22 @@ export function slashToDotPath(slashPath: string): string {
 /**
  * Build the full SSM parameter path
  * Example: buildFullPath({ prefix: "/zenfig", service: "api", env: "prod" }, "database.url")
- *          -> "/zenfig/api/prod/database/url"
+ *          -> "/zenfig/prod/api/database/url"
  */
 export function buildFullPath(ctx: ProviderContext, keyPath: string): string {
+  const prefix = ctx.prefix.endsWith('/') ? ctx.prefix.slice(0, -1) : ctx.prefix;
   const slashKeyPath = dotToSlashPath(keyPath);
-  return `${ctx.prefix}/${ctx.service}/${ctx.env}/${slashKeyPath}`;
+  return `${prefix}/${ctx.env}/${ctx.service}/${slashKeyPath}`;
 }
 
 /**
  * Extract the key path from a full SSM parameter path
- * Example: extractKeyPath("/zenfig/api/prod/database/url", { prefix: "/zenfig", service: "api", env: "prod" })
+ * Example: extractKeyPath("/zenfig/prod/api/database/url", { prefix: "/zenfig", service: "api", env: "prod" })
  *          -> "database.url"
  */
 export function extractKeyPath(fullPath: string, ctx: ProviderContext): string {
-  const basePrefix = `${ctx.prefix}/${ctx.service}/${ctx.env}/`;
+  const prefix = ctx.prefix.endsWith('/') ? ctx.prefix.slice(0, -1) : ctx.prefix;
+  const basePrefix = `${prefix}/${ctx.env}/${ctx.service}/`;
   if (fullPath.startsWith(basePrefix)) {
     return slashToDotPath(fullPath.slice(basePrefix.length));
   }

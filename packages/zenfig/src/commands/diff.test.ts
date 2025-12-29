@@ -67,7 +67,7 @@ describe('Diff Command', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zenfig-diff-test-'));
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
 
-    const storageKey = '/zenfig/api/dev';
+    const storageKey = '/zenfig/dev/api';
     mockProvider = createMockProvider({
       [storageKey]: {
         'database.host': 'localhost',
@@ -109,6 +109,7 @@ describe('Diff Command', () => {
       );
 
       expect(result.hasChanges).toBe(false);
+      expect(result.warnings).toEqual([]);
       expect(result.entries.every((e) => e.status === 'unchanged')).toBe(true);
     });
 
@@ -129,6 +130,7 @@ describe('Diff Command', () => {
       );
 
       expect(result.hasChanges).toBe(true);
+      expect(result.warnings).toEqual([]);
 
       const hostEntry = result.entries.find((e) => e.key === 'database.host');
       expect(hostEntry?.status).toBe('modified');
@@ -156,6 +158,7 @@ describe('Diff Command', () => {
       );
 
       expect(result.hasChanges).toBe(true);
+      expect(result.warnings).toEqual([]);
 
       const retriesEntry = result.entries.find((e) => e.key === 'api.maxRetries');
       expect(retriesEntry?.status).toBe('added');
@@ -180,6 +183,7 @@ describe('Diff Command', () => {
       );
 
       expect(result.hasChanges).toBe(true);
+      expect(result.warnings).toEqual([]);
 
       const timeoutEntry = result.entries.find((e) => e.key === 'api.timeout');
       expect(timeoutEntry?.status).toBe('removed');
@@ -188,9 +192,9 @@ describe('Diff Command', () => {
     });
 
     it('should handle multiple sources', async () => {
-      const sourceStorageKey = '/zenfig/shared/dev';
+      const sourceStorageKey = '/zenfig/dev/shared';
       const mockProviderWithSources = createMockProvider({
-        '/zenfig/api/dev': {
+        '/zenfig/dev/api': {
           'database.host': 'localhost',
         },
         [sourceStorageKey]: {

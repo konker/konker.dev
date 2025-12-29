@@ -9,7 +9,7 @@ import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
 import { invalidTypeError, type ValidationError } from '../errors.js';
-import { getTypeDescription, isOptionalSchema, unwrapOptional } from './resolver.js';
+import { getTypeDescription, isObjectSchema, unwrapOptional, validateKeyPathSegments } from './resolver.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -235,58 +235,77 @@ export function serializeValue(value: unknown, schema: TSchema): string {
  * @param kv - Flat map of canonical dot paths to string values
  * @param schema - The TypeBox schema
  */
+export type ProviderParseResult = {
+  readonly parsed: Record<string, unknown>;
+  readonly unknownKeys: ReadonlyArray<string>;
+};
+
+function resolveSchemaForSegments(
+  rootSchema: TSchema,
+  segments: ReadonlyArray<string>
+): { readonly schema: TSchema | undefined; readonly known: boolean } {
+  let currentSchema = rootSchema;
+
+  for (const segment of segments) {
+    currentSchema = unwrapOptional(currentSchema);
+
+    if (!isObjectSchema(currentSchema)) {
+      return { schema: undefined, known: false };
+    }
+
+    const props = currentSchema.properties;
+    const propSchema = props[segment];
+    if (!propSchema) {
+      return { schema: undefined, known: false };
+    }
+
+    currentSchema = propSchema as TSchema;
+  }
+
+  return { schema: currentSchema, known: true };
+}
+
 export function parseProviderKV(
   kv: Record<string, string>,
   schema: TSchema
-): Effect.Effect<Record<string, unknown>, ValidationError> {
+): Effect.Effect<ProviderParseResult, ValidationError> {
   return pipe(
     Effect.forEach(Object.entries(kv), ([path, value]) =>
       pipe(
-        Effect.sync(() => {
-          // Split path and navigate schema
-          const segments = path.split('.');
-          let currentSchema = schema;
-
-          for (let i = 0; i < segments.length; i++) {
-            const segment = segments[i]!;
-
-            // Navigate schema
-            if (currentSchema[Kind] === 'Object' && 'properties' in currentSchema) {
-              const props = (currentSchema as TSchema & { properties: Record<string, TSchema> }).properties;
-              const propSchema = props[segment];
-              if (propSchema) {
-                currentSchema = propSchema;
-              }
-            }
-
-            // Unwrap optional for navigation if not last
-            if (i < segments.length - 1 && isOptionalSchema(currentSchema)) {
-              currentSchema = unwrapOptional(currentSchema);
-            }
+        validateKeyPathSegments(path),
+        Effect.map((segments) => {
+          const resolved = resolveSchemaForSegments(schema, segments);
+          return { path, value, segments, resolved };
+        }),
+        Effect.flatMap(({ path: keyPath, resolved, segments, value }) => {
+          if (!resolved.known || !resolved.schema) {
+            return Effect.succeed({ segments, parsed: value, known: false, path: keyPath });
           }
 
-          return { path, segments, currentSchema };
-        }),
-        Effect.flatMap(({ currentSchema, path: keyPath, segments }) =>
-          pipe(
-            parseValue(value, currentSchema, keyPath),
-            Effect.map((parsed) => ({ segments, parsed }))
-          )
-        )
+          return pipe(
+            parseValue(value, resolved.schema, keyPath),
+            Effect.map((parsed) => ({ segments, parsed, known: true, path: keyPath }))
+          );
+        })
       )
     ),
     Effect.map((results) => {
-      const result: Record<string, unknown> = {};
+      const parsed: Record<string, unknown> = {};
+      const unknownKeys: Array<string> = [];
 
-      for (const { parsed, segments } of results) {
-        let current: Record<string, unknown> = result;
+      for (const { known, parsed: value, path, segments } of results) {
+        if (!known) {
+          unknownKeys.push(path);
+        }
+
+        let current: Record<string, unknown> = parsed;
 
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i]!;
           const isLast = i === segments.length - 1;
 
           if (isLast) {
-            current[segment] = parsed;
+            current[segment] = value;
           } else {
             if (!(segment in current) || typeof current[segment] !== 'object') {
               current[segment] = {};
@@ -296,7 +315,7 @@ export function parseProviderKV(
         }
       }
 
-      return result;
+      return { parsed, unknownKeys };
     })
   );
 }

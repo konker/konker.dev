@@ -98,40 +98,6 @@ describe('Doctor Command', () => {
       expect(result.checks.some((c) => c.name === 'Binary: jsonnet')).toBe(true);
     });
 
-    it('should check chamber binary when provider is chamber', async () => {
-      const config: ResolvedConfig = {
-        ...defaultConfig,
-        provider: 'chamber',
-        schema: path.join(tempDir, 'schema.ts'),
-        jsonnet: path.join(tempDir, 'config.jsonnet'),
-      };
-
-      // Create required files
-      fs.writeFileSync(config.schema, 'export const ConfigSchema = {}');
-      fs.writeFileSync(config.jsonnet, '{}');
-
-      const result = await Effect.runPromise(executeDoctor({ config }));
-
-      expect(result.checks.some((c) => c.name === 'Binary: chamber')).toBe(true);
-    });
-
-    it('should not check chamber binary when provider is mock', async () => {
-      const config: ResolvedConfig = {
-        ...defaultConfig,
-        provider: 'mock',
-        schema: path.join(tempDir, 'schema.ts'),
-        jsonnet: path.join(tempDir, 'config.jsonnet'),
-      };
-
-      // Create required files
-      fs.writeFileSync(config.schema, 'export const ConfigSchema = {}');
-      fs.writeFileSync(config.jsonnet, '{}');
-
-      const result = await Effect.runPromise(executeDoctor({ config }));
-
-      expect(result.checks.some((c) => c.name === 'Binary: chamber')).toBe(false);
-    });
-
     it('should report error when binary not found', async () => {
       vi.mocked(execa).mockImplementation((cmd, _args) => {
         if (cmd === 'which') {

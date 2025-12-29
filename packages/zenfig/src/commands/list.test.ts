@@ -163,7 +163,7 @@ describe('List Command', () => {
     });
 
     it('should return sorted keys from provider', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: {
           'zebra.key': 'z-value',
@@ -189,7 +189,7 @@ describe('List Command', () => {
     });
 
     it('should sort keys case-insensitively', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: {
           'Zebra.key': 'z-value',
@@ -216,7 +216,7 @@ describe('List Command', () => {
 
   describe('runList', () => {
     it('should output keys format by default', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: {
           'database.url': 'postgres://localhost',
@@ -236,7 +236,7 @@ describe('List Command', () => {
     });
 
     it('should output keys format when format is "keys"', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: { key1: 'value1' },
       });
@@ -254,7 +254,7 @@ describe('List Command', () => {
     });
 
     it('should output table format when format is "table"', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: { 'test.key': 'test-value' },
       });
@@ -274,7 +274,7 @@ describe('List Command', () => {
     });
 
     it('should output json format when format is "json"', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: { 'test.key': 'test-value' },
       });
@@ -294,7 +294,7 @@ describe('List Command', () => {
     });
 
     it('should show values when unsafeShowValues is true', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: { 'test.key': 'secret-value' },
       });
@@ -315,7 +315,7 @@ describe('List Command', () => {
     });
 
     it('should redact values when showValues is true but stdout is not TTY', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.service}/${ctx.env}`;
+      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
       mockProvider = createMockProvider({
         [storageKey]: { 'test.key': 'secret-value' },
       });

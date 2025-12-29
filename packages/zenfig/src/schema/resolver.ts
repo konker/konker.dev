@@ -2,13 +2,13 @@
  * Schema Path Resolver
  *
  * Resolves dot-notation key paths to TypeBox schema nodes
- * Supports case-insensitive matching with canonical casing output
+ * Matches schema property names case-sensitively
  */
 import { Kind, type TObject, type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
-import { keyNotFoundError, type ValidationError } from '../errors.js';
+import { invalidKeyPathError, keyNotFoundError, type ValidationError } from '../errors.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -27,6 +27,28 @@ export type SchemaKeyInfo = {
   readonly hasDefault: boolean;
   readonly defaultValue?: unknown;
 };
+
+// --------------------------------------------------------------------------
+// Key Path Rules
+// --------------------------------------------------------------------------
+
+export const KEY_SEGMENT_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+export function validateKeyPathSegments(keyPath: string): Effect.Effect<ReadonlyArray<string>, ValidationError> {
+  return Effect.suspend(() => {
+    if (!keyPath || keyPath.trim() === '') {
+      return Effect.fail(keyNotFoundError('(empty path)'));
+    }
+
+    const segments = keyPath.split('.');
+    const invalid = segments.find((segment) => !KEY_SEGMENT_PATTERN.test(segment));
+    if (invalid) {
+      return Effect.fail(invalidKeyPathError(keyPath, `Invalid key segment '${invalid}'`));
+    }
+
+    return Effect.succeed(segments);
+  });
+}
 
 // --------------------------------------------------------------------------
 // Type Guards
@@ -64,18 +86,17 @@ export function unwrapOptional(schema: TSchema): TSchema {
 // --------------------------------------------------------------------------
 
 /**
- * Find a property in an object schema (case-insensitive)
+ * Find a property in an object schema (case-sensitive)
  * Returns the canonical property name and schema, or undefined
  */
 function findProperty(
   objectSchema: TObject,
   segment: string
 ): { readonly propertyName: string; readonly schema: TSchema } | undefined {
-  const lowerSegment = segment.toLowerCase();
   const properties = objectSchema.properties;
 
   for (const [propName, propSchema] of Object.entries(properties)) {
-    if (propName.toLowerCase() === lowerSegment) {
+    if (propName === segment) {
       return { propertyName: propName, schema: propSchema as TSchema };
     }
   }
@@ -87,23 +108,13 @@ function findProperty(
  * Resolve a dot-notation path to a schema node
  *
  * @param schema - The root TypeBox schema (must be an object)
- * @param keyPath - Dot-notation path (e.g., "database.url" or "API.TimeoutMS")
+ * @param keyPath - Dot-notation path (e.g., "database.url")
  * @returns Resolved path with canonical casing and schema node
  */
 export function resolvePath(schema: TSchema, keyPath: string): Effect.Effect<ResolvedPath, ValidationError> {
   return pipe(
-    Effect.sync(() => {
-      if (!keyPath || keyPath.trim() === '') {
-        return { valid: false as const, error: keyNotFoundError('(empty path)') };
-      }
-      return { valid: true as const, segments: keyPath.split('.') };
-    }),
-    Effect.flatMap((result) => {
-      if (!result.valid) {
-        return Effect.fail(result.error);
-      }
-
-      const { segments } = result;
+    validateKeyPathSegments(keyPath),
+    Effect.flatMap((segments) => {
       const canonicalSegments: Array<string> = [];
       let currentSchema = schema;
 

@@ -9,11 +9,20 @@ import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
-import { fileNotFoundError, formatError, type SystemError, type ValidationError, type ZenfigError } from '../errors.js';
-import { unflatten } from '../lib/flatten.js';
+import {
+  fileNotFoundError,
+  formatError,
+  type SystemError,
+  unknownKeysError,
+  type ValidationError,
+  type ZenfigError,
+} from '../errors.js';
+import { flatten, pathToEnvKey } from '../lib/flatten.js';
 import { detectFormat, parseEnvContent } from '../lib/format.js';
+import { validateAll } from '../schema/index.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { validateAll } from '../schema/validator.js';
+import { parseProviderKV } from '../schema/parser.js';
+import { getAllLeafPaths, validateKeyPathSegments } from '../schema/resolver.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -29,6 +38,7 @@ export type ValidateResult = {
   readonly valid: boolean;
   readonly errors: ReadonlyArray<ValidationError>;
   readonly parsed: Record<string, unknown>;
+  readonly warnings: ReadonlyArray<string>;
 };
 
 // --------------------------------------------------------------------------
@@ -67,41 +77,87 @@ export function executeValidate(
         return Effect.fail(fileNotFoundError(`Unable to detect format of ${options.file}`));
       }
 
-      // 4. Parse content
-      if (format === 'json') {
-        return pipe(
-          Effect.try({
-            try: () => JSON.parse(content) as Record<string, unknown>,
-            catch: () => fileNotFoundError(`Invalid JSON in ${options.file}`),
-          }),
-          Effect.map((parsed) => ({ parsed, config: options.config }))
-        );
-      } else {
-        // Parse .env format
-        const envMap = parseEnvContent(content);
-        // Need to convert env keys back to dot paths and unflatten
-        // This is a simplified version - full implementation would match against schema
-        const parsed = unflatten(envMap);
-        return Effect.succeed({ parsed, config: options.config });
-      }
-    }),
-    Effect.flatMap(({ config, parsed }) =>
-      // 5. Load schema
-      pipe(
-        loadSchemaWithDefaults(config.schema, config.schemaExportName),
-        Effect.flatMap(({ schema }) =>
-          // 6. Validate
-          pipe(
-            validateAll(parsed, schema),
-            Effect.map((result) => ({
-              valid: result.errors.length === 0,
-              errors: result.errors,
-              parsed: result.value as Record<string, unknown>,
-            }))
-          )
-        )
-      )
-    )
+      return pipe(
+        loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+        Effect.flatMap(({ schema }) => {
+          if (format === 'json') {
+            return pipe(
+              Effect.try({
+                try: () => JSON.parse(content) as Record<string, unknown>,
+                catch: () => fileNotFoundError(`Invalid JSON in ${options.file}`),
+              }),
+              Effect.flatMap((parsed) =>
+                pipe(
+                  collectUnknownKeys(parsed, schema),
+                  Effect.flatMap((unknownKeys) => {
+                    if (unknownKeys.length > 0 && options.config.strict) {
+                      return Effect.fail(unknownKeysError(unknownKeys));
+                    }
+
+                    const warnings =
+                      unknownKeys.length > 0 ? [`Unknown keys in ${options.file}: ${unknownKeys.join(', ')}`] : [];
+
+                    return pipe(
+                      validateAll(parsed, schema),
+                      Effect.map((result) => ({
+                        valid: result.errors.length === 0,
+                        errors: result.errors,
+                        parsed: result.value as Record<string, unknown>,
+                        warnings,
+                      }))
+                    );
+                  })
+                )
+              )
+            );
+          }
+
+          const envMap = parseEnvContent(content);
+          const envKeyMap = buildEnvKeyMap(schema, options.config.separator);
+          const unknownEnvKeys = Object.keys(envMap).filter((key) => !envKeyMap.has(key));
+
+          if (unknownEnvKeys.length > 0 && options.config.strict) {
+            return Effect.fail(unknownKeysError(unknownEnvKeys));
+          }
+
+          const warnings =
+            unknownEnvKeys.length > 0 ? [`Unknown keys in ${options.file}: ${unknownEnvKeys.join(', ')}`] : [];
+
+          const kv: Record<string, string> = {};
+          for (const [envKey, value] of Object.entries(envMap)) {
+            const path = envKeyMap.get(envKey);
+            if (!path) {
+              continue;
+            }
+            kv[path] = value;
+          }
+
+          return pipe(
+            parseProviderKV(kv, schema),
+            Effect.flatMap((parsedResult) => {
+              if (parsedResult.unknownKeys.length > 0 && options.config.strict) {
+                return Effect.fail(unknownKeysError(parsedResult.unknownKeys));
+              }
+
+              const combinedWarnings =
+                parsedResult.unknownKeys.length > 0
+                  ? warnings.concat(`Unknown keys in ${options.file}: ${parsedResult.unknownKeys.join(', ')}`)
+                  : warnings;
+
+              return pipe(
+                validateAll(parsedResult.parsed, schema),
+                Effect.map((result) => ({
+                  valid: result.errors.length === 0,
+                  errors: result.errors,
+                  parsed: result.value as Record<string, unknown>,
+                  warnings: combinedWarnings,
+                }))
+              );
+            })
+          );
+        })
+      );
+    })
   );
 }
 
@@ -114,6 +170,10 @@ export function runValidate(
   return pipe(
     executeValidate(options),
     Effect.map((result) => {
+      for (const warning of result.warnings) {
+        console.error(`[zenfig] Warning: ${warning}`);
+      }
+
       if (result.valid) {
         console.log(`Validation passed: ${options.file}`);
         return true;
@@ -129,5 +189,40 @@ export function runValidate(
 
       return false;
     })
+  );
+}
+
+// --------------------------------------------------------------------------
+// Helpers
+// --------------------------------------------------------------------------
+
+function buildEnvKeyMap(schema: unknown, separator: string): Map<string, string> {
+  const envKeyMap = new Map<string, string>();
+  const leafPaths = getAllLeafPaths(schema as never)
+    .map((entry) => entry.path)
+    .filter((path) => path.length > 0);
+
+  for (const path of leafPaths) {
+    envKeyMap.set(pathToEnvKey(path, separator), path);
+  }
+
+  return envKeyMap;
+}
+
+function collectUnknownKeys(
+  parsed: Record<string, unknown>,
+  schema: unknown
+): Effect.Effect<ReadonlyArray<string>, ValidationError> {
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return Effect.succeed([]);
+  }
+
+  const leafPaths = getAllLeafPaths(schema as never).map((entry) => entry.path);
+  const knownPaths = new Set(leafPaths.filter((path) => path.length > 0));
+  const flat = flatten(parsed as Record<string, unknown>);
+
+  return pipe(
+    Effect.forEach(Object.keys(flat), (key) => validateKeyPathSegments(key)),
+    Effect.map(() => Object.keys(flat).filter((key) => !knownPaths.has(key)))
   );
 }

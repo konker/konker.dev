@@ -12,7 +12,6 @@
     "config",
     "secrets",
     "ssm",
-    "chamber",
     "jsonnet",
     "typebox",
     "typescript",
@@ -28,137 +27,37 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "./api/root/core": {
+      "types": "./dist/api/root/core.d.ts",
+      "import": "./dist/api/root/core.js"
     },
-    "./commands/delete": {
-      "types": "./dist/commands/delete.d.ts",
-      "import": "./dist/commands/delete.js"
+    "./api/root/handler": {
+      "types": "./dist/api/root/handler.d.ts",
+      "import": "./dist/api/root/handler.js"
     },
-    "./commands/diff": {
-      "types": "./dist/commands/diff.d.ts",
-      "import": "./dist/commands/diff.js"
+    "./config/config.schema": {
+      "types": "./dist/config/config.schema.d.ts",
+      "import": "./dist/config/config.schema.js"
     },
-    "./commands/doctor": {
-      "types": "./dist/commands/doctor.d.ts",
-      "import": "./dist/commands/doctor.js"
+    "./hono/hono-app": {
+      "types": "./dist/hono/hono-app.d.ts",
+      "import": "./dist/hono/hono-app.js"
     },
-    "./commands/export": {
-      "types": "./dist/commands/export.d.ts",
-      "import": "./dist/commands/export.js"
+    "./hono/hono-aws-serverless": {
+      "types": "./dist/hono/hono-aws-serverless.d.ts",
+      "import": "./dist/hono/hono-aws-serverless.js"
     },
-    "./commands": {
-      "types": "./dist/commands/index.d.ts",
-      "import": "./dist/commands/index.js"
+    "./hono/hono-cloudflare-serverless": {
+      "types": "./dist/hono/hono-cloudflare-serverless.d.ts",
+      "import": "./dist/hono/hono-cloudflare-serverless.js"
     },
-    "./commands/init": {
-      "types": "./dist/commands/init.d.ts",
-      "import": "./dist/commands/init.js"
+    "./hono/hono-node-server": {
+      "types": "./dist/hono/hono-node-server.d.ts",
+      "import": "./dist/hono/hono-node-server.js"
     },
-    "./commands/list": {
-      "types": "./dist/commands/list.d.ts",
-      "import": "./dist/commands/list.js"
-    },
-    "./commands/snapshot": {
-      "types": "./dist/commands/snapshot.d.ts",
-      "import": "./dist/commands/snapshot.js"
-    },
-    "./commands/upsert": {
-      "types": "./dist/commands/upsert.d.ts",
-      "import": "./dist/commands/upsert.js"
-    },
-    "./commands/validate": {
-      "types": "./dist/commands/validate.d.ts",
-      "import": "./dist/commands/validate.js"
-    },
-    "./jsonnet/executor": {
-      "types": "./dist/jsonnet/executor.d.ts",
-      "import": "./dist/jsonnet/executor.js"
-    },
-    "./jsonnet": {
-      "types": "./dist/jsonnet/index.d.ts",
-      "import": "./dist/jsonnet/index.js"
-    },
-    "./jsonnet/tempFile": {
-      "types": "./dist/jsonnet/tempFile.d.ts",
-      "import": "./dist/jsonnet/tempFile.js"
-    },
-    "./lib/flatten": {
-      "types": "./dist/lib/flatten.d.ts",
-      "import": "./dist/lib/flatten.js"
-    },
-    "./lib/format": {
-      "types": "./dist/lib/format.d.ts",
-      "import": "./dist/lib/format.js"
-    },
-    "./lib": {
-      "types": "./dist/lib/index.d.ts",
-      "import": "./dist/lib/index.js"
-    },
-    "./lib/merge": {
-      "types": "./dist/lib/merge.d.ts",
-      "import": "./dist/lib/merge.js"
-    },
-    "./lib/redact": {
-      "types": "./dist/lib/redact.d.ts",
-      "import": "./dist/lib/redact.js"
-    },
-    "./providers/ChamberProvider": {
-      "types": "./dist/providers/ChamberProvider.d.ts",
-      "import": "./dist/providers/ChamberProvider.js"
-    },
-    "./providers/guards": {
-      "types": "./dist/providers/guards.d.ts",
-      "import": "./dist/providers/guards.js"
-    },
-    "./providers": {
-      "types": "./dist/providers/index.d.ts",
-      "import": "./dist/providers/index.js"
-    },
-    "./providers/MockProvider": {
-      "types": "./dist/providers/MockProvider.d.ts",
-      "import": "./dist/providers/MockProvider.js"
-    },
-    "./providers/Provider": {
-      "types": "./dist/providers/Provider.d.ts",
-      "import": "./dist/providers/Provider.js"
-    },
-    "./providers/registry": {
-      "types": "./dist/providers/registry.d.ts",
-      "import": "./dist/providers/registry.js"
-    },
-    "./schema": {
-      "types": "./dist/schema/index.d.ts",
-      "import": "./dist/schema/index.js"
-    },
-    "./schema/loader": {
-      "types": "./dist/schema/loader.d.ts",
-      "import": "./dist/schema/loader.js"
-    },
-    "./schema/parser": {
-      "types": "./dist/schema/parser.d.ts",
-      "import": "./dist/schema/parser.js"
-    },
-    "./schema/resolver": {
-      "types": "./dist/schema/resolver.d.ts",
-      "import": "./dist/schema/resolver.js"
-    },
-    "./schema/validator": {
-      "types": "./dist/schema/validator.d.ts",
-      "import": "./dist/schema/validator.js"
-    },
-    "./cli": {
-      "types": "./dist/cli.d.ts",
-      "import": "./dist/cli.js"
-    },
-    "./config": {
-      "types": "./dist/config.d.ts",
-      "import": "./dist/config.js"
-    },
-    "./errors": {
-      "types": "./dist/errors.d.ts",
-      "import": "./dist/errors.js"
+    "./lib/consts": {
+      "types": "./dist/lib/consts.d.ts",
+      "import": "./dist/lib/consts.js"
     }
   },
   "files": [
@@ -168,6 +67,8 @@
   "main": "dist/index.js",
   "dependencies": {
     "@konker.dev/tiny-error-fp": "workspace:*",
+    "@aws-sdk/client-ssm": "^3.777.0",
+    "@aws-sdk/client-sts": "^3.777.0",
     "@sinclair/typebox": "^0.34.45",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",

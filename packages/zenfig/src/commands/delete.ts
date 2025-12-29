@@ -14,7 +14,7 @@ import { checkProviderGuards } from '../providers/guards.js';
 import { type ProviderContext } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { resolvePath } from '../schema/resolver.js';
+import { resolvePath, validateKeyPathSegments } from '../schema/resolver.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -66,10 +66,12 @@ export function executeDelete(
   options: DeleteOptions
 ): Effect.Effect<DeleteResult, ProviderError | ValidationError | SystemError | ZenfigError> {
   return pipe(
-    // 1. Load schema
-    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+    // 1. Validate key path segments
+    validateKeyPathSegments(options.key),
+    // 2. Load schema
+    Effect.flatMap(() => loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName)),
     Effect.flatMap(({ schema }) =>
-      // 2. Resolve the key path (may not exist in schema - warn but allow)
+      // 3. Resolve the key path (may not exist in schema - warn but allow)
       pipe(
         Effect.either(resolvePath(schema, options.key)),
         Effect.map((resolveResult) => {
@@ -87,10 +89,10 @@ export function executeDelete(
     Effect.flatMap((canonicalKey) => {
       const { config, confirm = false, service } = options;
 
-      // 3. Confirm deletion
+      // 4. Confirm deletion
       if (!confirm && !config.ci) {
         return pipe(
-          promptConfirmation(`Delete key '${canonicalKey}' from ${config.ssmPrefix}/${service}/${config.env}?`),
+          promptConfirmation(`Delete key '${canonicalKey}' from ${config.ssmPrefix}/${config.env}/${service}?`),
           Effect.flatMap(
             (confirmed): Effect.Effect<{ canonicalKey: string; deleted: boolean; shouldDelete: boolean }, never> => {
               if (!confirmed) {
@@ -121,7 +123,7 @@ export function executeDelete(
         env: config.env,
       };
 
-      // 4. Get provider and delete
+      // 5. Get provider and delete
       return pipe(
         getProvider(config.provider),
         Effect.flatMap((provider) =>
@@ -131,7 +133,7 @@ export function executeDelete(
           )
         ),
         Effect.map(() => {
-          // 5. Audit log
+          // 6. Audit log
           const timestamp = new Date().toISOString();
           const user = process.env.USER ?? process.env.USERNAME ?? 'unknown';
           console.error(`[${timestamp}] Deleted: ${canonicalKey} by ${user}`);

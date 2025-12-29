@@ -114,6 +114,7 @@ describe('Validate Command', () => {
 
       expect(result.valid).toBe(true);
       expect(result.errors).toEqual([]);
+      expect(result.warnings).toEqual([]);
     });
 
     it('should detect validation errors', async () => {
@@ -139,13 +140,14 @@ describe('Validate Command', () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.warnings).toEqual([]);
     });
 
     it('should validate ENV file format', async () => {
-      // ENV file parsing keeps keys as-is (no conversion to nested objects)
-      // So DATABASE_HOST stays as DATABASE_HOST, not database.host
       const schema = Type.Object({
-        DATABASE_HOST: Type.String(),
+        database: Type.Object({
+          host: Type.String(),
+        }),
       });
 
       vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
@@ -163,6 +165,7 @@ describe('Validate Command', () => {
       );
 
       expect(result.valid).toBe(true);
+      expect(result.warnings).toEqual([]);
     });
 
     it('should fail for invalid JSON', async () => {
@@ -201,6 +204,37 @@ describe('Validate Command', () => {
       );
 
       expect(result.valid).toBe(true);
+      expect(result.warnings).toEqual([]);
+    });
+
+    it('should fail on unknown keys in strict mode', async () => {
+      const schema = Type.Object({
+        key: Type.String(),
+      });
+
+      vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema, schemaHash: 'sha256:abc' }));
+
+      const jsonPath = path.join(tempDir, 'unknown-keys.json');
+      fs.writeFileSync(jsonPath, JSON.stringify({ key: 'value', extra: 'nope' }));
+      createdFiles.push(jsonPath);
+
+      const strictConfig: ResolvedConfig = { ...defaultConfig, strict: true };
+
+      const exit = await Effect.runPromiseExit(
+        executeValidate({
+          file: jsonPath,
+          format: 'json',
+          config: strictConfig,
+        })
+      );
+
+      expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure') {
+        const cause = exit.cause;
+        if (cause._tag === 'Fail') {
+          expect(cause.error.context.code).toBe(ErrorCode.VAL004);
+        }
+      }
     });
 
     it('should fail when format cannot be detected', async () => {

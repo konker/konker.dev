@@ -31,11 +31,11 @@ describe('provider guards', () => {
 
   it('getProviderGuardConfig should match provider names case-insensitively', () => {
     const guards: ProviderGuardsConfig = {
-      Chamber: { region: 'us-east-1' },
+      'Aws-Ssm': { region: 'us-east-1' },
     };
 
-    expect(getProviderGuardConfig('chamber', guards)).toEqual({ region: 'us-east-1' });
-    expect(getProviderGuardConfig('Chamber', guards)).toEqual({ region: 'us-east-1' });
+    expect(getProviderGuardConfig('aws-ssm', guards)).toEqual({ region: 'us-east-1' });
+    expect(getProviderGuardConfig('Aws-Ssm', guards)).toEqual({ region: 'us-east-1' });
   });
 
   it('getProviderGuardConfig should return direct matches', () => {
@@ -48,10 +48,10 @@ describe('provider guards', () => {
 
   it('getProviderGuardConfig should match normalized provider names', () => {
     const guards: ProviderGuardsConfig = {
-      chamber: { region: 'us-east-1' },
+      'aws-ssm': { region: 'us-east-1' },
     };
 
-    expect(getProviderGuardConfig('Chamber', guards)).toEqual({ region: 'us-east-1' });
+    expect(getProviderGuardConfig('Aws-Ssm', guards)).toEqual({ region: 'us-east-1' });
   });
 
   it('checkProviderGuards should no-op when provider lacks guard hook', async () => {

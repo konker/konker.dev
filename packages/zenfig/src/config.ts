@@ -96,7 +96,7 @@ export type CLIOptions = Schema.Schema.Type<typeof CLIOptionsSchema>;
 
 const DEFAULT_CONFIG: ResolvedConfig = {
   env: 'dev',
-  provider: 'chamber',
+  provider: 'aws-ssm',
   ssmPrefix: '/zenfig',
   schema: 'src/schema.ts',
   schemaExportName: 'ConfigSchema',

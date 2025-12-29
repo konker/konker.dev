@@ -12,6 +12,7 @@ import {
   type JsonnetError,
   type ProviderError,
   type SystemError,
+  unknownKeysError,
   type ValidationError,
   type ZenfigError,
 } from '../errors.js';
@@ -21,9 +22,9 @@ import { formatConflicts, mergeConfigs, type MergeOptions, type MergeResult } fr
 import { checkProviderGuards } from '../providers/guards.js';
 import { type Provider, type ProviderContext, type ProviderKV } from '../providers/Provider.js';
 import { getProvider } from '../providers/registry.js';
+import { validate } from '../schema/index.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { parseProviderKV } from '../schema/parser.js';
-import { validate } from '../schema/validator.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -65,16 +66,34 @@ function fetchAllServices(
   services: ReadonlyArray<string>,
   rootSchema: TSchema,
   providerGuards: ResolvedConfig['providerGuards']
-): Effect.Effect<ReadonlyArray<readonly [string, Record<string, unknown>]>, ProviderError | ValidationError> {
-  return Effect.forEach(services, (service) => {
-    const ctx: ProviderContext = { prefix, service, env };
-    return pipe(
-      checkProviderGuards(provider, ctx, providerGuards),
-      Effect.flatMap(() => fetchService(provider, ctx)),
-      Effect.flatMap((kv) => parseProviderKV(kv, rootSchema)),
-      Effect.map((parsed) => [service, parsed] as const)
-    );
-  });
+): Effect.Effect<
+  {
+    readonly parsedServices: ReadonlyArray<readonly [string, Record<string, unknown>]>;
+    readonly unknownKeys: ReadonlyArray<{ readonly service: string; readonly keys: ReadonlyArray<string> }>;
+  },
+  ProviderError | ValidationError
+> {
+  return pipe(
+    Effect.forEach(services, (service) => {
+      const ctx: ProviderContext = { prefix, service, env };
+      return pipe(
+        checkProviderGuards(provider, ctx, providerGuards),
+        Effect.flatMap(() => fetchService(provider, ctx)),
+        Effect.flatMap((kv) => parseProviderKV(kv, rootSchema)),
+        Effect.map((result) => ({
+          service,
+          parsed: result.parsed,
+          unknownKeys: result.unknownKeys,
+        }))
+      );
+    }),
+    Effect.map((results) => ({
+      parsedServices: results.map((result) => [result.service, result.parsed] as const),
+      unknownKeys: results
+        .filter((result) => result.unknownKeys.length > 0)
+        .map((result) => ({ service: result.service, keys: result.unknownKeys })),
+    }))
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -104,20 +123,32 @@ export function executeExport(
       // 3-4. Fetch and parse all services
       return pipe(
         fetchAllServices(provider, config.ssmPrefix, config.env, allServices, schema, config.providerGuards),
-        Effect.map((parsedServices) => ({ parsedServices, schema, config }))
+        Effect.map((result) => ({ ...result, schema, config }))
       );
     }),
-    Effect.flatMap(({ config, parsedServices, schema }) => {
+    Effect.flatMap(({ config, parsedServices, schema, unknownKeys }) => {
       // 5. Merge all sources
       const mergeOptions: MergeOptions = {
         strictMerge: options.strictMerge ?? config.strict,
         warnOnOverride: options.warnOnOverride,
       };
 
+      if (unknownKeys.length > 0 && config.strict) {
+        const flattened = unknownKeys.flatMap((entry) => entry.keys.map((key) => `${entry.service}:${key}`));
+        return Effect.fail(unknownKeysError(flattened));
+      }
+
       return pipe(
         mergeConfigs(parsedServices, mergeOptions),
         Effect.map((mergeResult) => {
           const warnings: Array<string> = [];
+
+          if (unknownKeys.length > 0) {
+            const warningLines = unknownKeys.map(
+              (entry) => `Unknown keys for service '${entry.service}': ${entry.keys.join(', ')}`
+            );
+            warnings.push(...warningLines);
+          }
 
           // Log conflicts if any
           if (mergeResult.conflicts.length > 0 && options.warnOnOverride) {
