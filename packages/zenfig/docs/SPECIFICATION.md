@@ -7,36 +7,39 @@
   - [2. Technical Stack](#2-technical-stack)
   - [3. Core Workflow](#3-core-workflow)
     - [Core Concepts (Layers, Paths, and Values)](#core-concepts-layers-paths-and-values)
-    - [A. Export Workflow (Fetch -> Process -> Validate -> Output)](#a-export-workflow-fetch---process---validate---output)
+    - [A. Export Workflow (Fetch -> Parse + Merge -> Validate -> Output)](#a-export-workflow-fetch---parse--merge---validate---output)
     - [B. Upsert Workflow (Input -> Validate -> Push)](#b-upsert-workflow-input---validate---push)
-    - [C. Diff Workflow (Fetch -> Render -> Compare -> Report)](#c-diff-workflow-fetch---render---compare---report)
-    - [D. Validate Workflow (Input -> Parse -> Validate)](#d-validate-workflow-input---parse---validate)
-    - [E. Delete Workflow (Input -> Validate -> Confirm -> Remove)](#e-delete-workflow-input---validate---confirm---remove)
-    - [F. Snapshot Workflow](#f-snapshot-workflow)
+    - [C. Validate Workflow (Input -> Parse -> Validate)](#c-validate-workflow-input---parse---validate)
+    - [D. Delete Workflow (Input -> Validate -> Confirm -> Remove)](#d-delete-workflow-input---validate---confirm---remove)
+    - [E. Snapshot Workflow](#e-snapshot-workflow)
       - [Save (Fetch Stored -> Validate -> Store)](#save-fetch-stored---validate---store)
       - [Restore (Load -> Validate -> Diff -> Confirm -> Push)](#restore-load---validate---diff---confirm---push)
       - [Snapshot File Format (v1)](#snapshot-file-format-v1)
-    - [G. Doctor Workflow (Check -> Report)](#g-doctor-workflow-check---report)
   - [4. Provider Model (Pluggable)](#4-provider-model-pluggable)
     - [Provider Interface](#provider-interface)
     - [Default Provider: AWS SSM (`aws-ssm`)](#default-provider-aws-ssm-aws-ssm)
     - [Provider Registry](#provider-registry)
     - [Encryption Verification](#encryption-verification)
-  - [5. Configuration Contract](#5-configuration-contract)
-    - [Jsonnet Inputs](#jsonnet-inputs)
-    - [Jsonnet Output](#jsonnet-output)
-  - [6. SSM Naming Convention](#6-ssm-naming-convention)
-  - [7. Multi-Source Composition](#7-multi-source-composition)
+  - [5. Validator Model (Pluggable)](#5-validator-model-pluggable)
+    - [Validator Selection](#validator-selection)
+    - [Validator Interface](#validator-interface)
+    - [Schema Export Conventions](#schema-export-conventions)
+    - [Error Normalization](#error-normalization)
+  - [6. Configuration Contract](#6-configuration-contract)
+    - [Merged Config Input](#merged-config-input)
+    - [Output](#output)
+  - [7. SSM Naming Convention](#7-ssm-naming-convention)
+  - [8. Multi-Source Composition](#8-multi-source-composition)
     - [CLI Input](#cli-input)
     - [Merge Semantics](#merge-semantics)
     - [Merge Conflict Behavior](#merge-conflict-behavior)
-    - [Jsonnet Contract](#jsonnet-contract)
-  - [8. Implementation Requirements](#8-implementation-requirements)
+  - [9. Implementation Requirements](#9-implementation-requirements)
     - [Implementation Conventions](#implementation-conventions)
     - [Project Structure](#project-structure)
     - [CLI Interface](#cli-interface)
       - [Core Commands](#core-commands)
       - [Examples](#examples)
+    - [Programmatic API (TypeScript)](#programmatic-api-typescript)
     - [Environment Variable Precedence](#environment-variable-precedence)
     - [Config File (`zenfigrc.json` / `zenfigrc.json5`)](#config-file-zenfigrcjson--zenfigrcjson5)
       - [Provider Guards](#provider-guards)
@@ -48,7 +51,6 @@
     - [Output Formatting](#output-formatting)
       - [.env Format Rules](#env-format-rules)
       - [Null and Undefined Handling](#null-and-undefined-handling)
-    - [Jsonnet Execution](#jsonnet-execution)
     - [Environment Support](#environment-support)
     - [Security Requirements](#security-requirements)
     - [Style Guidelines](#style-guidelines)
@@ -60,7 +62,7 @@
       - [Test Coverage Requirements](#test-coverage-requirements)
     - [Documentation](#documentation)
     - [Exit Codes](#exit-codes)
-  - [9. Error Catalog](#9-error-catalog)
+  - [10. Error Catalog](#10-error-catalog)
     - [Error Code Structure](#error-code-structure)
     - [Validation Errors (VAL)](#validation-errors-val)
       - [VAL001: Invalid Type](#val001-invalid-type)
@@ -74,21 +76,15 @@
       - [PROV003: Parameter Not Found](#prov003-parameter-not-found)
       - [PROV004: Encryption Verification Failed](#prov004-encryption-verification-failed)
       - [PROV005: Write Permission Denied](#prov005-write-permission-denied)
-    - [Jsonnet Errors (JSON)](#jsonnet-errors-json)
-      - [JSON001: Syntax Error](#json001-syntax-error)
-      - [JSON002: Runtime Error](#json002-runtime-error)
-      - [JSON003: Invalid Output](#json003-invalid-output)
-      - [JSON004: Missing External Variable](#json004-missing-external-variable)
     - [CLI Errors (CLI)](#cli-errors-cli)
       - [CLI001: Invalid Flag](#cli001-invalid-flag)
       - [CLI002: Missing Required Argument](#cli002-missing-required-argument)
       - [CLI003: Conflicting Flags](#cli003-conflicting-flags)
     - [System Errors (SYS)](#system-errors-sys)
-      - [SYS001: Binary Not Found](#sys001-binary-not-found)
-      - [SYS002: File Not Found](#sys002-file-not-found)
-      - [SYS003: Permission Denied](#sys003-permission-denied)
-      - [SYS004: Snapshot Schema Mismatch](#sys004-snapshot-schema-mismatch)
-  - [10. Performance Characteristics](#10-performance-characteristics)
+      - [SYS001: File Not Found](#sys001-file-not-found)
+      - [SYS002: Permission Denied](#sys002-permission-denied)
+      - [SYS003: Snapshot Schema Mismatch](#sys003-snapshot-schema-mismatch)
+  - [11. Performance Characteristics](#11-performance-characteristics)
     - [Operational Limits](#operational-limits)
     - [Expected Latency](#expected-latency)
     - [Rate Limiting](#rate-limiting)
@@ -96,43 +92,26 @@
     - [Optimization Recommendations](#optimization-recommendations)
     - [Memory Usage](#memory-usage)
     - [Disk Usage](#disk-usage)
-  - [11. Concrete Usage Example](#11-concrete-usage-example)
+  - [12. Concrete Usage Example](#12-concrete-usage-example)
     - [Example Files](#example-files)
     - [SSM State (Initial)](#ssm-state-initial)
     - [Steps](#steps)
     - [Parsed Secrets (per source)](#parsed-secrets-per-source)
-    - [Merged Secrets (Jsonnet Order: api + shared + overrides)](#merged-secrets-jsonnet-order-api--shared--overrides)
+    - [Merged Config (Merge Order: api + shared + overrides)](#merged-config-merge-order-api--shared--overrides)
     - [Output (format json)](#output-format-json)
     - [Output (format env)](#output-format-env)
-  - [12. Init Command Specification](#12-init-command-specification)
-    - [Basic Usage](#basic-usage)
-    - [Input Schema Example](#input-schema-example)
-    - [Generated Identity Jsonnet (Default)](#generated-identity-jsonnet-default)
-    - [Edge Cases and Behaviors](#edge-cases-and-behaviors)
-      - [1. Output File Already Exists](#1-output-file-already-exists)
-      - [2. Include Schema Defaults](#2-include-schema-defaults)
-      - [3. Optional Fields](#3-optional-fields)
-      - [4. Arrays in Schema](#4-arrays-in-schema)
-      - [5. Union Types](#5-union-types)
-      - [6. Nested Objects (Deep)](#6-nested-objects-deep)
-      - [7. Schema File Not Found](#7-schema-file-not-found)
-      - [8. Schema Export Name Mismatch](#8-schema-export-name-mismatch)
-      - [9. Output Directory Doesn't Exist](#9-output-directory-doesnt-exist)
-      - [10. Schema Validation](#10-schema-validation)
   - [13. Implementation Prompt for LLM](#13-implementation-prompt-for-llm)
   <!-- TOC -->
 
 ## 1. Goal
 
-Design and implement a CLI tool called **Zenfig** that orchestrates config providers, Jsonnet, and TypeBox. It ensures that application configurations are logic-driven, securely retrieved, and strictly validated before reaching the runtime environment.
+Design and implement a CLI tool called **Zenfig** that orchestrates config providers and a pluggable validation layer (Effect Schema by default, Zod optional). It ensures that application configurations are securely retrieved, strictly validated, and safely exported for runtime use.
 
 ## 2. Technical Stack
 
 - **Runtime:** Node.js or Bun (TypeScript).
 - **Provider (default):** AWS SSM via the AWS SDK (`aws-ssm` provider).
-- **Configuration Templating:** [Go-Jsonnet](https://github.com/google/go-jsonnet).
-- **Validation:** [TypeBox](https://github.com/sinclairzx81/typebox) with Ajv.
-- **Process Management:** `execa` for calling system binaries.
+- **Validation:** Pluggable schema validation: [Effect Schema](https://github.com/Effect-TS/effect) (`effect/Schema`, default) or [Zod](https://github.com/colinhacks/zod).
 
 ---
 
@@ -143,7 +122,7 @@ Design and implement a CLI tool called **Zenfig** that orchestrates config provi
 Zenfig operates on two related but distinct layers of configuration data:
 
 1. **Stored values (provider layer):** Key/value strings persisted in the backing store (default: AWS SSM) under a `<prefix>/<env>/<service>/...` hierarchy.
-2. **Rendered config (runtime layer):** The final, schema-valid configuration object produced by evaluating `config.jsonnet` with fetched values plus logic/defaults.
+2. **Resolved config (runtime layer):** The final, schema-valid configuration object produced by parsing and merging stored values.
 
 Zenfig uses a **canonical key path** for CLI and internal operations:
 
@@ -160,29 +139,27 @@ Key path representations:
 
 Stored value encoding (provider strings) is schema-directed:
 
-- `Type.String`: stored as-is (no JSON quoting)
-- `Type.Boolean`: `true` / `false`
-- `Type.Integer` / `Type.Number`: base-10 numeric string (e.g. `6500`, `0.25`)
-- `Type.Array` / `Type.Object`: minified JSON (e.g. `["a","b"]`, `{"k":"v"}`)
+- `string` schema (`Schema.String` / `z.string()`): stored as-is (no JSON quoting)
+- `boolean` schema (`Schema.Boolean` / `z.boolean()`): `true` / `false`
+- `number` schema (`Schema.Number` / `z.number()`, including integer refinements): base-10 numeric string (e.g. `6500`, `0.25`)
+- `array` / `object` schema (`Schema.Array`/`Schema.Struct`/`Schema.Record` or `z.array()`/`z.object()`/`z.record()`): minified JSON (e.g. `["a","b"]`, `{"k":"v"}`)
 
-By default, Zenfig does not print secret values in logs or diffs unless explicitly requested via an opt-in flag.
+By default, Zenfig does not print secret values in logs unless explicitly requested via an opt-in flag.
 
-### A. Export Workflow (Fetch -> Process -> Validate -> Output)
+### A. Export Workflow (Fetch -> Parse + Merge -> Validate -> Output)
 
 1. **Fetch:** Retrieve stored values from the provider for the primary service and any `--source` services.
    - Default (AWS SSM): `GetParametersByPath` under `<prefix>/<env>/<service>` (via AWS SDK).
    - Provider returns a flat map of canonical key paths to **string** values.
 2. **Parse + Merge:** Convert provider strings into typed values using the schema (schema-directed parsing) and deep-merge all sources.
-3. **Inject:** Pass the merged, typed `secrets` object into `go-jsonnet` as External Variables via temp file or stdin (not CLI args).
-4. **Template:** Evaluate `config.jsonnet` to produce the rendered config (may apply defaults/derivations/clamps).
-5. **Validate:** Validate the rendered config against the TypeBox schema (Ajv).
-6. **Format:** Convert the validated object into `.env` (flat) or `.json` (nested).
+3. **Validate:** Validate the merged config against the selected validation layer (Effect Schema or Zod).
+4. **Format:** Convert the validated object into `.env` (flat) or `.json` (nested).
 
 ### B. Upsert Workflow (Input -> Validate -> Push)
 
 1. **Input:** Accept a service name, key, and value (via CLI args or stdin for sensitive values).
 2. **Resolve:** Locate the target schema node using partial path resolution (dot notation; case-sensitive input).
-3. **Parse + Validate:** Parse the input string into a typed value based on the resolved schema node, then validate with Ajv.
+3. **Parse + Validate:** Parse the input string into a typed value based on the resolved schema node, then validate with the selected validation layer.
    - Strings are not auto-coerced to numbers/booleans; parsing is schema-directed.
    - Arrays/objects require JSON input (validated and then stored as minified JSON).
 4. **Serialize:** Convert the typed value back into the provider string encoding (see Stored value encoding).
@@ -190,27 +167,15 @@ By default, Zenfig does not print secret values in logs or diffs unless explicit
    - _Constraint:_ Use AWS SSM `SecureString` for all writes when supported by provider.
    - Verify encryption type post-write and warn if not SecureString.
 
-### C. Diff Workflow (Fetch -> Render -> Compare -> Report)
-
-Diff compares **stored values** (what’s in the provider) with the **rendered config** (what applications consume after Jsonnet).
-
-1. **Fetch:** Retrieve current stored values via provider `fetch`.
-2. **Render:** Generate rendered config using the export workflow (in-memory, no external output).
-3. **Compare:** Flatten both sides to canonical key paths and compute added/removed/modified keys.
-4. **Report:** Output changes.
-   - Default output is **redacted** (no secret values printed).
-   - Optional: `--show-values` prints values (TTY-only; otherwise require `--unsafe-show-values`).
-   - Exit code 0 if no differences, 1 if differences found.
-
-### D. Validate Workflow (Input -> Parse -> Validate)
+### C. Validate Workflow (Input -> Parse -> Validate)
 
 1. **Input:** Accept file path to JSON or `.env` file via `--file`.
 2. **Parse:** Load and parse the file contents (JSON or env format auto-detected).
-3. **Validate:** Apply full TypeBox schema validation.
+3. **Validate:** Apply full schema validation using the selected validation layer.
 4. **Report:** Output validation errors with full paths, expected types, constraints, and suggestions.
    - Exit code 0 if valid, 1 if invalid.
 
-### E. Delete Workflow (Input -> Validate -> Confirm -> Remove)
+### D. Delete Workflow (Input -> Validate -> Confirm -> Remove)
 
 1. **Input:** Accept service name and key path via CLI.
 2. **Validate:** Check key exists in schema (warn if not, but allow deletion).
@@ -218,7 +183,7 @@ Diff compares **stored values** (what’s in the provider) with the **rendered c
 4. **Remove:** Execute provider `delete` (default AWS SSM: `DeleteParameter` on `<prefix>/<env>/<service>/<key-path>`).
 5. **Audit:** Log deletion with timestamp, user, and key to stderr (values are redacted by default).
 
-### F. Snapshot Workflow
+### E. Snapshot Workflow
 
 #### Save (Fetch Stored -> Validate -> Store)
 
@@ -262,15 +227,6 @@ Snapshots store **provider-layer** values (strings) keyed by canonical dot paths
 ```
 
 If `--encrypt` is used, the on-disk snapshot must be encrypted at rest; the spec permits either (a) encrypting the entire file or (b) storing `meta` in plaintext while encrypting `data` as an authenticated ciphertext.
-
-### G. Doctor Workflow (Check -> Report)
-
-1. **Check binaries:** Verify `jsonnet` is available in `PATH`.
-2. **Check files:** Verify schema and Jsonnet template paths exist and are readable.
-3. **Check schema loading:** Verify the schema file can be loaded and contains the configured export name.
-4. **Optional provider check:** If credentials are available, perform a read-only provider `fetch` and report counts only (never values).
-
----
 
 ## 4. Provider Model (Pluggable)
 
@@ -332,22 +288,88 @@ enum EncryptionType {
 
 ---
 
-## 5. Configuration Contract
+## 5. Validator Model (Pluggable)
 
-### Jsonnet Inputs
+Zenfig supports multiple schema validators behind a shared adapter interface. Effect Schema is the default; Zod is optional.
 
-- `secrets`: merged, typed object constructed from provider `fetch` results after schema-directed parsing and multi-source merge.
-- `defaults`: optional static defaults (object) in code or file.
-- `env`: environment name (string), typically sourced from `--env` / `ZENFIG_ENV` / `NODE_ENV`.
+### Validator Selection
 
-### Jsonnet Output
+- Select via CLI `--validation <effect|zod>`, config `validation`, or env `ZENFIG_VALIDATION`.
+- Default is `effect` when unspecified.
+- `schema` must export `ConfigSchema` for the selected validator.
 
-- Must evaluate to a JSON object compatible with the TypeBox schema.
-- Non-object or invalid JSON should produce a validation error with exit code 1.
+### Validator Interface
+
+Each adapter must provide a consistent surface:
+
+- **Load schema export:** Load `ConfigSchema` from the `schema` file.
+- **Resolve path:** Resolve dot-notation paths to a schema node with canonical casing.
+- **Enumerate leaf paths:** Return all leaf schema paths with optional/default metadata.
+- **Validate values:** Validate a value against a schema node and return normalized errors.
+- **Describe types:** Provide human-readable type/constraint descriptions for error messages.
+
+Reference interface (shape only, not exact types):
+
+```ts
+type ValidationIssue = {
+  path: string;
+  expected: string;
+  received: unknown;
+  message: string;
+};
+
+type ValidationResult = { readonly ok: true } | { readonly ok: false; readonly issues: ReadonlyArray<ValidationIssue> };
+
+type ValidatorAdapter = {
+  readonly name: 'effect' | 'zod';
+  readonly loadSchema: (filePath: string, exportName: string) => Promise<unknown>;
+  readonly resolvePath: (schema: unknown, keyPath: string) => ResolvedPath;
+  readonly getLeafPaths: (schema: unknown) => ReadonlyArray<SchemaKeyInfo>;
+  readonly validateNode: (schemaNode: unknown, value: unknown) => ValidationResult;
+  readonly validateRoot: (schema: unknown, value: unknown) => ValidationResult;
+  readonly describeNode: (schemaNode: unknown) => string;
+};
+```
+
+Adapter requirements:
+
+- Do not enable implicit coercion or type conversions in the underlying validator.
+- Detect `optional`, `nullable`, and `default` semantics for leaf metadata and error reporting.
+- Keep schema node introspection inside the adapter (core logic treats nodes as opaque).
+
+### Schema Export Conventions
+
+- When `validation=effect`, `ConfigSchema` must be an Effect Schema value.
+- When `validation=zod`, `ConfigSchema` must be a Zod schema value.
+- The schema file must export exactly one schema value named `ConfigSchema` (no dual exports for multiple validators).
+- Schema type mismatches (e.g., Zod schema when `validation=effect`) must fail fast with a clear error.
+
+### Error Normalization
+
+Adapters must normalize validator-specific errors into Zenfig's error catalog, including:
+
+- Full path (canonical dot path)
+- Expected type/constraints
+- Actual value (truncated if needed)
+- Specific failure reason
+- Suggested remediation
 
 ---
 
-## 6. SSM Naming Convention
+## 6. Configuration Contract
+
+### Merged Config Input
+
+- The merged, typed object constructed from provider `fetch` results after schema-directed parsing and multi-source merge.
+
+### Output
+
+- The merged config must validate against the selected schema validator.
+- Invalid or non-object results should produce a validation error with exit code 1.
+
+---
+
+## 7. SSM Naming Convention
 
 - Parameter name format: `<prefix>/<env>/<service>/<key-path>`.
 - Default `prefix` is `/zenfig`, configurable via `--ssm-prefix` or `ZENFIG_SSM_PREFIX`.
@@ -359,7 +381,7 @@ enum EncryptionType {
 
 ---
 
-## 7. Multi-Source Composition
+## 8. Multi-Source Composition
 
 Zenfig may compose multiple SSM roots into a single config output.
 
@@ -370,8 +392,8 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 ### Merge Semantics
 
-- All sources are merged into a single `secrets` object.
-- Merge order follows Jsonnet semantics (later sources override earlier keys).
+- All sources are merged into a single config object.
+- Merge order is last-wins (later sources override earlier keys).
 - Precedence order is: primary `<service>` first, then each `--source` in the order provided.
   - Example: `zenfig export api --source shared --source overrides`
     - SSM paths fetched (with `--env prod` and default prefix `/zenfig`):
@@ -384,7 +406,7 @@ Zenfig may compose multiple SSM roots into a single config output.
       - `api`: `{"database":{"url":"postgres://api-main"},"feature":{"enableBeta":false}}`
       - `shared`: `{"database":{"url":"postgres://shared"},"redis":{"url":"redis://shared"}}`
       - `overrides`: `{"feature":{"enableBeta":true}}`
-    - Merged `secrets` (Jsonnet order: `api` + `shared` + `overrides`, last wins):
+    - Merged config (order: `api` + `shared` + `overrides`, last wins):
       - `{"database":{"url":"postgres://shared"},"feature":{"enableBeta":true},"redis":{"url":"redis://shared"}}`
 
 ### Merge Conflict Behavior
@@ -400,15 +422,9 @@ Zenfig may compose multiple SSM roots into a single config output.
 - **Unknown keys:** Keys not present in the schema are allowed by default (treated as strings) but should emit a warning; `--strict` turns this into an error.
 - **Conflict reporting:** Use `--warn-on-override` to log all overrides (useful for debugging inheritance issues).
 
-### Jsonnet Contract
-
-- Always pass a single `secrets` object via temp file (e.g., `--ext-code secrets=@/tmp/zenfig-secrets.json`).
-- Never pass secrets via command-line arguments to prevent exposure in process lists.
-- Jsonnet is the composition layer, responsible for final shaping.
-
 ---
 
-## 8. Implementation Requirements
+## 9. Implementation Requirements
 
 ### Implementation Conventions
 
@@ -418,12 +434,15 @@ Zenfig may compose multiple SSM roots into a single config output.
 ### Project Structure
 
 - `src/cli.ts`: CLI entry point using `commander`.
-- `src/schema.ts`: Exported TypeBox schema (the "Source of Truth").
-- `src/engine.ts`: Orchestrates provider, Jsonnet evaluation, and validation.
-- `src/transformer.ts`: Flattens nested objects into `KEY_SUBKEY=value`.
-- `src/providers/Provider.ts`: Provider interface and types.
-- `src/providers/registry.ts`: Provider lookup and default selection.
-- `src/providers/AwsSsmProvider.ts`: Provider implementation using AWS SSM.
+- `src/index.ts`: Package entry point for programmatic usage.
+- `src/api.ts`: Programmatic export API wrapper (export-only).
+- `src/config.ts`: Config resolution and merging (CLI flags, env vars, rc file, defaults).
+- `src/commands/*`: Command implementations (export, upsert, validate, list, delete, snapshot).
+- `src/lib/*`: Formatting, merge, flatten, and redaction utilities.
+- `src/schema/*`: Schema loader, resolver, parser, and validator glue.
+- `src/validation/*`: Validator interface plus Effect Schema and Zod adapters.
+- `src/providers/*`: Provider interface, registry, and implementations (e.g., AWS SSM).
+- `src/errors.ts`: Error types, formatting, and exit codes.
 
 ### CLI Interface
 
@@ -433,14 +452,13 @@ Zenfig may compose multiple SSM roots into a single config output.
 # Global options (available on all commands)
   --ci                        # Disable prompts; require explicit flags like --confirm
   --strict                    # Treat warnings as errors (e.g., unknown keys)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Export configuration
 zenfig export <service> [options]
   --source <service>          # Additional sources (repeatable)
   --format <env|json>         # Output format (default: env)
   --provider <name>           # Provider name (default: aws-ssm)
-  --jsonnet <path>            # Jsonnet template path (default: config.jsonnet)
-  --jsonnet-timeout <ms>      # Kill jsonnet after timeout (default: 30000)
   --env <environment>         # Environment name (overrides NODE_ENV)
   --separator <char>          # Env key separator (default: _)
   --strict-merge              # Fail on type conflicts during merge
@@ -448,6 +466,8 @@ zenfig export <service> [options]
   --cache <duration>          # Cache provider fetches (e.g., 30s, 5m; dev-only)
   --no-cache                  # Disable cache even if configured
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Upsert configuration value
 zenfig upsert <service> <key> [value] [options]
@@ -457,27 +477,15 @@ zenfig upsert <service> <key> [value] [options]
   --type <auto|string|int|float|bool|json>  # How to parse input before validation (default: auto)
   --skip-encryption-check     # Skip encryption verification (not recommended)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Validate configuration file
 zenfig validate [options]
   --file <path>               # Path to JSON or .env file
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
   --format <env|json>         # File format (auto-detected if not specified)
-
-# Show diff between stored values and rendered config
-zenfig diff <service> [options]
-  --source <service>          # Additional sources (repeatable)
-  --format <json|table>       # Output format (default: table)
-  --provider <name>           # Provider name (default: aws-ssm)
-  --jsonnet <path>            # Jsonnet template path (default: config.jsonnet)
-  --jsonnet-timeout <ms>      # Kill jsonnet after timeout (default: 30000)
-  --env <environment>         # Environment name (overrides NODE_ENV)
-  --show-values               # Print secret values (TTY only; use --unsafe-show-values for CI)
-  --unsafe-show-values        # Allow printing secrets even when stdout is not a TTY (dangerous)
-  --cache <duration>          # Cache provider fetches (e.g., 30s, 5m; dev-only)
-  --no-cache                  # Disable cache even if configured
-  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # List configuration keys
 zenfig list <service> [options]
@@ -498,53 +506,95 @@ zenfig list api --env prod
 # List keys with values in JSON format (local dev only)
 zenfig list api --env prod --format json --show-values
 
-
 # Delete configuration value
-
 zenfig delete <service> <key> [options]
---provider <name> # Provider name (default: aws-ssm)
---env <environment> # Environment name (overrides NODE_ENV)
---confirm # Skip interactive confirmation
---ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+  --provider <name>           # Provider name (default: aws-ssm)
+  --env <environment>         # Environment name (overrides NODE_ENV)
+  --confirm                   # Skip interactive confirmation
+  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Save configuration snapshot
-
 zenfig snapshot save <service> [options]
---source <service> # Additional sources (repeatable)
---provider <name> # Provider name (default: aws-ssm)
---env <environment> # Environment name (overrides NODE_ENV)
---output <path> # Output path (default: .zenfig/snapshots/)
---encrypt # Encrypt snapshot at rest (recommended)
---snapshot-key-file <path> # Read encryption key from file (preferred over CLI args)
---ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+  --source <service>          # Additional sources (repeatable)
+  --provider <name>           # Provider name (default: aws-ssm)
+  --env <environment>         # Environment name (overrides NODE_ENV)
+  --output <path>             # Output path (default: .zenfig/snapshots/)
+  --encrypt                   # Encrypt snapshot at rest (recommended)
+  --snapshot-key-file <path>  # Read encryption key from file (preferred over CLI args)
+  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Restore configuration from snapshot
-
 zenfig snapshot restore <snapshot-file> [options]
---provider <name> # Provider name (default: aws-ssm)
---dry-run # Show diff without applying changes
---force-schema-mismatch # Allow restore despite schema hash mismatch
---confirm # Skip interactive confirmation
---show-values # Print secret values in diff output (TTY only)
---unsafe-show-values # Allow printing secrets even when stdout is not a TTY (dangerous)
---ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+  --provider <name>           # Provider name (default: aws-ssm)
+  --dry-run                   # Show diff without applying changes
+  --force-schema-mismatch     # Allow restore despite schema hash mismatch
+  --confirm                   # Skip interactive confirmation
+  --show-values               # Print secret values in diff output (TTY only)
+  --unsafe-show-values        # Allow printing secrets even when stdout is not a TTY (dangerous)
+  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --validation <effect|zod>   # Validation layer (default: effect)
+```
 
-# Initialize Jsonnet template from schema
+### Programmatic API (TypeScript)
 
-zenfig init [options]
---schema <path> # Schema path (default: src/schema.ts)
---schema-export-name <name> # Schema export name (default: ConfigSchema)
---output <path> # Output path (default: config.jsonnet)
---force # Overwrite existing file
---include-defaults # Include schema defaults in template
+Zenfig must expose a TypeScript API for **export-only** usage. This API is intended for programmatic use (e.g., SST
+deployments) and **must not** expose any write actions (no upsert, delete, snapshot, or list).
 
-# Check local prerequisites and basic connectivity
+The API should:
 
-zenfig doctor [options]
---provider <name> # Provider name (default: aws-ssm)
---schema <path> # Schema path (default: src/schema.ts)
---schema-export-name <name> # Schema export name (default: ConfigSchema)
---jsonnet <path> # Jsonnet template path (default: config.jsonnet)
+- Run the same export workflow as the CLI (fetch -> parse + merge -> validate -> format).
+- Accept explicit config overrides, but default to the same config resolution rules as the CLI.
+- Return both structured data and the formatted output string.
+
+Proposed surface (exported from the package root):
+
+```ts
+type ExportApiOptions = {
+  service: string;
+  sources?: ReadonlyArray<string>;
+  format?: 'env' | 'json';
+  separator?: string;
+  strict?: boolean;
+  strictMerge?: boolean;
+  warnOnOverride?: boolean;
+  config?: Partial<ResolvedConfig>; // provider, env, validation, schema path, prefix, etc.
+};
+
+type ExportApiResult = {
+  config: Record<string, unknown>;
+  formatted: string;
+  conflicts: ReadonlyArray<MergeConflict>;
+  warnings: ReadonlyArray<string>;
+};
+
+export function exportConfig(options: ExportApiOptions): Promise<ExportApiResult>;
+```
+
+Example usage:
+
+```ts
+import { exportConfig } from 'zenfig';
+
+const result = await exportConfig({
+  service: 'api',
+  sources: ['shared'],
+  format: 'json',
+  config: {
+    env: 'prod',
+    provider: 'aws-ssm',
+    ssmPrefix: '/zenfig',
+    schema: 'src/schema.ts',
+    validation: 'effect',
+  },
+});
+
+// Structured config for use in deployments
+const configObject = result.config;
 ```
 
 ### Environment Variable Precedence
@@ -562,9 +612,7 @@ Supported environment variables:
 - `ZENFIG_SSM_PREFIX`: Default SSM path prefix
 - `ZENFIG_PROVIDER`: Default provider name
 - `ZENFIG_SCHEMA`: Default schema path
-- `ZENFIG_SCHEMA_EXPORT_NAME`: Default schema export name (default: `ConfigSchema`)
-- `ZENFIG_JSONNET`: Default Jsonnet template path
-- `ZENFIG_JSONNET_TIMEOUT_MS`: Default Jsonnet timeout in ms
+- `ZENFIG_VALIDATION`: Validation layer (`effect` or `zod`, default: `effect`)
 - `ZENFIG_CACHE`: Default provider fetch cache duration (e.g., `5m`, `0` to disable)
 - `ZENFIG_CI`: If set (`1`/`true`), disable prompts and require explicit confirmation flags
 - `ZENFIG_IGNORE_PROVIDER_GUARDS`: If set (`1`/`true`), skip provider guard checks (emergency use)
@@ -584,13 +632,11 @@ Example:
   "provider": "aws-ssm",
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
-  "schemaExportName": "ConfigSchema",
-  "jsonnet": "config.jsonnet",
+  "validation": "effect",
   "sources": ["shared", "overrides"],
   "format": "env",
   "separator": "_",
   "cache": "5m",
-  "jsonnetTimeoutMs": 30000,
   "providerGuards": {
     "aws-ssm": {
       "accountId": "123456789012",
@@ -605,6 +651,7 @@ Rules:
 - `zenfigrc.json`/`zenfigrc.json5` must not contain secrets.
 - CLI flags override environment variables, which override `zenfigrc.json`/`zenfigrc.json5`, which override defaults.
 - Unknown keys should be ignored with a warning (or error in `--strict` mode).
+- The schema file referenced by `schema` must export `ConfigSchema` for the selected validation layer.
 
 #### Provider Guards
 
@@ -649,6 +696,18 @@ Guidelines:
 
 ### Validation Details
 
+#### Pluggable Validation Layer
+
+Validation is selected via config/CLI (`validation: effect|zod`) and must be wired through a small adapter interface.
+
+Required adapter capabilities:
+
+- Load the schema export for the selected validator (Effect Schema or Zod).
+- Resolve dot-paths to schema nodes (for upsert validation and error reporting).
+- Enumerate leaf paths (for `.env` validation and formatting).
+- Validate a value against a schema node and return structured errors.
+- Provide human-readable type/constraint descriptions for error messages.
+
 #### Partial Path Resolution
 
 - Keys use dot notation (e.g., `database.url`, `api.timeoutMs`).
@@ -658,36 +717,35 @@ Guidelines:
   1. Split key by `.` into segments (e.g., `database.url` → `["database", "url"]`)
   2. Reject any segment that does not match `^[A-Za-z0-9_-]+$`
   3. Starting from schema root, traverse each segment:
-     - If current node is `Type.Object`, look for a property whose name matches the segment exactly
+     - If current node is an object schema (e.g., `Schema.Struct` or `z.object()`), look for a property whose name matches the segment exactly
      - If segment not found, error: `Key 'database.url' not found in schema`
-  4. At final segment, extract the TypeBox type (e.g., `Type.String({ format: "uri" })`)
-  5. Validate value against extracted type using Ajv
+  4. At final segment, extract the schema node (e.g., `Schema.String` or `z.string()` with a URI refinement)
+  5. Validate value against the extracted schema node using the selected validation layer
 - Example validation for `database.url`:
   ```ts
-  // Schema: Type.Object({ database: Type.Object({ url: Type.String({ format: "uri" }) }) })
+  // Schema (Effect): Schema.Struct({ database: Schema.Struct({ url: Schema.String.pipe(Schema.pattern(URI_REGEX)) }) })
   // Key: "database.url"
   // Segments: ["database", "url"]
-  // Resolved type: Type.String({ format: "uri" })
+  // Resolved type: Schema.String (URI refinement)
   // Value: "postgres://localhost:5432/mydb"
   // Result: Valid ✓
   ```
 
 #### Schema-Directed Value Parsing
 
-Zenfig parses provider strings and CLI/file inputs into typed values **before** validation. Ajv type coercion should be disabled; parsing is explicit and schema-driven.
+Zenfig parses provider strings and CLI/file inputs into typed values **before** validation. Parsing is explicit and schema-driven; no implicit type coercion.
 
 Parsing rules (by resolved schema node):
 
-- `Type.String`: keep as string (no implicit JSON parsing)
-- `Type.Boolean`: accept `true`/`false` (case-insensitive), parse to boolean
-- `Type.Integer`: parse base-10 integer; reject decimals/NaN/Infinity
-- `Type.Number`: parse number; reject NaN/Infinity
-- `Type.Array` / `Type.Object`: require JSON input; parse with `JSON.parse`
-- `Type.Union`: attempt each branch’s parsing strategy in schema order and validate; choose the first branch that validates
+- `Schema.String` / `z.string()`: keep as string (no implicit JSON parsing)
+- `Schema.Boolean` / `z.boolean()`: accept `true`/`false` (case-insensitive), parse to boolean
+- `Schema.Number` / `z.number()` (integer refinement when required): parse base-10 number; reject decimals for integer schemas and reject NaN/Infinity
+- `Schema.Array` / `Schema.Struct` / `Schema.Record` or `z.array()` / `z.object()` / `z.record()`: require JSON input; parse with `JSON.parse`
+- `Schema.Union` / `z.union()`: attempt each branch’s parsing strategy in schema order and validate; choose the first branch that validates
 
 For `upsert`, `--type` can override parsing:
 
-- `--type string`: treat input as raw string even if the schema is not `Type.String` (validation will likely fail unless schema accepts string)
+- `--type string`: treat input as raw string even if the schema is not `Schema.String` / `z.string()` (validation will likely fail unless schema accepts string)
 - `--type json`: force `JSON.parse` first (useful for arrays/objects)
 - `--type int|float|bool`: force the corresponding parser first
 
@@ -751,7 +809,7 @@ Validation Error: database.url
   - **Booleans:** Lowercase `true` or `false` (not quoted)
   - **Arrays:** JSON.stringify with no spacing (e.g., `TAGS=["a","b","c"]`)
   - **Objects:** JSON.stringify with no spacing (e.g., `OPTS={"key":"value"}`)
-  - **null:** Error (not allowed unless schema explicitly permits via `Type.Union([Type.Null(), ...])`)
+  - **null:** Error (not allowed unless schema explicitly permits via a union with null, e.g., `Schema.Null` / `z.null()`)
   - **undefined:** Omit key entirely (never serialize)
 - **Array serialization:** Use `JSON.stringify(value)` with no spacing, no pretty-printing
   - Example: `["a", "b"]` → `ITEMS=["a","b"]`
@@ -776,7 +834,7 @@ TAGS=["prod","api","v2"]
 
 - **null:**
   - By default, `null` values cause validation error: `Value cannot be null`
-  - Allow `null` explicitly via `Type.Union([Type.Null(), ...])` (optional fields only affect `undefined`, not `null`)
+  - Allow `null` explicitly via a union with null (optional fields only affect `undefined`, not `null`)
   - If allowed and encountered:
     - `.env` format: Omit the key (env vars cannot represent null)
     - `.json` format: Include as `"key": null`
@@ -789,16 +847,9 @@ TAGS=["prod","api","v2"]
   - `.env` format: `KEY=""` or `KEY=` (no value after `=`)
   - `.json` format: `"key": ""`
 
-### Jsonnet Execution
-
-- Prefer `--ext-code` for large objects to avoid command length limits.
-- Support `--jsonnet` override path for `config.jsonnet`.
-- Support `--jsonnet-timeout <ms>` to abort long-running templates.
-- Bubble Jsonnet errors (file/line) to `stderr` and exit 1.
-
 ### Environment Support
 
-- **Local:** Must look for `jsonnet` in the system path; `aws-ssm` uses the AWS SDK (no provider binary).
+- **Local:** No external binaries required; `aws-ssm` uses the AWS SDK.
 - **CI/CD:** Ensure the tool exits with `code 1` on any validation error to break the build.
 - **Non-interactive:** In `--ci` / `ZENFIG_CI=1` mode (or when stdin is not a TTY), never prompt; require explicit flags like `--confirm`.
 - **Logging:** Write logs to `stderr` so `stdout` can be redirected to files; never print secret values by default.
@@ -806,7 +857,7 @@ TAGS=["prod","api","v2"]
 ### Security Requirements
 
 - **Redaction by default:** Commands must not print secret values unless explicitly requested via `--show-values` (and must support redaction even in structured outputs like JSON).
-- **Safe secret handling:** Never pass secrets via command-line arguments to child processes; use temp files/stdin for Jsonnet/provider calls.
+- **No secrets in process args:** Avoid passing secret values via command-line arguments to any external processes.
 - **Showing values is gated:** `--show-values` may only print values when stdout is a TTY; otherwise require `--unsafe-show-values` (dangerous, intended for local debugging only).
 - **Snapshots:** Write snapshot files with mode `0600` and support optional encryption at rest (`--encrypt` using `ZENFIG_SNAPSHOT_KEY` or `--snapshot-key-file`).
 
@@ -846,11 +897,7 @@ Core logic that must be tested:
    - Constraint validation (min, max, regex, enum)
    - Null/undefined handling
    - Error message formatting
-
-5. **Jsonnet input shaping:**
-   - Secrets object construction
-   - Temp file creation and cleanup
-   - External variable injection
+   - Adapter coverage for Effect Schema and Zod
 
 #### Integration Tests
 
@@ -858,7 +905,6 @@ Test complete workflows with real dependencies:
 
 1. **Export workflow:**
    - Mock aws-ssm provider
-   - Real jsonnet execution
    - Full validation pipeline
    - Multiple output formats
 
@@ -873,10 +919,9 @@ Test complete workflows with real dependencies:
    - Correct merge order
    - Conflict detection
 
-4. **Diff workflow:**
-   - Detect added/removed/modified keys
-   - Format outputs (JSON, table)
-   - Exit code behavior
+4. **List workflow:**
+   - Fetch keys per service
+   - Redaction behavior
 
 #### Edge Case Tests
 
@@ -918,13 +963,6 @@ Critical edge cases that must be covered:
    - Null vs undefined vs missing
    - Mixed-type arrays: `[1, "two", true]`
 
-7. **Jsonnet edge cases:**
-   - Syntax errors in template
-   - Runtime errors (division by zero, etc.)
-   - Infinite loops (timeout)
-   - Missing std.extVar
-   - Returning non-object (string, array, null)
-
 #### Contract Tests
 
 Provider interface compliance:
@@ -955,7 +993,7 @@ Provider interface compliance:
 ### Exit Codes
 
 - `0`: Success
-- `1`: Validation/template errors, diff differences found (when enabled), or non-auth provider operation failures
+- `1`: Validation errors or non-auth provider operation failures
 - `2`: Configuration errors (invalid flags, missing required args)
 - `3`: File not found or permission errors
 - `4`: Provider connection, authentication, or authorization errors
@@ -964,21 +1002,21 @@ Provider interface compliance:
 Default mapping:
 
 - `CLI*` → exit `2`
-- `SYS001`/`SYS002`/`SYS003` → exit `3`
+- `SYS001`/`SYS002` → exit `3`
 - `PROV001`/`PROV002`/`PROV005` → exit `4`
-- `SYS004` → exit `5` (unless forced)
+- `SYS003` → exit `5` (unless forced)
 - All other errors → exit `1`
 
 ---
 
-## 9. Error Catalog
+## 10. Error Catalog
 
 ### Error Code Structure
 
 Each error has:
 
 - **Code:** Unique identifier (e.g., `VAL001`, `PROV002`)
-- **Category:** Validation, Provider, Jsonnet, CLI, System
+- **Category:** Validation, Provider, CLI, System
 - **Severity:** Error (command fails) or Warning (continue with caution)
 - **Exit code:** Derived from category and error type (see Exit Codes)
 - **Message:** Human-readable description
@@ -1062,7 +1100,7 @@ Validation Error [VAL005]: api.key
   Received: null
   Problem:  This field cannot be null
 
-  Remediation: Provide a non-null value or use Type.Union([Type.Null(), ...]) in schema
+  Remediation: Provide a non-null value or allow null explicitly in the schema (e.g., `Schema.Null` / `z.null()`)
 ```
 
 ### Provider Errors (PROV)
@@ -1113,61 +1151,6 @@ Validation Error [VAL005]: api.key
 - Verify resource ARN matches target parameter path
 - Check for service control policies (SCPs) blocking writes
 
-### Jsonnet Errors (JSON)
-
-#### JSON001: Syntax Error
-
-**Message:** `Jsonnet template has syntax error`
-**Example:**
-
-```
-Jsonnet Error [JSON001]: config.jsonnet:12:5
-
-  Problem:  Expected '}' but found ','
-
-  Line 12:  enableBeta: true,
-                           ^
-  Remediation: Fix syntax error in Jsonnet template
-```
-
-#### JSON002: Runtime Error
-
-**Message:** `Jsonnet template failed during evaluation`
-**Example:**
-
-```
-Jsonnet Error [JSON002]: config.jsonnet:15:18
-
-  Problem:  Division by zero
-
-  Line 15:  timeout: s.api.max / s.api.divisor
-                                   ^
-  Remediation: Check logic in Jsonnet template
-```
-
-#### JSON003: Invalid Output
-
-**Message:** `Jsonnet did not return a valid object`
-**Example:**
-
-```
-Jsonnet Error [JSON003]
-
-  Expected: JSON object
-  Received: string "hello"
-  Problem:  Jsonnet must evaluate to an object, not a primitive
-
-  Remediation: Ensure Jsonnet returns { ... } object structure
-```
-
-#### JSON004: Missing External Variable
-
-**Message:** `Required external variable not provided`
-**Remediation:**
-
-- Ensure `secrets` and `env` are passed via `--ext-code`
-- Check temp file creation succeeded
-
 ### CLI Errors (CLI)
 
 #### CLI001: Invalid Flag
@@ -1187,25 +1170,16 @@ Jsonnet Error [JSON003]
 
 ### System Errors (SYS)
 
-#### SYS001: Binary Not Found
-
-**Message:** `Required binary not found in PATH`
-**Remediation:**
-
-- Install `jsonnet`: `brew install go-jsonnet` or build from source
-- No provider binary required for `aws-ssm`
-- Verify binary is in PATH: `which jsonnet`
-
-#### SYS002: File Not Found
+#### SYS001: File Not Found
 
 **Message:** `Required file does not exist`
 **Remediation:**
 
 - Check file path is correct
 - Verify file permissions (readable)
-- For schema: Ensure `src/schema.ts` exports `ConfigSchema`
+- For schema: Ensure `src/schema.ts` exports `ConfigSchema` for the selected validation layer
 
-#### SYS003: Permission Denied
+#### SYS002: Permission Denied
 
 **Message:** `Insufficient filesystem permissions`
 **Remediation:**
@@ -1213,7 +1187,7 @@ Jsonnet Error [JSON003]
 - Check file/directory permissions
 - Verify write access for snapshot directory (`.zenfig/snapshots/`)
 
-#### SYS004: Snapshot Schema Mismatch
+#### SYS003: Snapshot Schema Mismatch
 
 **Message:** `Snapshot schema hash does not match current schema`
 **Severity:** Error by default (warning if forced)
@@ -1225,7 +1199,7 @@ Jsonnet Error [JSON003]
 
 ---
 
-## 10. Performance Characteristics
+## 11. Performance Characteristics
 
 ### Operational Limits
 
@@ -1233,7 +1207,6 @@ Jsonnet Error [JSON003]
 - **Maximum value size:** 8 KB per value (SSM SecureString limit)
 - **Maximum nesting depth:** 20 levels (practical limit for readability)
 - **Maximum sources:** 50 sources per export (to avoid excessive merge complexity)
-- **Jsonnet execution timeout:** 30 seconds (configurable via `--jsonnet-timeout`)
 
 ### Expected Latency
 
@@ -1246,7 +1219,6 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 | `export` (1000 keys)     | 2s          | 4s          | Multiple batch API calls required             |
 | `upsert`                 | 300ms       | 600ms       | Single PutParameter + encryption verification |
 | `validate` (local file)  | 50ms        | 100ms       | Pure compute, no I/O                          |
-| `diff`                   | 500ms       | 1s          | Fetch + export + compare                      |
 | `snapshot save`          | 600ms       | 1.2s        | Fetch + validate + local write                |
 | `snapshot restore`       | 5s          | 10s         | Per-key upsert (100 keys)                     |
 | Multi-source (3 sources) | +200ms      | +400ms      | Linear overhead per source                    |
@@ -1270,7 +1242,7 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 
 **Schema compilation cache:**
 
-- Cache compiled Ajv validator in memory for duration of CLI process
+- Cache compiled validators/decoders for the selected validation layer in memory for duration of CLI process
 - Reuse across multiple validations (e.g., snapshot restore with 100 keys)
 - No disk cache (schema changes should be reflected immediately)
 
@@ -1282,11 +1254,6 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 - Cache storage: Temp directory (`.zenfig/cache/`)
 - Cache invalidation: Age-based (TTL) or manual (`--no-cache` flag)
 
-**Jsonnet evaluation cache:**
-
-- No caching (templates may have side effects or time-based logic)
-- Fast enough (<100ms for typical templates) to not require caching
-
 ### Optimization Recommendations
 
 1. **Large configs (1000+ keys):**
@@ -1295,7 +1262,6 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
    - Use snapshot restore instead of individual upserts for bulk updates
 
 2. **CI/CD pipelines:**
-   - Cache Jsonnet binary in CI image
    - Use validation-only steps (no provider calls) for PR checks
    - Parallelize exports for multiple services
 
@@ -1311,7 +1277,6 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 
 - **Baseline:** ~50 MB (Node.js runtime + dependencies)
 - **Per 1000 keys:** +10 MB (in-memory config object)
-- **Jsonnet evaluation:** +20 MB temporary allocation
 - **Peak:** ~100 MB for typical workloads (100-500 keys)
 - **Large configs (5000+ keys):** ~200 MB
 
@@ -1323,52 +1288,50 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 
 ---
 
-## 11. Concrete Usage Example
+## 12. Concrete Usage Example
 
 ### Example Files
 
-`src/schema.ts`:
+`src/schema.ts` (Effect Schema example):
 
 ```ts
-import { Type } from '@sinclair/typebox';
+import * as Schema from 'effect/Schema';
 
-export const ConfigSchema = Type.Object({
-  database: Type.Object({
-    url: Type.String({ format: 'uri' }),
+export const ConfigSchema = Schema.Struct({
+  database: Schema.Struct({
+    url: Schema.String,
   }),
-  redis: Type.Object({
-    url: Type.String({ format: 'uri' }),
+  redis: Schema.Struct({
+    url: Schema.String,
   }),
-  feature: Type.Object({
-    enableBeta: Type.Boolean({ default: false }),
+  feature: Schema.Struct({
+    enableBeta: Schema.Boolean,
   }),
-  api: Type.Object({
-    timeoutMs: Type.Integer({ minimum: 1, default: 5000 }),
+  api: Schema.Struct({
+    timeoutMs: Schema.Number,
   }),
 });
 ```
 
-`config.jsonnet`:
+Zod equivalent:
 
-```jsonnet
-local s = std.extVar("secrets");
-local env = std.extVar("env");
-local timeoutMs = std.min([std.max([std.get(s.api, "timeoutMs", 5000), 1000]), 30000]);
-local databaseUrl = s.database.url + "?application_name=api";
-{
-  database: {
-    url: databaseUrl,
-  },
-  redis: {
-    url: std.get(s.redis, "url", "redis://localhost:6379"),
-  },
-  feature: {
-    enableBeta: s.feature.enableBeta || env == "staging",
-  },
-  api: {
-    timeoutMs: timeoutMs,
-  },
-}
+```ts
+import { z } from 'zod';
+
+export const ConfigSchema = z.object({
+  database: z.object({
+    url: z.string(),
+  }),
+  redis: z.object({
+    url: z.string(),
+  }),
+  feature: z.object({
+    enableBeta: z.boolean(),
+  }),
+  api: z.object({
+    timeoutMs: z.number(),
+  }),
+});
 ```
 
 ### SSM State (Initial)
@@ -1387,7 +1350,7 @@ local databaseUrl = s.database.url + "?application_name=api";
 zenfig upsert api api.timeoutMs 6500 --env prod
 ```
 
-Result: writes `/zenfig/prod/api/api/timeoutMs = 6500` (validated as `Type.Integer({ minimum: 1 })`).
+Result: writes `/zenfig/prod/api/api/timeoutMs = 6500` (validated per the selected schema).
 
 2. **Upsert invalid value**
 
@@ -1412,28 +1375,7 @@ zenfig validate --file .env.prod --schema src/schema.ts
 
 Result: Validates all keys and values, reports any errors with detailed messages.
 
-5. **Diff stored vs rendered config**
-
-```bash
-# Check for configuration drift in production
-zenfig diff api --source shared --source overrides --env prod --format table
-```
-
-Result: Shows differences between stored values (provider layer) and rendered config (Jsonnet). Output is redacted by default; use `--show-values` for local debugging.
-
-```
-┌─────────────────┬───────────────────────────────┬───────────────────────────────┬──────────┐
-│ Key             │ Stored (Provider)             │ Rendered (Jsonnet)            │ Status   │
-├─────────────────┼───────────────────────────────┼───────────────────────────────┼──────────┤
-│ api.timeoutMs   │ <redacted>                    │ <redacted>                    │ Modified │
-│ feature.newFlag │ (not set)                     │ <redacted>                    │ Added    │
-│ legacy.setting  │ <redacted>                    │ (removed)                     │ Removed  │
-└─────────────────┴───────────────────────────────┴───────────────────────────────┴──────────┘
-```
-
-Exit code: 1 (differences found)
-
-6. **List stored keys**
+5. **List stored keys**
 
 ```bash
 # List stored keys for a service
@@ -1453,7 +1395,7 @@ Result: Shows stored keys (and values if `--show-values` is provided), redacted 
 └─────────────────┴───────────────────────────────┘
 ```
 
-7. **Delete configuration value**
+6. **Delete configuration value**
 
 ```bash
 # Remove deprecated config key
@@ -1462,7 +1404,7 @@ zenfig delete api legacy.setting --env prod --confirm
 
 Result: Deletes `/zenfig/prod/api/legacy/setting`, logs deletion with timestamp.
 
-8. **Save configuration snapshot**
+7. **Save configuration snapshot**
 
 ```bash
 # Backup production config before major change
@@ -1471,7 +1413,7 @@ zenfig snapshot save api --source shared --env prod
 
 Result: Saves to `.zenfig/snapshots/api-prod-2024-01-15T10-30-00.json` with metadata.
 
-9. **Restore configuration from snapshot**
+8. **Restore configuration from snapshot**
 
 ```bash
 # Rollback to previous snapshot after failed deployment
@@ -1480,7 +1422,7 @@ zenfig snapshot restore .zenfig/snapshots/api-prod-2024-01-15T10-30-00.json --dr
 
 Result: Shows diff of what would change, requires `--confirm` to apply.
 
-10. **Upsert with stdin (secure)**
+9. **Upsert with stdin (secure)**
 
 ```bash
 # Set sensitive value without exposing in process list
@@ -1498,7 +1440,7 @@ Result: Writes `/zenfig/prod/api/jwt/secret` as SecureString, verifies encryptio
 - `overrides`:
   `{"feature":{"enableBeta":true}}`
 
-### Merged Secrets (Jsonnet Order: api + shared + overrides)
+### Merged Config (Merge Order: api + shared + overrides)
 
 ```json
 {
@@ -1513,271 +1455,20 @@ Result: Writes `/zenfig/prod/api/jwt/secret` as SecureString, verifies encryptio
 
 ```json
 {
-  "database": { "url": "postgres://api-main?application_name=api" },
+  "database": { "url": "postgres://api-main" },
   "redis": { "url": "redis://shared" },
   "feature": { "enableBeta": true },
-  "api": { "timeoutMs": 30000 }
+  "api": { "timeoutMs": 60000 }
 }
 ```
 
 ### Output (format env)
 
 ```
-API_TIMEOUT_MS=30000
-DATABASE_URL="postgres://api-main?application_name=api"
+API_TIMEOUT_MS=60000
+DATABASE_URL="postgres://api-main"
 FEATURE_ENABLE_BETA=true
 REDIS_URL=redis://shared
-```
-
----
-
-## 12. Init Command Specification
-
-### Basic Usage
-
-```bash
-zenfig init --schema src/schema.ts --output config.jsonnet
-```
-
-### Input Schema Example
-
-```ts
-import { Type } from '@sinclair/typebox';
-
-export const ConfigSchema = Type.Object({
-  database: Type.Object({
-    url: Type.String({ format: 'uri' }),
-  }),
-  feature: Type.Object({
-    enableBeta: Type.Boolean({ default: false }),
-  }),
-});
-```
-
-### Generated Identity Jsonnet (Default)
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  database: {
-    url: s.database.url,
-  },
-  feature: {
-    enableBeta: s.feature.enableBeta,
-  },
-}
-```
-
-### Edge Cases and Behaviors
-
-#### 1. Output File Already Exists
-
-**Scenario:** `config.jsonnet` already exists
-**Default behavior:** Error and exit (do not overwrite)
-
-```
-Error: Output file already exists: config.jsonnet
-Use --force to overwrite
-```
-
-**With `--force` flag:** Overwrite existing file with warning
-
-```
-Warning: Overwriting existing file: config.jsonnet
-```
-
-#### 2. Include Schema Defaults
-
-**With `--include-defaults` flag:**
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  database: {
-    url: s.database.url,
-  },
-  feature: {
-    // Schema default: false
-    enableBeta: std.get(s.feature, "enableBeta", false),
-  },
-}
-```
-
-Comments indicate which fields have defaults, and `std.get` provides fallback values.
-
-#### 3. Optional Fields
-
-**Schema with optional fields:**
-
-```ts
-export const ConfigSchema = Type.Object({
-  database: Type.Object({
-    url: Type.String({ format: 'uri' }),
-    pool: Type.Optional(
-      Type.Object({
-        max: Type.Integer({ minimum: 1, default: 10 }),
-      })
-    ),
-  }),
-});
-```
-
-**Generated Jsonnet (default):**
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  database: {
-    url: s.database.url,
-    pool: if std.objectHas(s.database, "pool") then {
-      max: s.database.pool.max,
-    } else {},
-  },
-}
-```
-
-**Generated Jsonnet (with `--include-defaults`):**
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  database: {
-    url: s.database.url,
-    pool: if std.objectHas(s.database, "pool") then {
-      // Schema default: 10
-      max: std.get(s.database.pool, "max", 10),
-    } else {},
-  },
-}
-```
-
-#### 4. Arrays in Schema
-
-**Schema with arrays:**
-
-```ts
-export const ConfigSchema = Type.Object({
-  allowedOrigins: Type.Array(Type.String({ format: 'uri' })),
-});
-```
-
-**Generated Jsonnet:**
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  allowedOrigins: s.allowedOrigins,
-}
-```
-
-#### 5. Union Types
-
-**Schema with unions:**
-
-```ts
-export const ConfigSchema = Type.Object({
-  timeout: Type.Union([Type.Integer({ minimum: 0 }), Type.Literal('infinity')]),
-});
-```
-
-**Generated Jsonnet:**
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  // Union type: integer | "infinity"
-  timeout: s.timeout,
-}
-```
-
-Comment indicates the union type for clarity.
-
-#### 6. Nested Objects (Deep)
-
-**Schema with deep nesting:**
-
-```ts
-export const ConfigSchema = Type.Object({
-  database: Type.Object({
-    connection: Type.Object({
-      pool: Type.Object({
-        min: Type.Integer({ minimum: 0, default: 2 }),
-        max: Type.Integer({ minimum: 1, default: 10 }),
-      }),
-    }),
-  }),
-});
-```
-
-**Generated Jsonnet (with `--include-defaults`):**
-
-```jsonnet
-local s = std.extVar("secrets");
-{
-  database: {
-    connection: {
-      pool: {
-        // Schema default: 2
-        min: std.get(s.database.connection.pool, "min", 2),
-        // Schema default: 10
-        max: std.get(s.database.connection.pool, "max", 10),
-      },
-    },
-  },
-}
-```
-
-#### 7. Schema File Not Found
-
-**Scenario:** Schema file doesn't exist
-**Behavior:** Error with helpful message
-
-```
-Error [SYS002]: Schema file not found: src/schema.ts
-
-Remediation:
-  - Check file path is correct
-  - Ensure schema exports 'ConfigSchema'
-  - Example schema:
-      import { Type } from "@sinclair/typebox";
-      export const ConfigSchema = Type.Object({ ... });
-```
-
-#### 8. Schema Export Name Mismatch
-
-**Scenario:** Schema file doesn't export `ConfigSchema`
-**Behavior:** Error with discovery
-
-```
-Error: 'ConfigSchema' not found in src/schema.ts
-
-Found exports: MySchema, AppConfig
-
-Remediation: Rename export to 'ConfigSchema' or use --schema-export-name flag
-Example: zenfig init --schema src/schema.ts --schema-export-name AppConfig
-```
-
-#### 9. Output Directory Doesn't Exist
-
-**Scenario:** `--output deep/nested/config.jsonnet` where `deep/nested/` doesn't exist
-**Behavior:** Create parent directories automatically (like `mkdir -p`)
-
-```
-Info: Creating directory: deep/nested/
-Generated: deep/nested/config.jsonnet
-```
-
-#### 10. Schema Validation
-
-**Scenario:** Schema file has syntax errors or invalid TypeBox usage
-**Behavior:** Error with TypeScript/parsing error details
-
-```
-Error: Failed to parse schema file: src/schema.ts
-
-  Problem:  Unexpected token '}' at line 15
-
-Remediation: Fix syntax error in schema file
 ```
 
 ---
@@ -1787,18 +1478,15 @@ Remediation: Fix syntax error in schema file
 "Act as a Senior DevOps Engineer. Based on the Zenfig specification provided, generate a TypeScript implementation with the following requirements:
 
 1. **Core dependencies:**
-   - Use `execa` for shell command execution (jsonnet binary)
-   - Use `@sinclair/typebox` and `ajv` for schema validation
+   - Implement a pluggable validator interface with `effect/Schema` (default) and `zod` adapters
    - Use `@aws-sdk/client-ssm` for the default AWS SSM provider
    - Use `commander` for CLI interface
-   - Use `chalk` for colored terminal output
-   - Use `cli-table3` for table formatting (diff command)
 
 2. **Critical features:**
-   - Implement all core commands: export, upsert, validate, diff, delete, snapshot (save/restore), init, doctor
-   - Secure secret passing: Use temp files for secrets, never pass via CLI args
+   - Implement all core commands: export, upsert, validate, list, delete, snapshot (save/restore)
+   - Secure secret handling: Never log or print secret values unless explicitly requested
    - Partial path validation: Implement schema traversal algorithm as specified
-   - Schema-directed parsing: Parse provider/CLI/file inputs into typed values before validation (no Ajv coercion)
+   - Schema-directed parsing: Parse provider/CLI/file inputs into typed values before validation (no implicit coercion)
    - Error messages: Include full path, expected type, actual value, constraint details, and suggestions
    - Env flattening: Implement robust flattening with proper quoting, escaping, and type serialization
    - Merge conflict detection: Deep merge with type mismatch warnings
@@ -1817,7 +1505,7 @@ Remediation: Fix syntax error in schema file
    - Minimum 80% code coverage
 
 5. **Error handling:**
-   - Implement all error codes from Error Catalog (VAL001-005, PROV001-005, JSON001-004, CLI001-003, SYS001-004)
+   - Implement all error codes from Error Catalog (VAL001-005, PROV001-005, CLI001-003, SYS001-003)
    - Proper exit codes (0-5 as specified)
    - Structured error output with remediation guidance
 

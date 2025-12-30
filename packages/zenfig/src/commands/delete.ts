@@ -69,11 +69,11 @@ export function executeDelete(
     // 1. Validate key path segments
     validateKeyPathSegments(options.key),
     // 2. Load schema
-    Effect.flatMap(() => loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName)),
-    Effect.flatMap(({ schema }) =>
+    Effect.flatMap(() => loadSchemaWithDefaults(options.config.schema, options.config.validation)),
+    Effect.flatMap(({ adapter, schema }) =>
       // 3. Resolve the key path (may not exist in schema - warn but allow)
       pipe(
-        Effect.either(resolvePath(schema, options.key)),
+        Effect.either(resolvePath(schema, options.key, adapter)),
         Effect.map((resolveResult) => {
           if (resolveResult._tag === 'Left') {
             // Key not in schema - warn but use the input as-is

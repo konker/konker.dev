@@ -23,6 +23,7 @@ import { validateAll } from '../schema/index.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { parseProviderKV } from '../schema/parser.js';
 import { getAllLeafPaths, validateKeyPathSegments } from '../schema/resolver.js';
+import type { ValidatorAdapter } from '../validation/types.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -78,8 +79,8 @@ export function executeValidate(
       }
 
       return pipe(
-        loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
-        Effect.flatMap(({ schema }) => {
+        loadSchemaWithDefaults(options.config.schema, options.config.validation),
+        Effect.flatMap(({ adapter, schema }) => {
           if (format === 'json') {
             return pipe(
               Effect.try({
@@ -88,7 +89,7 @@ export function executeValidate(
               }),
               Effect.flatMap((parsed) =>
                 pipe(
-                  collectUnknownKeys(parsed, schema),
+                  collectUnknownKeys(parsed, schema, adapter),
                   Effect.flatMap((unknownKeys) => {
                     if (unknownKeys.length > 0 && options.config.strict) {
                       return Effect.fail(unknownKeysError(unknownKeys));
@@ -98,7 +99,7 @@ export function executeValidate(
                       unknownKeys.length > 0 ? [`Unknown keys in ${options.file}: ${unknownKeys.join(', ')}`] : [];
 
                     return pipe(
-                      validateAll(parsed, schema),
+                      validateAll(parsed, schema, adapter),
                       Effect.map((result) => ({
                         valid: result.errors.length === 0,
                         errors: result.errors,
@@ -113,7 +114,7 @@ export function executeValidate(
           }
 
           const envMap = parseEnvContent(content);
-          const envKeyMap = buildEnvKeyMap(schema, options.config.separator);
+          const envKeyMap = buildEnvKeyMap(schema, adapter, options.config.separator);
           const unknownEnvKeys = Object.keys(envMap).filter((key) => !envKeyMap.has(key));
 
           if (unknownEnvKeys.length > 0 && options.config.strict) {
@@ -133,7 +134,7 @@ export function executeValidate(
           }
 
           return pipe(
-            parseProviderKV(kv, schema),
+            parseProviderKV(kv, schema, adapter),
             Effect.flatMap((parsedResult) => {
               if (parsedResult.unknownKeys.length > 0 && options.config.strict) {
                 return Effect.fail(unknownKeysError(parsedResult.unknownKeys));
@@ -145,7 +146,7 @@ export function executeValidate(
                   : warnings;
 
               return pipe(
-                validateAll(parsedResult.parsed, schema),
+                validateAll(parsedResult.parsed, schema, adapter),
                 Effect.map((result) => ({
                   valid: result.errors.length === 0,
                   errors: result.errors,
@@ -196,9 +197,9 @@ export function runValidate(
 // Helpers
 // --------------------------------------------------------------------------
 
-function buildEnvKeyMap(schema: unknown, separator: string): Map<string, string> {
+function buildEnvKeyMap(schema: unknown, adapter: ValidatorAdapter, separator: string): Map<string, string> {
   const envKeyMap = new Map<string, string>();
-  const leafPaths = getAllLeafPaths(schema as never)
+  const leafPaths = getAllLeafPaths(schema as never, adapter)
     .map((entry) => entry.path)
     .filter((path) => path.length > 0);
 
@@ -211,13 +212,14 @@ function buildEnvKeyMap(schema: unknown, separator: string): Map<string, string>
 
 function collectUnknownKeys(
   parsed: Record<string, unknown>,
-  schema: unknown
+  schema: unknown,
+  adapter: ValidatorAdapter
 ): Effect.Effect<ReadonlyArray<string>, ValidationError> {
   if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
     return Effect.succeed([]);
   }
 
-  const leafPaths = getAllLeafPaths(schema as never).map((entry) => entry.path);
+  const leafPaths = getAllLeafPaths(schema as never, adapter).map((entry) => entry.path);
   const knownPaths = new Set(leafPaths.filter((path) => path.length > 0));
   const flat = flatten(parsed as Record<string, unknown>);
 

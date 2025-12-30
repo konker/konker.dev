@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   authenticationFailedError,
-  binaryNotFoundError,
   CLIError,
   conflictingFlagsError,
   connectionFailedError,
@@ -25,11 +24,6 @@ import {
   invalidFlagError,
   invalidKeyPathError,
   invalidTypeError,
-  JsonnetError,
-  jsonnetInvalidOutputError,
-  jsonnetMissingVariableError,
-  jsonnetRuntimeError,
-  jsonnetSyntaxError,
   keyNotFoundError,
   missingRequiredArgumentError,
   nullNotAllowedError,
@@ -53,14 +47,13 @@ describe('errors', () => {
       expect(errorCodeToExitCode(ErrorCode.CLI003)).toBe(EXIT_CONFIG_ERROR);
     });
 
-    it('should map SYS001-003 to EXIT_FILE_ERROR', () => {
+    it('should map SYS001-002 to EXIT_FILE_ERROR', () => {
       expect(errorCodeToExitCode(ErrorCode.SYS001)).toBe(EXIT_FILE_ERROR);
       expect(errorCodeToExitCode(ErrorCode.SYS002)).toBe(EXIT_FILE_ERROR);
-      expect(errorCodeToExitCode(ErrorCode.SYS003)).toBe(EXIT_FILE_ERROR);
     });
 
-    it('should map SYS004 to EXIT_SCHEMA_MISMATCH', () => {
-      expect(errorCodeToExitCode(ErrorCode.SYS004)).toBe(EXIT_SCHEMA_MISMATCH);
+    it('should map SYS003 to EXIT_SCHEMA_MISMATCH', () => {
+      expect(errorCodeToExitCode(ErrorCode.SYS003)).toBe(EXIT_SCHEMA_MISMATCH);
     });
 
     it('should map PROV001-002-005 to EXIT_AUTH_ERROR', () => {
@@ -76,7 +69,6 @@ describe('errors', () => {
     it('should default to EXIT_VALIDATION_ERROR', () => {
       expect(errorCodeToExitCode(ErrorCode.VAL001)).toBe(EXIT_VALIDATION_ERROR);
       expect(errorCodeToExitCode(ErrorCode.VAL002)).toBe(EXIT_VALIDATION_ERROR);
-      expect(errorCodeToExitCode(ErrorCode.JSON001)).toBe(EXIT_VALIDATION_ERROR);
     });
   });
 
@@ -241,39 +233,6 @@ describe('errors', () => {
       });
     });
 
-    describe('jsonnet errors', () => {
-      it('jsonnetSyntaxError should create correct error', () => {
-        const error = jsonnetSyntaxError('config.jsonnet:10:5', 'Unexpected token');
-
-        expect(error.context.code).toBe(ErrorCode.JSON001);
-        expect(error.context.location).toBe('config.jsonnet:10:5');
-        expect(error.context.problem).toBe('Unexpected token');
-      });
-
-      it('jsonnetRuntimeError should create correct error', () => {
-        const error = jsonnetRuntimeError('config.jsonnet:20:10', 'Division by zero');
-
-        expect(error.context.code).toBe(ErrorCode.JSON002);
-        expect(error.context.location).toBe('config.jsonnet:20:10');
-        expect(error.context.problem).toBe('Division by zero');
-      });
-
-      it('jsonnetInvalidOutputError should create correct error', () => {
-        const error = jsonnetInvalidOutputError('"string"');
-
-        expect(error.context.code).toBe(ErrorCode.JSON003);
-        expect(error.context.expected).toBe('JSON object');
-        expect(error.context.received).toBe('"string"');
-      });
-
-      it('jsonnetMissingVariableError should create correct error', () => {
-        const error = jsonnetMissingVariableError('env');
-
-        expect(error.context.code).toBe(ErrorCode.JSON004);
-        expect(error.context.problem).toContain('env');
-      });
-    });
-
     describe('CLI errors', () => {
       it('invalidFlagError should create correct error', () => {
         const error = invalidFlagError('--unknown');
@@ -300,26 +259,10 @@ describe('errors', () => {
     });
 
     describe('system errors', () => {
-      it('binaryNotFoundError should create correct error for jsonnet', () => {
-        const error = binaryNotFoundError('jsonnet');
-
-        expect(error.context.code).toBe(ErrorCode.SYS001);
-        expect(error.context.problem).toContain('jsonnet');
-        expect(error.context.remediation).toContain('go-jsonnet');
-      });
-
-      it('binaryNotFoundError should create correct error for other binaries', () => {
-        const error = binaryNotFoundError('custom-bin');
-
-        expect(error.context.code).toBe(ErrorCode.SYS001);
-        expect(error.context.problem).toContain('custom-bin');
-        expect(error.context.remediation).toContain('custom-bin');
-      });
-
       it('fileNotFoundError should create correct error', () => {
         const error = fileNotFoundError('/path/to/file.json');
 
-        expect(error.context.code).toBe(ErrorCode.SYS002);
+        expect(error.context.code).toBe(ErrorCode.SYS001);
         expect(error.context.path).toBe('/path/to/file.json');
         expect(error.context.problem).toContain('/path/to/file.json');
       });
@@ -327,7 +270,7 @@ describe('errors', () => {
       it('permissionDeniedError should create correct error', () => {
         const error = permissionDeniedError('/path/to/file', 'read');
 
-        expect(error.context.code).toBe(ErrorCode.SYS003);
+        expect(error.context.code).toBe(ErrorCode.SYS002);
         expect(error.context.path).toBe('/path/to/file');
         expect(error.context.problem).toContain('read');
       });
@@ -335,7 +278,7 @@ describe('errors', () => {
       it('snapshotSchemaMismatchError should create correct error', () => {
         const error = snapshotSchemaMismatchError('abc123', 'def456');
 
-        expect(error.context.code).toBe(ErrorCode.SYS004);
+        expect(error.context.code).toBe(ErrorCode.SYS003);
         expect(error.context.expected).toBe('abc123');
         expect(error.context.received).toBe('def456');
       });
@@ -358,15 +301,6 @@ describe('errors', () => {
       });
       expect(error._tag).toBe('ProviderError');
       expect(error.exitCode).toBe(EXIT_AUTH_ERROR);
-    });
-
-    it('JsonnetError should have correct tag', () => {
-      const error = new JsonnetError({
-        message: 'Test',
-        context: { code: ErrorCode.JSON001 },
-      });
-      expect(error._tag).toBe('JsonnetError');
-      expect(error.exitCode).toBe(EXIT_VALIDATION_ERROR);
     });
 
     it('CLIError should have correct tag', () => {
@@ -446,13 +380,6 @@ describe('errors', () => {
       expect(formatted).not.toContain(': undefined');
     });
 
-    it('should format error with location', () => {
-      const error = jsonnetSyntaxError('config.jsonnet:10:5', 'Unexpected token');
-      const formatted = formatError(error);
-
-      expect(formatted).toContain('Location: config.jsonnet:10:5');
-    });
-
     it('should format error with example', () => {
       const error = formatViolationError('email', 'email', 'invalid', 'user@example.com');
       const formatted = formatError(error);
@@ -472,14 +399,7 @@ describe('errors', () => {
       const error = fileNotFoundError('/path/to/file');
       const formatted = formatError(error);
 
-      expect(formatted).toContain('System Error [SYS002]');
-    });
-
-    it('should format Jsonnet error', () => {
-      const error = jsonnetRuntimeError('file.jsonnet:1:1', 'Error');
-      const formatted = formatError(error);
-
-      expect(formatted).toContain('Jsonnet Error [JSON002]');
+      expect(formatted).toContain('System Error [SYS001]');
     });
   });
 

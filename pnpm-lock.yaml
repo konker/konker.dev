@@ -1383,15 +1383,6 @@ importers:
       '@konker.dev/tiny-error-fp':
         specifier: workspace:*
         version: link:../tiny-error-fp
-      '@sinclair/typebox':
-        specifier: ^0.34.45
-        version: 0.34.45
-      ajv:
-        specifier: ^8.17.1
-        version: 8.17.1
-      ajv-formats:
-        specifier: ^3.0.1
-        version: 3.0.1(ajv@8.17.1)
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
@@ -1404,12 +1395,12 @@ importers:
       effect:
         specifier: ^3.19.13
         version: 3.19.13
-      execa:
-        specifier: ^9.6.1
-        version: 9.6.1
       json5:
         specifier: ^2.2.3
         version: 2.2.3
+      zod:
+        specifier: ^3.25.67
+        version: 3.25.76
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.2
@@ -1424,8 +1415,8 @@ importers:
         specifier: ^9.39.2
         version: 9.39.2
       '@konker.dev/common-config':
-        specifier: ^0.5.1
-        version: 0.5.1(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
+        specifier: ^0.7.0
+        version: 0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
       '@types/node':
         specifier: ^25.0.3
         version: 25.0.3
@@ -2743,10 +2734,6 @@ packages:
     peerDependencies:
       astro: ^4.0.0
 
-  '@konker.dev/common-config@0.5.1':
-    resolution: {integrity: sha512-yPpT6CyW/6v1vca096X7tMMb+rEYPbnfibwRnrcA1+ExCaf7o26Hb0McxH4wiJyioXwcgUgOS3onXkQ/lYw+iA==}
-    hasBin: true
-
   '@konker.dev/common-config@0.7.0':
     resolution: {integrity: sha512-l+GT5XYkjVjUrai5m+kc7WrEDs8KR9L02Vf/dioVH6pfVewQxbfLsjAqS3uaK5fxFqfAZqn+ojVEso8lGO3hDg==}
     hasBin: true
@@ -2967,9 +2954,6 @@ packages:
 
   '@sinclair/typebox@0.25.21':
     resolution: {integrity: sha512-gFukHN4t8K4+wVC+ECqeqwzBDeFeTzBXroBTqE6vcWrQGbEUpHO7LYdG0f4xnvYq4VOEwITSlHlp0JBAIFMS/g==}
-
-  '@sinclair/typebox@0.34.45':
-    resolution: {integrity: sha512-qJcFVfCa5jxBFSuv7S5WYbA8XdeCPmhnaVVfX/2Y6L8WYg8sk3XY2+6W0zH+3mq1Cz+YC7Ki66HfqX6IHAwnkg==}
 
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
@@ -7129,6 +7113,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   skin-tone@2.0.0:
@@ -10304,22 +10289,6 @@ snapshots:
     dependencies:
       astro: 5.16.6(@azure/storage-blob@12.28.0)(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.52.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1)
 
-  '@konker.dev/common-config@0.5.1(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))':
-    dependencies:
-      '@aws-sdk/client-cloudfront-keyvaluestore': 3.958.0(aws-crt@1.27.3)
-      '@aws-sdk/signature-v4-crt': 3.957.0
-      eslint-plugin-jsonc: 2.21.0(eslint@9.39.2(jiti@2.6.1))
-      jsonc-eslint-parser: 2.4.2
-      lodash: 4.17.21
-    transitivePeerDependencies:
-      - '@eslint/json'
-      - aws-crt
-      - bufferutil
-      - debug
-      - eslint
-      - supports-color
-      - utf-8-validate
-
   '@konker.dev/common-config@0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))':
     dependencies:
       '@aws-sdk/client-cloudfront-keyvaluestore': 3.958.0(aws-crt@1.27.3)
@@ -10549,8 +10518,6 @@ snapshots:
   '@shikijs/vscode-textmate@10.0.2': {}
 
   '@sinclair/typebox@0.25.21': {}
-
-  '@sinclair/typebox@0.34.45': {}
 
   '@sindresorhus/is@4.6.0': {}
 

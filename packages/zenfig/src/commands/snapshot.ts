@@ -146,7 +146,7 @@ export function executeSnapshotSave(
 ): Effect.Effect<SnapshotSaveResult, ProviderError | SystemError | ValidationError | ZenfigError> {
   return pipe(
     // 1. Load schema for hash
-    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+    loadSchemaWithDefaults(options.config.schema, options.config.validation),
     Effect.flatMap(({ schemaHash }) =>
       // 2. Get provider
       pipe(
@@ -280,7 +280,7 @@ export function executeSnapshotRestore(
 
       // 3. Check schema hash
       return pipe(
-        loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
+        loadSchemaWithDefaults(options.config.schema, options.config.validation),
         Effect.flatMap(({ schemaHash }) => {
           const { forceSchemaMatch = false } = options;
 

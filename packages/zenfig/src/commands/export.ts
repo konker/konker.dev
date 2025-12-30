@@ -1,22 +1,19 @@
 /**
  * Export Command
  *
- * Workflow: Fetch -> Parse -> Merge -> Inject -> Template -> Validate -> Format
+ * Workflow: Fetch -> Parse -> Merge -> Validate -> Format
  */
-import { type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
 import { type ResolvedConfig } from '../config.js';
 import {
-  type JsonnetError,
   type ProviderError,
   type SystemError,
   unknownKeysError,
   type ValidationError,
   type ZenfigError,
 } from '../errors.js';
-import { evaluateTemplate } from '../jsonnet/executor.js';
 import { formatConfig } from '../lib/format.js';
 import { formatConflicts, mergeConfigs, type MergeOptions, type MergeResult } from '../lib/merge.js';
 import { checkProviderGuards } from '../providers/guards.js';
@@ -25,6 +22,7 @@ import { getProvider } from '../providers/registry.js';
 import { validate } from '../schema/index.js';
 import { loadSchemaWithDefaults } from '../schema/loader.js';
 import { parseProviderKV } from '../schema/parser.js';
+import type { ValidatorAdapter } from '../validation/types.js';
 
 // --------------------------------------------------------------------------
 // Types
@@ -64,7 +62,8 @@ function fetchAllServices(
   prefix: string,
   env: string,
   services: ReadonlyArray<string>,
-  rootSchema: TSchema,
+  rootSchema: unknown,
+  adapter: ValidatorAdapter,
   providerGuards: ResolvedConfig['providerGuards']
 ): Effect.Effect<
   {
@@ -79,7 +78,7 @@ function fetchAllServices(
       return pipe(
         checkProviderGuards(provider, ctx, providerGuards),
         Effect.flatMap(() => fetchService(provider, ctx)),
-        Effect.flatMap((kv) => parseProviderKV(kv, rootSchema)),
+        Effect.flatMap((kv) => parseProviderKV(kv, rootSchema, adapter)),
         Effect.map((result) => ({
           service,
           parsed: result.parsed,
@@ -105,28 +104,28 @@ function fetchAllServices(
  */
 export function executeExport(
   options: ExportOptions
-): Effect.Effect<ExportResult, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+): Effect.Effect<ExportResult, ProviderError | ValidationError | SystemError | ZenfigError | Error> {
   return pipe(
     // 1. Load schema
-    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
-    Effect.flatMap(({ schema }) =>
+    loadSchemaWithDefaults(options.config.schema, options.config.validation),
+    Effect.flatMap(({ adapter, schema }) =>
       // 2. Get provider
       pipe(
         getProvider(options.config.provider),
-        Effect.map((provider) => ({ schema, provider }))
+        Effect.map((provider) => ({ schema, adapter, provider }))
       )
     ),
-    Effect.flatMap(({ provider, schema }) => {
+    Effect.flatMap(({ adapter, provider, schema }) => {
       const { config, service, sources = [] } = options;
       const allServices = [service, ...sources];
 
       // 3-4. Fetch and parse all services
       return pipe(
-        fetchAllServices(provider, config.ssmPrefix, config.env, allServices, schema, config.providerGuards),
-        Effect.map((result) => ({ ...result, schema, config }))
+        fetchAllServices(provider, config.ssmPrefix, config.env, allServices, schema, adapter, config.providerGuards),
+        Effect.map((result) => ({ ...result, schema, adapter, config }))
       );
     }),
-    Effect.flatMap(({ config, parsedServices, schema, unknownKeys }) => {
+    Effect.flatMap(({ adapter, config, parsedServices, schema, unknownKeys }) => {
       // 5. Merge all sources
       const mergeOptions: MergeOptions = {
         strictMerge: options.strictMerge ?? config.strict,
@@ -156,26 +155,20 @@ export function executeExport(
             warnings.push(`Merge conflicts:\n${conflictLog}`);
           }
 
-          return { mergeResult, schema, config, warnings };
+          return { mergeResult, schema, adapter, config, warnings };
         })
       );
     }),
-    Effect.flatMap(({ config, mergeResult, schema, warnings }) =>
-      // 6. Evaluate Jsonnet template
+    Effect.flatMap(({ adapter, config, mergeResult, schema, warnings }) =>
+      // 6. Validate against schema
       pipe(
-        evaluateTemplate(mergeResult.merged, config.env, config.jsonnet, config.jsonnetTimeoutMs),
-        Effect.flatMap((rendered) =>
-          // 7. Validate against schema
-          pipe(
-            validate<Record<string, unknown>>(rendered, schema),
-            Effect.map((validated) => ({
-              validated,
-              mergeResult,
-              config,
-              warnings,
-            }))
-          )
-        )
+        validate<Record<string, unknown>>(mergeResult.merged, schema, adapter),
+        Effect.map((validated) => ({
+          validated,
+          mergeResult,
+          config,
+          warnings,
+        }))
       )
     ),
     Effect.map(({ config, mergeResult, validated, warnings }) => {
@@ -199,7 +192,7 @@ export function executeExport(
  */
 export function runExport(
   options: ExportOptions
-): Effect.Effect<void, ProviderError | ValidationError | JsonnetError | SystemError | ZenfigError | Error> {
+): Effect.Effect<void, ProviderError | ValidationError | SystemError | ZenfigError | Error> {
   return pipe(
     executeExport(options),
     Effect.map((result) => {

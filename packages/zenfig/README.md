@@ -1,12 +1,11 @@
 # Zenfig
 
-CLI tool for configuration and secrets management using AWS SSM, Jsonnet, and TypeBox.
+CLI tool for configuration and secrets management using AWS SSM with a pluggable validation layer (Effect Schema or Zod).
 
 ## Prerequisites
 
 - Node.js 18+ (or a compatible runtime)
 - pnpm
-- jsonnet CLI on PATH
 - AWS credentials and region configuration for the default `aws-ssm` provider
 
 ## Setup
@@ -27,6 +26,8 @@ pnpm run build
 
 Zenfig reads configuration from `zenfigrc.json` or `zenfigrc.json5` (searches current and parent directories) and
 environment variables. Both files are parsed with JSON5, so comments and trailing commas are allowed.
+Validation is pluggable; set `validation` to `effect` (default) or `zod`. Your schema file must export a single
+`ConfigSchema` value that matches the selected validator.
 
 Example `zenfigrc.json`:
 
@@ -36,8 +37,7 @@ Example `zenfigrc.json`:
   "provider": "aws-ssm",
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
-  "schemaExportName": "ConfigSchema",
-  "jsonnet": "config.jsonnet",
+  "validation": "effect",
   "providerGuards": {
     "aws-ssm": {
       "accountId": "123456789012",
@@ -58,12 +58,10 @@ Environment overrides:
 - `ZENFIG_PROVIDER`
 - `ZENFIG_SSM_PREFIX`
 - `ZENFIG_SCHEMA`
-- `ZENFIG_SCHEMA_EXPORT_NAME`
-- `ZENFIG_JSONNET`
+- `ZENFIG_VALIDATION`
 - `ZENFIG_FORMAT`
 - `ZENFIG_SEPARATOR`
 - `ZENFIG_CACHE`
-- `ZENFIG_JSONNET_TIMEOUT_MS`
 - `ZENFIG_CI`
 - `ZENFIG_IGNORE_PROVIDER_GUARDS`
 
@@ -91,6 +89,31 @@ Use a different provider:
 
 ```sh
 ZENFIG_PROVIDER=mock pnpm run zenfig list <service>
+```
+
+## Programmatic API (export-only)
+
+Zenfig exposes a TypeScript API for export-only usage. It resolves configuration the same way as the CLI (rc file,
+env vars, defaults), but lets you override values inline.
+
+```ts
+import { exportConfig } from '@konker.dev/zenfig';
+
+const result = await exportConfig({
+  service: 'api',
+  sources: ['shared'],
+  format: 'json',
+  config: {
+    env: 'prod',
+    provider: 'aws-ssm',
+    ssmPrefix: '/zenfig',
+    schema: 'src/schema.ts',
+    validation: 'effect',
+  },
+});
+
+// Structured config object
+console.log(result.config);
 ```
 
 ## Development

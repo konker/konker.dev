@@ -2,128 +2,80 @@
 /**
  * Delete Command Tests
  */
-import { createInterface } from 'node:readline';
+import { Readable } from 'node:stream';
 
-import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
-import { createMockProvider } from '../providers/MockProvider.js';
-import { getProvider } from '../providers/registry.js';
-import { loadSchemaWithDefaults } from '../schema/loader.js';
+import {
+  createBasicProviderData,
+  createTestConfig,
+  registerMockProviderWithData,
+  schemaBasicPath,
+} from '../test/fixtures/index.js';
 import { executeDelete, runDelete } from './delete.js';
-
-vi.mock('node:readline', () => ({
-  createInterface: vi.fn(),
-}));
-
-// Mock dependencies
-vi.mock('../schema/loader.js', () => ({
-  loadSchemaWithDefaults: vi.fn(),
-}));
-
-vi.mock('../providers/registry.js', () => ({
-  getProvider: vi.fn(),
-}));
 
 describe('Delete Command', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-  let mockProvider: ReturnType<typeof createMockProvider>;
   const originalEnv = process.env;
+  const originalStdin = process.stdin;
 
-  const defaultConfig: ResolvedConfig = {
-    env: 'dev',
-    provider: 'mock',
-    ssmPrefix: '/zenfig',
-    schema: 'src/schema.ts',
-    schemaExportName: 'ConfigSchema',
-    jsonnet: 'config.jsonnet',
-    sources: [],
-    format: 'env',
-    separator: '_',
-    cache: undefined,
-    jsonnetTimeoutMs: 30000,
-    ci: false,
-    strict: false,
-    providerGuards: {},
-  };
-
-  const testSchema = Type.Object({
-    database: Type.Object({
-      host: Type.String(),
-      port: Type.Integer(),
-    }),
+  const baseConfig: ResolvedConfig = createTestConfig({ schema: schemaBasicPath });
+  const buildConfig = (provider: string, overrides: Partial<ResolvedConfig> = {}): ResolvedConfig => ({
+    ...baseConfig,
+    provider,
+    ...overrides,
   });
 
   beforeEach(() => {
-    vi.resetAllMocks();
     process.env = { ...originalEnv };
-
-    const storageKey = '/zenfig/dev/api';
-    mockProvider = createMockProvider({
-      [storageKey]: {
-        'database.host': 'localhost',
-        'database.port': '5432',
-      },
-    });
-
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
-
-    vi.mocked(createInterface).mockReturnValue({
-      question: (_message: string, cb: (answer: string) => void) => cb('y'),
-      close: vi.fn(),
-    } as unknown as ReturnType<typeof createInterface>);
-
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
-    vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    Object.defineProperty(process, 'stdin', { value: originalStdin, configurable: true });
     process.env = originalEnv;
+    vi.restoreAllMocks();
   });
 
   describe('executeDelete', () => {
     it('should delete existing key with confirm flag', async () => {
+      const { name, provider } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const result = await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.canonicalKey).toBe('database.host');
       expect(result.deleted).toBe(true);
 
-      // Verify key was deleted
-      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      const stored = await Effect.runPromise(provider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBeUndefined();
     });
 
     it('should warn for key not in schema but still delete', async () => {
-      // Add an extra key that exists in provider but not in schema
-      const mockProviderWithUnknownKey = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'localhost',
-          'database.port': '5432',
+      const { name } = registerMockProviderWithData(
+        createBasicProviderData('api', {
           'unknown.key': 'some-value',
-        },
-      });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithUnknownKey));
+        })
+      );
 
       const result = await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'unknown.key',
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -132,14 +84,13 @@ describe('Delete Command', () => {
     });
 
     it('should require confirm flag in CI mode', async () => {
-      const ciConfig: ResolvedConfig = { ...defaultConfig, ci: true };
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
 
       const result = await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
-          // No confirm flag
-          config: ciConfig,
+          config: buildConfig(name, { ci: true }),
         })
       );
 
@@ -148,14 +99,14 @@ describe('Delete Command', () => {
     });
 
     it('should delete in CI mode with confirm flag', async () => {
-      const ciConfig: ResolvedConfig = { ...defaultConfig, ci: true };
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
 
       const result = await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
           confirm: true,
-          config: ciConfig,
+          config: buildConfig(name, { ci: true }),
         })
       );
 
@@ -164,13 +115,14 @@ describe('Delete Command', () => {
 
     it('should log audit information', async () => {
       process.env.USER = 'testuser';
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
 
       await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -180,13 +132,14 @@ describe('Delete Command', () => {
     it('should fall back to USERNAME when USER is not set', async () => {
       delete process.env.USER;
       process.env.USERNAME = 'altuser';
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
 
       await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -195,15 +148,15 @@ describe('Delete Command', () => {
 
     it('should use unknown when no user info is available', async () => {
       delete process.env.USER;
-
       delete process.env.USERNAME;
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
 
       await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -211,37 +164,35 @@ describe('Delete Command', () => {
     });
 
     it('should cancel deletion when prompt declines', async () => {
-      vi.mocked(createInterface).mockReturnValueOnce({
-        question: (_message: string, cb: (answer: string) => void) => cb('n'),
-        close: vi.fn(),
-      } as unknown as ReturnType<typeof createInterface>);
+      const { name, provider } = registerMockProviderWithData(createBasicProviderData('api'));
+      const mockStdin = Readable.from(['n\n']);
+      Object.defineProperty(process, 'stdin', { value: mockStdin, configurable: true });
 
       const result = await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.deleted).toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith('Deletion cancelled.');
 
-      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      const stored = await Effect.runPromise(provider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBe('localhost');
     });
 
     it('should delete when prompt confirms', async () => {
-      vi.mocked(createInterface).mockReturnValueOnce({
-        question: (_message: string, cb: (answer: string) => void) => cb('y'),
-        close: vi.fn(),
-      } as unknown as ReturnType<typeof createInterface>);
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+      const mockStdin = Readable.from(['y\n']);
+      Object.defineProperty(process, 'stdin', { value: mockStdin, configurable: true });
 
       const result = await Effect.runPromise(
         executeDelete({
           service: 'api',
           key: 'database.host',
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -251,12 +202,14 @@ describe('Delete Command', () => {
 
   describe('runDelete', () => {
     it('should print success message on deletion', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const result = await Effect.runPromise(
         runDelete({
           service: 'api',
           key: 'database.host',
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -265,14 +218,13 @@ describe('Delete Command', () => {
     });
 
     it('should return false when not deleted', async () => {
-      const ciConfig: ResolvedConfig = { ...defaultConfig, ci: true };
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
 
       const result = await Effect.runPromise(
         runDelete({
           service: 'api',
           key: 'database.host',
-          // No confirm flag
-          config: ciConfig,
+          config: buildConfig(name, { ci: true }),
         })
       );
 
