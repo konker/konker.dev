@@ -13,6 +13,7 @@ const fixturesDir = path.dirname(fileURLToPath(import.meta.url));
 let providerCounter = 0;
 
 export const schemaBasicPath = path.join(fixturesDir, 'schema.basic.ts');
+export const schemaBasicZodPath = path.join(fixturesDir, 'schema.basic.zod.ts');
 
 export const basicProviderKv: ProviderKV = {
   'database.host': 'localhost',
@@ -88,7 +89,7 @@ export function createTestConfig(overrides: Partial<ResolvedConfig> = {}): Resol
     provider: 'mock',
     ssmPrefix: '/zenfig',
     schema: schemaBasicPath,
-    schemaExportName: 'ConfigSchema',
+    validation: 'effect',
     sources: [],
     format: 'env',
     separator: '_',

@@ -4,7 +4,7 @@
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
-  "description": "CLI tool for configuration and secrets management using AWS SSM and TypeBox",
+  "description": "CLI tool for configuration and secrets management using AWS SSM with pluggable validation (Effect Schema or Zod)",
   "homepage": "https://konker.dev/",
   "keywords": [
     "node",
@@ -12,7 +12,8 @@
     "config",
     "secrets",
     "ssm",
-    "typebox",
+    "schema",
+    "zod",
     "typescript",
     "functional-programming",
     "effect-ts"
@@ -130,6 +131,34 @@
       "types": "./dist/test/fixtures/schema.basic.d.ts",
       "import": "./dist/test/fixtures/schema.basic.js"
     },
+    "./test/fixtures/schema.basic.zod": {
+      "types": "./dist/test/fixtures/schema.basic.zod.d.ts",
+      "import": "./dist/test/fixtures/schema.basic.zod.js"
+    },
+    "./validation/effect": {
+      "types": "./dist/validation/effect.d.ts",
+      "import": "./dist/validation/effect.js"
+    },
+    "./validation/hash": {
+      "types": "./dist/validation/hash.d.ts",
+      "import": "./dist/validation/hash.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.js"
+    },
+    "./validation/parse": {
+      "types": "./dist/validation/parse.d.ts",
+      "import": "./dist/validation/parse.js"
+    },
+    "./validation/types": {
+      "types": "./dist/validation/types.d.ts",
+      "import": "./dist/validation/types.js"
+    },
+    "./validation/zod": {
+      "types": "./dist/validation/zod.d.ts",
+      "import": "./dist/validation/zod.js"
+    },
     "./api": {
       "types": "./dist/api.d.ts",
       "import": "./dist/api.js"
@@ -156,14 +185,12 @@
     "@aws-sdk/client-ssm": "^3.777.0",
     "@aws-sdk/client-sts": "^3.777.0",
     "@konker.dev/tiny-error-fp": "workspace:*",
-    "@sinclair/typebox": "^0.34.45",
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
     "chalk": "^5.6.2",
     "cli-table3": "^0.6.5",
     "commander": "^14.0.2",
     "effect": "^3.19.13",
-    "json5": "^2.2.3"
+    "json5": "^2.2.3",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

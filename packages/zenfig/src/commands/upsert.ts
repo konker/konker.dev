@@ -72,15 +72,15 @@ export function executeUpsert(
 ): Effect.Effect<UpsertResult, ProviderError | ValidationError | SystemError | ZenfigError> {
   return pipe(
     // 1. Load schema
-    loadSchemaWithDefaults(options.config.schema, options.config.schemaExportName),
-    Effect.flatMap(({ schema }) =>
+    loadSchemaWithDefaults(options.config.schema, options.config.validation),
+    Effect.flatMap(({ adapter, schema }) =>
       // 2. Resolve and canonicalize the key path
       pipe(
-        resolvePath(schema, options.key),
-        Effect.map((resolved) => ({ resolved }))
+        resolvePath(schema, options.key, adapter),
+        Effect.map((resolved) => ({ resolved, adapter }))
       )
     ),
-    Effect.flatMap(({ resolved }) => {
+    Effect.flatMap(({ adapter, resolved }) => {
       const canonicalKey = resolved.canonicalPath;
 
       // 3. Get the value
@@ -91,15 +91,16 @@ export function executeUpsert(
         Effect.flatMap((rawValue) =>
           // 4. Parse the value according to schema
           pipe(
-            parseValue(rawValue, resolved.schema, canonicalKey, options.type ?? 'auto'),
+            parseValue(rawValue, resolved.schema, canonicalKey, options.type ?? 'auto', adapter),
             Effect.flatMap((parsedValue) =>
               // 5. Validate the parsed value
               pipe(
-                validate(parsedValue, resolved.schema),
+                validate(parsedValue, resolved.schema, adapter),
                 Effect.map((validatedValue) => ({
                   canonicalKey,
                   validatedValue,
                   resolvedSchema: resolved.schema,
+                  adapter,
                 }))
               )
             )
@@ -107,9 +108,9 @@ export function executeUpsert(
         )
       );
     }),
-    Effect.flatMap(({ canonicalKey, resolvedSchema, validatedValue }) => {
+    Effect.flatMap(({ adapter, canonicalKey, resolvedSchema, validatedValue }) => {
       // 6. Serialize back to provider string format
-      const serialized = serializeValue(validatedValue, resolvedSchema);
+      const serialized = serializeValue(validatedValue, resolvedSchema, adapter);
 
       const { config, service, skipEncryptionCheck = false } = options;
       const ctx: ProviderContext = {

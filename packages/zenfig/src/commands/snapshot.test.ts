@@ -51,7 +51,7 @@ describe('Snapshot Commands', () => {
   });
 
   beforeAll(async () => {
-    const result = await Effect.runPromise(loadSchema(schemaBasicPath, 'ConfigSchema'));
+    const result = await Effect.runPromise(loadSchema(schemaBasicPath, 'effect'));
     schemaHash = result.schemaHash;
   });
 

@@ -31,7 +31,7 @@ export const ZenfigRcSchema = Schema.Struct({
   provider: Schema.optional(Schema.String),
   ssmPrefix: Schema.optional(Schema.String),
   schema: Schema.optional(Schema.String),
-  schemaExportName: Schema.optional(Schema.String),
+  validation: Schema.optional(Schema.Union(Schema.Literal('effect'), Schema.Literal('zod'))),
   sources: Schema.optional(Schema.Array(Schema.String)),
   format: Schema.optional(Schema.Union(Schema.Literal('env'), Schema.Literal('json'))),
   separator: Schema.optional(Schema.String),
@@ -49,7 +49,7 @@ export const ResolvedConfigSchema = Schema.Struct({
   provider: Schema.String,
   ssmPrefix: Schema.String,
   schema: Schema.String,
-  schemaExportName: Schema.String,
+  validation: Schema.Union(Schema.Literal('effect'), Schema.Literal('zod')),
   sources: Schema.Array(Schema.String),
   format: Schema.Union(Schema.Literal('env'), Schema.Literal('json')),
   separator: Schema.String,
@@ -69,7 +69,7 @@ export const CLIOptionsSchema = Schema.Struct({
   provider: Schema.optional(Schema.String),
   ssmPrefix: Schema.optional(Schema.String),
   schema: Schema.optional(Schema.String),
-  schemaExportName: Schema.optional(Schema.String),
+  validation: Schema.optional(Schema.Union(Schema.Literal('effect'), Schema.Literal('zod'))),
   source: Schema.optional(Schema.Array(Schema.String)),
   format: Schema.optional(Schema.Union(Schema.Literal('env'), Schema.Literal('json'))),
   separator: Schema.optional(Schema.String),
@@ -93,7 +93,7 @@ const DEFAULT_CONFIG: ResolvedConfig = {
   provider: 'aws-ssm',
   ssmPrefix: '/zenfig',
   schema: 'src/schema.ts',
-  schemaExportName: 'ConfigSchema',
+  validation: 'effect',
   sources: [],
   format: 'env',
   separator: '_',
@@ -192,11 +192,11 @@ export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<Resolv
 
       const schema = cliOptions.schema ?? getEnvVar('ZENFIG_SCHEMA') ?? rcConfig?.schema ?? DEFAULT_CONFIG.schema;
 
-      const schemaExportName =
-        cliOptions.schemaExportName ??
-        getEnvVar('ZENFIG_SCHEMA_EXPORT_NAME') ??
-        rcConfig?.schemaExportName ??
-        DEFAULT_CONFIG.schemaExportName;
+      const validation =
+        cliOptions.validation ??
+        (getEnvVar('ZENFIG_VALIDATION') as ResolvedConfig['validation'] | undefined) ??
+        rcConfig?.validation ??
+        DEFAULT_CONFIG.validation;
 
       const sources = cliOptions.source ?? rcConfig?.sources ?? DEFAULT_CONFIG.sources;
 
@@ -222,7 +222,7 @@ export function resolveConfig(cliOptions: CLIOptions = {}): Effect.Effect<Resolv
         provider,
         ssmPrefix,
         schema,
-        schemaExportName,
+        validation,
         sources,
         format,
         separator,
@@ -245,7 +245,7 @@ export function mergeCliOptions(config: ResolvedConfig, cliOptions: CLIOptions):
     provider: cliOptions.provider ?? config.provider,
     ssmPrefix: cliOptions.ssmPrefix ?? config.ssmPrefix,
     schema: cliOptions.schema ?? config.schema,
-    schemaExportName: cliOptions.schemaExportName ?? config.schemaExportName,
+    validation: cliOptions.validation ?? config.validation,
     sources: cliOptions.source ?? config.sources,
     format: cliOptions.format ?? config.format,
     separator: cliOptions.separator ?? config.separator,

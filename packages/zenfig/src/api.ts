@@ -36,7 +36,7 @@ function buildCliOptions(options: ExportApiOptions): CLIOptions {
     provider: overrides?.provider,
     ssmPrefix: overrides?.ssmPrefix,
     schema: overrides?.schema,
-    schemaExportName: overrides?.schemaExportName,
+    validation: overrides?.validation,
     source: overrides?.sources,
     format: options.format ?? overrides?.format,
     separator: options.separator ?? overrides?.separator,

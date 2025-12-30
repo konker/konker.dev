@@ -54,7 +54,7 @@ describe('exportConfig', () => {
         ssmPrefix: '/zenfig',
         env: 'dev',
         schema: schemaBasicPath,
-        schemaExportName: 'ConfigSchema',
+        validation: 'effect',
         format: 'json',
       },
     });
@@ -73,7 +73,7 @@ describe('exportConfig', () => {
         ssmPrefix: '/zenfig',
         env: 'dev',
         schema: schemaBasicPath,
-        schemaExportName: 'ConfigSchema',
+        validation: 'effect',
         format: 'json',
       },
     });
@@ -96,7 +96,7 @@ describe('exportConfig', () => {
         ssmPrefix: '/zenfig',
         env: 'dev',
         schema: schemaBasicPath,
-        schemaExportName: 'ConfigSchema',
+        validation: 'effect',
         sources: ['shared'],
       },
     });
@@ -118,7 +118,7 @@ describe('exportConfig', () => {
       provider: name,
       ssmPrefix: '/custom',
       schema: schemaBasicPath,
-      schemaExportName: 'ConfigSchema',
+      validation: 'effect',
       format: 'json',
     });
 

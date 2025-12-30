@@ -101,7 +101,7 @@ program
   .option('--no-cache', 'Disable cache')
   .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
   .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
+  .option('--validation <effect|zod>', 'Validation layer (default: effect)')
   .action(
     (
       service: string,
@@ -143,7 +143,7 @@ program
   .option('--skip-encryption-check', 'Skip encryption verification')
   .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
   .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
+  .option('--validation <effect|zod>', 'Validation layer (default: effect)')
   .action(
     (
       service: string,
@@ -183,8 +183,8 @@ program
   .description('Validate configuration file')
   .requiredOption('--file <path>', 'Path to JSON or .env file')
   .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
   .option('--format <env|json>', 'File format (auto-detected if not specified)')
+  .option('--validation <effect|zod>', 'Validation layer (default: effect)')
   .action((options: CLIOptions & { file: string }) => {
     runEffect(
       pipe(
@@ -259,7 +259,7 @@ program
   .option('--confirm', 'Skip interactive confirmation')
   .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
   .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
+  .option('--validation <effect|zod>', 'Validation layer (default: effect)')
   .action((service: string, key: string, options: CLIOptions & { confirm?: boolean }) => {
     runEffect(
       pipe(
@@ -297,7 +297,7 @@ snapshotCmd
   .option('--snapshot-key-file <path>', 'Read encryption key from file')
   .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
   .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
+  .option('--validation <effect|zod>', 'Validation layer (default: effect)')
   .action(
     (
       service: string,
@@ -337,7 +337,7 @@ snapshotCmd
   .option('--unsafe-show-values', 'Allow printing secrets even when stdout is not a TTY')
   .option('--ssm-prefix <prefix>', 'SSM path prefix (default: /zenfig)')
   .option('--schema <path>', 'Schema path')
-  .option('--schema-export-name <name>', 'Schema export name')
+  .option('--validation <effect|zod>', 'Validation layer (default: effect)')
   .action(
     (
       snapshotFile: string,

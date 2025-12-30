@@ -1,16 +1,16 @@
-import { Type } from '@sinclair/typebox';
+import * as Schema from 'effect/Schema';
 
-export const ConfigSchema = Type.Object({
-  database: Type.Object({
-    host: Type.String(),
-    port: Type.Integer({ minimum: 1, maximum: 65535 }),
-    url: Type.String({ format: 'uri' }),
+export const ConfigSchema = Schema.Struct({
+  database: Schema.Struct({
+    host: Schema.String,
+    port: Schema.Number.pipe(Schema.int(), Schema.between(1, 65535)),
+    url: Schema.String,
   }),
-  api: Type.Object({
-    timeout: Type.Integer({ minimum: 1 }),
+  api: Schema.Struct({
+    timeout: Schema.Number.pipe(Schema.int(), Schema.greaterThanOrEqualTo(1)),
   }),
-  feature: Type.Object({
-    enableBeta: Type.Boolean({ default: false }),
+  feature: Schema.Struct({
+    enableBeta: Schema.Boolean,
   }),
-  tags: Type.Array(Type.String()),
+  tags: Schema.Array(Schema.String),
 });

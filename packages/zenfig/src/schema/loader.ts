@@ -1,26 +1,27 @@
 /**
  * Schema Loader
  *
- * Dynamically loads TypeBox schemas from TypeScript files
+ * Dynamically loads validation schemas from TypeScript files
  */
-import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { type TSchema } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
 import { pipe } from 'effect/Function';
 
 import { fileNotFoundError, type SystemError, type ValidationError, type ZenfigError } from '../errors.js';
+import { getValidatorAdapter, type ValidationKind, type ValidatorAdapter } from '../validation/index.js';
 
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
 
 export type SchemaLoadResult = {
-  readonly schema: TSchema;
+  readonly schema: unknown;
   readonly schemaHash: string;
+  readonly adapter: ValidatorAdapter;
+  readonly validation: ValidationKind;
 };
 
 // --------------------------------------------------------------------------
@@ -42,23 +43,17 @@ function fileExists(filePath: string): Effect.Effect<boolean, never> {
 }
 
 /**
- * Compute SHA-256 hash of schema for change detection
- */
-export function computeSchemaHash(schema: TSchema): string {
-  const schemaJson = JSON.stringify(schema);
-  return `sha256:${crypto.createHash('sha256').update(schemaJson).digest('hex')}`;
-}
-
-/**
- * Load a TypeBox schema from a TypeScript file
+ * Load a schema from a TypeScript file
  *
  * @param schemaPath - Path to the schema file
- * @param exportName - Name of the export (default: "ConfigSchema")
+ * @param validation - Validation layer (effect | zod)
  */
 export function loadSchema(
   schemaPath: string,
-  exportName = 'ConfigSchema'
+  validation: ValidationKind
 ): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> {
+  const adapter = getValidatorAdapter(validation);
+
   return pipe(
     Effect.sync(() => path.resolve(schemaPath)),
     Effect.flatMap((absolutePath) =>
@@ -69,8 +64,6 @@ export function loadSchema(
             return Effect.fail(fileNotFoundError(absolutePath));
           }
 
-          // Import the module
-          // Using dynamic import with file URL for cross-platform compatibility
           const fileUrl = pathToFileURL(absolutePath).href;
 
           return pipe(
@@ -79,27 +72,23 @@ export function loadSchema(
               catch: () => fileNotFoundError(absolutePath),
             }),
             Effect.flatMap((module: Record<string, unknown>) => {
-              // Extract the schema export
-              const schema = module[exportName];
+              const schema = module.ConfigSchema;
               if (!schema) {
-                // Find available exports for error message
                 const availableExports = Object.keys(module).filter((k) => k !== 'default' && k !== '__esModule');
                 return Effect.fail(
                   fileNotFoundError(
-                    `Export '${exportName}' not found in ${absolutePath}. Available exports: ${availableExports.join(', ')}`
+                    `Export 'ConfigSchema' not found in ${absolutePath}. Available exports: ${availableExports.join(', ')}`
                   )
                 );
               }
 
-              // Validate it's a TypeBox schema (has Kind property)
-              if (typeof schema !== 'object' || schema === null || !('type' in schema)) {
-                return Effect.fail(fileNotFoundError(`Export '${exportName}' is not a valid TypeBox schema`));
+              if (!adapter.isSchema(schema)) {
+                return Effect.fail(fileNotFoundError(`Export 'ConfigSchema' is not a valid ${adapter.name} schema`));
               }
 
-              const typedSchema = schema as unknown as TSchema;
-              const schemaHash = computeSchemaHash(typedSchema);
+              const schemaHash = adapter.computeSchemaHash(schema);
 
-              return Effect.succeed({ schema: typedSchema, schemaHash });
+              return Effect.succeed({ schema, schemaHash, adapter, validation });
             })
           );
         })
@@ -113,9 +102,9 @@ export function loadSchema(
  */
 export function loadSchemaWithDefaults(
   schemaPath?: string,
-  exportName?: string
+  validation?: ValidationKind
 ): Effect.Effect<SchemaLoadResult, SystemError | ValidationError | ZenfigError> {
   const resolvedPath = schemaPath ?? 'src/schema.ts';
-  const resolvedExportName = exportName ?? 'ConfigSchema';
-  return loadSchema(resolvedPath, resolvedExportName);
+  const resolvedValidation = validation ?? 'effect';
+  return loadSchema(resolvedPath, resolvedValidation);
 }

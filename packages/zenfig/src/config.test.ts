@@ -45,7 +45,7 @@ describe('config', () => {
       expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/zenfig');
       expect(result.schema).toBe('src/schema.ts');
-      expect(result.schemaExportName).toBe('ConfigSchema');
+      expect(result.validation).toBe('effect');
       expect(result.sources).toEqual([]);
       expect(result.format).toBe('env');
       expect(result.separator).toBe('_');
@@ -67,7 +67,7 @@ describe('config', () => {
       process.env.ZENFIG_PROVIDER = 'aws-ssm';
       process.env.ZENFIG_SSM_PREFIX = '/custom/prefix';
       process.env.ZENFIG_SCHEMA = 'custom-schema.ts';
-      process.env.ZENFIG_SCHEMA_EXPORT_NAME = 'MySchema';
+      process.env.ZENFIG_VALIDATION = 'zod';
       process.env.ZENFIG_FORMAT = 'json';
       process.env.ZENFIG_CACHE = '.cache/zenfig';
 
@@ -76,7 +76,7 @@ describe('config', () => {
       expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/custom/prefix');
       expect(result.schema).toBe('custom-schema.ts');
-      expect(result.schemaExportName).toBe('MySchema');
+      expect(result.validation).toBe('zod');
       expect(result.format).toBe('json');
       expect(result.cache).toBe('.cache/zenfig');
     });
@@ -87,7 +87,7 @@ describe('config', () => {
         provider: 'aws-ssm',
         ssmPrefix: '/app',
         schema: 'config/schema.ts',
-        schemaExportName: 'AppSchema',
+        validation: 'zod',
         sources: ['source1.json', 'source2.json'],
         format: 'json',
         separator: '__',
@@ -108,7 +108,7 @@ describe('config', () => {
       expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/app');
       expect(result.schema).toBe('config/schema.ts');
-      expect(result.schemaExportName).toBe('AppSchema');
+      expect(result.validation).toBe('zod');
       expect(result.sources).toEqual(['source1.json', 'source2.json']);
       expect(result.format).toBe('json');
       expect(result.separator).toBe('__');
@@ -130,7 +130,7 @@ describe('config', () => {
           provider: 'aws-ssm',
           ssmPrefix: '/app',
           schema: 'config/schema.ts',
-          schemaExportName: 'AppSchema',
+          validation: 'zod',
           sources: ['source1.json', 'source2.json'],
           format: 'json',
           separator: '__',
@@ -150,7 +150,7 @@ describe('config', () => {
       expect(result.provider).toBe('aws-ssm');
       expect(result.ssmPrefix).toBe('/app');
       expect(result.schema).toBe('config/schema.ts');
-      expect(result.schemaExportName).toBe('AppSchema');
+      expect(result.validation).toBe('zod');
       expect(result.sources).toEqual(['source1.json', 'source2.json']);
       expect(result.format).toBe('json');
       expect(result.separator).toBe('__');
@@ -229,7 +229,7 @@ describe('config', () => {
       provider: 'aws-ssm',
       ssmPrefix: '/zenfig',
       schema: 'src/schema.ts',
-      schemaExportName: 'ConfigSchema',
+      validation: 'effect',
       sources: [],
       format: 'env',
       separator: '_',
@@ -245,7 +245,7 @@ describe('config', () => {
         provider: 'custom',
         ssmPrefix: '/custom',
         schema: 'custom.ts',
-        schemaExportName: 'Custom',
+        validation: 'zod',
         source: ['a.json', 'b.json'],
         format: 'json',
         separator: '__',
@@ -258,7 +258,7 @@ describe('config', () => {
       expect(result.provider).toBe('custom');
       expect(result.ssmPrefix).toBe('/custom');
       expect(result.schema).toBe('custom.ts');
-      expect(result.schemaExportName).toBe('Custom');
+      expect(result.validation).toBe('zod');
       expect(result.sources).toEqual(['a.json', 'b.json']);
       expect(result.format).toBe('json');
       expect(result.separator).toBe('__');
