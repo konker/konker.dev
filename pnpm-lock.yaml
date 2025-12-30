@@ -32,9 +32,6 @@ importers:
       hono:
         specifier: ^4.11.3
         version: 4.11.3
-      sst:
-        specifier: 3.17.25
-        version: 3.17.25
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.2
@@ -51,6 +48,9 @@ importers:
       '@konker.dev/common-config':
         specifier: ^0.7.0
         version: 0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
+      '@konker.dev/config-o-tron':
+        specifier: 0.0.1
+        version: 0.0.1(aws-crt@1.27.3)
       '@types/aws-lambda':
         specifier: ^8.10.159
         version: 8.10.159
@@ -84,6 +84,9 @@ importers:
       prettier:
         specifier: ^3.7.4
         version: 3.7.4
+      sst:
+        specifier: ^3.17.14
+        version: 3.17.25
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
@@ -2737,6 +2740,13 @@ packages:
   '@konker.dev/common-config@0.7.0':
     resolution: {integrity: sha512-l+GT5XYkjVjUrai5m+kc7WrEDs8KR9L02Vf/dioVH6pfVewQxbfLsjAqS3uaK5fxFqfAZqn+ojVEso8lGO3hDg==}
     hasBin: true
+
+  '@konker.dev/config-o-tron@0.0.1':
+    resolution: {integrity: sha512-G02x0fbi2e9FPD7szdH/3LJxG3QzzrO4HpHPzbMKkrEKXz1vCjo3eIfascJRC2GWz2oCe7DjZzZ3GB4Spw90qw==}
+    hasBin: true
+
+  '@konker.dev/tiny-error-fp@0.1.12':
+    resolution: {integrity: sha512-/rjkzaCYQ+z4+KG+qTGOLKlxWPbN2EPURusHF8wR8gWonTS9Oig5vd5NRBrJXArFwjRCvABhSCmdHFnNN5iz7Q==}
 
   '@loaderkit/resolve@1.0.4':
     resolution: {integrity: sha512-rJzYKVcV4dxJv+vW6jlvagF8zvGxHJ2+HTr1e2qOejfmGhAApgJHl8Aog4mMszxceTRiKTTbnpgmTO1bEZHV/A==}
@@ -8239,11 +8249,6 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
-  zod-to-json-schema@3.24.6:
-    resolution: {integrity: sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==}
-    peerDependencies:
-      zod: ^3.24.1
-
   zod-to-json-schema@3.25.1:
     resolution: {integrity: sha512-pM/SU9d3YAggzi6MtR4h7ruuQlqKtad8e9S0fmxcMi+ueAK5Korys/aWcV9LIIHTVbj01NdzxcnXSN+O74ZIVA==}
     peerDependencies:
@@ -10305,6 +10310,24 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@konker.dev/config-o-tron@0.0.1(aws-crt@1.27.3)':
+    dependencies:
+      '@aws-sdk/client-ssm': 3.958.0(aws-crt@1.27.3)
+      '@aws-sdk/client-sts': 3.958.0(aws-crt@1.27.3)
+      '@konker.dev/tiny-error-fp': 0.1.12
+      chalk: 5.6.2
+      cli-table3: 0.6.5
+      commander: 14.0.2
+      effect: 3.19.13
+      json5: 2.2.3
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - aws-crt
+
+  '@konker.dev/tiny-error-fp@0.1.12':
+    dependencies:
+      effect: 3.19.13
+
   '@loaderkit/resolve@1.0.4':
     dependencies:
       '@braidai/lang': 1.1.2
@@ -10351,7 +10374,7 @@ snapshots:
       pkce-challenge: 4.1.0
       raw-body: 3.0.1
       zod: 3.25.76
-      zod-to-json-schema: 3.24.6(zod@3.25.76)
+      zod-to-json-schema: 3.25.1(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
 
@@ -16876,10 +16899,6 @@ snapshots:
   zod-to-json-schema@3.24.3(zod@3.24.2):
     dependencies:
       zod: 3.24.2
-
-  zod-to-json-schema@3.24.6(zod@3.25.76):
-    dependencies:
-      zod: 3.25.76
 
   zod-to-json-schema@3.25.1(zod@3.25.76):
     dependencies:

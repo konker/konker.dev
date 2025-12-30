@@ -16,6 +16,8 @@ export function core(event: RequestW<CoreEvent>): Effect.Effect<CoreResponse> {
       ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
       konker: 'RULEZZ!',
       foo: process.env.FOO,
+      DATABASE_DBNAME: event.validatedEnv.DATABASE_DBNAME,
+      DATABASE_PORT: event.validatedEnv.DATABASE_PORT,
     },
   });
 }
