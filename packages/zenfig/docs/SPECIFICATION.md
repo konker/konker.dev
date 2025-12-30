@@ -34,6 +34,7 @@
     - [CLI Interface](#cli-interface)
       - [Core Commands](#core-commands)
       - [Examples](#examples)
+    - [Programmatic API (TypeScript)](#programmatic-api-typescript)
     - [Environment Variable Precedence](#environment-variable-precedence)
     - [Config File (`zenfigrc.json` / `zenfigrc.json5`)](#config-file-zenfigrcjson--zenfigrcjson5)
       - [Provider Guards](#provider-guards)
@@ -360,12 +361,14 @@ Zenfig may compose multiple SSM roots into a single config output.
 ### Project Structure
 
 - `src/cli.ts`: CLI entry point using `commander`.
-- `src/schema.ts`: Exported TypeBox schema (the "Source of Truth").
-- `src/engine.ts`: Orchestrates provider fetch, merge, validation, and formatting.
-- `src/transformer.ts`: Flattens nested objects into `KEY_SUBKEY=value`.
-- `src/providers/Provider.ts`: Provider interface and types.
-- `src/providers/registry.ts`: Provider lookup and default selection.
-- `src/providers/AwsSsmProvider.ts`: Provider implementation using AWS SSM.
+- `src/index.ts`: Package entry point for programmatic usage.
+- `src/api.ts`: Programmatic export API wrapper (export-only).
+- `src/config.ts`: Config resolution and merging (CLI flags, env vars, rc file, defaults).
+- `src/commands/*`: Command implementations (export, upsert, validate, list, delete, snapshot).
+- `src/lib/*`: Formatting, merge, flatten, and redaction utilities.
+- `src/schema/*`: Schema loader, resolver, parser, and validator.
+- `src/providers/*`: Provider interface, registry, and implementations (e.g., AWS SSM).
+- `src/errors.ts`: Error types, formatting, and exit codes.
 
 ### CLI Interface
 
@@ -388,6 +391,8 @@ zenfig export <service> [options]
   --cache <duration>          # Cache provider fetches (e.g., 30s, 5m; dev-only)
   --no-cache                  # Disable cache even if configured
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --schema-export-name <name> # Schema export name (default: ConfigSchema)
 
 # Upsert configuration value
 zenfig upsert <service> <key> [value] [options]
@@ -397,6 +402,8 @@ zenfig upsert <service> <key> [value] [options]
   --type <auto|string|int|float|bool|json>  # How to parse input before validation (default: auto)
   --skip-encryption-check     # Skip encryption verification (not recommended)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --schema-export-name <name> # Schema export name (default: ConfigSchema)
 
 # Validate configuration file
 zenfig validate [options]
@@ -424,36 +431,95 @@ zenfig list api --env prod
 # List keys with values in JSON format (local dev only)
 zenfig list api --env prod --format json --show-values
 
-
 # Delete configuration value
-
 zenfig delete <service> <key> [options]
---provider <name> # Provider name (default: aws-ssm)
---env <environment> # Environment name (overrides NODE_ENV)
---confirm # Skip interactive confirmation
---ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+  --provider <name>           # Provider name (default: aws-ssm)
+  --env <environment>         # Environment name (overrides NODE_ENV)
+  --confirm                   # Skip interactive confirmation
+  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --schema-export-name <name> # Schema export name (default: ConfigSchema)
 
 # Save configuration snapshot
-
 zenfig snapshot save <service> [options]
---source <service> # Additional sources (repeatable)
---provider <name> # Provider name (default: aws-ssm)
---env <environment> # Environment name (overrides NODE_ENV)
---output <path> # Output path (default: .zenfig/snapshots/)
---encrypt # Encrypt snapshot at rest (recommended)
---snapshot-key-file <path> # Read encryption key from file (preferred over CLI args)
---ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+  --source <service>          # Additional sources (repeatable)
+  --provider <name>           # Provider name (default: aws-ssm)
+  --env <environment>         # Environment name (overrides NODE_ENV)
+  --output <path>             # Output path (default: .zenfig/snapshots/)
+  --encrypt                   # Encrypt snapshot at rest (recommended)
+  --snapshot-key-file <path>  # Read encryption key from file (preferred over CLI args)
+  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --schema-export-name <name> # Schema export name (default: ConfigSchema)
 
 # Restore configuration from snapshot
-
 zenfig snapshot restore <snapshot-file> [options]
---provider <name> # Provider name (default: aws-ssm)
---dry-run # Show diff without applying changes
---force-schema-mismatch # Allow restore despite schema hash mismatch
---confirm # Skip interactive confirmation
---show-values # Print secret values in diff output (TTY only)
---unsafe-show-values # Allow printing secrets even when stdout is not a TTY (dangerous)
---ssm-prefix <prefix> # SSM path prefix (default: /zenfig)
+  --provider <name>           # Provider name (default: aws-ssm)
+  --dry-run                   # Show diff without applying changes
+  --force-schema-mismatch     # Allow restore despite schema hash mismatch
+  --confirm                   # Skip interactive confirmation
+  --show-values               # Print secret values in diff output (TTY only)
+  --unsafe-show-values        # Allow printing secrets even when stdout is not a TTY (dangerous)
+  --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
+  --schema <path>             # Schema path (default: src/schema.ts)
+  --schema-export-name <name> # Schema export name (default: ConfigSchema)
+```
+
+### Programmatic API (TypeScript)
+
+Zenfig must expose a TypeScript API for **export-only** usage. This API is intended for programmatic use (e.g., SST
+deployments) and **must not** expose any write actions (no upsert, delete, snapshot, or list).
+
+The API should:
+
+- Run the same export workflow as the CLI (fetch -> parse + merge -> validate -> format).
+- Accept explicit config overrides, but default to the same config resolution rules as the CLI.
+- Return both structured data and the formatted output string.
+
+Proposed surface (exported from the package root):
+
+```ts
+type ExportApiOptions = {
+  service: string;
+  sources?: ReadonlyArray<string>;
+  format?: 'env' | 'json';
+  separator?: string;
+  strict?: boolean;
+  strictMerge?: boolean;
+  warnOnOverride?: boolean;
+  config?: Partial<ResolvedConfig>; // provider, env, schema path, prefix, etc.
+};
+
+type ExportApiResult = {
+  config: Record<string, unknown>;
+  formatted: string;
+  conflicts: ReadonlyArray<MergeConflict>;
+  warnings: ReadonlyArray<string>;
+};
+
+export function exportConfig(options: ExportApiOptions): Promise<ExportApiResult>;
+```
+
+Example usage:
+
+```ts
+import { exportConfig } from 'zenfig';
+
+const result = await exportConfig({
+  service: 'api',
+  sources: ['shared'],
+  format: 'json',
+  config: {
+    env: 'prod',
+    provider: 'aws-ssm',
+    ssmPrefix: '/zenfig',
+    schema: 'src/schema.ts',
+    schemaExportName: 'ConfigSchema',
+  },
+});
+
+// Structured config for use in deployments
+const configObject = result.config;
 ```
 
 ### Environment Variable Precedence
