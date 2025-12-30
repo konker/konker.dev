@@ -5,45 +5,36 @@ import * as Effect from 'effect/Effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ResolvedConfig } from '../config.js';
-import { createMockProvider } from '../providers/MockProvider.js';
-import type { ProviderContext } from '../providers/Provider.js';
+import type { ProviderKV } from '../providers/Provider.js';
+import { createProviderData, createTestConfig, registerMockProviderWithData } from '../test/fixtures/index.js';
 import { executeList, formatListJson, formatListKeys, formatListTable, type ListOptions, runList } from './list.js';
 
-// Mock the registry to return our mock provider
-vi.mock('../providers/registry.js', () => ({
-  getProvider: vi.fn(),
-}));
-
-import { getProvider } from '../providers/registry.js';
-
 describe('List Command', () => {
-  const ctx: ProviderContext = {
+  const ctx = {
     prefix: '/zenfig',
     service: 'test-service',
     env: 'dev',
   };
 
-  const baseConfig: ResolvedConfig = {
+  const baseConfig: ResolvedConfig = createTestConfig({
     env: ctx.env,
-    provider: 'mock',
     ssmPrefix: ctx.prefix,
-    schema: 'src/schema.ts',
-    schemaExportName: 'ConfigSchema',
-    sources: [],
-    format: 'env',
-    separator: '_',
-    cache: undefined,
-    ci: false,
-    strict: false,
-    providerGuards: {},
-  };
+  });
 
-  let mockProvider: ReturnType<typeof createMockProvider>;
   let consoleSpy: ReturnType<typeof vi.spyOn>;
 
+  const createConfig = (provider: string): ResolvedConfig => ({
+    ...baseConfig,
+    provider,
+  });
+
+  const registerProvider = (kv?: ProviderKV): ResolvedConfig => {
+    const initialData = kv ? createProviderData(ctx.service, kv, { prefix: ctx.prefix, env: ctx.env }) : undefined;
+    const { name } = registerMockProviderWithData(initialData);
+    return createConfig(name);
+  };
+
   beforeEach(() => {
-    mockProvider = createMockProvider();
-    vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
   });
 
@@ -149,9 +140,11 @@ describe('List Command', () => {
 
   describe('executeList', () => {
     it('should return empty keys for empty provider', async () => {
+      const config = registerProvider();
+
       const options: ListOptions = {
         service: ctx.service,
-        config: baseConfig,
+        config,
       };
 
       const result = await Effect.runPromise(executeList(options));
@@ -161,19 +154,15 @@ describe('List Command', () => {
     });
 
     it('should return sorted keys from provider', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: {
-          'zebra.key': 'z-value',
-          'alpha.key': 'a-value',
-          'middle.key': 'm-value',
-        },
+      const config = registerProvider({
+        'zebra.key': 'z-value',
+        'alpha.key': 'a-value',
+        'middle.key': 'm-value',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
-        config: baseConfig,
+        config,
       };
 
       const result = await Effect.runPromise(executeList(options));
@@ -187,19 +176,15 @@ describe('List Command', () => {
     });
 
     it('should sort keys case-insensitively', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: {
-          'Zebra.key': 'z-value',
-          'alpha.key': 'a-value',
-          'BETA.key': 'b-value',
-        },
+      const config = registerProvider({
+        'Zebra.key': 'z-value',
+        'alpha.key': 'a-value',
+        'BETA.key': 'b-value',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
-        config: baseConfig,
+        config,
       };
 
       const result = await Effect.runPromise(executeList(options));
@@ -214,18 +199,14 @@ describe('List Command', () => {
 
   describe('runList', () => {
     it('should output keys format by default', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: {
-          'database.url': 'postgres://localhost',
-          'api.key': 'secret',
-        },
+      const config = registerProvider({
+        'database.url': 'postgres://localhost',
+        'api.key': 'secret',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -234,16 +215,14 @@ describe('List Command', () => {
     });
 
     it('should output keys format when format is "keys"', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: { key1: 'value1' },
+      const config = registerProvider({
+        key1: 'value1',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
         format: 'keys',
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -252,16 +231,14 @@ describe('List Command', () => {
     });
 
     it('should output table format when format is "table"', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: { 'test.key': 'test-value' },
+      const config = registerProvider({
+        'test.key': 'test-value',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
         format: 'table',
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -272,16 +249,14 @@ describe('List Command', () => {
     });
 
     it('should output json format when format is "json"', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: { 'test.key': 'test-value' },
+      const config = registerProvider({
+        'test.key': 'test-value',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
         format: 'json',
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -292,17 +267,15 @@ describe('List Command', () => {
     });
 
     it('should show values when unsafeShowValues is true', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: { 'test.key': 'secret-value' },
+      const config = registerProvider({
+        'test.key': 'secret-value',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
       const options: ListOptions = {
         service: ctx.service,
         format: 'json',
         unsafeShowValues: true,
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -313,13 +286,10 @@ describe('List Command', () => {
     });
 
     it('should redact values when showValues is true but stdout is not TTY', async () => {
-      const storageKey = `${ctx.prefix}/${ctx.env}/${ctx.service}`;
-      mockProvider = createMockProvider({
-        [storageKey]: { 'test.key': 'secret-value' },
+      const config = registerProvider({
+        'test.key': 'secret-value',
       });
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
 
-      // Mock stdout.isTTY to be false
       const originalIsTTY = process.stdout.isTTY;
       Object.defineProperty(process.stdout, 'isTTY', { value: false, configurable: true });
 
@@ -327,12 +297,11 @@ describe('List Command', () => {
         service: ctx.service,
         format: 'json',
         showValues: true,
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
 
-      // Restore
       Object.defineProperty(process.stdout, 'isTTY', { value: originalIsTTY, configurable: true });
 
       const output = consoleSpy.mock.calls[0]![0] as string;
@@ -341,10 +310,12 @@ describe('List Command', () => {
     });
 
     it('should output "No keys found." for empty provider with keys format', async () => {
+      const config = registerProvider();
+
       const options: ListOptions = {
         service: ctx.service,
         format: 'keys',
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -353,10 +324,12 @@ describe('List Command', () => {
     });
 
     it('should output "No keys found." for empty provider with table format', async () => {
+      const config = registerProvider();
+
       const options: ListOptions = {
         service: ctx.service,
         format: 'table',
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));
@@ -365,10 +338,12 @@ describe('List Command', () => {
     });
 
     it('should output "{}" for empty provider with json format', async () => {
+      const config = registerProvider();
+
       const options: ListOptions = {
         service: ctx.service,
         format: 'json',
-        config: baseConfig,
+        config,
       };
 
       await Effect.runPromise(runList(options));

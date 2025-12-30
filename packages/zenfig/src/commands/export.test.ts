@@ -1,95 +1,35 @@
 /**
  * Export Command Tests
  */
-import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ResolvedConfig } from '../config.js';
-import { ErrorCode, ValidationError } from '../errors.js';
-import { createMockProvider } from '../providers/MockProvider.js';
-import { getProvider } from '../providers/registry.js';
-import { validate } from '../schema/index.js';
-import { loadSchemaWithDefaults } from '../schema/loader.js';
-import { parseProviderKV } from '../schema/parser.js';
+import { ErrorCode } from '../errors.js';
+import {
+  basicParsedConfig,
+  createBasicProviderData,
+  createProviderData,
+  createTestConfig,
+  registerMockProviderWithData,
+  schemaBasicPath,
+} from '../test/fixtures/index.js';
 import { executeExport, runExport } from './export.js';
-
-// Mock dependencies
-vi.mock('../schema/loader.js', () => ({
-  loadSchemaWithDefaults: vi.fn(),
-}));
-
-vi.mock('../providers/registry.js', () => ({
-  getProvider: vi.fn(),
-}));
-
-vi.mock('../schema/validator.js', () => ({
-  validate: vi.fn(),
-}));
-
-vi.mock('../schema/parser.js', async () => {
-  const actual = (await vi.importActual('../schema/parser.js')) as { parseProviderKV: typeof parseProviderKV };
-  return { ...actual, parseProviderKV: vi.fn(actual.parseProviderKV) };
-});
 
 describe('Export Command', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let stdoutWriteSpy: ReturnType<typeof vi.spyOn>;
-  let mockProvider: ReturnType<typeof createMockProvider>;
-  let actualParseProviderKV: typeof parseProviderKV;
 
-  const defaultConfig: ResolvedConfig = {
-    env: 'dev',
-    provider: 'mock',
-    ssmPrefix: '/zenfig',
-    schema: 'src/schema.ts',
-    schemaExportName: 'ConfigSchema',
-    sources: [],
-    format: 'env',
-    separator: '_',
-    cache: undefined,
-    ci: false,
-    strict: false,
-    providerGuards: {},
-  };
-
-  const testSchema = Type.Object({
-    database: Type.Object({
-      host: Type.String(),
-      port: Type.Integer(),
-    }),
-    api: Type.Object({
-      timeout: Type.Integer(),
-    }),
+  const baseConfig = createTestConfig({ schema: schemaBasicPath });
+  const buildConfig = (provider: string, overrides: Partial<ResolvedConfig> = {}): ResolvedConfig => ({
+    ...baseConfig,
+    provider,
+    ...overrides,
   });
 
   beforeEach(() => {
-    vi.resetAllMocks();
-
-    const storageKey = '/zenfig/dev/api';
-    mockProvider = createMockProvider({
-      [storageKey]: {
-        'database.host': 'localhost',
-        'database.port': '5432',
-        'api.timeout': '30000',
-      },
-    });
-
-    vi.spyOn(console, 'log').mockImplementation(vi.fn());
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
-    stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(vi.fn());
-
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abc' }));
-    vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
-    vi.mocked(parseProviderKV).mockImplementation(actualParseProviderKV);
-
-    // Default: validate just passes through the value
-    vi.mocked(validate).mockImplementation((value: unknown) => Effect.succeed(value));
-  });
-
-  beforeAll(async () => {
-    const actual = (await vi.importActual('../schema/parser.js')) as { parseProviderKV: typeof parseProviderKV };
-    actualParseProviderKV = actual.parseProviderKV;
+    stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
 
   afterEach(() => {
@@ -98,85 +38,99 @@ describe('Export Command', () => {
 
   describe('executeExport', () => {
     it('should export configuration from provider', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
-      expect(result.config).toEqual({
-        database: { host: 'localhost', port: 5432 },
-        api: { timeout: 30000 },
-      });
+      expect(result.config).toEqual(basicParsedConfig);
     });
 
     it('should format output as env', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
-          config: { ...defaultConfig, format: 'env' },
+          config: buildConfig(name, { format: 'env' }),
         })
       );
 
       expect(result.formatted).toContain('DATABASE_HOST=localhost');
       expect(result.formatted).toContain('DATABASE_PORT=5432');
+      expect(result.formatted).toContain('FEATURE_ENABLE_BETA=true');
     });
 
     it('should format output as JSON', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
-          config: { ...defaultConfig, format: 'json' },
+          config: buildConfig(name, { format: 'json' }),
         })
       );
 
-      const parsed = JSON.parse(result.formatted);
-      expect(parsed.database.host).toBe('localhost');
-      expect(parsed.database.port).toBe(5432);
+      const parsed = JSON.parse(result.formatted.trim());
+      expect(parsed).toEqual(basicParsedConfig);
     });
 
     it('should merge multiple sources', async () => {
-      const mockProviderWithSources = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'api-host',
-        },
-        '/zenfig/dev/shared': {
-          'database.port': '5432',
-        },
+      const apiKv = {
+        'database.host': 'api-host',
+        'database.url': 'https://api.example.com',
+        'api.timeout': '30000',
+        'feature.enableBeta': 'true',
+        tags: '["alpha","beta"]',
+      };
+      const sharedKv = {
+        'database.port': '5432',
+      };
+      const { name } = registerMockProviderWithData({
+        ...createProviderData('api', apiKv),
+        ...createProviderData('shared', sharedKv),
       });
 
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithSources));
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
           sources: ['shared'],
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.config).toEqual({
-        database: { host: 'api-host', port: 5432 },
+        database: {
+          host: 'api-host',
+          port: 5432,
+          url: 'https://api.example.com',
+        },
+        api: {
+          timeout: 30000,
+        },
+        feature: {
+          enableBeta: true,
+        },
+        tags: ['alpha', 'beta'],
       });
     });
 
     it('should detect merge conflicts', async () => {
-      const mockProviderWithConflicts = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'api-host',
-        },
-        '/zenfig/dev/shared': {
-          'database.host': 'shared-host', // Same key, different value
-        },
+      const { name } = registerMockProviderWithData({
+        ...createBasicProviderData('api'),
+        ...createBasicProviderData('shared', { 'database.host': 'shared-host' }),
       });
 
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithConflicts));
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
           sources: ['shared'],
           warnOnOverride: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -184,39 +138,38 @@ describe('Export Command', () => {
       expect(result.warnings.length).toBeGreaterThan(0);
     });
 
-    it('should validate output against schema', async () => {
-      // Mock validation failure
-      vi.mocked(validate).mockReturnValue(Effect.fail(new ValidationError({ message: 'Validation failed' } as never)));
+    it('should fail when schema validation fails', async () => {
+      const { name } = registerMockProviderWithData(
+        createBasicProviderData('api', {
+          'database.port': '99999',
+        })
+      );
 
       const exit = await Effect.runPromiseExit(
         executeExport({
           service: 'api',
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(exit._tag).toBe('Failure');
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        const error = exit.cause.error as { context?: { code?: string } };
+        expect(error.context?.code).toBe(ErrorCode.VAL003);
+      }
     });
 
     it('should warn on unknown keys when not strict', async () => {
-      const mockProviderWithUnknown = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'localhost',
+      const { name } = registerMockProviderWithData(
+        createBasicProviderData('api', {
           'unknown.key': 'oops',
-        },
-      });
-
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithUnknown));
-      vi.mocked(parseProviderKV).mockReturnValueOnce(
-        Effect.succeed({
-          parsed: { database: { host: 'localhost' } },
-          unknownKeys: ['unknown.key'],
         })
       );
+
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -224,38 +177,33 @@ describe('Export Command', () => {
     });
 
     it('should fail on unknown keys in strict mode', async () => {
-      const mockProviderWithUnknown = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'localhost',
+      const { name } = registerMockProviderWithData(
+        createBasicProviderData('api', {
           'unknown.key': 'oops',
-        },
-      });
-
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithUnknown));
-      vi.mocked(parseProviderKV).mockReturnValueOnce(
-        Effect.succeed({
-          parsed: { database: { host: 'localhost' } },
-          unknownKeys: ['unknown.key'],
         })
       );
+
       const exit = await Effect.runPromiseExit(
         executeExport({
           service: 'api',
-          config: { ...defaultConfig, strict: true },
+          config: buildConfig(name, { strict: true }),
         })
       );
 
       expect(exit._tag).toBe('Failure');
-      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail' && 'context' in exit.cause.error) {
-        expect(exit.cause.error.context.code).toBe(ErrorCode.VAL004);
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        const error = exit.cause.error as { context?: { code?: string } };
+        expect(error.context?.code).toBe(ErrorCode.VAL004);
       }
     });
 
     it('should use custom separator', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const result = await Effect.runPromise(
         executeExport({
           service: 'api',
-          config: { ...defaultConfig, format: 'env', separator: '__' },
+          config: buildConfig(name, { format: 'env', separator: '__' }),
         })
       );
 
@@ -265,38 +213,31 @@ describe('Export Command', () => {
 
   describe('runExport', () => {
     it('should write formatted output to stdout', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       await Effect.runPromise(
         runExport({
           service: 'api',
-          config: { ...defaultConfig, format: 'json' },
+          config: buildConfig(name, { format: 'json' }),
         })
       );
 
       expect(stdoutWriteSpy).toHaveBeenCalled();
-      const output = stdoutWriteSpy.mock.calls[0]?.[0];
-      expect(JSON.parse(output)).toEqual({
-        api: { timeout: 30000 },
-        database: { host: 'localhost', port: 5432 },
-      });
+      const output = stdoutWriteSpy.mock.calls[0]?.[0] as string;
+      expect(JSON.parse(output.trim())).toEqual(basicParsedConfig);
     });
 
     it('should print warnings to stderr', async () => {
-      const mockProviderWithConflicts = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'api-host',
-        },
-        '/zenfig/dev/shared': {
-          'database.host': 'shared-host',
-        },
-      });
+      const { name } = registerMockProviderWithData(
+        createBasicProviderData('api', {
+          'unknown.key': 'oops',
+        })
+      );
 
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithConflicts));
       await Effect.runPromise(
         runExport({
           service: 'api',
-          sources: ['shared'],
-          warnOnOverride: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 

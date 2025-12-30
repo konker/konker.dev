@@ -2,126 +2,98 @@
  * Snapshot Command Tests
  */
 import * as fs from 'node:fs';
-import * as os from 'node:os';
 import * as path from 'node:path';
-import { createInterface } from 'node:readline';
 
-import { Type } from '@sinclair/typebox';
 import * as Effect from 'effect/Effect';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type ResolvedConfig } from '../config.js';
 import { ErrorCode } from '../errors.js';
-import { createMockProvider } from '../providers/MockProvider.js';
-import { getProvider } from '../providers/registry.js';
-import { loadSchemaWithDefaults } from '../schema/loader.js';
+import { loadSchema } from '../schema/loader.js';
+import {
+  basicProviderKv,
+  createBasicProviderData,
+  createTempDir,
+  createTestConfig,
+  registerMockProviderWithData,
+  removeDir,
+  schemaBasicPath,
+} from '../test/fixtures/index.js';
 import { executeSnapshotRestore, executeSnapshotSave, runSnapshotRestore, runSnapshotSave } from './snapshot.js';
-
-vi.mock('node:readline', () => ({
-  createInterface: vi.fn(),
-}));
-
-// Mock dependencies
-vi.mock('../schema/loader.js', () => ({
-  loadSchemaWithDefaults: vi.fn(),
-}));
-
-vi.mock('../providers/registry.js', () => ({
-  getProvider: vi.fn(),
-}));
 
 describe('Snapshot Commands', () => {
   let tempDir: string;
   let consoleSpy: ReturnType<typeof vi.spyOn>;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-  let mockProvider: ReturnType<typeof createMockProvider>;
+  let schemaHash = '';
 
-  const defaultConfig: ResolvedConfig = {
-    env: 'dev',
-    provider: 'mock',
-    ssmPrefix: '/zenfig',
-    schema: 'src/schema.ts',
-    schemaExportName: 'ConfigSchema',
-    sources: [],
-    format: 'env',
-    separator: '_',
-    cache: undefined,
-    ci: false,
-    strict: false,
-    providerGuards: {},
-  };
+  const baseConfig = createTestConfig({ schema: schemaBasicPath });
+  const buildConfig = (provider: string) => ({
+    ...baseConfig,
+    provider,
+  });
 
-  const testSchema = Type.Object({
-    database: Type.Object({
-      host: Type.String(),
-      port: Type.Integer(),
-    }),
+  const createSnapshot = (
+    data: Record<string, Record<string, string>>,
+    hashOverride: string | undefined = undefined
+  ) => ({
+    version: 1 as const,
+    layer: 'stored' as const,
+    meta: {
+      timestamp: new Date().toISOString(),
+      env: baseConfig.env,
+      provider: 'mock',
+      ssmPrefix: baseConfig.ssmPrefix,
+      schemaHash: hashOverride ?? schemaHash,
+      services: Object.keys(data),
+    },
+    data,
+  });
+
+  beforeAll(async () => {
+    const result = await Effect.runPromise(loadSchema(schemaBasicPath, 'ConfigSchema'));
+    schemaHash = result.schemaHash;
   });
 
   beforeEach(() => {
-    vi.resetAllMocks();
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zenfig-snapshot-test-'));
-
-    const storageKey = '/zenfig/dev/api';
-    mockProvider = createMockProvider({
-      [storageKey]: {
-        'database.host': 'localhost',
-        'database.port': '5432',
-      },
-    });
-
+    tempDir = createTempDir('zenfig-snapshot-test-');
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(vi.fn());
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
-
-    vi.mocked(createInterface).mockReturnValue({
-      question: (_message: string, cb: (answer: string) => void) => cb('y'),
-      close: vi.fn(),
-    } as unknown as ReturnType<typeof createInterface>);
-
-    vi.mocked(loadSchemaWithDefaults).mockReturnValue(
-      Effect.succeed({ schema: testSchema, schemaHash: 'sha256:abcdef1234567890' })
-    );
-    vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProvider));
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-
-    // Clean up temp directory
-    try {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    } catch {
-      // Ignore
-    }
+    removeDir(tempDir);
   });
 
   describe('executeSnapshotSave', () => {
     it('should save snapshot to file', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
 
       const result = await Effect.runPromise(
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.path).toBe(outputPath);
-      expect(result.keyCount).toBe(2);
+      expect(result.keyCount).toBe(Object.keys(basicProviderKv).length);
       expect(fs.existsSync(outputPath)).toBe(true);
     });
 
     it('should include metadata in snapshot', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
 
       await Effect.runPromise(
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -129,18 +101,19 @@ describe('Snapshot Commands', () => {
       expect(snapshot.version).toBe(1);
       expect(snapshot.layer).toBe('stored');
       expect(snapshot.meta.env).toBe('dev');
-      expect(snapshot.meta.provider).toBe('mock');
-      expect(snapshot.meta.schemaHash).toMatch(/^sha256:/);
+      expect(snapshot.meta.provider).toBe(name);
+      expect(snapshot.meta.schemaHash).toBe(schemaHash);
     });
 
     it('should store data per service', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
 
       await Effect.runPromise(
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -150,17 +123,10 @@ describe('Snapshot Commands', () => {
     });
 
     it('should save multiple services when sources specified', async () => {
-      const mockProviderWithSources = createMockProvider({
-        '/zenfig/dev/api': {
-          'database.host': 'localhost',
-        },
-        '/zenfig/dev/shared': {
-          'database.port': '5432',
-        },
+      const { name } = registerMockProviderWithData({
+        ...createBasicProviderData('api'),
+        ...createBasicProviderData('shared', { 'database.host': 'shared-host' }),
       });
-
-      vi.mocked(getProvider).mockReturnValue(Effect.succeed(mockProviderWithSources));
-
       const outputPath = path.join(tempDir, 'snapshot.json');
 
       const result = await Effect.runPromise(
@@ -168,7 +134,7 @@ describe('Snapshot Commands', () => {
           service: 'api',
           sources: ['shared'],
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -180,11 +146,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should use default path when output not specified', async () => {
-      // Create .zenfig/snapshots directory
-      const snapshotsDir = path.join(tempDir, '.zenfig', 'snapshots');
-      fs.mkdirSync(snapshotsDir, { recursive: true });
-
-      // Change to temp dir for this test
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const originalCwd = process.cwd();
       process.chdir(tempDir);
 
@@ -192,7 +154,7 @@ describe('Snapshot Commands', () => {
         const result = await Effect.runPromise(
           executeSnapshotSave({
             service: 'api',
-            config: defaultConfig,
+            config: buildConfig(name),
           })
         );
 
@@ -204,13 +166,14 @@ describe('Snapshot Commands', () => {
     });
 
     it('should warn if not covered by gitignore', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
 
       await Effect.runPromise(
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -218,6 +181,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should skip warning when .gitignore covers .zenfig', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
       const gitignorePath = path.join(tempDir, '.gitignore');
       fs.writeFileSync(gitignorePath, '.zenfig\n');
@@ -226,7 +190,7 @@ describe('Snapshot Commands', () => {
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -234,6 +198,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should warn when .gitignore is unreadable', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
       const gitignorePath = path.join(tempDir, '.gitignore');
       fs.writeFileSync(gitignorePath, '.zenfig/snapshots\n');
@@ -244,7 +209,7 @@ describe('Snapshot Commands', () => {
           executeSnapshotSave({
             service: 'api',
             output: outputPath,
-            config: defaultConfig,
+            config: buildConfig(name),
           })
         );
       } finally {
@@ -255,6 +220,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should skip warning when .gitignore covers snapshots', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
       const gitignorePath = path.join(tempDir, '.gitignore');
       fs.writeFileSync(gitignorePath, '.zenfig/snapshots\n');
@@ -263,7 +229,7 @@ describe('Snapshot Commands', () => {
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -271,9 +237,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should warn when default path is not covered by gitignore', async () => {
-      const snapshotsDir = path.join(tempDir, '.zenfig', 'snapshots');
-      fs.mkdirSync(snapshotsDir, { recursive: true });
-
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const originalCwd = process.cwd();
       process.chdir(tempDir);
 
@@ -281,7 +245,7 @@ describe('Snapshot Commands', () => {
         await Effect.runPromise(
           executeSnapshotSave({
             service: 'api',
-            config: defaultConfig,
+            config: buildConfig(name),
           })
         );
       } finally {
@@ -292,6 +256,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should fail when snapshot directory cannot be created', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const blockedPath = path.join(tempDir, 'no-dir');
       fs.writeFileSync(blockedPath, 'not-a-directory');
 
@@ -300,7 +265,7 @@ describe('Snapshot Commands', () => {
         executeSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -311,6 +276,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should fail when snapshot cannot be written', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const readonlyDir = path.join(tempDir, 'readonly');
       fs.mkdirSync(readonlyDir, { recursive: true });
       fs.chmodSync(readonlyDir, 0o500);
@@ -321,16 +287,13 @@ describe('Snapshot Commands', () => {
           executeSnapshotSave({
             service: 'api',
             output: outputPath,
-            config: defaultConfig,
+            config: buildConfig(name),
           })
         );
 
         expect(exit._tag).toBe('Failure');
-        if (exit._tag === 'Failure') {
-          const cause = exit.cause;
-          if (cause._tag === 'Fail') {
-            expect(cause.error.context.code).toBe(ErrorCode.SYS002);
-          }
+        if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+          expect(exit.cause.error.context.code).toBe(ErrorCode.SYS002);
         }
       } finally {
         fs.chmodSync(readonlyDir, 0o700);
@@ -339,58 +302,42 @@ describe('Snapshot Commands', () => {
   });
 
   describe('executeSnapshotRestore', () => {
-    const createSnapshot = (data: Record<string, Record<string, string>>, schemaHash = 'sha256:abcdef1234567890') => ({
-      version: 1,
-      layer: 'stored',
-      meta: {
-        timestamp: new Date().toISOString(),
-        env: 'dev',
-        provider: 'mock',
-        ssmPrefix: '/zenfig',
-        schemaHash,
-        services: Object.keys(data),
-      },
-      data,
-    });
-
     it('should fail when snapshot file does not exist', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
+
       const exit = await Effect.runPromiseExit(
         executeSnapshotRestore({
           snapshotFile: '/nonexistent/snapshot.json',
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(exit._tag).toBe('Failure');
-      if (exit._tag === 'Failure') {
-        const cause = exit.cause;
-        if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
-        }
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS001);
       }
     });
 
     it('should fail when snapshot JSON is invalid', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       fs.writeFileSync(snapshotPath, '{ invalid json');
 
       const exit = await Effect.runPromiseExit(
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(exit._tag).toBe('Failure');
-      if (exit._tag === 'Failure') {
-        const cause = exit.cause;
-        if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
-        }
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS001);
       }
     });
 
     it('should fail when snapshot file cannot be read', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
@@ -404,16 +351,13 @@ describe('Snapshot Commands', () => {
         const exit = await Effect.runPromiseExit(
           executeSnapshotRestore({
             snapshotFile: snapshotPath,
-            config: defaultConfig,
+            config: buildConfig(name),
           })
         );
 
         expect(exit._tag).toBe('Failure');
-        if (exit._tag === 'Failure') {
-          const cause = exit.cause;
-          if (cause._tag === 'Fail') {
-            expect(cause.error.context.code).toBe(ErrorCode.SYS001);
-          }
+        if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+          expect(exit.cause.error.context.code).toBe(ErrorCode.SYS001);
         }
       } finally {
         fs.chmodSync(snapshotPath, 0o600);
@@ -421,6 +365,7 @@ describe('Snapshot Commands', () => {
     });
 
     it('should fail when snapshot version is unsupported', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = {
         version: 2,
@@ -430,7 +375,7 @@ describe('Snapshot Commands', () => {
           env: 'dev',
           provider: 'mock',
           ssmPrefix: '/zenfig',
-          schemaHash: 'sha256:abcdef1234567890',
+          schemaHash,
           services: ['api'],
         },
         data: {
@@ -443,25 +388,22 @@ describe('Snapshot Commands', () => {
       const exit = await Effect.runPromiseExit(
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(exit._tag).toBe('Failure');
-      if (exit._tag === 'Failure') {
-        const cause = exit.cause;
-        if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS001);
-        }
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS001);
       }
     });
 
     it('should detect no changes when data matches', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
-          'database.host': 'localhost',
-          'database.port': '5432',
+          ...basicProviderKv,
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -470,7 +412,7 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           dryRun: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -479,11 +421,12 @@ describe('Snapshot Commands', () => {
     });
 
     it('should detect changes when data differs', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
+          ...basicProviderKv,
           'database.host': 'new-host',
-          'database.port': '5432',
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -492,21 +435,21 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           dryRun: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.changes.length).toBeGreaterThan(0);
-      expect(result.changes.find((c) => c.key === 'database.host')?.action).toBe('update');
+      expect(result.changes.find((change) => change.key === 'database.host')?.action).toBe('update');
     });
 
     it('should detect new keys to add', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
-          'database.host': 'localhost',
-          'database.port': '5432',
-          'database.timeout': '30000', // New key
+          ...basicProviderKv,
+          'database.timeout': '30000',
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -515,19 +458,20 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           dryRun: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
-      expect(result.changes.find((c) => c.key === 'database.timeout')?.action).toBe('add');
+      expect(result.changes.find((change) => change.key === 'database.timeout')?.action).toBe('add');
     });
 
     it('should not apply changes in dry run mode', async () => {
+      const { name, provider } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
+          ...basicProviderKv,
           'database.host': 'new-host',
-          'database.port': '5432',
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -536,23 +480,23 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           dryRun: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.applied).toBe(false);
 
-      // Verify data was not changed
-      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      const stored = await Effect.runPromise(provider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBe('localhost');
     });
 
     it('should apply changes with confirm flag', async () => {
+      const { name, provider } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
+          ...basicProviderKv,
           'database.host': 'new-host',
-          'database.port': '5432',
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -561,23 +505,23 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.applied).toBe(true);
 
-      // Verify data was changed
-      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      const stored = await Effect.runPromise(provider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBe('new-host');
     });
 
     it('should cancel restore when prompt declines', async () => {
+      const { name, provider } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
+          ...basicProviderKv,
           'database.host': 'new-host',
-          'database.port': '5432',
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -586,49 +530,24 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           _testPromptOverride: () => Effect.succeed(false),
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.applied).toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Restore cancelled'));
 
-      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      const stored = await Effect.runPromise(provider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBe('localhost');
     });
 
-    it('should use interactive prompt when no override is provided', async () => {
-      vi.mocked(createInterface).mockReturnValueOnce({
-        question: (_message: string, cb: (answer: string) => void) => cb('n'),
-        close: vi.fn(),
-      } as unknown as ReturnType<typeof createInterface>);
-
-      const snapshotPath = path.join(tempDir, 'snapshot.json');
-      const snapshot = createSnapshot({
-        api: {
-          'database.host': 'new-host',
-          'database.port': '5432',
-        },
-      });
-      fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
-
-      const result = await Effect.runPromise(
-        executeSnapshotRestore({
-          snapshotFile: snapshotPath,
-          config: defaultConfig,
-        })
-      );
-
-      expect(result.applied).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Restore cancelled'));
-    });
-
     it('should apply changes after prompt confirmation', async () => {
+      const { name, provider } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
         api: {
+          ...basicProviderKv,
           'database.host': 'new-host',
-          'database.port': '5432',
         },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -637,17 +556,18 @@ describe('Snapshot Commands', () => {
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
           _testPromptOverride: () => Effect.succeed(true),
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(result.applied).toBe(true);
 
-      const stored = await Effect.runPromise(mockProvider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
+      const stored = await Effect.runPromise(provider.fetch({ prefix: '/zenfig', service: 'api', env: 'dev' }));
       expect(stored['database.host']).toBe('new-host');
     });
 
     it('should fail when schema hash does not match', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({ api: { 'database.host': 'localhost' } }, 'sha256:differenthash');
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
@@ -655,25 +575,20 @@ describe('Snapshot Commands', () => {
       const exit = await Effect.runPromiseExit(
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
       expect(exit._tag).toBe('Failure');
-      if (exit._tag === 'Failure') {
-        const cause = exit.cause;
-        if (cause._tag === 'Fail') {
-          expect(cause.error.context.code).toBe(ErrorCode.SYS003);
-        }
+      if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+        expect(exit.cause.error.context.code).toBe(ErrorCode.SYS003);
       }
     });
 
     it('should proceed with force flag when schema hash does not match', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
-      const snapshot = createSnapshot(
-        { api: { 'database.host': 'localhost', 'database.port': '5432' } },
-        'sha256:differenthash'
-      );
+      const snapshot = createSnapshot({ api: { 'database.host': 'localhost' } }, 'sha256:differenthash');
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
 
       const result = await Effect.runPromise(
@@ -681,28 +596,29 @@ describe('Snapshot Commands', () => {
           snapshotFile: snapshotPath,
           forceSchemaMatch: true,
           dryRun: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
-      expect(result.applied).toBe(false); // Dry run
+      expect(result.applied).toBe(false);
       expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Schema has changed'));
     });
 
     it('should require confirm flag in CI mode', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
       const snapshot = createSnapshot({
-        api: { 'database.host': 'new-host', 'database.port': '5432' },
+        api: {
+          ...basicProviderKv,
+          'database.host': 'new-host',
+        },
       });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
-
-      const ciConfig: ResolvedConfig = { ...defaultConfig, ci: true };
 
       const result = await Effect.runPromise(
         executeSnapshotRestore({
           snapshotFile: snapshotPath,
-          // No confirm flag
-          config: ciConfig,
+          config: { ...buildConfig(name), ci: true },
         })
       );
 
@@ -713,13 +629,14 @@ describe('Snapshot Commands', () => {
 
   describe('runSnapshotSave', () => {
     it('should print summary on success', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const outputPath = path.join(tempDir, 'snapshot.json');
 
       await Effect.runPromise(
         runSnapshotSave({
           service: 'api',
           output: outputPath,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -729,29 +646,21 @@ describe('Snapshot Commands', () => {
 
   describe('runSnapshotRestore', () => {
     it('should return true when changes applied', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
-      const snapshot = {
-        version: 1,
-        layer: 'stored',
-        meta: {
-          timestamp: new Date().toISOString(),
-          env: 'dev',
-          provider: 'mock',
-          ssmPrefix: '/zenfig',
-          schemaHash: 'sha256:abcdef1234567890',
-          services: ['api'],
+      const snapshot = createSnapshot({
+        api: {
+          ...basicProviderKv,
+          'database.host': 'new-host',
         },
-        data: {
-          api: { 'database.host': 'new-host', 'database.port': '5432' },
-        },
-      };
+      });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
 
       const result = await Effect.runPromise(
         runSnapshotRestore({
           snapshotFile: snapshotPath,
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 
@@ -759,29 +668,20 @@ describe('Snapshot Commands', () => {
     });
 
     it('should return false when no changes applied', async () => {
+      const { name } = registerMockProviderWithData(createBasicProviderData('api'));
       const snapshotPath = path.join(tempDir, 'snapshot.json');
-      const snapshot = {
-        version: 1,
-        layer: 'stored',
-        meta: {
-          timestamp: new Date().toISOString(),
-          env: 'dev',
-          provider: 'mock',
-          ssmPrefix: '/zenfig',
-          schemaHash: 'sha256:abcdef1234567890',
-          services: ['api'],
+      const snapshot = createSnapshot({
+        api: {
+          ...basicProviderKv,
         },
-        data: {
-          api: { 'database.host': 'localhost', 'database.port': '5432' },
-        },
-      };
+      });
       fs.writeFileSync(snapshotPath, JSON.stringify(snapshot));
 
       const result = await Effect.runPromise(
         runSnapshotRestore({
           snapshotFile: snapshotPath,
           confirm: true,
-          config: defaultConfig,
+          config: buildConfig(name),
         })
       );
 

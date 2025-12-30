@@ -122,6 +122,14 @@
       "types": "./dist/schema/validator.d.ts",
       "import": "./dist/schema/validator.js"
     },
+    "./test/fixtures": {
+      "types": "./dist/test/fixtures/index.d.ts",
+      "import": "./dist/test/fixtures/index.js"
+    },
+    "./test/fixtures/schema.basic": {
+      "types": "./dist/test/fixtures/schema.basic.d.ts",
+      "import": "./dist/test/fixtures/schema.basic.js"
+    },
     "./cli": {
       "types": "./dist/cli.d.ts",
       "import": "./dist/cli.js"

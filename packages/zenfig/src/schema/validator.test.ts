@@ -135,6 +135,25 @@ describe('Schema Validator', () => {
         const result = await Effect.runPromise(validate('192.168.1.1', schema));
         expect(result).toBe('192.168.1.1');
       });
+
+      it('should include format examples in errors', async () => {
+        const cases = [
+          { format: 'uri', example: 'https://example.com/path' },
+          { format: 'date-time', example: '2024-01-15T10:30:00Z' },
+          { format: 'ipv4', example: '192.168.1.1' },
+        ];
+
+        for (const { example, format } of cases) {
+          const schema = Type.String({ format });
+          const exit = await Effect.runPromiseExit(validate('invalid', schema));
+
+          expect(exit._tag).toBe('Failure');
+          if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+            expect(exit.cause.error.context.code).toBe(ErrorCode.VAL002);
+            expect(exit.cause.error.context.example).toBe(example);
+          }
+        }
+      });
     });
 
     describe('constraint validation', () => {
@@ -210,6 +229,16 @@ describe('Schema Validator', () => {
         expect(exit._tag).toBe('Failure');
       });
 
+      it('should validate const', async () => {
+        const schema = Type.Literal('fixed');
+        const exit = await Effect.runPromiseExit(validate('bad', schema));
+
+        expect(exit._tag).toBe('Failure');
+        if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+          expect(exit.cause.error.context.code).toBe(ErrorCode.VAL003);
+        }
+      });
+
       it('should validate required properties', async () => {
         const schema = Type.Object({
           required: Type.String(),
@@ -243,6 +272,18 @@ describe('Schema Validator', () => {
             expect(cause.error.context.code).toBe(ErrorCode.VAL003);
             expect(cause.error.context.path).toBe('extra');
           }
+        }
+      });
+    });
+
+    describe('error context', () => {
+      it('should include null in received values', async () => {
+        const schema = Type.Object({ a: Type.Object({ b: Type.String() }) });
+        const exit = await Effect.runPromiseExit(validate({ a: null }, schema));
+
+        expect(exit._tag).toBe('Failure');
+        if (exit._tag === 'Failure' && exit.cause._tag === 'Fail') {
+          expect(exit.cause.error.context.received).toContain('null');
         }
       });
     });
