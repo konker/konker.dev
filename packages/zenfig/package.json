@@ -130,6 +130,10 @@
       "types": "./dist/test/fixtures/schema.basic.d.ts",
       "import": "./dist/test/fixtures/schema.basic.js"
     },
+    "./api": {
+      "types": "./dist/api.d.ts",
+      "import": "./dist/api.js"
+    },
     "./cli": {
       "types": "./dist/cli.d.ts",
       "import": "./dist/cli.js"
@@ -166,7 +170,7 @@
     "@effect/language-service": "^0.62.5",
     "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.39.2",
-    "@konker.dev/common-config": "^0.5.1",
+    "@konker.dev/common-config": "^0.7.0",
     "@types/node": "^25.0.3",
     "@vitest/coverage-istanbul": "^4.0.16",
     "aws-sdk-client-mock": "^4.1.0",

@@ -89,6 +89,31 @@ Use a different provider:
 ZENFIG_PROVIDER=mock pnpm run zenfig list <service>
 ```
 
+## Programmatic API (export-only)
+
+Zenfig exposes a TypeScript API for export-only usage. It resolves configuration the same way as the CLI (rc file,
+env vars, defaults), but lets you override values inline.
+
+```ts
+import { exportConfig } from '@konker.dev/zenfig';
+
+const result = await exportConfig({
+  service: 'api',
+  sources: ['shared'],
+  format: 'json',
+  config: {
+    env: 'prod',
+    provider: 'aws-ssm',
+    ssmPrefix: '/zenfig',
+    schema: 'src/schema.ts',
+    schemaExportName: 'ConfigSchema',
+  },
+});
+
+// Structured config object
+console.log(result.config);
+```
+
 ## Development
 
 Run tests:

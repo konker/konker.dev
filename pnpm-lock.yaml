@@ -1421,8 +1421,8 @@ importers:
         specifier: ^9.39.2
         version: 9.39.2
       '@konker.dev/common-config':
-        specifier: ^0.5.1
-        version: 0.5.1(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
+        specifier: ^0.7.0
+        version: 0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
       '@types/node':
         specifier: ^25.0.3
         version: 25.0.3
@@ -2739,10 +2739,6 @@ packages:
     engines: {node: '>= 18.0.0'}
     peerDependencies:
       astro: ^4.0.0
-
-  '@konker.dev/common-config@0.5.1':
-    resolution: {integrity: sha512-yPpT6CyW/6v1vca096X7tMMb+rEYPbnfibwRnrcA1+ExCaf7o26Hb0McxH4wiJyioXwcgUgOS3onXkQ/lYw+iA==}
-    hasBin: true
 
   '@konker.dev/common-config@0.7.0':
     resolution: {integrity: sha512-l+GT5XYkjVjUrai5m+kc7WrEDs8KR9L02Vf/dioVH6pfVewQxbfLsjAqS3uaK5fxFqfAZqn+ojVEso8lGO3hDg==}
@@ -10301,22 +10297,6 @@ snapshots:
   '@kindspells/astro-shield@1.7.1(astro@5.16.6(@azure/storage-blob@12.28.0)(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.52.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1))':
     dependencies:
       astro: 5.16.6(@azure/storage-blob@12.28.0)(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.52.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1)
-
-  '@konker.dev/common-config@0.5.1(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))':
-    dependencies:
-      '@aws-sdk/client-cloudfront-keyvaluestore': 3.958.0(aws-crt@1.27.3)
-      '@aws-sdk/signature-v4-crt': 3.957.0
-      eslint-plugin-jsonc: 2.21.0(eslint@9.39.2(jiti@2.6.1))
-      jsonc-eslint-parser: 2.4.2
-      lodash: 4.17.21
-    transitivePeerDependencies:
-      - '@eslint/json'
-      - aws-crt
-      - bufferutil
-      - debug
-      - eslint
-      - supports-color
-      - utf-8-validate
 
   '@konker.dev/common-config@0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))':
     dependencies:
