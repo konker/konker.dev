@@ -1,6 +1,6 @@
 # Zenfig
 
-CLI tool for configuration and secrets management using AWS SSM and TypeBox.
+CLI tool for configuration and secrets management using AWS SSM with a pluggable validation layer (Effect Schema or Zod).
 
 ## Prerequisites
 
@@ -26,6 +26,8 @@ pnpm run build
 
 Zenfig reads configuration from `zenfigrc.json` or `zenfigrc.json5` (searches current and parent directories) and
 environment variables. Both files are parsed with JSON5, so comments and trailing commas are allowed.
+Validation is pluggable; set `validation` to `effect` (default) or `zod`. Your schema file must export a single
+`ConfigSchema` value that matches the selected validator.
 
 Example `zenfigrc.json`:
 
@@ -35,7 +37,7 @@ Example `zenfigrc.json`:
   "provider": "aws-ssm",
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
-  "schemaExportName": "ConfigSchema",
+  "validation": "effect",
   "providerGuards": {
     "aws-ssm": {
       "accountId": "123456789012",
@@ -56,7 +58,7 @@ Environment overrides:
 - `ZENFIG_PROVIDER`
 - `ZENFIG_SSM_PREFIX`
 - `ZENFIG_SCHEMA`
-- `ZENFIG_SCHEMA_EXPORT_NAME`
+- `ZENFIG_VALIDATION`
 - `ZENFIG_FORMAT`
 - `ZENFIG_SEPARATOR`
 - `ZENFIG_CACHE`
@@ -106,7 +108,7 @@ const result = await exportConfig({
     provider: 'aws-ssm',
     ssmPrefix: '/zenfig',
     schema: 'src/schema.ts',
-    schemaExportName: 'ConfigSchema',
+    validation: 'effect',
   },
 });
 

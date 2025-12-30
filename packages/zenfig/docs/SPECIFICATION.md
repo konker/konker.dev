@@ -20,15 +20,20 @@
     - [Default Provider: AWS SSM (`aws-ssm`)](#default-provider-aws-ssm-aws-ssm)
     - [Provider Registry](#provider-registry)
     - [Encryption Verification](#encryption-verification)
-  - [5. Configuration Contract](#5-configuration-contract)
+  - [5. Validator Model (Pluggable)](#5-validator-model-pluggable)
+    - [Validator Selection](#validator-selection)
+    - [Validator Interface](#validator-interface)
+    - [Schema Export Conventions](#schema-export-conventions)
+    - [Error Normalization](#error-normalization)
+  - [6. Configuration Contract](#6-configuration-contract)
     - [Merged Config Input](#merged-config-input)
     - [Output](#output)
-  - [6. SSM Naming Convention](#6-ssm-naming-convention)
-  - [7. Multi-Source Composition](#7-multi-source-composition)
+  - [7. SSM Naming Convention](#7-ssm-naming-convention)
+  - [8. Multi-Source Composition](#8-multi-source-composition)
     - [CLI Input](#cli-input)
     - [Merge Semantics](#merge-semantics)
     - [Merge Conflict Behavior](#merge-conflict-behavior)
-  - [8. Implementation Requirements](#8-implementation-requirements)
+  - [9. Implementation Requirements](#9-implementation-requirements)
     - [Implementation Conventions](#implementation-conventions)
     - [Project Structure](#project-structure)
     - [CLI Interface](#cli-interface)
@@ -57,7 +62,7 @@
       - [Test Coverage Requirements](#test-coverage-requirements)
     - [Documentation](#documentation)
     - [Exit Codes](#exit-codes)
-  - [9. Error Catalog](#9-error-catalog)
+  - [10. Error Catalog](#10-error-catalog)
     - [Error Code Structure](#error-code-structure)
     - [Validation Errors (VAL)](#validation-errors-val)
       - [VAL001: Invalid Type](#val001-invalid-type)
@@ -79,7 +84,7 @@
       - [SYS001: File Not Found](#sys001-file-not-found)
       - [SYS002: Permission Denied](#sys002-permission-denied)
       - [SYS003: Snapshot Schema Mismatch](#sys003-snapshot-schema-mismatch)
-  - [10. Performance Characteristics](#10-performance-characteristics)
+  - [11. Performance Characteristics](#11-performance-characteristics)
     - [Operational Limits](#operational-limits)
     - [Expected Latency](#expected-latency)
     - [Rate Limiting](#rate-limiting)
@@ -87,7 +92,7 @@
     - [Optimization Recommendations](#optimization-recommendations)
     - [Memory Usage](#memory-usage)
     - [Disk Usage](#disk-usage)
-  - [11. Concrete Usage Example](#11-concrete-usage-example)
+  - [12. Concrete Usage Example](#12-concrete-usage-example)
     - [Example Files](#example-files)
     - [SSM State (Initial)](#ssm-state-initial)
     - [Steps](#steps)
@@ -95,18 +100,18 @@
     - [Merged Config (Merge Order: api + shared + overrides)](#merged-config-merge-order-api--shared--overrides)
     - [Output (format json)](#output-format-json)
     - [Output (format env)](#output-format-env)
-  - [12. Implementation Prompt for LLM](#12-implementation-prompt-for-llm)
+  - [13. Implementation Prompt for LLM](#13-implementation-prompt-for-llm)
   <!-- TOC -->
 
 ## 1. Goal
 
-Design and implement a CLI tool called **Zenfig** that orchestrates config providers and TypeBox. It ensures that application configurations are securely retrieved, strictly validated, and safely exported for runtime use.
+Design and implement a CLI tool called **Zenfig** that orchestrates config providers and a pluggable validation layer (Effect Schema by default, Zod optional). It ensures that application configurations are securely retrieved, strictly validated, and safely exported for runtime use.
 
 ## 2. Technical Stack
 
 - **Runtime:** Node.js or Bun (TypeScript).
 - **Provider (default):** AWS SSM via the AWS SDK (`aws-ssm` provider).
-- **Validation:** [TypeBox](https://github.com/sinclairzx81/typebox) with Ajv.
+- **Validation:** Pluggable schema validation: [Effect Schema](https://github.com/Effect-TS/effect) (`effect/Schema`, default) or [Zod](https://github.com/colinhacks/zod).
 
 ---
 
@@ -134,10 +139,10 @@ Key path representations:
 
 Stored value encoding (provider strings) is schema-directed:
 
-- `Type.String`: stored as-is (no JSON quoting)
-- `Type.Boolean`: `true` / `false`
-- `Type.Integer` / `Type.Number`: base-10 numeric string (e.g. `6500`, `0.25`)
-- `Type.Array` / `Type.Object`: minified JSON (e.g. `["a","b"]`, `{"k":"v"}`)
+- `string` schema (`Schema.String` / `z.string()`): stored as-is (no JSON quoting)
+- `boolean` schema (`Schema.Boolean` / `z.boolean()`): `true` / `false`
+- `number` schema (`Schema.Number` / `z.number()`, including integer refinements): base-10 numeric string (e.g. `6500`, `0.25`)
+- `array` / `object` schema (`Schema.Array`/`Schema.Struct`/`Schema.Record` or `z.array()`/`z.object()`/`z.record()`): minified JSON (e.g. `["a","b"]`, `{"k":"v"}`)
 
 By default, Zenfig does not print secret values in logs unless explicitly requested via an opt-in flag.
 
@@ -147,14 +152,14 @@ By default, Zenfig does not print secret values in logs unless explicitly reques
    - Default (AWS SSM): `GetParametersByPath` under `<prefix>/<env>/<service>` (via AWS SDK).
    - Provider returns a flat map of canonical key paths to **string** values.
 2. **Parse + Merge:** Convert provider strings into typed values using the schema (schema-directed parsing) and deep-merge all sources.
-3. **Validate:** Validate the merged config against the TypeBox schema (Ajv).
+3. **Validate:** Validate the merged config against the selected validation layer (Effect Schema or Zod).
 4. **Format:** Convert the validated object into `.env` (flat) or `.json` (nested).
 
 ### B. Upsert Workflow (Input -> Validate -> Push)
 
 1. **Input:** Accept a service name, key, and value (via CLI args or stdin for sensitive values).
 2. **Resolve:** Locate the target schema node using partial path resolution (dot notation; case-sensitive input).
-3. **Parse + Validate:** Parse the input string into a typed value based on the resolved schema node, then validate with Ajv.
+3. **Parse + Validate:** Parse the input string into a typed value based on the resolved schema node, then validate with the selected validation layer.
    - Strings are not auto-coerced to numbers/booleans; parsing is schema-directed.
    - Arrays/objects require JSON input (validated and then stored as minified JSON).
 4. **Serialize:** Convert the typed value back into the provider string encoding (see Stored value encoding).
@@ -166,7 +171,7 @@ By default, Zenfig does not print secret values in logs unless explicitly reques
 
 1. **Input:** Accept file path to JSON or `.env` file via `--file`.
 2. **Parse:** Load and parse the file contents (JSON or env format auto-detected).
-3. **Validate:** Apply full TypeBox schema validation.
+3. **Validate:** Apply full schema validation using the selected validation layer.
 4. **Report:** Output validation errors with full paths, expected types, constraints, and suggestions.
    - Exit code 0 if valid, 1 if invalid.
 
@@ -283,7 +288,75 @@ enum EncryptionType {
 
 ---
 
-## 5. Configuration Contract
+## 5. Validator Model (Pluggable)
+
+Zenfig supports multiple schema validators behind a shared adapter interface. Effect Schema is the default; Zod is optional.
+
+### Validator Selection
+
+- Select via CLI `--validation <effect|zod>`, config `validation`, or env `ZENFIG_VALIDATION`.
+- Default is `effect` when unspecified.
+- `schema` must export `ConfigSchema` for the selected validator.
+
+### Validator Interface
+
+Each adapter must provide a consistent surface:
+
+- **Load schema export:** Load `ConfigSchema` from the `schema` file.
+- **Resolve path:** Resolve dot-notation paths to a schema node with canonical casing.
+- **Enumerate leaf paths:** Return all leaf schema paths with optional/default metadata.
+- **Validate values:** Validate a value against a schema node and return normalized errors.
+- **Describe types:** Provide human-readable type/constraint descriptions for error messages.
+
+Reference interface (shape only, not exact types):
+
+```ts
+type ValidationIssue = {
+  path: string;
+  expected: string;
+  received: unknown;
+  message: string;
+};
+
+type ValidationResult = { readonly ok: true } | { readonly ok: false; readonly issues: ReadonlyArray<ValidationIssue> };
+
+type ValidatorAdapter = {
+  readonly name: 'effect' | 'zod';
+  readonly loadSchema: (filePath: string, exportName: string) => Promise<unknown>;
+  readonly resolvePath: (schema: unknown, keyPath: string) => ResolvedPath;
+  readonly getLeafPaths: (schema: unknown) => ReadonlyArray<SchemaKeyInfo>;
+  readonly validateNode: (schemaNode: unknown, value: unknown) => ValidationResult;
+  readonly validateRoot: (schema: unknown, value: unknown) => ValidationResult;
+  readonly describeNode: (schemaNode: unknown) => string;
+};
+```
+
+Adapter requirements:
+
+- Do not enable implicit coercion or type conversions in the underlying validator.
+- Detect `optional`, `nullable`, and `default` semantics for leaf metadata and error reporting.
+- Keep schema node introspection inside the adapter (core logic treats nodes as opaque).
+
+### Schema Export Conventions
+
+- When `validation=effect`, `ConfigSchema` must be an Effect Schema value.
+- When `validation=zod`, `ConfigSchema` must be a Zod schema value.
+- The schema file must export exactly one schema value named `ConfigSchema` (no dual exports for multiple validators).
+- Schema type mismatches (e.g., Zod schema when `validation=effect`) must fail fast with a clear error.
+
+### Error Normalization
+
+Adapters must normalize validator-specific errors into Zenfig's error catalog, including:
+
+- Full path (canonical dot path)
+- Expected type/constraints
+- Actual value (truncated if needed)
+- Specific failure reason
+- Suggested remediation
+
+---
+
+## 6. Configuration Contract
 
 ### Merged Config Input
 
@@ -291,12 +364,12 @@ enum EncryptionType {
 
 ### Output
 
-- The merged config must validate against the TypeBox schema.
+- The merged config must validate against the selected schema validator.
 - Invalid or non-object results should produce a validation error with exit code 1.
 
 ---
 
-## 6. SSM Naming Convention
+## 7. SSM Naming Convention
 
 - Parameter name format: `<prefix>/<env>/<service>/<key-path>`.
 - Default `prefix` is `/zenfig`, configurable via `--ssm-prefix` or `ZENFIG_SSM_PREFIX`.
@@ -308,7 +381,7 @@ enum EncryptionType {
 
 ---
 
-## 7. Multi-Source Composition
+## 8. Multi-Source Composition
 
 Zenfig may compose multiple SSM roots into a single config output.
 
@@ -351,7 +424,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 
 ---
 
-## 8. Implementation Requirements
+## 9. Implementation Requirements
 
 ### Implementation Conventions
 
@@ -366,7 +439,8 @@ Zenfig may compose multiple SSM roots into a single config output.
 - `src/config.ts`: Config resolution and merging (CLI flags, env vars, rc file, defaults).
 - `src/commands/*`: Command implementations (export, upsert, validate, list, delete, snapshot).
 - `src/lib/*`: Formatting, merge, flatten, and redaction utilities.
-- `src/schema/*`: Schema loader, resolver, parser, and validator.
+- `src/schema/*`: Schema loader, resolver, parser, and validator glue.
+- `src/validation/*`: Validator interface plus Effect Schema and Zod adapters.
 - `src/providers/*`: Provider interface, registry, and implementations (e.g., AWS SSM).
 - `src/errors.ts`: Error types, formatting, and exit codes.
 
@@ -378,6 +452,7 @@ Zenfig may compose multiple SSM roots into a single config output.
 # Global options (available on all commands)
   --ci                        # Disable prompts; require explicit flags like --confirm
   --strict                    # Treat warnings as errors (e.g., unknown keys)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Export configuration
 zenfig export <service> [options]
@@ -392,7 +467,7 @@ zenfig export <service> [options]
   --no-cache                  # Disable cache even if configured
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Upsert configuration value
 zenfig upsert <service> <key> [value] [options]
@@ -403,14 +478,14 @@ zenfig upsert <service> <key> [value] [options]
   --skip-encryption-check     # Skip encryption verification (not recommended)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Validate configuration file
 zenfig validate [options]
   --file <path>               # Path to JSON or .env file
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
   --format <env|json>         # File format (auto-detected if not specified)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # List configuration keys
 zenfig list <service> [options]
@@ -438,7 +513,7 @@ zenfig delete <service> <key> [options]
   --confirm                   # Skip interactive confirmation
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Save configuration snapshot
 zenfig snapshot save <service> [options]
@@ -450,7 +525,7 @@ zenfig snapshot save <service> [options]
   --snapshot-key-file <path>  # Read encryption key from file (preferred over CLI args)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
+  --validation <effect|zod>   # Validation layer (default: effect)
 
 # Restore configuration from snapshot
 zenfig snapshot restore <snapshot-file> [options]
@@ -462,7 +537,7 @@ zenfig snapshot restore <snapshot-file> [options]
   --unsafe-show-values        # Allow printing secrets even when stdout is not a TTY (dangerous)
   --ssm-prefix <prefix>       # SSM path prefix (default: /zenfig)
   --schema <path>             # Schema path (default: src/schema.ts)
-  --schema-export-name <name> # Schema export name (default: ConfigSchema)
+  --validation <effect|zod>   # Validation layer (default: effect)
 ```
 
 ### Programmatic API (TypeScript)
@@ -487,7 +562,7 @@ type ExportApiOptions = {
   strict?: boolean;
   strictMerge?: boolean;
   warnOnOverride?: boolean;
-  config?: Partial<ResolvedConfig>; // provider, env, schema path, prefix, etc.
+  config?: Partial<ResolvedConfig>; // provider, env, validation, schema path, prefix, etc.
 };
 
 type ExportApiResult = {
@@ -514,7 +589,7 @@ const result = await exportConfig({
     provider: 'aws-ssm',
     ssmPrefix: '/zenfig',
     schema: 'src/schema.ts',
-    schemaExportName: 'ConfigSchema',
+    validation: 'effect',
   },
 });
 
@@ -537,7 +612,7 @@ Supported environment variables:
 - `ZENFIG_SSM_PREFIX`: Default SSM path prefix
 - `ZENFIG_PROVIDER`: Default provider name
 - `ZENFIG_SCHEMA`: Default schema path
-- `ZENFIG_SCHEMA_EXPORT_NAME`: Default schema export name (default: `ConfigSchema`)
+- `ZENFIG_VALIDATION`: Validation layer (`effect` or `zod`, default: `effect`)
 - `ZENFIG_CACHE`: Default provider fetch cache duration (e.g., `5m`, `0` to disable)
 - `ZENFIG_CI`: If set (`1`/`true`), disable prompts and require explicit confirmation flags
 - `ZENFIG_IGNORE_PROVIDER_GUARDS`: If set (`1`/`true`), skip provider guard checks (emergency use)
@@ -557,7 +632,7 @@ Example:
   "provider": "aws-ssm",
   "ssmPrefix": "/zenfig",
   "schema": "src/schema.ts",
-  "schemaExportName": "ConfigSchema",
+  "validation": "effect",
   "sources": ["shared", "overrides"],
   "format": "env",
   "separator": "_",
@@ -576,6 +651,7 @@ Rules:
 - `zenfigrc.json`/`zenfigrc.json5` must not contain secrets.
 - CLI flags override environment variables, which override `zenfigrc.json`/`zenfigrc.json5`, which override defaults.
 - Unknown keys should be ignored with a warning (or error in `--strict` mode).
+- The schema file referenced by `schema` must export `ConfigSchema` for the selected validation layer.
 
 #### Provider Guards
 
@@ -620,6 +696,18 @@ Guidelines:
 
 ### Validation Details
 
+#### Pluggable Validation Layer
+
+Validation is selected via config/CLI (`validation: effect|zod`) and must be wired through a small adapter interface.
+
+Required adapter capabilities:
+
+- Load the schema export for the selected validator (Effect Schema or Zod).
+- Resolve dot-paths to schema nodes (for upsert validation and error reporting).
+- Enumerate leaf paths (for `.env` validation and formatting).
+- Validate a value against a schema node and return structured errors.
+- Provide human-readable type/constraint descriptions for error messages.
+
 #### Partial Path Resolution
 
 - Keys use dot notation (e.g., `database.url`, `api.timeoutMs`).
@@ -629,36 +717,35 @@ Guidelines:
   1. Split key by `.` into segments (e.g., `database.url` → `["database", "url"]`)
   2. Reject any segment that does not match `^[A-Za-z0-9_-]+$`
   3. Starting from schema root, traverse each segment:
-     - If current node is `Type.Object`, look for a property whose name matches the segment exactly
+     - If current node is an object schema (e.g., `Schema.Struct` or `z.object()`), look for a property whose name matches the segment exactly
      - If segment not found, error: `Key 'database.url' not found in schema`
-  4. At final segment, extract the TypeBox type (e.g., `Type.String({ format: "uri" })`)
-  5. Validate value against extracted type using Ajv
+  4. At final segment, extract the schema node (e.g., `Schema.String` or `z.string()` with a URI refinement)
+  5. Validate value against the extracted schema node using the selected validation layer
 - Example validation for `database.url`:
   ```ts
-  // Schema: Type.Object({ database: Type.Object({ url: Type.String({ format: "uri" }) }) })
+  // Schema (Effect): Schema.Struct({ database: Schema.Struct({ url: Schema.String.pipe(Schema.pattern(URI_REGEX)) }) })
   // Key: "database.url"
   // Segments: ["database", "url"]
-  // Resolved type: Type.String({ format: "uri" })
+  // Resolved type: Schema.String (URI refinement)
   // Value: "postgres://localhost:5432/mydb"
   // Result: Valid ✓
   ```
 
 #### Schema-Directed Value Parsing
 
-Zenfig parses provider strings and CLI/file inputs into typed values **before** validation. Ajv type coercion should be disabled; parsing is explicit and schema-driven.
+Zenfig parses provider strings and CLI/file inputs into typed values **before** validation. Parsing is explicit and schema-driven; no implicit type coercion.
 
 Parsing rules (by resolved schema node):
 
-- `Type.String`: keep as string (no implicit JSON parsing)
-- `Type.Boolean`: accept `true`/`false` (case-insensitive), parse to boolean
-- `Type.Integer`: parse base-10 integer; reject decimals/NaN/Infinity
-- `Type.Number`: parse number; reject NaN/Infinity
-- `Type.Array` / `Type.Object`: require JSON input; parse with `JSON.parse`
-- `Type.Union`: attempt each branch’s parsing strategy in schema order and validate; choose the first branch that validates
+- `Schema.String` / `z.string()`: keep as string (no implicit JSON parsing)
+- `Schema.Boolean` / `z.boolean()`: accept `true`/`false` (case-insensitive), parse to boolean
+- `Schema.Number` / `z.number()` (integer refinement when required): parse base-10 number; reject decimals for integer schemas and reject NaN/Infinity
+- `Schema.Array` / `Schema.Struct` / `Schema.Record` or `z.array()` / `z.object()` / `z.record()`: require JSON input; parse with `JSON.parse`
+- `Schema.Union` / `z.union()`: attempt each branch’s parsing strategy in schema order and validate; choose the first branch that validates
 
 For `upsert`, `--type` can override parsing:
 
-- `--type string`: treat input as raw string even if the schema is not `Type.String` (validation will likely fail unless schema accepts string)
+- `--type string`: treat input as raw string even if the schema is not `Schema.String` / `z.string()` (validation will likely fail unless schema accepts string)
 - `--type json`: force `JSON.parse` first (useful for arrays/objects)
 - `--type int|float|bool`: force the corresponding parser first
 
@@ -722,7 +809,7 @@ Validation Error: database.url
   - **Booleans:** Lowercase `true` or `false` (not quoted)
   - **Arrays:** JSON.stringify with no spacing (e.g., `TAGS=["a","b","c"]`)
   - **Objects:** JSON.stringify with no spacing (e.g., `OPTS={"key":"value"}`)
-  - **null:** Error (not allowed unless schema explicitly permits via `Type.Union([Type.Null(), ...])`)
+  - **null:** Error (not allowed unless schema explicitly permits via a union with null, e.g., `Schema.Null` / `z.null()`)
   - **undefined:** Omit key entirely (never serialize)
 - **Array serialization:** Use `JSON.stringify(value)` with no spacing, no pretty-printing
   - Example: `["a", "b"]` → `ITEMS=["a","b"]`
@@ -747,7 +834,7 @@ TAGS=["prod","api","v2"]
 
 - **null:**
   - By default, `null` values cause validation error: `Value cannot be null`
-  - Allow `null` explicitly via `Type.Union([Type.Null(), ...])` (optional fields only affect `undefined`, not `null`)
+  - Allow `null` explicitly via a union with null (optional fields only affect `undefined`, not `null`)
   - If allowed and encountered:
     - `.env` format: Omit the key (env vars cannot represent null)
     - `.json` format: Include as `"key": null`
@@ -810,6 +897,7 @@ Core logic that must be tested:
    - Constraint validation (min, max, regex, enum)
    - Null/undefined handling
    - Error message formatting
+   - Adapter coverage for Effect Schema and Zod
 
 #### Integration Tests
 
@@ -921,7 +1009,7 @@ Default mapping:
 
 ---
 
-## 9. Error Catalog
+## 10. Error Catalog
 
 ### Error Code Structure
 
@@ -1012,7 +1100,7 @@ Validation Error [VAL005]: api.key
   Received: null
   Problem:  This field cannot be null
 
-  Remediation: Provide a non-null value or use Type.Union([Type.Null(), ...]) in schema
+  Remediation: Provide a non-null value or allow null explicitly in the schema (e.g., `Schema.Null` / `z.null()`)
 ```
 
 ### Provider Errors (PROV)
@@ -1089,7 +1177,7 @@ Validation Error [VAL005]: api.key
 
 - Check file path is correct
 - Verify file permissions (readable)
-- For schema: Ensure `src/schema.ts` exports `ConfigSchema`
+- For schema: Ensure `src/schema.ts` exports `ConfigSchema` for the selected validation layer
 
 #### SYS002: Permission Denied
 
@@ -1111,7 +1199,7 @@ Validation Error [VAL005]: api.key
 
 ---
 
-## 10. Performance Characteristics
+## 11. Performance Characteristics
 
 ### Operational Limits
 
@@ -1154,7 +1242,7 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 
 **Schema compilation cache:**
 
-- Cache compiled Ajv validator in memory for duration of CLI process
+- Cache compiled validators/decoders for the selected validation layer in memory for duration of CLI process
 - Reuse across multiple validations (e.g., snapshot restore with 100 keys)
 - No disk cache (schema changes should be reflected immediately)
 
@@ -1200,27 +1288,48 @@ All timings assume AWS us-east-1 region, warm IAM credentials:
 
 ---
 
-## 11. Concrete Usage Example
+## 12. Concrete Usage Example
 
 ### Example Files
 
-`src/schema.ts`:
+`src/schema.ts` (Effect Schema example):
 
 ```ts
-import { Type } from '@sinclair/typebox';
+import * as Schema from 'effect/Schema';
 
-export const ConfigSchema = Type.Object({
-  database: Type.Object({
-    url: Type.String({ format: 'uri' }),
+export const ConfigSchema = Schema.Struct({
+  database: Schema.Struct({
+    url: Schema.String,
   }),
-  redis: Type.Object({
-    url: Type.String({ format: 'uri' }),
+  redis: Schema.Struct({
+    url: Schema.String,
   }),
-  feature: Type.Object({
-    enableBeta: Type.Boolean({ default: false }),
+  feature: Schema.Struct({
+    enableBeta: Schema.Boolean,
   }),
-  api: Type.Object({
-    timeoutMs: Type.Integer({ minimum: 1, default: 5000 }),
+  api: Schema.Struct({
+    timeoutMs: Schema.Number,
+  }),
+});
+```
+
+Zod equivalent:
+
+```ts
+import { z } from 'zod';
+
+export const ConfigSchema = z.object({
+  database: z.object({
+    url: z.string(),
+  }),
+  redis: z.object({
+    url: z.string(),
+  }),
+  feature: z.object({
+    enableBeta: z.boolean(),
+  }),
+  api: z.object({
+    timeoutMs: z.number(),
   }),
 });
 ```
@@ -1241,7 +1350,7 @@ export const ConfigSchema = Type.Object({
 zenfig upsert api api.timeoutMs 6500 --env prod
 ```
 
-Result: writes `/zenfig/prod/api/api/timeoutMs = 6500` (validated as `Type.Integer({ minimum: 1 })`).
+Result: writes `/zenfig/prod/api/api/timeoutMs = 6500` (validated per the selected schema).
 
 2. **Upsert invalid value**
 
@@ -1364,12 +1473,12 @@ REDIS_URL=redis://shared
 
 ---
 
-## 12. Implementation Prompt for LLM
+## 13. Implementation Prompt for LLM
 
 "Act as a Senior DevOps Engineer. Based on the Zenfig specification provided, generate a TypeScript implementation with the following requirements:
 
 1. **Core dependencies:**
-   - Use `@sinclair/typebox` and `ajv` for schema validation
+   - Implement a pluggable validator interface with `effect/Schema` (default) and `zod` adapters
    - Use `@aws-sdk/client-ssm` for the default AWS SSM provider
    - Use `commander` for CLI interface
 
@@ -1377,7 +1486,7 @@ REDIS_URL=redis://shared
    - Implement all core commands: export, upsert, validate, list, delete, snapshot (save/restore)
    - Secure secret handling: Never log or print secret values unless explicitly requested
    - Partial path validation: Implement schema traversal algorithm as specified
-   - Schema-directed parsing: Parse provider/CLI/file inputs into typed values before validation (no Ajv coercion)
+   - Schema-directed parsing: Parse provider/CLI/file inputs into typed values before validation (no implicit coercion)
    - Error messages: Include full path, expected type, actual value, constraint details, and suggestions
    - Env flattening: Implement robust flattening with proper quoting, escaping, and type serialization
    - Merge conflict detection: Deep merge with type mismatch warnings
