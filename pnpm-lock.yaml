@@ -415,6 +415,103 @@ importers:
         specifier: ^4.0.16
         version: 4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1)
 
+  packages/config-o-tron:
+    dependencies:
+      '@aws-sdk/client-ssm':
+        specifier: ^3.777.0
+        version: 3.958.0(aws-crt@1.27.3)
+      '@aws-sdk/client-sts':
+        specifier: ^3.777.0
+        version: 3.958.0(aws-crt@1.27.3)
+      '@konker.dev/tiny-error-fp':
+        specifier: workspace:*
+        version: link:../tiny-error-fp
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
+      cli-table3:
+        specifier: ^0.6.5
+        version: 0.6.5
+      commander:
+        specifier: ^14.0.2
+        version: 14.0.2
+      effect:
+        specifier: ^3.19.13
+        version: 3.19.13
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
+      zod:
+        specifier: ^3.25.67
+        version: 3.25.76
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.2
+        version: 0.18.2
+      '@effect/language-service':
+        specifier: ^0.62.5
+        version: 0.62.5
+      '@eslint/compat':
+        specifier: ^2.0.0
+        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
+      '@konker.dev/common-config':
+        specifier: ^0.7.0
+        version: 0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.0.3
+      '@vitest/coverage-istanbul':
+        specifier: ^4.0.16
+        version: 4.0.16(vitest@4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
+      aws-sdk-client-mock:
+        specifier: ^4.1.0
+        version: 4.1.0
+      aws-sdk-client-mock-vitest:
+        specifier: ^7.0.1
+        version: 7.0.1(@smithy/types@4.11.0)(aws-sdk-client-mock@4.1.0)(vitest@4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      eslint-plugin-fp:
+        specifier: ^2.3.0
+        version: 2.3.0(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.4(eslint@9.39.2(jiti@2.6.1))(prettier@3.7.4)
+      eslint-plugin-simple-import-sort:
+        specifier: ^12.1.1
+        version: 12.1.1(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-sort-destructure-keys:
+        specifier: ^2.0.0
+        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
+      leasot:
+        specifier: ^14.4.0
+        version: 14.4.0
+      madge:
+        specifier: ^8.0.0
+        version: 8.0.0(typescript@5.9.3)
+      prettier:
+        specifier: ^3.7.4
+        version: 3.7.4
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      type-coverage:
+        specifier: ^2.29.7
+        version: 2.29.7(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.50.1
+        version: 8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      vitest:
+        specifier: ^4.0.16
+        version: 4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1)
+
   packages/middleware-fp:
     dependencies:
       '@konker.dev/momento-cache-client-effect':
@@ -1332,103 +1429,6 @@ importers:
       '@vitest/coverage-istanbul':
         specifier: ^4.0.16
         version: 4.0.16(vitest@4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
-      eslint:
-        specifier: ^9.39.2
-        version: 9.39.2(jiti@2.6.1)
-      eslint-plugin-fp:
-        specifier: ^2.3.0
-        version: 2.3.0(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint@9.39.2(jiti@2.6.1))(prettier@3.7.4)
-      eslint-plugin-simple-import-sort:
-        specifier: ^12.1.1
-        version: 12.1.1(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-sort-destructure-keys:
-        specifier: ^2.0.0
-        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
-      leasot:
-        specifier: ^14.4.0
-        version: 14.4.0
-      madge:
-        specifier: ^8.0.0
-        version: 8.0.0(typescript@5.9.3)
-      prettier:
-        specifier: ^3.7.4
-        version: 3.7.4
-      tsx:
-        specifier: ^4.21.0
-        version: 4.21.0
-      type-coverage:
-        specifier: ^2.29.7
-        version: 2.29.7(typescript@5.9.3)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      typescript-eslint:
-        specifier: ^8.50.1
-        version: 8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      vitest:
-        specifier: ^4.0.16
-        version: 4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1)
-
-  packages/zenfig:
-    dependencies:
-      '@aws-sdk/client-ssm':
-        specifier: ^3.777.0
-        version: 3.958.0(aws-crt@1.27.3)
-      '@aws-sdk/client-sts':
-        specifier: ^3.777.0
-        version: 3.958.0(aws-crt@1.27.3)
-      '@konker.dev/tiny-error-fp':
-        specifier: workspace:*
-        version: link:../tiny-error-fp
-      chalk:
-        specifier: ^5.6.2
-        version: 5.6.2
-      cli-table3:
-        specifier: ^0.6.5
-        version: 0.6.5
-      commander:
-        specifier: ^14.0.2
-        version: 14.0.2
-      effect:
-        specifier: ^3.19.13
-        version: 3.19.13
-      json5:
-        specifier: ^2.2.3
-        version: 2.2.3
-      zod:
-        specifier: ^3.25.67
-        version: 3.25.76
-    devDependencies:
-      '@arethetypeswrong/cli':
-        specifier: ^0.18.2
-        version: 0.18.2
-      '@effect/language-service':
-        specifier: ^0.62.5
-        version: 0.62.5
-      '@eslint/compat':
-        specifier: ^2.0.0
-        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
-      '@eslint/js':
-        specifier: ^9.39.2
-        version: 9.39.2
-      '@konker.dev/common-config':
-        specifier: ^0.7.0
-        version: 0.7.0(aws-crt@1.27.3)(eslint@9.39.2(jiti@2.6.1))
-      '@types/node':
-        specifier: ^25.0.3
-        version: 25.0.3
-      '@vitest/coverage-istanbul':
-        specifier: ^4.0.16
-        version: 4.0.16(vitest@4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
-      aws-sdk-client-mock:
-        specifier: ^4.1.0
-        version: 4.1.0
-      aws-sdk-client-mock-vitest:
-        specifier: ^7.0.1
-        version: 7.0.1(@smithy/types@4.11.0)(aws-sdk-client-mock@4.1.0)(vitest@4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
       eslint:
         specifier: ^9.39.2
         version: 9.39.2(jiti@2.6.1)
