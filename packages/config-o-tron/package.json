@@ -1,0 +1,242 @@
+{
+  "name": "@konker.dev/config-o-tron",
+  "version": "0.0.2",
+  "type": "module",
+  "author": "Konrad Markus <mail@konker.dev>",
+  "license": "ISC",
+  "description": "CLI tool for configuration and secrets management using AWS SSM with pluggable validation (Effect Schema or Zod)",
+  "homepage": "https://konker.dev/",
+  "keywords": [
+    "node",
+    "cli",
+    "config",
+    "secrets",
+    "ssm",
+    "schema",
+    "zod",
+    "typescript",
+    "functional-programming",
+    "effect-ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konker/konker.dev/packages/config-o-tron"
+  },
+  "bin": {
+    "config-o-tron": "./dist/cli.js"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./commands/delete": {
+      "types": "./dist/commands/delete.d.ts",
+      "import": "./dist/commands/delete.js"
+    },
+    "./commands/export": {
+      "types": "./dist/commands/export.d.ts",
+      "import": "./dist/commands/export.js"
+    },
+    "./commands": {
+      "types": "./dist/commands/index.d.ts",
+      "import": "./dist/commands/index.js"
+    },
+    "./commands/list": {
+      "types": "./dist/commands/list.d.ts",
+      "import": "./dist/commands/list.js"
+    },
+    "./commands/snapshot": {
+      "types": "./dist/commands/snapshot.d.ts",
+      "import": "./dist/commands/snapshot.js"
+    },
+    "./commands/upsert": {
+      "types": "./dist/commands/upsert.d.ts",
+      "import": "./dist/commands/upsert.js"
+    },
+    "./commands/validate": {
+      "types": "./dist/commands/validate.d.ts",
+      "import": "./dist/commands/validate.js"
+    },
+    "./lib/flatten": {
+      "types": "./dist/lib/flatten.d.ts",
+      "import": "./dist/lib/flatten.js"
+    },
+    "./lib/format": {
+      "types": "./dist/lib/format.d.ts",
+      "import": "./dist/lib/format.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./lib/merge": {
+      "types": "./dist/lib/merge.d.ts",
+      "import": "./dist/lib/merge.js"
+    },
+    "./lib/redact": {
+      "types": "./dist/lib/redact.d.ts",
+      "import": "./dist/lib/redact.js"
+    },
+    "./providers/AwsSsmProvider": {
+      "types": "./dist/providers/AwsSsmProvider.d.ts",
+      "import": "./dist/providers/AwsSsmProvider.js"
+    },
+    "./providers/guards": {
+      "types": "./dist/providers/guards.d.ts",
+      "import": "./dist/providers/guards.js"
+    },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "import": "./dist/providers/index.js"
+    },
+    "./providers/MockProvider": {
+      "types": "./dist/providers/MockProvider.d.ts",
+      "import": "./dist/providers/MockProvider.js"
+    },
+    "./providers/Provider": {
+      "types": "./dist/providers/Provider.d.ts",
+      "import": "./dist/providers/Provider.js"
+    },
+    "./providers/registry": {
+      "types": "./dist/providers/registry.d.ts",
+      "import": "./dist/providers/registry.js"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js"
+    },
+    "./schema/loader": {
+      "types": "./dist/schema/loader.d.ts",
+      "import": "./dist/schema/loader.js"
+    },
+    "./schema/parser": {
+      "types": "./dist/schema/parser.d.ts",
+      "import": "./dist/schema/parser.js"
+    },
+    "./schema/resolver": {
+      "types": "./dist/schema/resolver.d.ts",
+      "import": "./dist/schema/resolver.js"
+    },
+    "./schema/validator": {
+      "types": "./dist/schema/validator.d.ts",
+      "import": "./dist/schema/validator.js"
+    },
+    "./test/fixtures": {
+      "types": "./dist/test/fixtures/index.d.ts",
+      "import": "./dist/test/fixtures/index.js"
+    },
+    "./test/fixtures/schema.basic": {
+      "types": "./dist/test/fixtures/schema.basic.d.ts",
+      "import": "./dist/test/fixtures/schema.basic.js"
+    },
+    "./test/fixtures/schema.basic.zod": {
+      "types": "./dist/test/fixtures/schema.basic.zod.d.ts",
+      "import": "./dist/test/fixtures/schema.basic.zod.js"
+    },
+    "./validation/effect": {
+      "types": "./dist/validation/effect.d.ts",
+      "import": "./dist/validation/effect.js"
+    },
+    "./validation/hash": {
+      "types": "./dist/validation/hash.d.ts",
+      "import": "./dist/validation/hash.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.js"
+    },
+    "./validation/parse": {
+      "types": "./dist/validation/parse.d.ts",
+      "import": "./dist/validation/parse.js"
+    },
+    "./validation/types": {
+      "types": "./dist/validation/types.d.ts",
+      "import": "./dist/validation/types.js"
+    },
+    "./validation/zod": {
+      "types": "./dist/validation/zod.d.ts",
+      "import": "./dist/validation/zod.js"
+    },
+    "./api": {
+      "types": "./dist/api.d.ts",
+      "import": "./dist/api.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "!dist/**/*.test.*"
+  ],
+  "main": "dist/index.js",
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.777.0",
+    "@aws-sdk/client-sts": "^3.777.0",
+    "@konker.dev/tiny-error-fp": "workspace:*",
+    "chalk": "^5.6.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^14.0.2",
+    "effect": "^3.19.13",
+    "json5": "^2.2.3",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@effect/language-service": "^0.62.5",
+    "@eslint/compat": "^2.0.0",
+    "@eslint/js": "^9.39.2",
+    "@konker.dev/common-config": "^0.7.0",
+    "@types/node": "^25.0.3",
+    "@vitest/coverage-istanbul": "^4.0.16",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-vitest": "^7.0.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "leasot": "^14.4.0",
+    "madge": "^8.0.0",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "type-coverage": "^2.29.7",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.1",
+    "vitest": "^4.0.16"
+  },
+  "scripts": {
+    "test": "vitest run --coverage",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "perms": "chmod +x ./dist/cli.js",
+    "build": "pnpm run clean && tsc && pnpm run perms",
+    "config-o-tron": "node dist/cli.js",
+    "type-coverage-check": "type-coverage --detail --at-least 97",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
+    "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
+    "eslint-fix": "npx eslint --fix||true",
+    "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
+    "exports-check": "NPM_CONFIG_CACHE=.npm-cache attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=node16",
+    "fixme-check": "leasot --exit-nicely --skip-unsupported src",
+    "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
+    "prettier-fix": "pnpm run prettier-check --write",
+    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
+    "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
+    "pre-push": "pnpm run lint-check && pnpm run typecheck",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/config-o-tron'",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
+    "cd": "echo TODO"
+  }
+}
