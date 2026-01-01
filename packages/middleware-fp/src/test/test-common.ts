@@ -23,6 +23,21 @@ export function echoCoreIn200W<I extends RequestW>(i: I): Effect.Effect<Response
   );
 }
 
+export function echoCoreInStrict200W<I extends RequestW>(i: I): Effect.Effect<ResponseW<{ in: I }>> {
+  return Effect.succeed(
+    makeResponseW(
+      {
+        statusCode: 200,
+        headers: {
+          ...i.headers,
+        },
+        body: i.body,
+      },
+      { in: i }
+    )
+  );
+}
+
 // TODO: type annotation comment
 export const echoCoreInDepsW =
   <I extends RequestW, E, R extends Record<string, unknown>>(Deps: Context.Tag<R, R>) =>

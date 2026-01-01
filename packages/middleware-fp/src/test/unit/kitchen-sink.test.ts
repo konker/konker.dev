@@ -105,7 +105,7 @@ describe('kitchen sink', () => {
           multiValueHeaders: {},
           isBase64Encoded: false,
           i: JSON.stringify(i, null, 2),
-          body: JSON.stringify({
+          body: {
             foo: i.body.foo.toUpperCase(),
             bar: i.body.bar * 2,
             baz: !i.body.baz,
@@ -113,7 +113,7 @@ describe('kitchen sink', () => {
             q: i.queryStringParameters.q,
             h: i.headers['content-type'].toUpperCase(),
             u: i.userId,
-          }),
+          },
         })
       );
     }
@@ -121,7 +121,8 @@ describe('kitchen sink', () => {
     const stack = pipe(
       echoCore,
       M.bodyValidator.middleware(Body),
-      M.jsonBodyParser.middleware({ encodeResponseBody: false }),
+      M.jsonBodyParserRequest.middleware(),
+      M.jsonBodySerializerResponse.middleware(),
       M.base64BodyDecoder.middleware(() => false),
       M.jwtAuthenticator.middleware(),
       M.headersValidator.middleware(Headers),
