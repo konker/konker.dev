@@ -118,11 +118,16 @@ jobs:
         with:
           aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
           aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role" # ${{ env.CONFIG_MANAGEMENT_ROLE_ARN }}
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-backend-boilerplate" # ${{ env.CONFIG_MANAGEMENT_ROLE_ARN }}
           role-external-id: "configuration-management-access"
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
-          role-skip-session-tagging: true # apparently we can not avoid this
-      # TODO
+          role-skip-session-tagging: true # apparently we cannot avoid this
+
+      - name: Export env from config-o-tron
+        run: |
+          cd ${{ env.CWD }}
+          pnpm config-o-tron export backend-boilerplate --env development --source common --format env > .env.development
+          cd -
 
       # Assume application deployment role
       - name: Configure AWS credentials (Application deployment role)
@@ -138,6 +143,11 @@ jobs:
       - name: Deploy to kubernetes (Development)
         run: |
           cd ${{ env.CWD }}
+
+          # Load environment variables from config-o-tron export
+          set -a
+          source .env.development
+          set +a
 
           # Apply resources in order to prevent Traefik timing issues
           # 1. Namespace first (creates if not exists)

@@ -17,11 +17,21 @@ export default $config({
 
   async run() {
     /*[XXX]
-    const ssmParamFoo = aws.ssm.Parameter.get(
-      'ssmParamFoo',
-      '/secrets/development/konkerdotdev-db-development/dbname',
-      {}
-    );
+    const zenfig = await import('@konker.dev/zenfig');
+
+    const configResult = await zenfig.exportConfig({
+      service: 'backendboilerplate',
+      sources: ['common'],
+      format: 'json',
+      // config: {
+      //   env: 'development',
+      //   provider: 'aws-ssm',
+      //   ssmPrefix: '/zenfig',
+      //   validation: 'effect',
+      //   schema: 'src/config/config.schema.ts',
+      // },
+    });
+    console.log('KONK91', configResult);
      */
 
     /*[TODO]
@@ -34,12 +44,30 @@ export default $config({
     // const ingressRoute = new kubernetes.networking.traefik.v1.('ingressRoute', {});
     */
 
+    const secrets = new kubernetes.core.v1.Secret('backend-boilerplate-secrets', {
+      metadata: {
+        name: 'backend-boilerplate-secrets',
+        namespace: 'backend-boilerplate',
+      },
+      type: 'Opaque',
+      stringData: {
+        DATABASE_DBNAME: process.env.DATABASE_DBNAME,
+        DATABASE_HOST: process.env.DATABASE_HOST,
+        DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+        DATABASE_PORT: process.env.DATABASE_PORT,
+        DATABASE_USERNAME: process.env.DATABASE_USERNAME,
+      },
+    });
+
     const deployment = new kubernetes.apps.v1.Deployment('deployment', {
       apiVersion: 'apps/v1',
       kind: 'Deployment',
       metadata: {
         name: 'backend-boilerplatedotkonkerdotdev',
         namespace: 'backend-boilerplate',
+        annotations: {
+          'pulumi.com/patchForce': 'true',
+        },
       },
       spec: {
         replicas: 1,
@@ -56,11 +84,56 @@ export default $config({
             containers: [
               {
                 name: 'backend-boilerplatedotkonkerdotdev',
-                image: '047719649582.dkr.ecr.eu-west-1.amazonaws.com/backend-boilerplate.konker.dev:latest',
+                image: `047719649582.dkr.ecr.eu-west-1.amazonaws.com/backend-boilerplate.konker.dev:${process.env.IMAGE_TAG || 'latest'}`,
                 ports: [{ containerPort: 3000 }],
                 env: [
                   { name: 'NODE_ENV', value: 'production' },
                   { name: 'FOO', value: 'FIXME: config' },
+                  {
+                    name: 'DATABASE_DBNAME',
+                    valueFrom: {
+                      secretKeyRef: {
+                        name: 'backend-boilerplate-secrets',
+                        key: 'DATABASE_DBNAME',
+                      },
+                    },
+                  },
+                  {
+                    name: 'DATABASE_HOST',
+                    valueFrom: {
+                      secretKeyRef: {
+                        name: 'backend-boilerplate-secrets',
+                        key: 'DATABASE_HOST',
+                      },
+                    },
+                  },
+                  {
+                    name: 'DATABASE_PASSWORD',
+                    valueFrom: {
+                      secretKeyRef: {
+                        name: 'backend-boilerplate-secrets',
+                        key: 'DATABASE_PASSWORD',
+                      },
+                    },
+                  },
+                  {
+                    name: 'DATABASE_PORT',
+                    valueFrom: {
+                      secretKeyRef: {
+                        name: 'backend-boilerplate-secrets',
+                        key: 'DATABASE_PORT',
+                      },
+                    },
+                  },
+                  {
+                    name: 'DATABASE_USERNAME',
+                    valueFrom: {
+                      secretKeyRef: {
+                        name: 'backend-boilerplate-secrets',
+                        key: 'DATABASE_USERNAME',
+                      },
+                    },
+                  },
                 ],
                 livenessProbe: {
                   httpGet: { path: '/health', port: 3000 },
