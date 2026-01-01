@@ -1,0 +1,12 @@
+{
+  "provider": "aws-ssm",
+  "ssmPrefix": "/config-o-tron",
+  "validation": "effect",
+  "schema": "src/config/config-o-tron.schema.ts",
+  "providerGuards": {
+    "aws-ssm": {
+      "region": "eu-west-1",
+      "accountId": "047719649582"
+    }
+  }
+}

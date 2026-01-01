@@ -1,11 +1,26 @@
 import { text } from 'node:stream/consumers';
 
 import { honoRequestFactory } from '@konker.dev/middleware-fp/test/fixtures/honoRequestFactory';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import * as unit from './handler.js';
 
 describe('root/handler', () => {
+  let origProcessEnv: NodeJS.ProcessEnv;
+  beforeAll(() => {
+    origProcessEnv = process.env;
+    process.env = {
+      DATABASE_HOST: 'database_host',
+      DATABASE_PORT: '1234',
+      DATABASE_USERNAME: 'database_username',
+      DATABASE_PASSWORD: 'database_password',
+      DATABASE_DBNAME: 'database_dbname',
+    };
+  });
+  afterAll(() => {
+    process.env = origProcessEnv;
+  });
+
   it('should work as expected with basic request', async () => {
     const TEST_REQUEST = honoRequestFactory('https://example.com/test', {
       method: 'GET',
@@ -22,6 +37,8 @@ describe('root/handler', () => {
         version: '0.0.2',
         ip: 'UNKNOWN',
         konker: 'RULEZZ!',
+        DATABASE_DBNAME: 'database_dbname',
+        DATABASE_PORT: 1234,
       })
     );
     expect(Object.fromEntries(actual.headers.entries())).toStrictEqual({
@@ -60,6 +77,8 @@ describe('root/handler', () => {
         version: '0.0.2',
         ip: '123.123.123.123',
         konker: 'RULEZZ!',
+        DATABASE_DBNAME: 'database_dbname',
+        DATABASE_PORT: 1234,
       })
     );
     expect(Object.fromEntries(actual.headers.entries())).toStrictEqual({

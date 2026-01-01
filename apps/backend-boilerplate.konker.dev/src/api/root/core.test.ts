@@ -22,6 +22,13 @@ describe('root/core', () => {
         },
         queryStringParameters: {},
         pathParameters: {},
+        validatedEnv: {
+          DATABASE_HOST: 'database_host',
+          DATABASE_PORT: 1234,
+          DATABASE_USERNAME: 'database_username',
+          DATABASE_PASSWORD: 'database_password',
+          DATABASE_DBNAME: 'database_dbname',
+        },
       },
       unit.core,
       Effect.runSync
@@ -33,10 +40,12 @@ describe('root/core', () => {
       },
       body: {
         apiId: 'backend-boilerplate-konker-dev',
+        version: '0.0.2',
         ip: 'UNKNOWN',
         konker: 'RULEZZ!',
         foo: 'foo-value',
-        version: '0.0.2',
+        DATABASE_DBNAME: 'database_dbname',
+        DATABASE_PORT: 1234,
       },
     });
   });
@@ -52,6 +61,13 @@ describe('root/core', () => {
         },
         queryStringParameters: {},
         pathParameters: {},
+        validatedEnv: {
+          DATABASE_HOST: 'database_host',
+          DATABASE_PORT: 1234,
+          DATABASE_USERNAME: 'database_username',
+          DATABASE_PASSWORD: 'database_password',
+          DATABASE_DBNAME: 'database_dbname',
+        },
       },
       unit.core,
       Effect.runSync
@@ -63,10 +79,12 @@ describe('root/core', () => {
       },
       body: {
         apiId: 'backend-boilerplate-konker-dev',
+        version: '0.0.2',
         ip: '123.123.123.123',
         konker: expect.anything(),
         foo: 'foo-value',
-        version: '0.0.2',
+        DATABASE_DBNAME: 'database_dbname',
+        DATABASE_PORT: 1234,
       },
     });
   });
