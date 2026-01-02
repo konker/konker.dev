@@ -16,18 +16,16 @@ export default $config({
   },
 
   async run() {
-    const ssmParamFoo = aws.ssm.Parameter.get(
-      'ssmParamFoo',
-      '/secrets/development/konkerdotdev-db-development/dbname',
-      {}
-    );
-
     const api = new sst.cloudflare.Worker('API_backend.boilerplate.development.konker.dev', {
       url: true,
       link: [],
       handler: './src/hono-cloudflare-serverless.handler',
       environment: {
-        FOO: ssmParamFoo.value,
+        DATABASE_DBNAME: process.env.DATABASE_DBNAME,
+        DATABASE_HOST: process.env.DATABASE_HOST,
+        DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+        DATABASE_PORT: process.env.DATABASE_PORT,
+        DATABASE_USERNAME: process.env.DATABASE_USERNAME,
       },
     });
     return {
