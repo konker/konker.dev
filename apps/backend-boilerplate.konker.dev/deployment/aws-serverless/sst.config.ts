@@ -15,24 +15,16 @@ export default $config({
   },
 
   async run() {
-    const aws_deployment = new aws.Provider('aws_deployment', {
-      region: 'eu-west-1',
-      // assumeRole: 'arn:aws:iam::898403669204:role/infra/eso-cross-account-role',
-    });
-
-    const ssmParamFoo = aws.ssm.Parameter.get(
-      'ssmParamFoo',
-      '/secrets/development/konkerdotdev-db-development/dbname',
-      {},
-      { provider: aws_deployment }
-    );
-
     const api = new sst.aws.Function('API_backend-boilerplate.development.konker.dev', {
       url: true,
       link: [],
       handler: './src/hono-aws-serverless.handler',
       environment: {
-        FOO: ssmParamFoo.value,
+        DATABASE_DBNAME: process.env.DATABASE_DBNAME,
+        DATABASE_HOST: process.env.DATABASE_HOST,
+        DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+        DATABASE_PORT: process.env.DATABASE_PORT,
+        DATABASE_USERNAME: process.env.DATABASE_USERNAME,
       },
     });
     return {

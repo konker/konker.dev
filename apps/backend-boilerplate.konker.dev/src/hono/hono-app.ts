@@ -7,7 +7,7 @@ export const app = new Hono()
   .get('/', (c) => {
     return handler(c.req);
   })
-  .get('/health', (c) => {
+  .get('/ping', (c) => {
     return c.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
