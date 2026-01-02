@@ -8,12 +8,12 @@ on:
         required: false
         type: string
 
-  push:
-    branches:
-      - 'development'
-    paths:
-      - 'apps/backend-boilerplate.konker.dev/src/**'
-      - 'apps/backend-boilerplate.konker.dev/deployment/aws-serverless/**'
+#  push:
+#    branches:
+#      - 'development'
+#    paths:
+#      - 'apps/backend-boilerplate.konker.dev/src/**'
+#      - 'apps/backend-boilerplate.konker.dev/deployment/aws-serverless/**'
 
 env:
   CWD: './apps/backend-boilerplate.konker.dev'
