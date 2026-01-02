@@ -16,35 +16,13 @@ export default $config({
   },
 
   async run() {
-    /*[XXX]
-    const zenfig = await import('@konker.dev/zenfig');
-
-    const configResult = await zenfig.exportConfig({
-      service: 'backendboilerplate',
-      sources: ['common'],
-      format: 'json',
-      // config: {
-      //   env: 'development',
-      //   provider: 'aws-ssm',
-      //   ssmPrefix: '/zenfig',
-      //   validation: 'effect',
-      //   schema: 'src/config/config.schema.ts',
-      // },
-    });
-    console.log('KONK91', configResult);
-     */
-
-    /*[TODO]
     const namespace = new kubernetes.core.v1.Namespace('namespace', {
       apiVersion: 'v1',
       kind: 'Namespace',
       metadata: { name: 'backend-boilerplate', labels: { 'image-source': 'ecr' } },
     });
-    const service = new kubernetes.core.v1.Service('service', {});
-    // const ingressRoute = new kubernetes.networking.traefik.v1.('ingressRoute', {});
-    */
 
-    const secrets = new kubernetes.core.v1.Secret('backend-boilerplate-secrets', {
+    new kubernetes.core.v1.Secret(`backend-boilerplate-secrets`, {
       metadata: {
         name: 'backend-boilerplate-secrets',
         namespace: 'backend-boilerplate',
@@ -56,6 +34,17 @@ export default $config({
         DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
         DATABASE_PORT: process.env.DATABASE_PORT,
         DATABASE_USERNAME: process.env.DATABASE_USERNAME,
+      },
+    });
+
+    const service = new kubernetes.core.v1.Service('service', {
+      apiVersion: 'v1',
+      kind: 'Service',
+      metadata: { name: 'backend-boilerplatedotkonkerdotdev', namespace: 'backend-boilerplate' },
+      spec: {
+        selector: { app: 'backend-boilerplatedotkonkerdotdev' },
+        ports: [{ name: 'http', port: 3000, targetPort: 3000 }],
+        type: 'ClusterIP',
       },
     });
 
@@ -88,7 +77,6 @@ export default $config({
                 ports: [{ containerPort: 3000 }],
                 env: [
                   { name: 'NODE_ENV', value: 'production' },
-                  { name: 'FOO', value: 'FIXME: config' },
                   {
                     name: 'DATABASE_DBNAME',
                     valueFrom: {
@@ -136,14 +124,14 @@ export default $config({
                   },
                 ],
                 livenessProbe: {
-                  httpGet: { path: '/health', port: 3000 },
+                  httpGet: { path: '/ping', port: 3000 },
                   initialDelaySeconds: 15,
                   periodSeconds: 10,
                   timeoutSeconds: 5,
                   failureThreshold: 3,
                 },
                 readinessProbe: {
-                  httpGet: { path: '/health', port: 3000 },
+                  httpGet: { path: '/ping', port: 3000 },
                   initialDelaySeconds: 5,
                   periodSeconds: 5,
                   timeoutSeconds: 3,
@@ -157,6 +145,8 @@ export default $config({
     });
 
     return {
+      namespace,
+      service,
       deployment,
     };
   },
