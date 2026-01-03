@@ -1,0 +1,8 @@
+# Ignore everything by default
+**
+
+# Allow the prebuilt output
+!.deploy/**
+
+# Allow the Dockerfile itself
+!deployment/Dockerfile
