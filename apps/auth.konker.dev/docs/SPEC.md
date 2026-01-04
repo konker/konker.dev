@@ -38,8 +38,7 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 ## OIDC specification
 ### Flows
 - Authorization Code + PKCE for browser apps
-- Client Credentials for service-to-service (optional, see open decisions)
-- Refresh tokens with rotation (see open decisions)
+- Refresh tokens with rotation (configurable)
 
 ### Endpoints
 - `/.well-known/openid-configuration`
@@ -58,14 +57,14 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 ### Tokens
 - Access token: JWT signed with rotating keys
 - ID token: JWT signed with rotating keys
-- Refresh token: opaque with rotation (if enabled)
+- Refresh token: opaque with rotation (configurable)
 - Token lifetimes: access 15m, id 15m, refresh 30d (defaults)
 
 ## Authentication flows
 ### Registration
 - Collect email + password
 - Verify email before enabling login
-- Optional invite-only mode (see open decisions)
+- Optional invite-only mode
 
 ### Login
 - Password + optional MFA
@@ -84,6 +83,7 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 - TOTP as primary method
 - Recovery codes generated at enrollment
 - Optional WebAuthn (future)
+- Enforce MFA for privileged roles
 
 ## Authorization model (RBAC)
 - Global roles (e.g., `admin`, `user`, `support`)
@@ -115,6 +115,7 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 - Secure cookies (HttpOnly, SameSite=Lax/Strict, Secure)
 - Password policy (min length, common password check)
 - Audit logging for auth events and admin actions
+- Stateless session tokens with a revocation mechanism (token denylist or rotation tracking)
 
 ## UI requirements
 ### User UI
@@ -144,9 +145,15 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 5) External IDPs: Google, GitHub
 6) RBAC claim enforcement across apps
 
+## Future development (out of scope for this spec)
+- Service-to-service auth via Client Credentials flow (separate project)
+- WebAuthn as an additional MFA method
+- Multi-tenant org management and per-tenant RBAC
+- SCIM provisioning and enterprise SSO (SAML)
+
 ## Open decisions (needs your input)
-1) Client Credentials flow: enable for service-to-service auth, or skip?
-2) Refresh tokens: enable rotation or rely on short-lived access tokens only?
-3) Invite-only registration vs open registration?
-4) Session storage: DB-backed sessions vs stateless JWT sessions?
-5) MFA requirement: optional per-user vs enforced for privileged roles?
+1) Client Credentials flow: skip for now; consider as a separate future project.
+2) Refresh token rotation: configurable (per environment or per client).
+3) Registration: support invite-only or open registration.
+4) Session storage: stateless JWT sessions with revocation capability.
+5) MFA requirement: enforced for privileged roles.
