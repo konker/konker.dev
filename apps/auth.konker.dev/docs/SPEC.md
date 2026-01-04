@@ -38,15 +38,15 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 ## OIDC specification
 ### Flows
 - Authorization Code + PKCE for browser apps
-- Refresh tokens with rotation (configurable)
+- Refresh tokens with rotation (configurable per client)
 
 ### Endpoints
-- `/.well-known/openid-configuration`
-- `/authorize`
-- `/token`
-- `/userinfo`
-- `/jwks.json`
-- `/logout` (front-channel)
+- `/oidc/.well-known/openid-configuration`
+- `/oidc/authorize`
+- `/oidc/token`
+- `/oidc/userinfo`
+- `/oidc/jwks.json`
+- `/oidc/logout` (front-channel)
 
 ### Scopes and claims
 - Required scopes: `openid`, `profile`, `email`
@@ -57,7 +57,7 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 ### Tokens
 - Access token: JWT signed with rotating keys
 - ID token: JWT signed with rotating keys
-- Refresh token: opaque with rotation (configurable)
+- Refresh token: opaque with rotation (configurable per client)
 - Token lifetimes: access 15m, id 15m, refresh 30d (defaults)
 
 ## Authentication flows
@@ -153,7 +153,7 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 
 ## Open decisions (needs your input)
 1) Client Credentials flow: skip for now; consider as a separate future project.
-2) Refresh token rotation: configurable (per environment or per client).
+2) Refresh token rotation: configurable per client.
 3) Registration: support invite-only or open registration.
 4) Session storage: stateless JWT sessions with revocation capability.
 5) MFA requirement: enforced for privileged roles.

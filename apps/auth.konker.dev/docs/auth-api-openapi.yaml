@@ -1,0 +1,1457 @@
+openapi: 3.0.3
+info:
+  title: auth.konker.dev Auth API and OIDC Provider
+  version: 0.1.0
+  description: |
+    Supporting OpenAPI spec for the Hono auth API and OIDC provider described in docs/auth-api-spec.md.
+servers:
+  - url: https://auth.konker.dev
+    description: Production
+  - url: http://localhost:3000
+    description: Local
+
+paths:
+  /api/auth/sign-up/email:
+    post:
+      summary: Sign up with email and password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpEmailRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/sign-in/email:
+    post:
+      summary: Sign in with email and password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInEmailRequest'
+      responses:
+        '200':
+          description: Better-auth response (may include twoFactorRedirect)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/sign-out:
+    post:
+      summary: Sign out
+      tags: [Auth]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/send-verification-email:
+    post:
+      summary: Send verification email
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendVerificationEmailRequest'
+      responses:
+        '200':
+          description: Verification email sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendVerificationEmailResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/verify-email:
+    get:
+      summary: Verify email
+      tags: [Auth]
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: callbackURL
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyEmailResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/update-user:
+    post:
+      summary: Update current user
+      tags: [User]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/get-session:
+    get:
+      summary: Get current session
+      tags: [Sessions]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: disableCookieCache
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Session payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/list-sessions:
+    get:
+      summary: List active sessions for the user
+      tags: [Sessions]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Active sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/revoke-session:
+    post:
+      summary: Revoke a single session
+      tags: [Sessions]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevokeSessionRequest'
+      responses:
+        '200':
+          description: Revoke result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevokeSessionResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/revoke-sessions:
+    post:
+      summary: Revoke all sessions for the user
+      tags: [Sessions]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Revoke result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevokeSessionResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/revoke-other-sessions:
+    post:
+      summary: Revoke all sessions except the current one
+      tags: [Sessions]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Revoke result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevokeSessionResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/request-password-reset:
+    post:
+      summary: Request password reset
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPasswordResetRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/reset-password:
+    post:
+      summary: Reset password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/change-password:
+    post:
+      summary: Change password
+      tags: [Auth]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/two-factor/enable:
+    post:
+      summary: Enable two-factor authentication
+      tags: [MFA]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorEnableRequest'
+      responses:
+        '200':
+          description: TOTP URI and backup codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/two-factor/get-totp-uri:
+    post:
+      summary: Get TOTP URI
+      tags: [MFA]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorGetTotpUriRequest'
+      responses:
+        '200':
+          description: TOTP URI
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/two-factor/verify-totp:
+    post:
+      summary: Verify TOTP
+      tags: [MFA]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorVerifyTotpRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/two-factor/send-otp:
+    post:
+      summary: Send OTP for 2FA
+      tags: [MFA]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorSendOtpRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/two-factor/verify-otp:
+    post:
+      summary: Verify OTP for 2FA
+      tags: [MFA]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorVerifyOtpRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/two-factor/generate-backup-codes:
+    post:
+      summary: Generate backup codes
+      tags: [MFA]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorGenerateBackupCodesRequest'
+      responses:
+        '200':
+          description: Backup codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/two-factor/verify-backup-code:
+    post:
+      summary: Verify backup code
+      tags: [MFA]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorVerifyBackupCodeRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/two-factor/disable:
+    post:
+      summary: Disable two-factor authentication
+      tags: [MFA]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorDisableRequest'
+      responses:
+        '200':
+          description: Better-auth response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+
+  /api/auth/invites/accept:
+    post:
+      summary: Accept invite
+      tags: [Invites]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteAcceptRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/list-user-sessions:
+    post:
+      summary: List user sessions (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminListUserSessionsRequest'
+      responses:
+        '200':
+          description: User sessions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminListUserSessionsResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/set-role:
+    post:
+      summary: Set user role (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSetRoleRequest'
+      responses:
+        '200':
+          description: User role updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/get-user:
+    get:
+      summary: Get user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/create-user:
+    post:
+      summary: Create user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCreateUserRequest'
+      responses:
+        '200':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/update-user:
+    post:
+      summary: Update user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/list-users:
+    get:
+      summary: List users (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: searchValue
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: searchField
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [email, name]
+        - name: searchOperator
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [contains, starts_with, ends_with]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            oneOf:
+              - type: string
+              - type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            oneOf:
+              - type: string
+              - type: number
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sortDirection
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: filterField
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: filterValue
+          in: query
+          required: false
+          schema:
+            oneOf:
+              - type: string
+              - type: number
+              - type: boolean
+        - name: filterOperator
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [eq, ne, lt, lte, gt, gte, contains]
+      responses:
+        '200':
+          description: User list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminListUsersResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/set-user-password:
+    post:
+      summary: Set user password (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSetUserPasswordRequest'
+      responses:
+        '200':
+          description: Password set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStatusResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/ban-user:
+    post:
+      summary: Ban user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminBanUserRequest'
+      responses:
+        '200':
+          description: User banned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/unban-user:
+    post:
+      summary: Unban user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserIdRequest'
+      responses:
+        '200':
+          description: User unbanned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/remove-user:
+    post:
+      summary: Remove user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserIdRequest'
+      responses:
+        '200':
+          description: User removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSuccessResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/impersonate-user:
+    post:
+      summary: Impersonate user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserIdRequest'
+      responses:
+        '200':
+          description: Impersonation session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminImpersonateResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/stop-impersonating:
+    post:
+      summary: Stop impersonating (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Stop impersonating result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetterAuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/has-permission:
+    post:
+      summary: Check permissions (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminHasPermissionRequest'
+      responses:
+        '200':
+          description: Permission check result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminHasPermissionResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/revoke-user-session:
+    post:
+      summary: Revoke a user session (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRevokeUserSessionRequest'
+      responses:
+        '200':
+          description: Session revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRevokeUserSessionResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/admin/revoke-user-sessions:
+    post:
+      summary: Revoke all sessions for a user (admin plugin)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRevokeUserSessionsRequest'
+      responses:
+        '200':
+          description: Sessions revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRevokeUserSessionResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /oidc/.well-known/openid-configuration:
+    get:
+      summary: OIDC discovery document
+      tags: [OIDC]
+      responses:
+        '200':
+          description: Discovery document
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /oidc/authorize:
+    get:
+      summary: Authorization endpoint
+      tags: [OIDC]
+      parameters:
+        - name: response_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [code]
+        - name: client_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: redirect_uri
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+        - name: scope
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: code_challenge
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: code_challenge_method
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [S256]
+      responses:
+        '302':
+          description: Redirect with authorization code
+
+  /oidc/token:
+    post:
+      summary: Token endpoint
+      tags: [OIDC]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+      responses:
+        '200':
+          description: Token response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/OidcErrorResponse'
+
+  /oidc/userinfo:
+    get:
+      summary: Userinfo endpoint
+      tags: [OIDC]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Userinfo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserinfoResponse'
+        '401':
+          $ref: '#/components/responses/OidcErrorResponse'
+
+  /oidc/jwks.json:
+    get:
+      summary: JSON Web Key Set
+      tags: [OIDC]
+      responses:
+        '200':
+          description: JWKS
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /oidc/logout:
+    get:
+      summary: Front-channel logout
+      tags: [OIDC]
+      parameters:
+        - name: id_token_hint
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: post_logout_redirect_uri
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uri
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect after logout
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+
+  responses:
+    ErrorResponse:
+      description: Better-auth error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BetterAuthResponse'
+    OidcErrorResponse:
+      description: OIDC error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OidcError'
+
+  schemas:
+    BetterAuthResponse:
+      type: object
+      additionalProperties: true
+
+    SignUpEmailRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        image:
+          type: string
+          format: uri
+        callbackURL:
+          type: string
+          format: uri
+      required: [name, email, password]
+
+    SignInEmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        rememberMe:
+          type: boolean
+        callbackURL:
+          type: string
+          format: uri
+      required: [email, password]
+
+    SendVerificationEmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        callbackURL:
+          type: string
+          format: uri
+      required: [email]
+
+    SendVerificationEmailResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+      required: [status]
+
+    VerifyEmailResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          additionalProperties: true
+        status:
+          type: boolean
+      required: [user, status]
+
+    Session:
+      type: object
+      additionalProperties: true
+
+    RevokeSessionRequest:
+      type: object
+      properties:
+        token:
+          type: string
+      required: [token]
+
+    RevokeSessionResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+      required: [status]
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+          nullable: true
+      additionalProperties: true
+
+    RequestPasswordResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        redirectTo:
+          type: string
+          format: uri
+      required: [email]
+
+    ResetPasswordRequest:
+      type: object
+      properties:
+        newPassword:
+          type: string
+        token:
+          type: string
+      required: [newPassword, token]
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        newPassword:
+          type: string
+        currentPassword:
+          type: string
+        revokeOtherSessions:
+          type: boolean
+      required: [newPassword, currentPassword]
+
+    TwoFactorEnableRequest:
+      type: object
+      properties:
+        password:
+          type: string
+        issuer:
+          type: string
+      required: [password]
+
+    TwoFactorGetTotpUriRequest:
+      type: object
+      properties:
+        password:
+          type: string
+      required: [password]
+
+    TwoFactorVerifyTotpRequest:
+      type: object
+      properties:
+        code:
+          type: string
+        trustDevice:
+          type: boolean
+      required: [code]
+
+    TwoFactorSendOtpRequest:
+      type: object
+      properties:
+        trustDevice:
+          type: boolean
+
+    TwoFactorVerifyOtpRequest:
+      type: object
+      properties:
+        code:
+          type: string
+        trustDevice:
+          type: boolean
+      required: [code]
+
+    TwoFactorGenerateBackupCodesRequest:
+      type: object
+      properties:
+        password:
+          type: string
+      required: [password]
+
+    TwoFactorVerifyBackupCodeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+        disableSession:
+          type: boolean
+        trustDevice:
+          type: boolean
+      required: [code]
+
+    TwoFactorDisableRequest:
+      type: object
+      properties:
+        password:
+          type: string
+      required: [password]
+
+    InviteAcceptRequest:
+      type: object
+      properties:
+        inviteToken:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+      required: [inviteToken, email, password]
+
+    AdminListUserSessionsRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+      required: [userId]
+
+    AdminListUserSessionsResponse:
+      type: object
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+      required: [sessions]
+
+    AdminRevokeUserSessionRequest:
+      type: object
+      properties:
+        sessionToken:
+          type: string
+      required: [sessionToken]
+
+    AdminRevokeUserSessionsRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+      required: [userId]
+
+    AdminRevokeUserSessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
+
+    AdminUserResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          additionalProperties: true
+      required: [user]
+
+    AdminSetRoleRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        role:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+      required: [userId, role]
+
+    AdminCreateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        name:
+          type: string
+        role:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        data:
+          type: object
+          additionalProperties: true
+      required: [email, password, name]
+
+    AdminUpdateUserRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+      required: [userId, data]
+
+    AdminListUsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        total:
+          type: number
+        limit:
+          type: number
+        offset:
+          type: number
+      required: [users, total]
+
+    AdminSetUserPasswordRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        newPassword:
+          type: string
+      required: [userId, newPassword]
+
+    AdminBanUserRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        banReason:
+          type: string
+        banExpiresIn:
+          type: number
+      required: [userId]
+
+    AdminUserIdRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+      required: [userId]
+
+    AdminSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
+
+    AdminStatusResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+      required: [status]
+
+    AdminImpersonateResponse:
+      type: object
+      properties:
+        session:
+          type: object
+          additionalProperties: true
+        user:
+          type: object
+          additionalProperties: true
+      required: [session, user]
+
+    AdminHasPermissionRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        role:
+          type: string
+        permission:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        permissions:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required: [permissions]
+
+    AdminHasPermissionResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        success:
+          type: boolean
+      required: [success]
+
+    TokenRequest:
+      type: object
+      properties:
+        grant_type:
+          type: string
+          enum: [authorization_code, refresh_token]
+        code:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+        client_id:
+          type: string
+        client_secret:
+          type: string
+        code_verifier:
+          type: string
+        refresh_token:
+          type: string
+      required: [grant_type]
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        id_token:
+          type: string
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_in:
+          type: integer
+        refresh_token:
+          type: string
+      required: [access_token, token_type, expires_in]
+
+    UserinfoResponse:
+      type: object
+      properties:
+        sub:
+          type: string
+        email:
+          type: string
+        email_verified:
+          type: boolean
+        name:
+          type: string
+        preferred_username:
+          type: string
+        picture:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required: [sub]
+
+    OidcError:
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+      required: [error]
