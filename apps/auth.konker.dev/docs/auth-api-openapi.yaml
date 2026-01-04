@@ -15,6 +15,13 @@ paths:
     post:
       summary: Sign up with email and password
       tags: [Auth]
+      parameters:
+        - name: client_id
+          in: query
+          required: false
+          description: OAuth client context used for registration policy enforcement. Required unless inferred from an active OIDC flow.
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -35,6 +42,13 @@ paths:
     post:
       summary: Sign in with email and password
       tags: [Auth]
+      parameters:
+        - name: client_id
+          in: query
+          required: false
+          description: OAuth client context used for per-client access policies. Required unless inferred from an active OIDC flow.
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -460,6 +474,88 @@ paths:
               schema:
                 $ref: '#/components/schemas/BetterAuthResponse'
         '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/invites/create:
+    post:
+      summary: Create invite (admin-only)
+      tags: [Invites]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteCreateRequest'
+      responses:
+        '201':
+          description: Invite created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteCreateResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/invites/list:
+    get:
+      summary: List invites (admin-only)
+      tags: [Invites]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: clientId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, accepted, revoked, expired]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invite list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteListResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/invites/revoke:
+    post:
+      summary: Revoke invite (admin-only)
+      tags: [Invites]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteRevokeRequest'
+      responses:
+        '200':
+          description: Invite revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteRevokeResponse'
+        '403':
           $ref: '#/components/responses/ErrorResponse'
 
   /api/auth/admin/list-user-sessions:
@@ -1188,6 +1284,88 @@ components:
         password:
           type: string
       required: [password]
+
+    InviteCreateRequest:
+      type: object
+      properties:
+        clientId:
+          type: string
+        email:
+          type: string
+        expiresIn:
+          type: integer
+          description: Optional TTL in seconds.
+      required: [clientId]
+
+    InviteCreateResponse:
+      type: object
+      properties:
+        inviteId:
+          type: string
+        clientId:
+          type: string
+        email:
+          type: string
+        inviteToken:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required: [inviteId, clientId, inviteToken, expiresAt]
+
+    InviteListItem:
+      type: object
+      properties:
+        inviteId:
+          type: string
+        clientId:
+          type: string
+        email:
+          type: string
+        invitedBy:
+          type: string
+          description: User ID of the admin who issued the invite.
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [pending, accepted, revoked, expired]
+        expiresAt:
+          type: string
+          format: date-time
+        acceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [inviteId, clientId, status, expiresAt, createdAt]
+
+    InviteListResponse:
+      type: object
+      properties:
+        invites:
+          type: array
+          items:
+            $ref: '#/components/schemas/InviteListItem'
+      required: [invites]
+
+    InviteRevokeRequest:
+      type: object
+      properties:
+        inviteId:
+          type: string
+      required: [inviteId]
+
+    InviteRevokeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
 
     InviteAcceptRequest:
       type: object

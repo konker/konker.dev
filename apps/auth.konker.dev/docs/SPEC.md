@@ -60,11 +60,23 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 - Refresh token: opaque with rotation (configurable per client)
 - Token lifetimes: access 15m, id 15m, refresh 30d (defaults)
 
+## Applications vs organizations
+- OAuth/OIDC clients represent separate applications. They define redirect URIs, scopes, and per-client policy.
+- better-auth organizations model tenant/workspace membership within an application, not application segregation.
+- Invite-only access is enforced per client (app), not via organizations. Invite tokens are bound to a
+  `client_id` (and optionally an email) and grant access to that client only.
+- The registration UI is app-aware (based on `client_id` from OIDC requests) and applies the client's
+  registration policy before calling better-auth endpoints.
+
 ## Authentication flows
 ### Registration
 - Collect email + password
 - Verify email before enabling login
-- Optional invite-only mode
+- Registration policy is per client: open, invite-only, or closed (pre-provisioned users only)
+- Invite-only mode requires a valid invite token scoped to the client
+- Invites are admin-issued, short-lived, and stored as hashed tokens
+- Client context is resolved via `client_id` from the OIDC flow or an explicit `client_id` on the
+  auth UI entrypoints. If no client context is present, registration and sign-in are rejected.
 
 ### Login
 - Password + optional MFA
@@ -102,8 +114,9 @@ Applications delegate authentication to auth.konker.dev via OIDC.
 - `user_emails` (user_id, email, verified_at)
 - `password_credentials` (user_id, hash, updated_at)
 - `sessions` (user_id, token_id, created_at, expires_at, device_name)
-- `oidc_clients` (client_id, client_secret_hash, redirect_uris, scopes)
+- `oidc_clients` (client_id, client_secret_hash, redirect_uris, scopes, refresh_rotation, registration_mode, require_mfa)
 - `oidc_tokens` (token_id, user_id, client_id, revoked_at)
+- `client_invites` (id, client_id, email, token_hash, expires_at, accepted_at, invited_by, revoked_at)
 - `mfa_factors` (user_id, type, secret, created_at)
 - `mfa_recovery_codes` (user_id, code_hash, used_at)
 - `roles`, `user_roles`

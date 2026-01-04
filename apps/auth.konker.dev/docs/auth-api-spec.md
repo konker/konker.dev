@@ -17,6 +17,11 @@ implemented by better-auth and documented here for integration clarity.
 - Base path: `/api/auth`
 - Versioning: not applied. Use a new base path if a breaking change is required.
 
+## Applications vs organizations
+- OAuth/OIDC clients represent separate applications. They define redirect URIs, scopes, and per-client policy.
+- better-auth organizations model tenant/workspace membership within an application, not application segregation.
+- Invite-only access is enforced per client (app), not via organizations. Invites are bound to a `client_id`.
+
 ## Conventions
 - Content-Type: `application/json` unless the endpoint is OIDC (`application/x-www-form-urlencoded` on `/oidc/token`).
 - All timestamps are ISO 8601 UTC strings.
@@ -39,6 +44,8 @@ Recommended integration steps:
 6) Use better-auth events/hooks (or Hono middleware) to emit audit logs for login, MFA, password
    reset, role changes, and email verification.
 7) Implement custom endpoints not provided by better-auth (invites) using the same DB/Drizzle layer.
+8) Enforce per-client access policies (open/invite-only/closed) in Hono before calling better-auth.
+   Do not use the better-auth organization plugin to segregate apps.
 
 Mapping guidance:
 - Sign-up/sign-in/sign-out, session access, password reset, email verification, two-factor: use
@@ -53,6 +60,22 @@ Mapping guidance:
   `dont_remember` (when `rememberMe` is disabled).
 - Two-factor plugin uses a `two_factor` cookie to track 2FA state.
 - Stateless sessions are supported via cookie cache strategies (`compact`, `jwt`, `jwe`).
+
+## Client access policy (per OAuth client)
+- Each OAuth client has a registration mode: `open`, `invite-only`, or `closed`.
+- Invite-only clients require a valid invite token bound to the `client_id`.
+- Closed clients only allow pre-provisioned users (no self-registration).
+- Client policy is checked by Hono before delegating to better-auth; request payloads remain unchanged.
+- The Web UI can pass `client_id` as an optional query parameter on sign-up/sign-in to set policy context.
+- If `client_id` is not provided, Hono must infer it from an active OIDC authorization flow. If no
+  client context exists, sign-up and sign-in are rejected.
+
+## Invite issuance and lifecycle
+- Invites are issued by admins and are scoped to a `client_id` (and optionally an email).
+- Invite tokens are random, single-use secrets. Store only a secure hash in the database.
+- An invite is valid when: not expired, not revoked, not accepted, and (if bound) email matches.
+- Acceptance marks `acceptedAt` and binds the created user to the invite for auditability.
+- Use short TTLs by default (for example 7-14 days), with optional per-invite overrides.
 
 ## Rate limiting and abuse controls
 - Apply IP + identifier rate limits on:
@@ -129,8 +152,78 @@ Optional OTP-based 2FA endpoints (if configured):
 
 #### Custom endpoints
 
+##### POST `/invites/create`
+Creates an invite for a specific OAuth client (admin-only).
+
+Request:
+```json
+{
+  "clientId": "client-id",
+  "email": "user@example.com",
+  "expiresIn": 1209600
+}
+```
+
+Response:
+```json
+{
+  "inviteId": "invite-id",
+  "clientId": "client-id",
+  "email": "user@example.com",
+  "inviteToken": "invite-token",
+  "expiresAt": "2025-01-01T00:00:00Z"
+}
+```
+
+##### GET `/invites/list`
+Lists invites for a given client (admin-only).
+
+Query:
+- `clientId` (required)
+- `status` (optional, `pending` | `accepted` | `revoked` | `expired`)
+- `limit` (optional, default 50)
+- `offset` (optional, default 0)
+
+Response:
+```json
+{
+  "invites": [
+    {
+      "inviteId": "invite-id",
+      "clientId": "client-id",
+      "email": "user@example.com",
+      "invitedBy": "user-id",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "status": "pending",
+      "expiresAt": "2025-01-01T00:00:00Z",
+      "acceptedAt": null,
+      "revokedAt": null
+    }
+  ]
+}
+```
+
+##### POST `/invites/revoke`
+Revokes a pending invite (admin-only).
+
+Request:
+```json
+{
+  "inviteId": "invite-id"
+}
+```
+
+Response:
+```json
+{
+  "success": true
+}
+```
+
 ##### POST `/invites/accept`
 Accepts an invite and creates the user using better-auth registration under the hood.
+The invite token is bound to a `client_id` (and optionally an email). This endpoint is the entry
+point for invite-only clients.
 
 Request:
 ```json
