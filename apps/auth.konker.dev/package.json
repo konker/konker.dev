@@ -1,10 +1,10 @@
 {
-  "name": "@konker.dev/backend-boilerplate.konker.dev",
+  "name": "@konker.dev/auth.konker.dev",
   "version": "0.0.1",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
-  "description": "Boilerplate for backend services",
+  "description": "Authentication service for konker.dev services",
   "homepage": "https://konker.dev/",
   "keywords": [
     "node",
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/konker.dev/apps/backend-boilerplate.konker.dev"
+    "url": "https://github.com/konker.dev/apps/auth.konker.dev"
   },
   "files": [
     "dist/**/*",
@@ -56,7 +56,7 @@
   },
   "scripts": {
     "build": "pnpm run clean && tsc",
-    "build:prod": "pnpm run build && pnpm deploy --filter @konker.dev/backend-boilerplate.konker.dev --prod ./.deploy",
+    "build:prod": "pnpm run build && pnpm deploy --filter @konker.dev/auth.konker.dev --prod ./.deploy",
     "build-container": "pnpm run build:prod && docker buildx build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG -f ./deployment/Dockerfile .",
     "push-container": "aws ecr get-login-password --region ${AWS_DEFAULT_REGION:-eu-west-1} | docker login --username AWS --password-stdin $AWS_ECR_REGISTRY && docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG",
     "dev": "tsx watch src/hono/hono-node-server.ts",
@@ -64,7 +64,7 @@
     "cd": "echo NOOP",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "clean": "rm -rf dist && rm -rf .deploy && rm -f tsconfig.tsbuildinfo",
-    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/backend-boilerplate'",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/auth.konker.dev'",
     "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
     "eslint-fix": "npx eslint --fix||true",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
