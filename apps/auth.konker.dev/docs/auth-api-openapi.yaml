@@ -15,6 +15,7 @@ paths:
     post:
       summary: Sign up with email and password
       tags: [Auth]
+      x-better-auth-call: auth.api.signUpEmail
       parameters:
         - name: client_id
           in: query
@@ -42,6 +43,7 @@ paths:
     post:
       summary: Sign in with email and password
       tags: [Auth]
+      x-better-auth-call: auth.api.signInEmail
       parameters:
         - name: client_id
           in: query
@@ -69,6 +71,7 @@ paths:
     post:
       summary: Sign out
       tags: [Auth]
+      x-better-auth-call: auth.api.signOut
       security:
         - cookieAuth: []
       responses:
@@ -83,6 +86,7 @@ paths:
     post:
       summary: Send verification email
       tags: [Auth]
+      x-better-auth-call: auth.api.sendVerificationEmail
       requestBody:
         required: true
         content:
@@ -103,6 +107,7 @@ paths:
     get:
       summary: Verify email
       tags: [Auth]
+      x-better-auth-call: auth.api.verifyEmail
       parameters:
         - name: token
           in: query
@@ -128,6 +133,7 @@ paths:
     post:
       summary: Update current user
       tags: [User]
+      x-better-auth-call: auth.api.updateUser
       security:
         - cookieAuth: []
       requestBody:
@@ -150,6 +156,7 @@ paths:
     get:
       summary: Get current session
       tags: [Sessions]
+      x-better-auth-call: auth.api.getSession
       security:
         - cookieAuth: []
       parameters:
@@ -172,6 +179,7 @@ paths:
     get:
       summary: List active sessions for the user
       tags: [Sessions]
+      x-better-auth-call: auth.api.listSessions
       security:
         - cookieAuth: []
       responses:
@@ -190,6 +198,7 @@ paths:
     post:
       summary: Revoke a single session
       tags: [Sessions]
+      x-better-auth-call: auth.api.revokeSession
       security:
         - cookieAuth: []
       requestBody:
@@ -212,6 +221,7 @@ paths:
     post:
       summary: Revoke all sessions for the user
       tags: [Sessions]
+      x-better-auth-call: auth.api.revokeSessions
       security:
         - cookieAuth: []
       responses:
@@ -228,6 +238,7 @@ paths:
     post:
       summary: Revoke all sessions except the current one
       tags: [Sessions]
+      x-better-auth-call: auth.api.revokeOtherSessions
       security:
         - cookieAuth: []
       responses:
@@ -244,6 +255,7 @@ paths:
     post:
       summary: Request password reset
       tags: [Auth]
+      x-better-auth-call: auth.api.requestPasswordReset
       requestBody:
         required: true
         content:
@@ -262,6 +274,7 @@ paths:
     post:
       summary: Reset password
       tags: [Auth]
+      x-better-auth-call: auth.api.resetPassword
       requestBody:
         required: true
         content:
@@ -282,6 +295,7 @@ paths:
     post:
       summary: Change password
       tags: [Auth]
+      x-better-auth-call: auth.api.changePassword
       security:
         - cookieAuth: []
       requestBody:
@@ -304,6 +318,7 @@ paths:
     post:
       summary: Enable two-factor authentication
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorEnable
       security:
         - cookieAuth: []
       requestBody:
@@ -324,6 +339,7 @@ paths:
     post:
       summary: Get TOTP URI
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorGetTotpUri
       security:
         - cookieAuth: []
       requestBody:
@@ -344,6 +360,7 @@ paths:
     post:
       summary: Verify TOTP
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorVerifyTotp
       requestBody:
         required: true
         content:
@@ -364,6 +381,7 @@ paths:
     post:
       summary: Send OTP for 2FA
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorSendOtp
       requestBody:
         required: false
         content:
@@ -382,6 +400,7 @@ paths:
     post:
       summary: Verify OTP for 2FA
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorVerifyOtp
       requestBody:
         required: true
         content:
@@ -402,6 +421,7 @@ paths:
     post:
       summary: Generate backup codes
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorGenerateBackupCodes
       security:
         - cookieAuth: []
       requestBody:
@@ -422,6 +442,7 @@ paths:
     post:
       summary: Verify backup code
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorVerifyBackupCode
       requestBody:
         required: true
         content:
@@ -440,6 +461,7 @@ paths:
     post:
       summary: Disable two-factor authentication
       tags: [MFA]
+      x-better-auth-call: auth.api.twoFactorDisable
       security:
         - cookieAuth: []
       requestBody:
@@ -460,6 +482,7 @@ paths:
     post:
       summary: Accept invite
       tags: [Invites]
+      x-implementation: custom
       requestBody:
         required: true
         content:
@@ -480,6 +503,7 @@ paths:
     post:
       summary: Create invite (admin-only)
       tags: [Invites]
+      x-implementation: custom
       security:
         - cookieAuth: []
       requestBody:
@@ -502,6 +526,7 @@ paths:
     get:
       summary: List invites (admin-only)
       tags: [Invites]
+      x-implementation: custom
       security:
         - cookieAuth: []
       parameters:
@@ -540,6 +565,7 @@ paths:
     post:
       summary: Revoke invite (admin-only)
       tags: [Invites]
+      x-implementation: custom
       security:
         - cookieAuth: []
       requestBody:
@@ -562,6 +588,7 @@ paths:
     post:
       summary: List user sessions (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.listUserSessions
       security:
         - cookieAuth: []
       requestBody:
@@ -584,6 +611,7 @@ paths:
     post:
       summary: Set user role (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.setRole
       security:
         - cookieAuth: []
       requestBody:
@@ -606,6 +634,7 @@ paths:
     get:
       summary: Get user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.getUser
       security:
         - cookieAuth: []
       parameters:
@@ -628,6 +657,7 @@ paths:
     post:
       summary: Create user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.createUser
       security:
         - cookieAuth: []
       requestBody:
@@ -650,6 +680,7 @@ paths:
     post:
       summary: Update user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.adminUpdateUser
       security:
         - cookieAuth: []
       requestBody:
@@ -672,6 +703,7 @@ paths:
     get:
       summary: List users (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.listUsers
       security:
         - cookieAuth: []
       parameters:
@@ -750,6 +782,7 @@ paths:
     post:
       summary: Set user password (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.setUserPassword
       security:
         - cookieAuth: []
       requestBody:
@@ -772,6 +805,7 @@ paths:
     post:
       summary: Ban user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.banUser
       security:
         - cookieAuth: []
       requestBody:
@@ -794,6 +828,7 @@ paths:
     post:
       summary: Unban user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.unbanUser
       security:
         - cookieAuth: []
       requestBody:
@@ -816,6 +851,7 @@ paths:
     post:
       summary: Remove user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.removeUser
       security:
         - cookieAuth: []
       requestBody:
@@ -838,6 +874,7 @@ paths:
     post:
       summary: Impersonate user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.impersonateUser
       security:
         - cookieAuth: []
       requestBody:
@@ -860,6 +897,7 @@ paths:
     post:
       summary: Stop impersonating (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.stopImpersonating
       security:
         - cookieAuth: []
       responses:
@@ -876,6 +914,7 @@ paths:
     post:
       summary: Check permissions (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.userHasPermission
       security:
         - cookieAuth: []
       requestBody:
@@ -898,6 +937,7 @@ paths:
     post:
       summary: Revoke a user session (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.revokeUserSession
       security:
         - cookieAuth: []
       requestBody:
@@ -920,6 +960,7 @@ paths:
     post:
       summary: Revoke all sessions for a user (admin plugin)
       tags: [Admin]
+      x-better-auth-call: auth.api.revokeUserSessions
       security:
         - cookieAuth: []
       requestBody:
@@ -942,6 +983,7 @@ paths:
     get:
       summary: OIDC discovery document
       tags: [OIDC]
+      x-implementation: better-auth-oidc
       responses:
         '200':
           description: Discovery document
@@ -954,6 +996,7 @@ paths:
     get:
       summary: Authorization endpoint
       tags: [OIDC]
+      x-implementation: better-auth-oidc
       parameters:
         - name: response_type
           in: query
@@ -1001,6 +1044,7 @@ paths:
     post:
       summary: Token endpoint
       tags: [OIDC]
+      x-implementation: better-auth-oidc
       requestBody:
         required: true
         content:
@@ -1021,6 +1065,7 @@ paths:
     get:
       summary: Userinfo endpoint
       tags: [OIDC]
+      x-implementation: better-auth-oidc
       security:
         - bearerAuth: []
       responses:
@@ -1037,6 +1082,7 @@ paths:
     get:
       summary: JSON Web Key Set
       tags: [OIDC]
+      x-implementation: better-auth-oidc
       responses:
         '200':
           description: JWKS
@@ -1049,6 +1095,7 @@ paths:
     get:
       summary: Front-channel logout
       tags: [OIDC]
+      x-implementation: better-auth-oidc
       parameters:
         - name: id_token_hint
           in: query
