@@ -3,6 +3,27 @@
 Centralized authentication and authorization service for konker.dev applications.
 Applications delegate authentication to auth.konker.dev via OIDC.
 
+## Table of contents
+- [Goals](#goals)
+- [Non-goals (for initial release)](#non-goals-for-initial-release)
+- [Implementation constraints](#implementation-constraints)
+- [Architecture overview](#architecture-overview)
+- [Core features](#core-features)
+- [OIDC specification](#oidc-specification)
+- [Applications vs organizations](#applications-vs-organizations)
+- [Authentication flows](#authentication-flows)
+- [MFA](#mfa)
+- [Authorization model (RBAC)](#authorization-model-rbac)
+- [External identity providers](#external-identity-providers)
+- [Data model (minimum tables)](#data-model-minimum-tables)
+- [Security requirements](#security-requirements)
+- [UI requirements](#ui-requirements)
+- [Observability](#observability)
+- [Deployment considerations](#deployment-considerations)
+- [Phased delivery plan](#phased-delivery-plan)
+- [Future development (out of scope for this spec)](#future-development-out-of-scope-for-this-spec)
+- [Open decisions (needs your input)](#open-decisions-needs-your-input)
+
 ## Goals
 - Provide a secure OIDC Identity Provider for konker.dev applications
 - Offer a first-class user experience for account management
