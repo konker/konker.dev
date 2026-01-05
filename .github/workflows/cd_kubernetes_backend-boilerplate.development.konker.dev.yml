@@ -149,19 +149,11 @@ jobs:
           source .env.development
           set +a
 
-          # Apply resources in order to prevent Traefik timing issues
-          # 1. Namespace first (creates if not exists)
-          kubectl apply -f ./deployment/k8s/development/k8s-namespace.yaml
-
-          # 2. Service (must exist before IngressRoute for Traefik)
-          kubectl apply -f ./deployment/k8s/development/k8s-service.yaml -n ${{ env.K8S_NAMESPACE }}
-
-          # 3. Deployment
-          ## kubectl apply -f ./deployment/k8s/production/k8s-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
           pnpm sst deploy --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
 
-          # 4. IngressRoute last (after Service exists to prevent 503 errors)
+          # 2. IngressRoute last (after Service exists to prevent 503 errors)
           kubectl apply -f ./deployment/k8s/development/k8s-ingresroute.yaml -n ${{ env.K8S_NAMESPACE }}
 
           # Restart deployment to ensure latest image is pulled
