@@ -1,0 +1,12 @@
+{
+  "extends": "../../packages/common-config/configs/tsconfig-base.json",
+  "include": ["./src"],
+  "exclude": ["./.deploy", "./.sst"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "plugins": [{ "name": "@effect/language-service" }]
+  }
+}
