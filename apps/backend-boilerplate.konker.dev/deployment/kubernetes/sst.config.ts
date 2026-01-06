@@ -29,11 +29,7 @@ export default $config({
       },
       type: 'Opaque',
       stringData: {
-        DATABASE_DBNAME: process.env.DATABASE_DBNAME,
-        DATABASE_HOST: process.env.DATABASE_HOST,
-        DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
-        DATABASE_PORT: process.env.DATABASE_PORT,
-        DATABASE_USERNAME: process.env.DATABASE_USERNAME,
+        DATABASE_URL: process.env.DATABASE_URL,
       },
     });
 
@@ -78,47 +74,11 @@ export default $config({
                 env: [
                   { name: 'NODE_ENV', value: 'production' },
                   {
-                    name: 'DATABASE_DBNAME',
+                    name: 'DATABASE_URL',
                     valueFrom: {
                       secretKeyRef: {
                         name: 'backend-boilerplate-secrets',
-                        key: 'DATABASE_DBNAME',
-                      },
-                    },
-                  },
-                  {
-                    name: 'DATABASE_HOST',
-                    valueFrom: {
-                      secretKeyRef: {
-                        name: 'backend-boilerplate-secrets',
-                        key: 'DATABASE_HOST',
-                      },
-                    },
-                  },
-                  {
-                    name: 'DATABASE_PASSWORD',
-                    valueFrom: {
-                      secretKeyRef: {
-                        name: 'backend-boilerplate-secrets',
-                        key: 'DATABASE_PASSWORD',
-                      },
-                    },
-                  },
-                  {
-                    name: 'DATABASE_PORT',
-                    valueFrom: {
-                      secretKeyRef: {
-                        name: 'backend-boilerplate-secrets',
-                        key: 'DATABASE_PORT',
-                      },
-                    },
-                  },
-                  {
-                    name: 'DATABASE_USERNAME',
-                    valueFrom: {
-                      secretKeyRef: {
-                        name: 'backend-boilerplate-secrets',
-                        key: 'DATABASE_USERNAME',
+                        key: 'DATABASE_URL',
                       },
                     },
                   },
