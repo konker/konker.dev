@@ -71,15 +71,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Cache SST artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            .sst
-            apps/backend-boilerplate.konker.dev/.sst
-          key: ${{ runner.os }}-sst-${{ hashFiles('apps/backend-boilerplate.konker.dev/deployment/kubernetes/sst.config.ts') }}
-          restore-keys: |
-            ${{ runner.os }}-sst-
+#      - name: Cache SST artifacts
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            .sst
+#            apps/backend-boilerplate.konker.dev/.sst
+#          key: ${{ runner.os }}-sst-${{ hashFiles('apps/backend-boilerplate.konker.dev/deployment/kubernetes/sst.config.ts') }}
+#          restore-keys: |
+#            ${{ runner.os }}-sst-
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -151,7 +151,6 @@ jobs:
 
           # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
-          /home/runner/.config/sst/bin/pulumi plugin install language nodejs
           pnpm sst refresh --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
           pnpm sst deploy --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
 
