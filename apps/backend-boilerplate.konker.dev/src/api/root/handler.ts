@@ -12,6 +12,7 @@ export type CoreResponse = ResponseW;
 export const handler = async (event: HonoRequest): Promise<Response> => {
   const stack = pipe(
     core,
+    M.sqlClientInitPg.middleware(),
     M.helmetJsHeaders.middleware(),
     M.jsonBodySerializerResponse.middleware(),
     M.headersNormalizer.middleware(),
