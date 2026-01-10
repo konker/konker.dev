@@ -151,6 +151,7 @@ jobs:
 
           # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
+          pnpm sst refresh --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
           pnpm sst deploy --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
 
           # 2. IngressRoute last
