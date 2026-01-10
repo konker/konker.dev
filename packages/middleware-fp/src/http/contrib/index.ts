@@ -23,5 +23,6 @@ export * as pathTokenAuthorizer from './pathTokenAuthorizer.js';
 export * as queryStringValidator from './queryStringValidator.js';
 export * as responseProcessor from './responseProcessor.js';
 export * as requestResponseLogger from './requestResponseLogger.js';
+export * as sqlClientInitPg from './sqlClientInitPg/index.js';
 export * as standardRequestResponseAdapter from './standardRequestResponseAdapter.js';
 export * as trivial from './trivial.js';
