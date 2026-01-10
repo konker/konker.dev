@@ -151,6 +151,7 @@ jobs:
 
           # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
+          /home/runner/.config/sst/bin/pulumi plugin install language nodejs
           pnpm sst refresh --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
           pnpm sst deploy --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
 
