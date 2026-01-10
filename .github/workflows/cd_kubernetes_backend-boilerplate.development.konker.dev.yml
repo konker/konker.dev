@@ -126,7 +126,7 @@ jobs:
       - name: Export env from config-o-tron
         run: |
           cd ${{ env.CWD }}
-          pnpm config-o-tron export backend-boilerplate --env development --source common --format env > .env.development
+          pnpm config-o-tron export backend-boilerplate --env development --source common --format env |tee .env.development >> $GITHUB_ENV
           cd -
 
       # Assume application deployment role
@@ -143,11 +143,6 @@ jobs:
       - name: Deploy to kubernetes (Development)
         run: |
           cd ${{ env.CWD }}
-
-          # Load environment variables from config-o-tron export
-          set -a
-          source .env.development
-          set +a
 
           # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs

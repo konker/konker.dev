@@ -200,7 +200,7 @@ importers:
         specifier: ^3.7.4
         version: 3.7.4
       sst:
-        specifier: ^3.17.14
+        specifier: ^3.17.25
         version: 3.17.25
       tsx:
         specifier: ^4.21.0
