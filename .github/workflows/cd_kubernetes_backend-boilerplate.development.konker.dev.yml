@@ -155,7 +155,7 @@ jobs:
           pnpm sst deploy --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
 
           # 2. IngressRoute last
-          kubectl apply -f ./deployment/kubernetes/development/k8s-ingresroute-development.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f ./deployment/kubernetes/k8s-ingresroute-development.yaml -n ${{ env.K8S_NAMESPACE }}
 
           # Restart deployment to ensure latest image is pulled
           kubectl rollout restart deployment/backend-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }}
