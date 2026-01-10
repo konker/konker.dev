@@ -40,7 +40,7 @@ export function echoCoreInStrict200W<I extends RequestW>(i: I): Effect.Effect<Re
 
 // TODO: type annotation comment
 export const echoCoreInDepsW =
-  <I extends RequestW, E, R extends Record<string, unknown>>(Deps: Context.Tag<R, R>) =>
+  <I extends RequestW, E, R>(Deps: Context.Tag<R, R>) =>
   (i: I): Effect.Effect<ResponseW<{ in: I; deps: R }>, E, R> => {
     return pipe(
       Deps,

@@ -4,8 +4,8 @@ export const ConfigSchema = Schema.Struct({
   database: Schema.Struct({
     host: Schema.String,
     port: Schema.Number.pipe(Schema.int()),
-    username: Schema.String,
+    user: Schema.String,
     password: Schema.String,
-    dbname: Schema.String,
+    name: Schema.String,
   }),
 });

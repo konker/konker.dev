@@ -1,2 +1,3 @@
 sst-env.d.ts
 **/bruno.json
+src/database/drizzle

@@ -140,6 +140,14 @@
       "types": "./dist/http/contrib/responseProcessor.d.ts",
       "import": "./dist/http/contrib/responseProcessor.js"
     },
+    "./http/contrib/sqlClientInitPg": {
+      "types": "./dist/http/contrib/sqlClientInitPg/index.d.ts",
+      "import": "./dist/http/contrib/sqlClientInitPg/index.js"
+    },
+    "./http/contrib/sqlClientInitPg/lib": {
+      "types": "./dist/http/contrib/sqlClientInitPg/lib.d.ts",
+      "import": "./dist/http/contrib/sqlClientInitPg/lib.js"
+    },
     "./http/contrib/standardRequestResponseAdapter": {
       "types": "./dist/http/contrib/standardRequestResponseAdapter.d.ts",
       "import": "./dist/http/contrib/standardRequestResponseAdapter.js"
@@ -227,8 +235,12 @@
   ],
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
+    "@effect/sql": "^0.49.0",
+    "@effect/sql-drizzle": "^0.48.0",
+    "@effect/sql-pg": "^0.50.1",
     "@gomomento/sdk": "^1.102.0",
     "aws-lambda": "^1.0.7",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.9.9"
   },
   "dependencies": {
