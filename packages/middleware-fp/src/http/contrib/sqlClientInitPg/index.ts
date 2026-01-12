@@ -12,6 +12,8 @@ const TAG = 'sqlClientInitPg';
 
 export type Adapted<R> = Exclude<R, SqlClient>;
 
+export { SslConfigSchema, type SslConfig } from './lib.js';
+
 export const middleware =
   (pgSqlClientLayer?: Layer.Layer<SqlClient, ConfigError.ConfigError | SqlError>) =>
   <I extends Rec, O extends Rec, E, R>(
