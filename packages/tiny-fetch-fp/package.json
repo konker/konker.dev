@@ -51,15 +51,15 @@
   "main": "dist/index.js",
   "dependencies": {
     "@konker.dev/tiny-error-fp": "workspace:*",
-    "effect": "^3.19.13"
+    "effect": "^3.19.14"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@effect/language-service": "^0.62.5",
-    "@eslint/compat": "^2.0.0",
+    "@effect/language-service": "^0.64.1",
+    "@eslint/compat": "^2.0.1",
     "@eslint/js": "^9.39.2",
     "@konker.dev/common-config": "^0.7.0",
-    "@types/node": "^25.0.3",
+    "@types/node": "^25.0.6",
     "@vitest/coverage-istanbul": "^4.0.16",
     "eslint": "^9.39.2",
     "eslint-plugin-fp": "^2.3.0",
@@ -72,7 +72,7 @@
     "tsx": "^4.21.0",
     "type-coverage": "^2.29.7",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.1",
+    "typescript-eslint": "^8.52.0",
     "vitest": "^4.0.16"
   },
   "scripts": {
