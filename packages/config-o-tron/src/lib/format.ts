@@ -21,7 +21,7 @@ export type FormatOptions = {
 /**
  * Check if a string needs quoting in .env format
  */
-function needsQuoting(value: string): boolean {
+function needsDoubleQuoting(value: string): boolean {
   // Needs quoting if:
   // - Contains spaces, #, =, newlines, or $
   // - Starts or ends with whitespace
@@ -35,13 +35,24 @@ function needsQuoting(value: string): boolean {
   return false;
 }
 
+function needsSingleQuoting(value: string): boolean {
+  return needsDoubleQuoting(value) && value.includes('"');
+}
+
 /**
  * Escape a string for double-quoted .env value
  */
-function escapeEnvValue(value: string): string {
+function escapeDoubleQuotedEnvValue(value: string): string {
   return value
     .replace(/\\/g, '\\\\') // Backslash first
     .replace(/"/g, '\\"') // Quotes
+    .replace(/\n/g, '\\n'); // Newlines
+}
+
+function escapeSingleQuotedEnvValue(value: string): string {
+  return value
+    .replace(/\\/g, '\\\\') // Backslash first
+    .replace(/'/g, '\\') // Quotes
     .replace(/\n/g, '\\n'); // Newlines
 }
 
@@ -60,8 +71,11 @@ function serializeEnvValue(value: unknown): string | undefined {
   }
 
   if (typeof value === 'string') {
-    if (needsQuoting(value)) {
-      return `"${escapeEnvValue(value)}"`;
+    if (needsSingleQuoting(value)) {
+      return `'${escapeSingleQuotedEnvValue(value)}'`;
+    }
+    if (needsDoubleQuoting(value)) {
+      return `"${escapeDoubleQuotedEnvValue(value)}"`;
     }
     return value;
   }
@@ -78,7 +92,7 @@ function serializeEnvValue(value: unknown): string | undefined {
     // Arrays and objects are serialized as minified JSON
     const json = JSON.stringify(value);
     // JSON always needs quoting since it contains special chars
-    return `"${escapeEnvValue(json)}"`;
+    return needsSingleQuoting(json) ? `'${escapeSingleQuotedEnvValue(json)}'` : `"${escapeDoubleQuotedEnvValue(json)}"`;
   }
 
   return String(value);
