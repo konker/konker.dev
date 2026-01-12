@@ -17,26 +17,31 @@ export default $config({
   },
 
   async run() {
-    new kubernetes.core.v1.Secret(`backend-boilerplate-secrets`, {
-      metadata: {
-        name: 'backend-boilerplate-secrets',
-        namespace: 'backend-boilerplate',
-      },
-      type: 'Opaque',
-      stringData: {
-        DATABASE_HOST: process.env.DATABASE_HOST,
-        DATABASE_PORT: process.env.DATABASE_PORT,
-        DATABASE_USER: process.env.DATABASE_USER,
-        DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
-        DATABASE_NAME: process.env.DATABASE_NAME,
-      },
-    });
-
     const namespace = new kubernetes.core.v1.Namespace('namespace', {
       apiVersion: 'v1',
       kind: 'Namespace',
       metadata: { name: 'backend-boilerplate', labels: { 'image-source': 'ecr' } },
     });
+
+    const secrets = new kubernetes.core.v1.Secret(
+      `backend-boilerplate-secrets`,
+      {
+        metadata: {
+          name: 'backend-boilerplate-secrets',
+          namespace: 'backend-boilerplate',
+        },
+        type: 'Opaque',
+        stringData: {
+          DATABASE_HOST: process.env.DATABASE_HOST,
+          DATABASE_PORT: process.env.DATABASE_PORT,
+          DATABASE_USER: process.env.DATABASE_USER,
+          DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+          DATABASE_NAME: process.env.DATABASE_NAME,
+          DATABASE_SSL: process.env.DATABASE_SSL,
+        },
+      },
+      { dependsOn: [namespace] }
+    );
 
     const service = new kubernetes.core.v1.Service(
       'service',
@@ -80,7 +85,8 @@ export default $config({
               containers: [
                 {
                   name: 'backend-boilerplatedotkonkerdotdev',
-                  image: `047719649582.dkr.ecr.eu-west-1.amazonaws.com/backend-boilerplate.konker.dev:${process.env.IMAGE_TAG || 'latest'}`,
+                  // image: `047719649582.dkr.ecr.eu-west-1.amazonaws.com/backend-boilerplate.konker.dev:${process.env.IMAGE_TAG || 'latest'}`,
+                  image: `${process.env.AWS_ECR_REGISTRY}/${process.env.AWS_ECR_REPOSITORY}:${process.env.IMAGE_TAG}`,
                   ports: [{ containerPort: 3000 }],
                   env: [
                     { name: 'NODE_ENV', value: 'production' },
@@ -129,6 +135,15 @@ export default $config({
                         },
                       },
                     },
+                    {
+                      name: 'DATABASE_SSL',
+                      valueFrom: {
+                        secretKeyRef: {
+                          name: 'backend-boilerplate-secrets',
+                          key: 'DATABASE_SSL',
+                        },
+                      },
+                    },
                   ],
                   livenessProbe: {
                     httpGet: { path: '/ping', port: 3000 },
@@ -150,7 +165,7 @@ export default $config({
           },
         },
       },
-      { dependsOn: [namespace, service] }
+      { dependsOn: [namespace, service, secrets] }
     );
 
     return {

@@ -43,7 +43,7 @@
     "@eslint/compat": "^2.0.1",
     "@eslint/js": "^9.39.2",
     "@konker.dev/common-config": "^0.7.0",
-    "@konker.dev/config-o-tron": "workspace:*",
+    "@konker.dev/config-o-tron": "0.0.2",
     "@types/aws-lambda": "^8.10.159",
     "@types/node": "^25.0.6",
     "@types/pg": "^8.16.0",

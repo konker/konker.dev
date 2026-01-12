@@ -51,9 +51,6 @@ describe('root/core', () => {
         version: '0.0.2',
         ip: 'UNKNOWN',
         konker: 'RULEZZ!',
-        foo: 'foo-value',
-        DATABASE_NAME: 'database_dbname',
-        DATABASE_PORT: 1234,
         result: [{ id: 123, name: 'widget-name', size: 42 }],
       },
     });
@@ -95,9 +92,6 @@ describe('root/core', () => {
         version: '0.0.2',
         ip: '123.123.123.123',
         konker: expect.anything(),
-        foo: 'foo-value',
-        DATABASE_NAME: 'database_dbname',
-        DATABASE_PORT: 1234,
         result: [{ id: 123, name: 'widget-name', size: 42 }],
       },
     });
