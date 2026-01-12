@@ -23,7 +23,7 @@ export function core(
         apiId: API_ID,
         version: VERSION,
         ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
-        konker: 'RULEZZ!',
+        konker: 'RULEZZ!!!',
         foo: process.env.FOO,
         DATABASE_NAME: event.validatedEnv.DATABASE_NAME,
         DATABASE_PORT: event.validatedEnv.DATABASE_PORT,

@@ -7,5 +7,6 @@ export const ConfigSchema = Schema.Struct({
     user: Schema.String,
     password: Schema.String,
     name: Schema.String,
+    ssl: Schema.Unknown,
   }),
 });
