@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/config-o-tron",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -182,23 +182,23 @@
   ],
   "main": "dist/index.js",
   "dependencies": {
-    "@aws-sdk/client-ssm": "^3.777.0",
-    "@aws-sdk/client-sts": "^3.777.0",
+    "@aws-sdk/client-ssm": "^3.966.0",
+    "@aws-sdk/client-sts": "^3.966.0",
     "@konker.dev/tiny-error-fp": "workspace:*",
     "chalk": "^5.6.2",
     "cli-table3": "^0.6.5",
     "commander": "^14.0.2",
-    "effect": "^3.19.13",
+    "effect": "^3.19.14",
     "json5": "^2.2.3",
     "zod": "^3.25.67"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@effect/language-service": "^0.62.5",
-    "@eslint/compat": "^2.0.0",
+    "@effect/language-service": "^0.64.1",
+    "@eslint/compat": "^2.0.1",
     "@eslint/js": "^9.39.2",
     "@konker.dev/common-config": "^0.7.0",
-    "@types/node": "^25.0.3",
+    "@types/node": "^25.0.6",
     "@vitest/coverage-istanbul": "^4.0.16",
     "aws-sdk-client-mock": "^4.1.0",
     "aws-sdk-client-mock-vitest": "^7.0.1",
@@ -213,7 +213,7 @@
     "tsx": "^4.21.0",
     "type-coverage": "^2.29.7",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.1",
+    "typescript-eslint": "^8.52.0",
     "vitest": "^4.0.16"
   },
   "scripts": {

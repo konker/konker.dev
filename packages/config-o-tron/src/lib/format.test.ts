@@ -62,7 +62,20 @@ describe('format', () => {
       expect(result).toContain('MY_VALUE="hello world"');
     });
 
-    it('should escape special characters in quoted values', () => {
+    it('should escape special characters in double quoted values', () => {
+      const data = {
+        my: {
+          value: "has 'quote' inside",
+        },
+      };
+
+      const result = formatEnv(data);
+
+      // Value has spaces, so it will be quoted, and internal quotes are escaped
+      expect(result).toContain(`MY_VALUE="has 'quote' inside"`);
+    });
+
+    it('should escape special characters in single quoted values', () => {
       const data = {
         my: {
           value: 'has "quote" inside',
@@ -71,8 +84,8 @@ describe('format', () => {
 
       const result = formatEnv(data);
 
-      // Value has spaces so it will be quoted, and internal quotes are escaped
-      expect(result).toContain('MY_VALUE="has \\"quote\\" inside"');
+      // Value has spaces, so it will be quoted, and internal quotes are escaped
+      expect(result).toContain(`MY_VALUE='has "quote" inside`);
     });
 
     it('should sort keys alphabetically', () => {

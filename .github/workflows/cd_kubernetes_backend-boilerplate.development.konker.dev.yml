@@ -71,15 +71,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Cache SST artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            .sst
-            apps/backend-boilerplate.konker.dev/.sst
-          key: ${{ runner.os }}-sst-${{ hashFiles('apps/backend-boilerplate.konker.dev/deployment/kubernetes/sst.config.ts') }}
-          restore-keys: |
-            ${{ runner.os }}-sst-
+#      - name: Cache SST artifacts
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            .sst
+#            apps/backend-boilerplate.konker.dev/.sst
+#          key: ${{ runner.os }}-sst-${{ hashFiles('apps/backend-boilerplate.konker.dev/deployment/kubernetes/sst.config.ts') }}
+#          restore-keys: |
+#            ${{ runner.os }}-sst-
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -126,7 +126,7 @@ jobs:
       - name: Export env from config-o-tron
         run: |
           cd ${{ env.CWD }}
-          pnpm config-o-tron export backend-boilerplate --env development --source common --format env > .env.development
+          pnpm config-o-tron export backend-boilerplate --env development --source common --format env |tee .env.development >> $GITHUB_ENV
           cd -
 
       # Assume application deployment role
@@ -144,25 +144,13 @@ jobs:
         run: |
           cd ${{ env.CWD }}
 
-          # Load environment variables from config-o-tron export
-          set -a
-          source .env.development
-          set +a
-
-          # Apply resources in order to prevent Traefik timing issues
-          # 1. Namespace first (creates if not exists)
-          kubectl apply -f ./deployment/k8s/development/k8s-namespace.yaml
-
-          # 2. Service (must exist before IngressRoute for Traefik)
-          kubectl apply -f ./deployment/k8s/development/k8s-service.yaml -n ${{ env.K8S_NAMESPACE }}
-
-          # 3. Deployment
-          ## kubectl apply -f ./deployment/k8s/production/k8s-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
+          pnpm sst refresh --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
           pnpm sst deploy --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
 
-          # 4. IngressRoute last (after Service exists to prevent 503 errors)
-          kubectl apply -f ./deployment/k8s/development/k8s-ingresroute.yaml -n ${{ env.K8S_NAMESPACE }}
+          # 2. IngressRoute last
+          kubectl apply -f ./deployment/kubernetes/k8s-ingresroute-development.yaml -n ${{ env.K8S_NAMESPACE }}
 
           # Restart deployment to ensure latest image is pulled
           kubectl rollout restart deployment/backend-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }}
