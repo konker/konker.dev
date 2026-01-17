@@ -24,9 +24,6 @@ export function core(
         version: VERSION,
         ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
         konker: 'RULEZZ!',
-        foo: process.env.FOO,
-        DATABASE_NAME: event.validatedEnv.DATABASE_NAME,
-        DATABASE_PORT: event.validatedEnv.DATABASE_PORT,
         result,
       },
     }))

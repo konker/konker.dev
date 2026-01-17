@@ -71,15 +71,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-#      - name: Cache SST artifacts
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            .sst
-#            apps/backend-boilerplate.konker.dev/.sst
-#          key: ${{ runner.os }}-sst-${{ hashFiles('apps/backend-boilerplate.konker.dev/deployment/kubernetes/sst.config.ts') }}
-#          restore-keys: |
-#            ${{ runner.os }}-sst-
+      - name: Cache SST artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            .sst
+            apps/backend-boilerplate.konker.dev/.sst
+          key: ${{ runner.os }}-sst-${{ hashFiles('apps/backend-boilerplate.konker.dev/deployment/kubernetes/sst.config.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-sst-
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -87,13 +87,26 @@ jobs:
       - name: Check if image exists in ECR
         id: check-image
         run: |
-          aws ecr describe-images \
+          set -euo pipefail
+          err_file="$(mktemp)"
+          if aws ecr describe-images \
             --repository-name ${{ env.AWS_ECR_REPOSITORY }} \
             --image-ids imageTag=${{ env.IMAGE_TAG }} \
             --region ${{ env.AWS_DEFAULT_REGION }} \
-            > /dev/null 2>&1 && echo "exists=true" >> $GITHUB_OUTPUT || echo "exists=false" >> $GITHUB_OUTPUT
+            > /dev/null 2> "$err_file"; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            if grep -q "ImageNotFoundException" "$err_file"; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "ECR describe-images failed:"
+              cat "$err_file"
+              exit 1
+            fi
+          fi
+          rm -f "$err_file"
 
-      - name: Build and push to ECR (Deployment)
+      - name: Build and push to ECR (Development)
         if: steps.check-image.outputs.exists == 'false'
         run: |
           pnpm run cd
@@ -116,8 +129,8 @@ jobs:
       - name: Configure AWS credentials (Configuration management role)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
-          aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
+          aws-access-key-id: '${{ env.AWS_ACCESS_KEY_ID }}'
+          aws-secret-access-key: '${{ env.AWS_SECRET_ACCESS_KEY }}'
           role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-backend-boilerplate" # ${{ env.CONFIG_MANAGEMENT_ROLE_ARN }}
           role-external-id: "configuration-management-access"
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
@@ -126,7 +139,7 @@ jobs:
       - name: Export env from config-o-tron
         run: |
           cd ${{ env.CWD }}
-          pnpm config-o-tron export backend-boilerplate --env development --source common --format env |tee .env.development >> $GITHUB_ENV
+          pnpm config-o-tron export backend-boilerplate-kubernetes --env=development --format=env >> .env.kubernetes.development
           cd -
 
       # Assume application deployment role
@@ -143,6 +156,11 @@ jobs:
       - name: Deploy to kubernetes (Development)
         run: |
           cd ${{ env.CWD }}
+          export PATH="$HOME/.config/sst/bin:$PATH"
+
+          set -a
+          source .env.kubernetes.development
+          set +a          
 
           # 1. Deployment
           pnpm sst install --config=./deployment/kubernetes/sst.config.ts --stage=development --print-logs
