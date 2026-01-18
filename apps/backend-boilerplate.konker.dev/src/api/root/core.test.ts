@@ -1,3 +1,4 @@
+import { NodeFileSystem } from '@effect/platform-node';
 import * as M from '@konker.dev/middleware-fp/http/contrib';
 import { Effect, pipe } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -18,7 +19,7 @@ describe('root/core', () => {
 
   it('should work as expected with basic request', async () => {
     const testData = [[123, 'widget-name', 42]];
-    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(mockSqlClientLayer(testData)));
+    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, mockSqlClientLayer(testData)));
 
     const actual = await pipe(
       {
@@ -39,6 +40,7 @@ describe('root/core', () => {
         },
       },
       stack,
+      Effect.provide(NodeFileSystem.layer),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
@@ -58,7 +60,7 @@ describe('root/core', () => {
 
   it('should work as expected with x-forwarded-for header', async () => {
     const testData = [[123, 'widget-name', 42]];
-    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(mockSqlClientLayer(testData)));
+    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, mockSqlClientLayer(testData)));
 
     const actual = await pipe(
       {
@@ -80,6 +82,7 @@ describe('root/core', () => {
         },
       },
       stack,
+      Effect.provide(NodeFileSystem.layer),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
