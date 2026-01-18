@@ -3,8 +3,16 @@ import { Effect, Layer, pipe } from 'effect';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import * as unit from './lib.js';
+import { ignoreCheckServerIdentity } from './lib.js';
 
 describe('middleware/sql-client-pg-init/lib', () => {
+  describe('ignoreCheckServerIdentity', () => {
+    it('should always return undefined', async () => {
+      const actual = unit.ignoreCheckServerIdentity('test-host', 'test-cert' as never);
+      expect(actual).toStrictEqual(undefined);
+    });
+  });
+
   describe('resolveSslConfigDirect', () => {
     let _oldEnv: NodeJS.ProcessEnv;
     beforeAll(() => {
@@ -72,7 +80,18 @@ describe('middleware/sql-client-pg-init/lib', () => {
         Effect.runPromise
       );
 
-      expect(actual).toStrictEqual({ ca: 'test-ca-bundle-content' });
+      expect(actual).toStrictEqual({ ca: 'test-ca-bundle-content', checkServerIdentity: undefined });
+    });
+
+    it('should work as expected with a valid file path and a checkServerIdentity function', async () => {
+      const actual = await pipe(
+        unit.resolveSslConfigCaBundle(`${__dirname}/fixtures/test-ca-bundle.pem`, ignoreCheckServerIdentity),
+        Effect.flatMap((config) => config),
+        Effect.provide(NodeFileSystem.layer),
+        Effect.runPromise
+      );
+
+      expect(actual).toStrictEqual({ ca: 'test-ca-bundle-content', checkServerIdentity: ignoreCheckServerIdentity });
     });
 
     it('should fail with a non-existent file path', async () => {

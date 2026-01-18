@@ -8,6 +8,7 @@ import { echoCoreIn200W } from '../../../test/test-common.js';
 import { EMPTY_REQUEST_W } from '../../RequestW.js';
 import * as unit from './index.js';
 import * as unitLib from './lib.js';
+import { ignoreCheckServerIdentity } from './lib.js';
 
 // Create a mock PgDrizzle layer for testing
 export const MockPgSqlClientLayer = Layer.succeed(SqlClient, {} as any);
@@ -19,7 +20,7 @@ describe('middleware/sql-client-pg-init', () => {
     });
 
     it('should work as expected with custom layer', async () => {
-      const egHandler = pipe(echoCoreIn200W, unit.middleware(undefined, MockPgSqlClientLayer));
+      const egHandler = pipe(echoCoreIn200W, unit.middleware(undefined, undefined, MockPgSqlClientLayer));
 
       const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
 
@@ -44,7 +45,7 @@ describe('middleware/sql-client-pg-init', () => {
       const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
 
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(undefined);
+      expect(spy).toHaveBeenCalledWith(undefined, undefined);
 
       expect(result).toMatchObject({
         body: 'OK',
@@ -67,7 +68,30 @@ describe('middleware/sql-client-pg-init', () => {
       const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
 
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith('/path/to/ca-bundle.pem');
+      expect(spy).toHaveBeenCalledWith('/path/to/ca-bundle.pem', undefined);
+
+      expect(result).toMatchObject({
+        body: 'OK',
+        headers: {},
+        in: {
+          url: '/',
+          headers: {},
+          method: 'GET',
+          pathParameters: {},
+          queryStringParameters: {},
+        },
+        statusCode: 200,
+      });
+    });
+
+    it('should work as expected with ca bundle file path and CheckServerIdentityFunction', async () => {
+      const spy = vi.spyOn(unitLib, 'createDefaultPgSqlClientLayer').mockReturnValue(MockPgSqlClientLayer as any);
+      const egHandler = pipe(echoCoreIn200W, unit.middleware('/path/to/ca-bundle.pem', ignoreCheckServerIdentity));
+
+      const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledWith('/path/to/ca-bundle.pem', ignoreCheckServerIdentity);
 
       expect(result).toMatchObject({
         body: 'OK',
