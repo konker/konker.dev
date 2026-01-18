@@ -1,25 +1,25 @@
+import { FileSystem } from '@effect/platform';
+import type { PlatformError } from '@effect/platform/Error';
 import type { SqlClient } from '@effect/sql/SqlClient';
 import type { SqlError } from '@effect/sql/SqlError';
 import { PgClient } from '@effect/sql-pg';
-import { Config, ConfigError, Either, type Layer, pipe, Schema } from 'effect';
-import type { ParseError } from 'effect/ParseResult';
-import { TreeFormatter } from 'effect/ParseResult';
+import { Config, ConfigError, Effect, Either, Layer, pipe, Schema } from 'effect';
+import { type ParseError, TreeFormatter } from 'effect/ParseResult';
 
 // --------------------------------------------------------------------------
 export const SslConfigSchema = Schema.parseJson(
-  Schema.Union(Schema.Boolean, Schema.Record({ key: Schema.String, value: Schema.Unknown }))
+  Schema.Union(
+    Schema.Boolean,
+    Schema.Struct({ ca: Schema.String }),
+    Schema.Record({ key: Schema.String, value: Schema.Unknown })
+  )
 );
 export type SslConfig = typeof SslConfigSchema.Type;
 
 // --------------------------------------------------------------------------
-/**
- * Resolves the SSL configuration for the database by reading and decoding the `DATABASE_SSL` environment variable.
- * If the variable is not set or cannot be decoded, a default value will be applied.
- *
- * @param {SslConfig} [defaultValue=false] - The default SSL configuration to use if no valid configuration is provided.
- * @return {Config.Config<SslConfig>} A configuration object for the SSL configuration, derived from the environment variable or fallback value.
- */
-export function resolveSslConfig(defaultValue: SslConfig): Config.Config<SslConfig> {
+export function resolveSslConfigDirect(
+  defaultValue: SslConfig
+): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError> {
   return Config.string('DATABASE_SSL')
     .pipe(
       Config.mapOrFail((str) =>
@@ -32,27 +32,38 @@ export function resolveSslConfig(defaultValue: SslConfig): Config.Config<SslConf
         )
       )
     )
-    .pipe(Config.withDefault(defaultValue));
+    .pipe(Config.withDefault(defaultValue))
+    .pipe(Effect.succeed);
 }
 
 // --------------------------------------------------------------------------
-/**
- * Creates a default postgresql client layer configured using environment variables.
- *
- * The configuration includes parameters such as host, port, username, password,
- * database name, and SSL settings. These values are retrieved from the environment
- * or configuration system.
- *
- * @return {Layer.Layer<SqlClient, ConfigError.ConfigError | SqlError>} A layer encapsulating the
- *         postgresql client, which can potentially fail due to configuration or SQL-related errors.
- */
-export function createDefaultPgSqlClientLayer(): Layer.Layer<SqlClient, ConfigError.ConfigError | SqlError> {
-  return PgClient.layerConfig({
-    host: Config.string('DATABASE_HOST'),
-    port: Config.number('DATABASE_PORT'),
-    username: Config.string('DATABASE_USER'),
-    password: Config.redacted('DATABASE_PASSWORD'),
-    database: Config.string('DATABASE_NAME'),
-    ssl: resolveSslConfig(false),
-  });
+export function resolveSslConfigCaBundle(
+  caBundleFilePath: string
+): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError, FileSystem.FileSystem> {
+  return pipe(
+    FileSystem.FileSystem,
+    Effect.flatMap((fs) => fs.readFileString(caBundleFilePath, 'utf8')),
+    Effect.mapError((err: PlatformError) => ConfigError.InvalidData([], err.message)),
+    Effect.map((ca) => Config.succeed({ ca }))
+  );
+}
+
+// --------------------------------------------------------------------------
+export function createDefaultPgSqlClientLayer(
+  caBundleFilePath?: string
+): Layer.Layer<SqlClient | PgClient.PgClient, SqlError | ConfigError.ConfigError, FileSystem.FileSystem> {
+  const sslConfigEffect = caBundleFilePath ? resolveSslConfigCaBundle(caBundleFilePath) : resolveSslConfigDirect(false);
+
+  return Layer.unwrapEffect(
+    Effect.map(sslConfigEffect, (sslConfig) =>
+      PgClient.layerConfig({
+        host: Config.string('DATABASE_HOST'),
+        port: Config.number('DATABASE_PORT'),
+        username: Config.string('DATABASE_USER'),
+        password: Config.redacted('DATABASE_PASSWORD'),
+        database: Config.string('DATABASE_NAME'),
+        ssl: sslConfig,
+      })
+    )
+  );
 }

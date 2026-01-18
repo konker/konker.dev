@@ -235,6 +235,8 @@
   ],
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
+    "@effect/platform": "^0.94.1",
+    "@effect/platform-node": "^0.104.0",
     "@effect/sql": "^0.49.0",
     "@effect/sql-pg": "^0.50.1",
     "@gomomento/sdk": "^1.102.0",
