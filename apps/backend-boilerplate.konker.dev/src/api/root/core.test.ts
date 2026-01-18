@@ -19,7 +19,7 @@ describe('root/core', () => {
 
   it('should work as expected with basic request', async () => {
     const testData = [[123, 'widget-name', 42]];
-    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, mockSqlClientLayer(testData)));
+    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, undefined, mockSqlClientLayer(testData)));
 
     const actual = await pipe(
       {
@@ -60,7 +60,7 @@ describe('root/core', () => {
 
   it('should work as expected with x-forwarded-for header', async () => {
     const testData = [[123, 'widget-name', 42]];
-    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, mockSqlClientLayer(testData)));
+    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, undefined, mockSqlClientLayer(testData)));
 
     const actual = await pipe(
       {
