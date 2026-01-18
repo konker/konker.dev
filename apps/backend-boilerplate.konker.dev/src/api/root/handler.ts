@@ -1,3 +1,4 @@
+import { NodeFileSystem } from '@effect/platform-node';
 import type { RequestW, ResponseW } from '@konker.dev/middleware-fp/http';
 import * as M from '@konker.dev/middleware-fp/http/contrib';
 import { Effect, pipe } from 'effect';
@@ -21,5 +22,6 @@ export const handler = async (event: HonoRequest): Promise<Response> => {
     M.requestResponseLogger.middleware(),
     M.honoAdapter.middleware()
   );
-  return pipe(event, stack, Effect.runPromise);
+
+  return pipe(event, stack, Effect.provide(NodeFileSystem.layer), Effect.runPromise);
 };
