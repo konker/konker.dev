@@ -1,3 +1,6 @@
+/* eslint-disable fp/no-nil */
+import type { PeerCertificate } from 'node:tls';
+
 import { FileSystem } from '@effect/platform';
 import type { PlatformError } from '@effect/platform/Error';
 import type { SqlClient } from '@effect/sql/SqlClient';
@@ -15,6 +18,13 @@ export const SslConfigSchema = Schema.parseJson(
   )
 );
 export type SslConfig = typeof SslConfigSchema.Type;
+
+// --------------------------------------------------------------------------
+export type CheckServerIdentityFunction = (_hostname: string, _cert: PeerCertificate) => Error | undefined;
+
+export function ignoreCheckServerIdentity(_hostname: string, _cert: PeerCertificate): Error | undefined {
+  return undefined;
+}
 
 // --------------------------------------------------------------------------
 export function resolveSslConfigDirect(
@@ -38,21 +48,30 @@ export function resolveSslConfigDirect(
 
 // --------------------------------------------------------------------------
 export function resolveSslConfigCaBundle(
-  caBundleFilePath: string
+  caBundleFilePath: string,
+  checkServerIdentityFunction?: CheckServerIdentityFunction
 ): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError, FileSystem.FileSystem> {
   return pipe(
     FileSystem.FileSystem,
     Effect.flatMap((fs) => fs.readFileString(caBundleFilePath, 'utf8')),
     Effect.mapError((err: PlatformError) => ConfigError.InvalidData([], err.message)),
-    Effect.map((ca) => Config.succeed({ ca }))
+    Effect.map((ca) =>
+      Config.succeed({
+        ca,
+        checkServerIdentity: checkServerIdentityFunction,
+      })
+    )
   );
 }
 
 // --------------------------------------------------------------------------
 export function createDefaultPgSqlClientLayer(
-  caBundleFilePath?: string
+  caBundleFilePath?: string,
+  checkServerIdentityFunction?: CheckServerIdentityFunction
 ): Layer.Layer<SqlClient | PgClient.PgClient, SqlError | ConfigError.ConfigError, FileSystem.FileSystem> {
-  const sslConfigEffect = caBundleFilePath ? resolveSslConfigCaBundle(caBundleFilePath) : resolveSslConfigDirect(false);
+  const sslConfigEffect = caBundleFilePath
+    ? resolveSslConfigCaBundle(caBundleFilePath, checkServerIdentityFunction)
+    : resolveSslConfigDirect(false);
 
   return Layer.unwrapEffect(
     Effect.map(sslConfigEffect, (sslConfig) =>
