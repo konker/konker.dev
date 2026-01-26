@@ -14,6 +14,7 @@ export function core(
   return pipe(
     PgDrizzle.make({ schema }),
     Effect.flatMap((db) => db.select().from(schema.widgets)),
+    Effect.withSpan('database'),
     Effect.map((result) => ({
       statusCode: 200,
       headers: {
@@ -26,6 +27,7 @@ export function core(
         konker: 'RULEZZ!',
         result,
       },
-    }))
+    })),
+    Effect.withSpan('request')
   );
 }
