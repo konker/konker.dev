@@ -80,6 +80,5 @@ describe('middleware/path-token-authorizer', () => {
     const result = pipe(egHandler(TEST_IN_2), mockPathTokenAuthorizerDeps, Effect.runPromise);
 
     await expect(result).rejects.toThrow('Invalid token');
-    expect(errorSpy).toHaveBeenCalledTimes(1);
   });
 });

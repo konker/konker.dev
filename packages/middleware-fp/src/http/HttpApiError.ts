@@ -1,23 +1,47 @@
-import { isTinyError, TinyError, toTinyError } from '@konker.dev/tiny-error-fp';
-import { pipe, Schema } from 'effect';
+/* eslint-disable fp/no-class */
+import { pipe, Predicate, Schema } from 'effect';
+import { TaggedError } from 'effect/Data';
 import * as Effect from 'effect/Effect';
 
 import { UNKNOWN_STRING_EFFECT } from './RequestResponseHandler.js';
 import { makeResponseW, type ResponseW } from './ResponseW.js';
 
 export const ERROR_TAG = 'HttpApiError' as const;
-export type ERROR_TAG = typeof ERROR_TAG;
 
-export type HttpApiError = TinyError<ERROR_TAG>;
+// --------------------------------------------------------------------------
+export class HttpApiError extends TaggedError(ERROR_TAG)<{
+  readonly statusCode: number;
+  readonly message: string;
+  readonly internal?: Array<unknown>;
+}> {}
 
-export const HttpApiError = TinyError<ERROR_TAG>(ERROR_TAG, 500);
-export const toHttpApiError = toTinyError<ERROR_TAG>(ERROR_TAG, HttpApiError);
-export const isHttpApiError = isTinyError(ERROR_TAG);
+// --------------------------------------------------------------------------
+export function isHttpApiError(x: unknown): x is HttpApiError {
+  return Predicate.isTagged(ERROR_TAG)(x);
+}
 
-export function toResponseW(error: HttpApiError): Effect.Effect<ResponseW, never, never> {
+// --------------------------------------------------------------------------
+export function toHttpApiError(x: unknown, statusCode?: number, message?: string): HttpApiError {
+  if (isHttpApiError(x)) {
+    return new HttpApiError({
+      statusCode: statusCode ?? x.statusCode,
+      message: message ?? x.message,
+      internal: [x, ...(x.internal ?? [])],
+    });
+  }
+
+  return new HttpApiError({
+    statusCode: statusCode ?? 500,
+    message: message ?? 'Internal Server Error',
+    internal: [x],
+  });
+}
+
+// --------------------------------------------------------------------------
+export function toErrorResponseW(error: HttpApiError): Effect.Effect<ResponseW, never, never> {
   return pipe(
-    // Formulate response body
-    { message: `${error.name}: ${error.message}`, statusCode: error.statusCode },
+    // Formulate response
+    { message: error.message, statusCode: error.statusCode },
     Schema.encode(Schema.parseJson()),
     Effect.orElse<string, never, never>(UNKNOWN_STRING_EFFECT),
     Effect.map((body) =>

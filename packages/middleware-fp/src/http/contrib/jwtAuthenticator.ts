@@ -4,7 +4,7 @@ import { jwtVerifyToken } from '@konker.dev/tiny-auth-utils-fp/jwt';
 import { Context, pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import { HttpApiError } from '../HttpApiError.js';
+import { type HttpApiError, toHttpApiError } from '../HttpApiError.js';
 import type { Rec, RequestResponseHandler } from '../index.js';
 import { makeRequestW, type RequestW } from '../RequestW.js';
 import type { WithNormalizedInputHeaders } from './headersNormalizer/types.js';
@@ -41,7 +41,7 @@ export const middleware =
             )
           : Effect.fail(void 0)
       ),
-      Effect.mapError((e) => HttpApiError('UnauthorizedError', `Invalid JWT credentials: ${e?.message}`, 401, TAG, e)),
+      Effect.mapError((e) => toHttpApiError(e, 401, `Invalid JWT credentials: ${e?.message}`)),
       Effect.tapError(Effect.logError),
       Effect.flatMap(wrapped),
       Effect.tap(Effect.logDebug(`[${TAG}] OUT`))

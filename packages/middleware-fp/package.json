@@ -249,7 +249,6 @@
     "@konker.dev/momento-cache-client-effect": "workspace:*",
     "@konker.dev/tiny-auth-utils-fp": "workspace:*",
     "@konker.dev/tiny-cache-fp": "workspace:*",
-    "@konker.dev/tiny-error-fp": "workspace:*",
     "@konker.dev/tiny-utils-fp": "workspace:*",
     "effect": "^3.19.14",
     "lesslog": "^1.0.2"

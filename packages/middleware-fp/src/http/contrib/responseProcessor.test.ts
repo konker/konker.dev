@@ -30,7 +30,7 @@ const TEST_OUT_2 = makeResponseW({
   },
   body: 'string body',
 });
-const TEST_OUT_3 = HttpApiError('SomeError', 'Some Error Message', 409);
+const TEST_OUT_3 = new HttpApiError({ statusCode: 409, message: 'Some Error Message' });
 
 export const testCoreL =
   (out: any): Handler<RequestW, ResponseW, Error, unknown> =>
@@ -90,7 +90,7 @@ describe('middleware/responseProcessor', () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: 'SomeError: Some Error Message', statusCode: 409 }),
+      body: JSON.stringify({ message: 'Some Error Message', statusCode: 409 }),
     });
     expect(errorSpy).toHaveBeenCalledTimes(1);
   });

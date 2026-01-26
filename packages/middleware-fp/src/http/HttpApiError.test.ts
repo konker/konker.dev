@@ -1,151 +1,94 @@
+import { Effect, pipe } from 'effect';
 import { describe, expect, it } from 'vitest';
 
 import * as unit from './HttpApiError.js';
 
-describe('error/ApiError', () => {
+describe('HttpApiError', () => {
   const s = 'STR_ERROR';
   const e = new Error(s);
-  const ae: unit.HttpApiError = unit.HttpApiError('AE_NAME', 'AE_MESSAGE', 123, 'AE_CODE_TAG', e, false, 'AE_STACK');
-  const aei: unit.HttpApiError = unit.HttpApiError('AE_NAME', 'AE_MESSAGE', 123, 'AE_CODE_TAG', e, true, 'AE_STACK');
+  const hae: unit.HttpApiError = new unit.HttpApiError({
+    statusCode: 123,
+    message: 'HAE_MESSAGE',
+    internal: ['HAE_STACK'],
+  });
   const circ: Record<string, unknown> = {};
   circ.x = circ;
 
-  describe('HttpApiError', () => {
-    it('should default as expected', () => {
-      expect(unit.HttpApiError().toObject()).toStrictEqual({
+  describe('toHttpApiError', () => {
+    it('should function as expected when passed just an HttpApiError', () => {
+      const actual = unit.toHttpApiError(hae);
+      expect(actual).toBeInstanceOf(unit.HttpApiError);
+      expect(actual).toMatchObject({
+        statusCode: 123,
+        message: 'HAE_MESSAGE',
+        internal: [hae, 'HAE_STACK'],
+      });
+    });
+
+    it('should function as expected when passed an HttpApiError, an override statusCode, and message', () => {
+      const actual = unit.toHttpApiError(hae, 456, 'MESSAGE_OVERRIDE');
+      expect(actual).toBeInstanceOf(unit.HttpApiError);
+      expect(actual).toMatchObject({
+        statusCode: 456,
+        message: 'MESSAGE_OVERRIDE',
+        internal: [hae, 'HAE_STACK'],
+      });
+    });
+
+    it('should function as expected when passed an Error', () => {
+      const actual = unit.toHttpApiError(e);
+      expect(actual).toBeInstanceOf(unit.HttpApiError);
+      expect(actual).toMatchObject({
         _tag: 'HttpApiError',
-        name: 'HttpApiError',
-        message: 'HttpApiError',
         statusCode: 500,
-        cause: 'UNKNOWN',
-        codeTag: 'GENERAL',
-        internal: true,
-        stack: expect.stringContaining('Error'),
+        message: 'Internal Server Error',
+        internal: [e],
+      });
+    });
+
+    it('should function as expected when passed an Error and other params', () => {
+      const actual = unit.toHttpApiError(e, 400, 'SOME_MESSAGE');
+      expect(actual).toBeInstanceOf(unit.HttpApiError);
+      expect(actual).toMatchObject({
+        _tag: 'HttpApiError',
+        statusCode: 400,
+        message: 'SOME_MESSAGE',
+        internal: [e],
+      });
+    });
+
+    it('should function as expected when passed a string', () => {
+      const actual = unit.toHttpApiError('ROOT_CAUSE');
+      expect(actual).toBeInstanceOf(unit.HttpApiError);
+      expect(actual).toMatchObject({
+        _tag: 'HttpApiError',
+        statusCode: 500,
+        message: 'Internal Server Error',
+        internal: ['ROOT_CAUSE'],
+      });
+    });
+
+    it('should function as expected when passed a string and other params', () => {
+      const actual = unit.toHttpApiError('ROOT_CAUSE', 400, 'SOME_MESSAGE');
+      expect(actual).toBeInstanceOf(unit.HttpApiError);
+      expect(actual).toMatchObject({
+        _tag: 'HttpApiError',
+        statusCode: 400,
+        message: 'SOME_MESSAGE',
+        internal: ['ROOT_CAUSE'],
       });
     });
   });
 
-  describe('toApiError', () => {
-    it('should function as expected when passed an ApiError', () => {
-      expect(unit.toHttpApiError(ae)).toStrictEqual(ae);
-      expect(unit.toHttpApiError(aei)).toStrictEqual(aei);
-    });
-
-    it('should function as expected when passed an Error', () => {
-      expect(unit.toHttpApiError(e, 'SOME_NAME', 'SOME_MESSAGE', 400).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'SOME_NAME',
-        message: 'SOME_MESSAGE',
-        statusCode: 400,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: e,
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError(e, 'SOME_NAME', 'SOME_MESSAGE').toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'SOME_NAME',
-        message: 'SOME_MESSAGE',
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: e,
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError(e, 'SOME_NAME').toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'SOME_NAME',
-        message: e.message,
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: e,
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError(e).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: e.name,
-        message: e.message,
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: e,
-        stack: expect.stringContaining('Error'),
-      });
-    });
-
-    it('should function as expected when passed an string', () => {
-      expect(unit.toHttpApiError(s).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'HttpApiError',
-        message: s,
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: 'STR_ERROR',
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError(s, 'SOME_NAME', 'SOME_MESSAGE').toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'SOME_NAME',
-        message: 'SOME_MESSAGE',
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: 'STR_ERROR',
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError(s, undefined, undefined, undefined).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'HttpApiError',
-        message: s,
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: 'STR_ERROR',
-        stack: expect.stringContaining('Error'),
-      });
-    });
-
-    it('should function as expected when passed other', () => {
-      expect(unit.toHttpApiError({ foo: 'BAR', message: s }).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'HttpApiError',
-        message: s,
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: {
-          foo: 'BAR',
-          message: 'STR_ERROR',
+  describe('toErrorResponseW', () => {
+    it('should function as expected', async () => {
+      const actual = await pipe(unit.toErrorResponseW(hae), Effect.runPromise);
+      expect(actual).toStrictEqual({
+        statusCode: 123,
+        headers: {
+          'Content-Type': 'application/json',
         },
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError({ foo: 'BAR!!!' }).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'HttpApiError',
-        message: '{"foo":"BAR!!!"}',
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: {
-          foo: 'BAR!!!',
-        },
-        stack: expect.stringContaining('Error'),
-      });
-      expect(unit.toHttpApiError({ foo: 'BAR!!!', circ }).toObject()).toStrictEqual({
-        _tag: 'HttpApiError',
-        name: 'HttpApiError',
-        message: 'UNKNOWN',
-        statusCode: 500,
-        codeTag: 'GENERAL',
-        internal: true,
-        cause: {
-          circ,
-          foo: 'BAR!!!',
-        },
-
-        stack: expect.stringContaining('Error'),
+        body: '{"message":"HAE_MESSAGE","statusCode":123}',
       });
     });
   });
