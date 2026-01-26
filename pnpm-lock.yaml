@@ -665,9 +665,6 @@ importers:
       '@konker.dev/tiny-cache-fp':
         specifier: workspace:*
         version: link:../tiny-cache-fp
-      '@konker.dev/tiny-error-fp':
-        specifier: workspace:*
-        version: link:../tiny-error-fp
       '@konker.dev/tiny-utils-fp':
         specifier: workspace:*
         version: link:../tiny-utils-fp

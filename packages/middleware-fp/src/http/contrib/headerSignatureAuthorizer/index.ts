@@ -30,7 +30,7 @@ export const middleware =
       Effect.flatMap(({ secret, signatureHeaderName }) =>
         Effect.if(validateHeaderSignature(i.headers[signatureHeaderName], i.body, secret), {
           onTrue: () => Effect.succeed(i),
-          onFalse: () => Effect.fail(HttpApiError('UnauthorizedError', 'Invalid signature', 401)),
+          onFalse: () => Effect.fail(new HttpApiError({ statusCode: 401, message: 'Invalid signature' })),
         })
       ),
       Effect.tapError((_) => Effect.logError(`UnauthorizedError: Invalid signature: ${i.body}`)),

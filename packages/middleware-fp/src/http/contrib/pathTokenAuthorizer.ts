@@ -29,11 +29,7 @@ export const middleware =
           !!process.env[secretTokenEnvName] && i.pathParameters?.[pathParamName] === process.env[secretTokenEnvName],
           {
             onTrue: () => Effect.succeed(i),
-            onFalse: () =>
-              pipe(
-                Effect.fail(HttpApiError('UnauthorizedError', 'Invalid token', 401)),
-                Effect.tap(Effect.logError('UnauthorizedError: Invalid token'))
-              ),
+            onFalse: () => pipe(Effect.fail(new HttpApiError({ statusCode: 401, message: 'Invalid token' }))),
           }
         )
       ),

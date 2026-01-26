@@ -1,7 +1,7 @@
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
 
-import { toHttpApiError, toResponseW } from '../HttpApiError.js';
+import { toErrorResponseW, toHttpApiError } from '../HttpApiError.js';
 import type { Rec, RequestResponseHandler } from '../index.js';
 import type { RequestW } from '../RequestW.js';
 import type { ResponseW } from '../ResponseW.js';
@@ -23,9 +23,9 @@ export const middleware =
         onFailure: (e) =>
           pipe(
             Effect.succeed(e),
-            Effect.tap(Effect.logError('Error', e)),
+            Effect.tap(Effect.logError),
             Effect.map(toHttpApiError),
-            Effect.flatMap(toResponseW)
+            Effect.flatMap(toErrorResponseW)
           ),
         onSuccess: (o: ResponseW<O>) => Effect.succeed(o),
       })
