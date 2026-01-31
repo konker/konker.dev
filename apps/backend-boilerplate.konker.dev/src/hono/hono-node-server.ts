@@ -3,7 +3,7 @@ import { serve } from '@hono/node-server';
 
 import { app } from './hono-app.js';
 
-const port = parseInt(process.env.PORT ?? '3001', 10);
+const port = parseInt(process.env.PORT ?? '3000', 10);
 const server = serve(
   {
     fetch: app.fetch,
