@@ -8,8 +8,9 @@ export const EnvSchema = Schema.Struct({
   DATABASE_PASSWORD: Schema.String,
   DATABASE_NAME: Schema.String,
   DATABASE_SSL: SslConfigSchema,
-  OTEL_TRACE_SINK_URL: Schema.String,
-  OTEL_TRACE_SINK_BASIC_AUTH_USERNAME: Schema.String,
-  OTEL_TRACE_SINK_BASIC_AUTH_PASSWORD: Schema.String,
+  // OTEL_TRACE_SINK_URL: Schema.String,
+  // OTEL_TRACE_SINK_BASIC_AUTH_USERNAME: Schema.String,
+  // OTEL_TRACE_SINK_BASIC_AUTH_PASSWORD: Schema.String,
 });
+
 export type Env = typeof EnvSchema.Type;
