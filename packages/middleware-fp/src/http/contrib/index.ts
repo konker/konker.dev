@@ -18,6 +18,7 @@ export * as jwtAuthenticator from './jwtAuthenticator.js';
 export * as jwtAuthenticatorRsa from './jwtAuthenticatorRsa.js';
 export * as jwtDecoder from './jwtDecoder.js';
 export * as momentoClientInit from './momentoClientInit.js';
+export * as otelTraceExporterInit from './otelTraceExporterInit/index.js';
 export * as pathParametersValidator from './pathParametersValidator.js';
 export * as pathTokenAuthorizer from './pathTokenAuthorizer.js';
 export * as queryStringValidator from './queryStringValidator.js';

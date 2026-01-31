@@ -61,6 +61,15 @@ export function basicAuthDecodeHeaderValue(
 }
 
 // --------------------------------------------------------------------------
+export function basicAuthEncodeHeaderValue(basicAuthCredentials: BasicAuthCredentials): Effect.Effect<string, Error> {
+  return pipe(
+    `${basicAuthCredentials.username}:${basicAuthCredentials.password}`,
+    Schema.encode(Schema.StringFromBase64),
+    Effect.map((encoded) => `Basic ${encoded}`)
+  );
+}
+
+// --------------------------------------------------------------------------
 export const basicAuthVerifyCredentials =
   (valid: ValidBasicAuthCredentialSet) =>
   (basicAuth: BasicAuthCredentials): Effect.Effect<BasicAuthUserContext> => {

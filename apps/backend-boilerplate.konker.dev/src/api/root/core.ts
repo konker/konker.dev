@@ -14,6 +14,7 @@ export function core(
   return pipe(
     PgDrizzle.make({ schema }),
     Effect.flatMap((db) => db.select().from(schema.widgets)),
+    Effect.withSpan('database'),
     Effect.map((result) => ({
       statusCode: 200,
       headers: {
@@ -23,9 +24,10 @@ export function core(
         apiId: API_ID,
         version: VERSION,
         ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
-        konker: 'RULEZZ!',
+        konker: 'RULEZZ!!',
         result,
       },
-    }))
+    })),
+    Effect.withSpan('request')
   );
 }
