@@ -1,20 +1,13 @@
-import type { SqlClient } from '@effect/sql/SqlClient';
-import type { SqlError } from '@effect/sql/SqlError';
-import * as PgDrizzle from '@effect/sql-drizzle/Pg';
 import type { RequestW } from '@konker.dev/middleware-fp/http';
 import { type ConfigError, Effect, pipe } from 'effect';
 
-import * as schema from '../../database/database.schema.js';
 import { API_ID, VERSION } from '../../lib/consts.js';
 import type { CoreEvent, CoreResponse } from './handler.js';
 
-export function core(
-  event: RequestW<CoreEvent>
-): Effect.Effect<CoreResponse, ConfigError.ConfigError | SqlError, SqlClient> {
+export function core(event: RequestW<CoreEvent>): Effect.Effect<CoreResponse, ConfigError.ConfigError, never> {
   return pipe(
-    PgDrizzle.make({ schema }),
-    Effect.tap(() => Effect.logInfo('root')),
-    Effect.flatMap((db) => db.select().from(schema.widgets)),
+    Effect.succeed('FOO'),
+    Effect.tap(() => Effect.logInfo('foo')),
     Effect.map((result) => ({
       statusCode: 200,
       headers: {

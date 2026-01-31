@@ -56,10 +56,6 @@
       "types": "./dist/http/contrib/envValidator.d.ts",
       "import": "./dist/http/contrib/envValidator.js"
     },
-    "./http/contrib/foo": {
-      "types": "./dist/http/contrib/foo.d.ts",
-      "import": "./dist/http/contrib/foo.js"
-    },
     "./http/contrib/headerSignatureAuthorizer": {
       "types": "./dist/http/contrib/headerSignatureAuthorizer/index.d.ts",
       "import": "./dist/http/contrib/headerSignatureAuthorizer/index.js"
@@ -132,10 +128,6 @@
       "types": "./dist/http/contrib/otelTraceExporterInit/index.d.ts",
       "import": "./dist/http/contrib/otelTraceExporterInit/index.js"
     },
-    "./http/contrib/otelTraceExporterInit/lib": {
-      "types": "./dist/http/contrib/otelTraceExporterInit/lib.d.ts",
-      "import": "./dist/http/contrib/otelTraceExporterInit/lib.js"
-    },
     "./http/contrib/pathParametersValidator": {
       "types": "./dist/http/contrib/pathParametersValidator.d.ts",
       "import": "./dist/http/contrib/pathParametersValidator.js"
@@ -143,6 +135,10 @@
     "./http/contrib/pathTokenAuthorizer": {
       "types": "./dist/http/contrib/pathTokenAuthorizer.d.ts",
       "import": "./dist/http/contrib/pathTokenAuthorizer.js"
+    },
+    "./http/contrib/provideLayer": {
+      "types": "./dist/http/contrib/provideLayer.d.ts",
+      "import": "./dist/http/contrib/provideLayer.js"
     },
     "./http/contrib/queryStringValidator": {
       "types": "./dist/http/contrib/queryStringValidator.d.ts",
@@ -152,9 +148,17 @@
       "types": "./dist/http/contrib/requestResponseLogger.d.ts",
       "import": "./dist/http/contrib/requestResponseLogger.js"
     },
+    "./http/contrib/requestSpan": {
+      "types": "./dist/http/contrib/requestSpan.d.ts",
+      "import": "./dist/http/contrib/requestSpan.js"
+    },
     "./http/contrib/responseProcessor": {
       "types": "./dist/http/contrib/responseProcessor.d.ts",
       "import": "./dist/http/contrib/responseProcessor.js"
+    },
+    "./http/contrib/setLogLevel": {
+      "types": "./dist/http/contrib/setLogLevel.d.ts",
+      "import": "./dist/http/contrib/setLogLevel.js"
     },
     "./http/contrib/sqlClientInitPg": {
       "types": "./dist/http/contrib/sqlClientInitPg/index.d.ts",

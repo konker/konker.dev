@@ -10,5 +10,8 @@ export default defineConfig({
   splitting: false,
   bundle: false,
   dts: false,
-  onSuccess: 'cp -r src/config/*.pem dist/config/',
+  esbuildOptions(options) {
+    options.supported = { ...options.supported, 'import-attributes': true };
+  },
+  onSuccess: 'cp -r src/config/* dist/config/',
 });

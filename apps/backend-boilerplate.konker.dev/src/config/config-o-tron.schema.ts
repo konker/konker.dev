@@ -13,4 +13,7 @@ export const ConfigSchema = Schema.Struct({
     name: Schema.String,
     ssl: Schema.Unknown,
   }),
+  otel: Schema.Struct({
+    trace_exporter_url: Schema.String,
+  }),
 });

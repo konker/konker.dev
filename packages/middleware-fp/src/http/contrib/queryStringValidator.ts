@@ -32,5 +32,6 @@ export const middleware =
           queryStringValidatorRaw: i.queryStringParameters,
         })
       ),
-      Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );

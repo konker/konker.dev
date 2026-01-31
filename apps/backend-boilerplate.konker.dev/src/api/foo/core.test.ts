@@ -1,12 +1,10 @@
 import { NodeFileSystem } from '@effect/platform-node';
-import * as M from '@konker.dev/middleware-fp/http/contrib';
 import { Effect, pipe } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { mockSqlClientLayer } from '../../test/mock-sql-client.js';
 import * as unit from './core.js';
 
-describe('root/core', () => {
+describe('foo/core', () => {
   let oldEnv: NodeJS.ProcessEnv;
 
   beforeAll(() => {
@@ -18,9 +16,6 @@ describe('root/core', () => {
   });
 
   it('should work as expected with basic request', async () => {
-    const testData = [[123, 'widget-name', 42]];
-    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, undefined, mockSqlClientLayer(testData)));
-
     const actual = await pipe(
       {
         url: '/',
@@ -40,7 +35,7 @@ describe('root/core', () => {
           OTEL_TRACE_EXPORTER_URL: 'http://test-exporter-url/',
         },
       },
-      stack,
+      unit.core,
       Effect.provide(NodeFileSystem.layer),
       Effect.runPromise
     );
@@ -54,15 +49,12 @@ describe('root/core', () => {
         version: '0.0.2',
         ip: 'UNKNOWN',
         konker: 'RULEZZ!',
-        result: [{ id: 123, name: 'widget-name', size: 42 }],
+        result: 'FOO',
       },
     });
   });
 
   it('should work as expected with x-forwarded-for header', async () => {
-    const testData = [[123, 'widget-name', 42]];
-    const stack = pipe(unit.core, M.sqlClientInitPg.middleware(undefined, undefined, mockSqlClientLayer(testData)));
-
     const actual = await pipe(
       {
         url: '/',
@@ -83,7 +75,7 @@ describe('root/core', () => {
           OTEL_TRACE_EXPORTER_URL: 'http://test-exporter-url/',
         },
       },
-      stack,
+      unit.core,
       Effect.provide(NodeFileSystem.layer),
       Effect.runPromise
     );
@@ -97,7 +89,7 @@ describe('root/core', () => {
         version: '0.0.2',
         ip: '123.123.123.123',
         konker: expect.anything(),
-        result: [{ id: 123, name: 'widget-name', size: 42 }],
+        result: 'FOO',
       },
     });
   });

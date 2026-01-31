@@ -34,11 +34,19 @@ export const middleware =
   ): RequestResponseHandler<I, O, E | ConfigError.ConfigError | SqlError, Adapted<R>> =>
   (i: RequestW<I>) => {
     if (pgSqlClientLayer) {
-      return pipe(wrapped(i), Effect.provide(pgSqlClientLayer), Effect.tap(Effect.logDebug(`[${TAG}] OUT`)));
+      return pipe(
+        Effect.succeed(i),
+        Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+        Effect.flatMap(wrapped),
+        Effect.provide(pgSqlClientLayer),
+        Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      );
     }
 
     return pipe(
-      wrapped(i),
+      Effect.succeed(i),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.flatMap(wrapped),
       Effect.provide(createDefaultPgSqlClientLayer(caBundleFilePath, checkServerIdentityFunction)),
       Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );
