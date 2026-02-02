@@ -11,9 +11,12 @@ import type { CoreEvent, CoreResponse } from './handler.js';
 export function core(
   event: RequestW<CoreEvent>
 ): Effect.Effect<CoreResponse, ConfigError.ConfigError | SqlError, SqlClient> {
+  const t0 = performance.now();
   return pipe(
     PgDrizzle.make({ schema }),
+    Effect.tap(() => Effect.logInfo('KONK0 ' + (performance.now() - t0))),
     Effect.flatMap((db) => db.select().from(schema.widgets)),
+    Effect.tap(() => Effect.logInfo('KONK1 ' + (performance.now() - t0))),
     Effect.withSpan('database'),
     Effect.map((result) => ({
       statusCode: 200,
@@ -24,7 +27,7 @@ export function core(
         apiId: API_ID,
         version: VERSION,
         ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
-        konker: 'RULEZZ!!',
+        konker: 'RULEZZ!!!',
         result,
       },
     })),

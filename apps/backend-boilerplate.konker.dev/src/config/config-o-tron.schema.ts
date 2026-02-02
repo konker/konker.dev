@@ -14,8 +14,6 @@ export const ConfigSchema = Schema.Struct({
     ssl: Schema.Unknown,
   }),
   otel: Schema.Struct({
-    trace_sink_url: Schema.String,
-    trace_sink_basic_auth_username: Schema.String,
-    trace_sink_basic_auth_password: Schema.String,
+    trace_exporter_url: Schema.String,
   }),
 });
