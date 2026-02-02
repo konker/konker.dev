@@ -145,6 +145,15 @@ export default $config({
                         },
                       },
                     },
+                    {
+                      name: 'OTEL_TRACE_EXPORTER_URL',
+                      valueFrom: {
+                        secretKeyRef: {
+                          name: 'backend-boilerplate-secrets',
+                          key: 'OTEL_TRACE_EXPORTER_URL',
+                        },
+                      },
+                    },
                   ],
                   livenessProbe: {
                     httpGet: { path: '/ping', port: 3000 },
