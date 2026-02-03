@@ -5,7 +5,7 @@ import { NodeFileSystem } from '@effect/platform-node';
 import type { RequestW, ResponseW } from '@konker.dev/middleware-fp/http';
 import * as M from '@konker.dev/middleware-fp/http/contrib';
 import { ignoreCheckServerIdentity } from '@konker.dev/middleware-fp/http/contrib/sqlClientInitPg';
-import { Effect, pipe } from 'effect';
+import { Effect, Logger, LogLevel, pipe } from 'effect';
 import type { HonoRequest } from 'hono';
 
 import { type Env, EnvSchema } from '../../config/env.schema.js';
@@ -31,7 +31,14 @@ export const handler = async (event: HonoRequest): Promise<Response> => {
     M.responseProcessor.middleware(),
     M.requestResponseLogger.middleware(),
     M.honoAdapter.middleware()
+    // TODO: add setLogLevel middleware
   );
 
-  return pipe(event, stack, Effect.provide(NodeFileSystem.layer), Effect.runPromise);
+  return pipe(
+    event,
+    stack,
+    Logger.withMinimumLogLevel(LogLevel.Debug),
+    Effect.provide(NodeFileSystem.layer),
+    Effect.runPromise
+  );
 };
