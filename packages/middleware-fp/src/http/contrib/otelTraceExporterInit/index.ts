@@ -30,6 +30,11 @@ export const middleware =
           spanProcessor: new BatchSpanProcessor(
             new OTLPTraceExporter({
               url: i.validatedEnv.OTEL_TRACE_EXPORTER_URL,
+              keepAlive: true,
+              // httpAgentOptions: {
+              //   keepAlive: true,
+              //   maxSockets: 10,
+              // },
             })
           ),
         }))
