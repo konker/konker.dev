@@ -22,7 +22,7 @@ export const middleware =
   (i: RequestW<I>) => {
     return pipe(
       Effect.succeed(i),
-      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN.`)),
       Effect.flatMap(wrapped),
       Effect.provide(
         NodeSdk.layer(() => ({
@@ -31,11 +31,15 @@ export const middleware =
             new OTLPTraceExporter({
               url: i.validatedEnv.OTEL_TRACE_EXPORTER_URL,
               keepAlive: true,
+
               httpAgentOptions: {
                 keepAlive: true,
                 maxSockets: 10,
+                enableTrace: true,
+                noDelay: true,
               },
-            })
+            }),
+            {}
           ),
         }))
       ),
