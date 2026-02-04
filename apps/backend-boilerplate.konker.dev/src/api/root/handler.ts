@@ -23,7 +23,7 @@ export const handler = async (event: HonoRequest): Promise<Response> => {
       path.resolve(__dirname, '../../config/eu-west-1-bundle.pem'),
       ignoreCheckServerIdentity
     ),
-    M.otelTraceExporterInit.middleware('backend-boilerplate'),
+    // M.otelTraceExporterInit.middleware('backend-boilerplate'),
     M.helmetJsHeaders.middleware(),
     M.jsonBodySerializerResponse.middleware(),
     M.headersNormalizer.middleware(),
