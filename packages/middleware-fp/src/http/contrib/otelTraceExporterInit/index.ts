@@ -22,7 +22,7 @@ export const middleware =
   (i: RequestW<I>) => {
     return pipe(
       Effect.succeed(i),
-      Effect.tap(Effect.logDebug(`[${TAG}] IN.`)),
+      Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
       Effect.flatMap(wrapped),
       Effect.provide(
         NodeSdk.layer(() => ({

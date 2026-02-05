@@ -1,8 +1,8 @@
 /* eslint-disable fp/no-nil */
 import type { PeerCertificate } from 'node:tls';
 
-import { FileSystem } from '@effect/platform';
-import type { PlatformError } from '@effect/platform/Error';
+import type { FileSystem } from '@effect/platform';
+// import type { PlatformError } from '@effect/platform/Error';
 import type { SqlClient } from '@effect/sql/SqlClient';
 import type { SqlError } from '@effect/sql/SqlError';
 import { PgClient } from '@effect/sql-pg';
@@ -52,9 +52,10 @@ export function resolveSslConfigCaBundle(
   checkServerIdentityFunction?: CheckServerIdentityFunction
 ): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError, FileSystem.FileSystem> {
   return pipe(
-    FileSystem.FileSystem,
-    Effect.flatMap((fs) => fs.readFileString(caBundleFilePath, 'utf8')),
-    Effect.mapError((err: PlatformError) => ConfigError.InvalidData([], err.message)),
+    Effect.succeed(caBundleFilePath),
+    // FileSystem.FileSystem,
+    // Effect.flatMap((fs) => fs.readFileString(caBundleFilePath, 'utf8')),
+    // Effect.mapError((err: PlatformError) => ConfigError.InvalidData([], err.message)),
     Effect.map((ca) =>
       Config.succeed({
         ca,
