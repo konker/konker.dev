@@ -38,6 +38,7 @@ export const middleware =
         Effect.succeed(i),
         Effect.tap(Effect.logDebug(`[${TAG}] IN`)),
         Effect.flatMap(wrapped),
+        Effect.tap(Effect.logDebug(`KONK80`)),
         Effect.provide(pgSqlClientLayer),
         Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
       );
