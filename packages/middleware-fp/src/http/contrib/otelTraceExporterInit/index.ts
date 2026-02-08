@@ -42,6 +42,7 @@ export const middleware =
           ),
         }))
       ),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

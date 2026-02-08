@@ -48,6 +48,7 @@ export const middleware =
       Effect.mapError((e) => toHttpApiError(e, 401, `Invalid basic auth credentials: ${e?.message}`)),
       Effect.tapError(Effect.logError),
       Effect.flatMap(wrapped),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

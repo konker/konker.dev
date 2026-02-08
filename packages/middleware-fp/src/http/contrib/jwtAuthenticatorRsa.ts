@@ -43,6 +43,7 @@ export const middleware =
       Effect.mapError((e) => toHttpApiError(e, 401, `Invalid JWT RSA credentials: ${e?.message}`)),
       Effect.tapError((_) => Effect.logError(`UnauthorizedError: Invalid JWT RSA credentials: ${i.headers}`)),
       Effect.flatMap(wrapped),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

@@ -36,6 +36,7 @@ export const middleware =
       Effect.mapError((e) => toHttpApiError(e, 401, `Invalid JWT credentials: ${e.message}`)),
       Effect.tapError((_) => Effect.logError(`UnauthorizedError: Invalid JWT credentials: ${i.headers}`)),
       Effect.flatMap(wrapped),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

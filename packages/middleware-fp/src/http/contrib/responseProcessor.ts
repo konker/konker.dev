@@ -28,6 +28,7 @@ export const middleware =
             Effect.flatMap(toErrorResponseW)
           ),
         onSuccess: (o: ResponseW<O>) => Effect.succeed(o),
-      })
+      }),
+      Effect.withSpan(TAG)
     );
   };

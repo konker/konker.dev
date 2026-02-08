@@ -20,6 +20,7 @@ export const middleware =
       Effect.map(transformInput(normalizeRequestHeaders)),
       Effect.flatMap(wrapped),
       Effect.map(transformOutput(normalizeResponseHeaders)),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

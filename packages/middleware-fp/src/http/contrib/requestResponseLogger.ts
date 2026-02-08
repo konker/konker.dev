@@ -18,6 +18,7 @@ export const middleware =
       Effect.tap((i) => Effect.logInfo(`[${TAG}] REQUEST`, i)),
       Effect.flatMap(wrapped),
       Effect.tap((o) => Effect.logInfo(`[${TAG}] RESPONSE`, o)),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

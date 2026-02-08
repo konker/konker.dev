@@ -35,6 +35,7 @@ export const middleware =
       ),
       Effect.tapError((_) => Effect.logError(`UnauthorizedError: Invalid signature: ${i.body}`)),
       Effect.flatMap(wrapped),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

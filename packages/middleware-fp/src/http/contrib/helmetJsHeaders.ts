@@ -37,5 +37,6 @@ export const middleware =
           ...x.headers,
         },
       })),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
