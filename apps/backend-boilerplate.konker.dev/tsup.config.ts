@@ -10,5 +10,5 @@ export default defineConfig({
   splitting: false,
   bundle: false,
   dts: false,
-  onSuccess: 'cp -r src/config/*.pem* dist/config/',
+  onSuccess: 'cp -r src/config/* dist/config/',
 });
