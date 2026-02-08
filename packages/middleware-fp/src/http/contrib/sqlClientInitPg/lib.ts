@@ -62,7 +62,9 @@ export function resolveSslConfigCaBundle(
         ca,
         checkServerIdentity: checkServerIdentityFunction,
       })
-    )
+    ),
+    Effect.cached,
+    Effect.flatten
   );
 }
 
