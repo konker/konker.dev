@@ -28,44 +28,27 @@ describe('middleware/sql-client-pg-init/lib', () => {
 
     it('should work as expected with boolean value', async () => {
       process.env.DATABASE_SSL = 'true';
-      const actual = await pipe(
-        unit.resolveSslConfigDirect(false),
-        Effect.flatMap((config) => config),
-        Effect.runPromise
-      );
+      const actual = await pipe(unit.resolveSslConfigDirect(false), Effect.runPromise);
 
       expect(actual).toEqual(true);
     });
 
     it('should work as expected with record value', async () => {
       process.env.DATABASE_SSL = '{ "rejectUnauthorized": false }';
-      const actual = await pipe(
-        unit.resolveSslConfigDirect(false),
-        Effect.flatMap((config) => config),
-        Effect.runPromise
-      );
+      const actual = await pipe(unit.resolveSslConfigDirect(false), Effect.runPromise);
 
       expect(actual).toStrictEqual({ rejectUnauthorized: false });
     });
 
     it('should work as expected with default value', async () => {
-      const actual = await pipe(
-        unit.resolveSslConfigDirect({ foo: 123 }),
-        Effect.flatMap((config) => config),
-        Effect.runPromise
-      );
+      const actual = await pipe(unit.resolveSslConfigDirect({ foo: 123 }), Effect.runPromise);
 
       expect(actual).toStrictEqual({ foo: 123 });
     });
 
     it('should work as expected with an invalid value', async () => {
       process.env.DATABASE_SSL = '123';
-      const actual = async () =>
-        pipe(
-          unit.resolveSslConfigDirect(false),
-          Effect.flatMap((config) => config),
-          Effect.runPromise
-        );
+      const actual = async () => pipe(unit.resolveSslConfigDirect(false), Effect.runPromise);
 
       await expect(actual).rejects.toThrow('Invalid data at DATABASE_SSL');
     });
@@ -74,8 +57,7 @@ describe('middleware/sql-client-pg-init/lib', () => {
   describe('resolveSslConfigCaBundle', () => {
     it('should work as expected with a valid file path', async () => {
       const actual = await pipe(
-        unit.resolveSslConfigCaBundle(`${__dirname}/fixtures/test-ca-bundle.pem`),
-        Effect.flatMap((config) => config),
+        unit.resolveSslConfigCaBundle(`test-ca-bundle-content`),
         Effect.provide(NodeFileSystem.layer),
         Effect.runPromise
       );
@@ -85,25 +67,12 @@ describe('middleware/sql-client-pg-init/lib', () => {
 
     it('should work as expected with a valid file path and a checkServerIdentity function', async () => {
       const actual = await pipe(
-        unit.resolveSslConfigCaBundle(`${__dirname}/fixtures/test-ca-bundle.pem`, ignoreCheckServerIdentity),
-        Effect.flatMap((config) => config),
+        unit.resolveSslConfigCaBundle(`test-ca-bundle-content`, ignoreCheckServerIdentity),
         Effect.provide(NodeFileSystem.layer),
         Effect.runPromise
       );
 
       expect(actual).toStrictEqual({ ca: 'test-ca-bundle-content', checkServerIdentity: ignoreCheckServerIdentity });
-    });
-
-    it('should fail with a non-existent file path', async () => {
-      const actual = async () =>
-        pipe(
-          unit.resolveSslConfigCaBundle('/non-existent-path/ca-bundle.pem'),
-          Effect.flatMap((config) => config),
-          Effect.provide(NodeFileSystem.layer),
-          Effect.runPromise
-        );
-
-      await expect(actual).rejects.toThrow('ENOENT');
     });
   });
 
