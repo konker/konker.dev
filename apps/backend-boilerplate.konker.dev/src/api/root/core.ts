@@ -25,7 +25,7 @@ export function core(
         apiId: API_ID,
         version: VERSION,
         ip: event.headers['x-forwarded-for'] ?? 'UNKNOWN',
-        konker: 'RULEZZ!',
+        konker: 'RULEZZ!!',
         result,
       },
     })),
