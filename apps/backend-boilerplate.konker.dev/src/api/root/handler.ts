@@ -6,7 +6,7 @@ import { Effect, Logger, LogLevel, pipe } from 'effect';
 import type { HonoRequest } from 'hono';
 
 import { type Env, EnvSchema } from '../../config/env.schema.js';
-import caBundle from '../../config/eu-west-1-bundle.pem.json';
+import caBundle from '../../config/eu-west-1-bundle.pem.json' with { type: 'json' };
 import { core } from './core.js';
 
 export type CoreEvent = RequestW<M.envValidator.WithValidatedEnv<Env>>;
