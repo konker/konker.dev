@@ -53,18 +53,14 @@ export function resolveSslConfigCaBundle(
 ): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError, FileSystem.FileSystem> {
   return pipe(
     FileSystem.FileSystem,
-    Effect.tap(Effect.log('KONK90')),
     Effect.flatMap((fs) => fs.readFileString(caBundleFilePath, 'utf8')),
-    Effect.tap(Effect.log('KONK91')),
     Effect.mapError((err: PlatformError) => ConfigError.InvalidData([], err.message)),
     Effect.map((ca) =>
       Config.succeed({
         ca,
         checkServerIdentity: checkServerIdentityFunction,
       })
-    ),
-    Effect.cached,
-    Effect.flatten
+    )
   );
 }
 
@@ -73,9 +69,13 @@ export function createDefaultPgSqlClientLayer(
   caBundleFilePath?: string,
   checkServerIdentityFunction?: CheckServerIdentityFunction
 ): Layer.Layer<SqlClient | PgClient.PgClient, SqlError | ConfigError.ConfigError, FileSystem.FileSystem> {
-  const sslConfigEffect = caBundleFilePath
-    ? resolveSslConfigCaBundle(caBundleFilePath, checkServerIdentityFunction)
-    : resolveSslConfigDirect(false);
+  const sslConfigEffect = pipe(
+    caBundleFilePath
+      ? resolveSslConfigCaBundle(caBundleFilePath, checkServerIdentityFunction)
+      : resolveSslConfigDirect(false),
+    Effect.cached,
+    Effect.flatten
+  );
 
   return Layer.unwrapEffect(
     Effect.map(sslConfigEffect, (sslConfig) =>
