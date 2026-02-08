@@ -62,5 +62,6 @@ export const middleware =
       Effect.flatMap(adaptFromHonoRequest),
       Effect.flatMap(wrapped),
       Effect.flatMap(adaptToHonoResponse),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );

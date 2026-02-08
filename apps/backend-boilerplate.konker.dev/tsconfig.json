@@ -1,6 +1,6 @@
 {
   "extends": "../../packages/common-config/configs/tsconfig-base.json",
-  "include": ["./src"],
+  "include": ["./src", "./src/config/*.json"],
   "exclude": ["./.deploy", "./.sst"],
   "compilerOptions": {
     "rootDir": "./src",

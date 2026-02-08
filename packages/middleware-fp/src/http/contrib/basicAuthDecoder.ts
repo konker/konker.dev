@@ -34,6 +34,7 @@ export const middleware =
       ),
       Effect.mapError(toMiddlewareError),
       Effect.flatMap(wrapped),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
   };

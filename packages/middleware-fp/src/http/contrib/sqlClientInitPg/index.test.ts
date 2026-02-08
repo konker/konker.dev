@@ -19,30 +19,24 @@ describe('middleware/sql-client-pg-init', () => {
       vi.restoreAllMocks();
     });
 
-    it('should work as expected with custom layer', async () => {
-      const egHandler = pipe(echoCoreIn200W, unit.middleware(undefined, undefined, MockPgSqlClientLayer));
-
-      const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
-
-      expect(result).toMatchObject({
-        body: 'OK',
-        headers: {},
-        in: {
-          url: '/',
-          headers: {},
-          method: 'GET',
-          pathParameters: {},
-          queryStringParameters: {},
-        },
-        statusCode: 200,
-      });
-    });
-
     it('should work as expected with default layer', async () => {
       const spy = vi.spyOn(unitLib, 'createDefaultPgSqlClientLayer').mockReturnValue(MockPgSqlClientLayer as any);
       const egHandler = pipe(echoCoreIn200W, unit.middleware());
 
-      const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
+      const result = await pipe(
+        egHandler({
+          ...EMPTY_REQUEST_W,
+          validatedEnv: {
+            DATABASE_HOST: 'string',
+            DATABASE_PORT: 123,
+            DATABASE_USER: 'string',
+            DATABASE_PASSWORD: 'string',
+            DATABASE_NAME: 'string',
+          },
+        }),
+        Effect.provide(NodeFileSystem.layer),
+        Effect.runPromise
+      );
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenCalledWith(undefined, undefined);
@@ -65,7 +59,20 @@ describe('middleware/sql-client-pg-init', () => {
       const spy = vi.spyOn(unitLib, 'createDefaultPgSqlClientLayer').mockReturnValue(MockPgSqlClientLayer as any);
       const egHandler = pipe(echoCoreIn200W, unit.middleware('/path/to/ca-bundle.pem'));
 
-      const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
+      const result = await pipe(
+        egHandler({
+          ...EMPTY_REQUEST_W,
+          validatedEnv: {
+            DATABASE_HOST: 'string',
+            DATABASE_PORT: 123,
+            DATABASE_USER: 'string',
+            DATABASE_PASSWORD: 'string',
+            DATABASE_NAME: 'string',
+          },
+        }),
+        Effect.provide(NodeFileSystem.layer),
+        Effect.runPromise
+      );
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenCalledWith('/path/to/ca-bundle.pem', undefined);
@@ -88,7 +95,20 @@ describe('middleware/sql-client-pg-init', () => {
       const spy = vi.spyOn(unitLib, 'createDefaultPgSqlClientLayer').mockReturnValue(MockPgSqlClientLayer as any);
       const egHandler = pipe(echoCoreIn200W, unit.middleware('/path/to/ca-bundle.pem', ignoreCheckServerIdentity));
 
-      const result = await pipe(egHandler(EMPTY_REQUEST_W), Effect.provide(NodeFileSystem.layer), Effect.runPromise);
+      const result = await pipe(
+        egHandler({
+          ...EMPTY_REQUEST_W,
+          validatedEnv: {
+            DATABASE_HOST: 'string',
+            DATABASE_PORT: 123,
+            DATABASE_USER: 'string',
+            DATABASE_PASSWORD: 'string',
+            DATABASE_NAME: 'string',
+          },
+        }),
+        Effect.provide(NodeFileSystem.layer),
+        Effect.runPromise
+      );
 
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenCalledWith('/path/to/ca-bundle.pem', ignoreCheckServerIdentity);

@@ -25,5 +25,7 @@ export const middleware =
       // Do something with the output
       Effect.map((o) => makeResponseW(o)),
       // Log after
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      // Add OTEL span
+      Effect.withSpan(TAG)
     );

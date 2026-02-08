@@ -64,5 +64,6 @@ export const middleware =
       Effect.flatMap(adaptFromStandardRequest),
       Effect.flatMap(wrapped),
       Effect.flatMap(adaptToStandardResponse),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );

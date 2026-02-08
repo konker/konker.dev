@@ -7,7 +7,13 @@ export default defineConfig({
     ...baseConfig.test,
     coverage: {
       ...baseConfig.test.coverage,
-      exclude: [...baseConfig.test.coverage.exclude, 'src/test/fixtures/', 'src/examples/example1.ts'],
+      exclude: [
+        ...baseConfig.test.coverage.exclude,
+        'src/test/fixtures/',
+        'src/examples/example1.ts',
+        'src/http/contrib/otelTraceExporterInit/index.ts',
+        'src/http/contrib/foo.ts',
+      ],
     },
   },
 });

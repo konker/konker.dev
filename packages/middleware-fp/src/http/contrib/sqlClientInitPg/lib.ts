@@ -1,12 +1,12 @@
 /* eslint-disable fp/no-nil */
 import type { PeerCertificate } from 'node:tls';
 
-import { FileSystem } from '@effect/platform';
-import type { PlatformError } from '@effect/platform/Error';
+import type { FileSystem } from '@effect/platform';
 import type { SqlClient } from '@effect/sql/SqlClient';
 import type { SqlError } from '@effect/sql/SqlError';
 import { PgClient } from '@effect/sql-pg';
-import { Config, ConfigError, Effect, Either, Layer, pipe, Schema } from 'effect';
+import type { Layer } from 'effect';
+import { Config, ConfigError, Either, pipe, Schema } from 'effect';
 import { type ParseError, TreeFormatter } from 'effect/ParseResult';
 
 // --------------------------------------------------------------------------
@@ -27,9 +27,7 @@ export function ignoreCheckServerIdentity(_hostname: string, _cert: PeerCertific
 }
 
 // --------------------------------------------------------------------------
-export function resolveSslConfigDirect(
-  defaultValue: SslConfig
-): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError> {
+export function resolveSslConfigDirect(defaultValue: SslConfig): Config.Config<SslConfig> {
   return Config.string('DATABASE_SSL')
     .pipe(
       Config.mapOrFail((str) =>
@@ -42,47 +40,37 @@ export function resolveSslConfigDirect(
         )
       )
     )
-    .pipe(Config.withDefault(defaultValue))
-    .pipe(Effect.succeed);
+    .pipe(Config.withDefault(defaultValue));
 }
 
 // --------------------------------------------------------------------------
 export function resolveSslConfigCaBundle(
-  caBundleFilePath: string,
+  caBundle: string,
   checkServerIdentityFunction?: CheckServerIdentityFunction
-): Effect.Effect<Config.Config<SslConfig>, ConfigError.ConfigError, FileSystem.FileSystem> {
+): Config.Config<SslConfig> {
   return pipe(
-    FileSystem.FileSystem,
-    Effect.flatMap((fs) => fs.readFileString(caBundleFilePath, 'utf8')),
-    Effect.mapError((err: PlatformError) => ConfigError.InvalidData([], err.message)),
-    Effect.map((ca) =>
-      Config.succeed({
-        ca,
-        checkServerIdentity: checkServerIdentityFunction,
-      })
-    )
+    Config.succeed({
+      ca: caBundle,
+      checkServerIdentity: checkServerIdentityFunction,
+    })
   );
 }
 
 // --------------------------------------------------------------------------
 export function createDefaultPgSqlClientLayer(
-  caBundleFilePath?: string,
+  caBundle?: string,
   checkServerIdentityFunction?: CheckServerIdentityFunction
 ): Layer.Layer<SqlClient | PgClient.PgClient, SqlError | ConfigError.ConfigError, FileSystem.FileSystem> {
-  const sslConfigEffect = caBundleFilePath
-    ? resolveSslConfigCaBundle(caBundleFilePath, checkServerIdentityFunction)
+  const sslConfig = caBundle
+    ? resolveSslConfigCaBundle(caBundle, checkServerIdentityFunction)
     : resolveSslConfigDirect(false);
 
-  return Layer.unwrapEffect(
-    Effect.map(sslConfigEffect, (sslConfig) =>
-      PgClient.layerConfig({
-        host: Config.string('DATABASE_HOST'),
-        port: Config.number('DATABASE_PORT'),
-        username: Config.string('DATABASE_USER'),
-        password: Config.redacted('DATABASE_PASSWORD'),
-        database: Config.string('DATABASE_NAME'),
-        ssl: sslConfig,
-      })
-    )
-  );
+  return PgClient.layerConfig({
+    host: Config.string('DATABASE_HOST'),
+    port: Config.number('DATABASE_PORT'),
+    username: Config.string('DATABASE_USER'),
+    password: Config.redacted('DATABASE_PASSWORD'),
+    database: Config.string('DATABASE_NAME'),
+    ssl: sslConfig,
+  });
 }

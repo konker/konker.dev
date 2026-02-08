@@ -24,5 +24,6 @@ export const middleware =
           catch: toMiddlewareError,
         })
       ),
-      Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped),
+      Effect.withSpan(TAG)
     );

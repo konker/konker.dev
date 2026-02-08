@@ -28,5 +28,6 @@ export const middleware =
       Effect.mapError(toMiddlewareError),
       Effect.map((validatedEnv: V0) => makeRequestW(i, { validatedEnv })),
       Effect.flatMap(wrapped),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );

@@ -55,5 +55,6 @@ export const middleware =
       Effect.map(adaptFromApiGatewayProxyEventV2),
       Effect.flatMap(wrapped),
       Effect.map(adaptToApiGatewayProxyResult),
-      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );

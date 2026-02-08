@@ -30,5 +30,7 @@ export const middleware =
           bodyValidatorRaw: i.body,
         })
       ),
-      Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`)),
+      Effect.withSpan(TAG)
     );
