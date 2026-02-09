@@ -69,9 +69,13 @@ export function createDefaultPgSqlClientLayer(
   caBundleFilePath?: string,
   checkServerIdentityFunction?: CheckServerIdentityFunction
 ): Layer.Layer<SqlClient | PgClient.PgClient, SqlError | ConfigError.ConfigError, FileSystem.FileSystem> {
-  const sslConfigEffect = caBundleFilePath
-    ? resolveSslConfigCaBundle(caBundleFilePath, checkServerIdentityFunction)
-    : resolveSslConfigDirect(false);
+  const sslConfigEffect = pipe(
+    caBundleFilePath
+      ? resolveSslConfigCaBundle(caBundleFilePath, checkServerIdentityFunction)
+      : resolveSslConfigDirect(false),
+    Effect.cached,
+    Effect.flatten
+  );
 
   return Layer.unwrapEffect(
     Effect.map(sslConfigEffect, (sslConfig) =>

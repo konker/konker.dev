@@ -82,6 +82,16 @@ describe('basic-auth', () => {
     });
   });
 
+  describe('basicAuthEncodeHeaderValue', () => {
+    it('should work as expected with valid input', () => {
+      const actual = unit.basicAuthEncodeHeaderValue({
+        username: 'foo',
+        password: 'bar',
+      });
+      expect(Effect.runSync(actual)).toStrictEqual('Basic Zm9vOmJhcg==');
+    });
+  });
+
   describe('basicAuthVerifyCredentials', () => {
     it('should work as expected in the positive case', () => {
       const actual = unit.basicAuthVerifyCredentials([{ username: 'user0', passwords: ['secret1'] }])({

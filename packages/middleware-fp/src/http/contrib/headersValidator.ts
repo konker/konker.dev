@@ -32,5 +32,6 @@ export const middleware =
           headersValidatorRaw: i.headers,
         })
       ),
-      Effect.flatMap(wrapped)
+      Effect.flatMap(wrapped),
+      Effect.tap(Effect.logDebug(`[${TAG}] OUT`))
     );
