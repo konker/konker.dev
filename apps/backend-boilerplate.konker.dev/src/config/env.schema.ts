@@ -9,6 +9,7 @@ export const EnvSchema = Schema.Struct({
   DATABASE_NAME: Schema.String,
   DATABASE_SSL: SslConfigSchema,
   OTEL_TRACE_EXPORTER_URL: Schema.String,
+  LOG_LEVEL: Schema.String,
 });
 
 export type Env = typeof EnvSchema.Type;

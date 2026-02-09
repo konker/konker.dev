@@ -1,11 +1,11 @@
-import type { ManagedRuntime } from 'effect';
 import { Hono } from 'hono';
 
 import { handler as fooHandlerCtor } from '../api/foo/handler.js';
 import { handler as rootHandlerCtor } from '../api/root/handler.js';
+import type { RuntimeLive } from '../deps/runtimeLive';
 import { API_ID, VERSION } from '../lib/consts.js';
 
-export const app = <R, ER>(runtime: ManagedRuntime.ManagedRuntime<R, ER>) => {
+export const app = (runtime: RuntimeLive) => {
   const rootHandler = rootHandlerCtor(runtime);
   const fooHandler = fooHandlerCtor(runtime);
 
