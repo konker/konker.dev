@@ -5,7 +5,7 @@ import { PgClient } from '@effect/sql-pg';
 import { Config, ConfigError, Effect, Either, Layer, pipe, Schema } from 'effect';
 import { type ParseError, TreeFormatter } from 'effect/ParseResult';
 
-import { mockSqlClientLayer } from '../test/mock-sql-client';
+import { mockSqlClientLayer } from '../test/mock-sql-client.js';
 
 // --------------------------------------------------------------------------
 export const SslConfigSchema = Schema.parseJson(
