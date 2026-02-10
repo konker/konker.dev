@@ -4,7 +4,7 @@ import { pipe } from 'effect';
 import type { HonoRequest } from 'hono';
 
 import { type Env, EnvSchema } from '../../config/env.schema.js';
-import type { RuntimeLive } from '../../deps/runtimeLive';
+import type { RuntimeLive } from '../../deps/runtimeLive.js';
 import { core } from './core.js';
 
 export type CoreEvent = RequestW<M.envValidator.WithValidatedEnv<Env>>;

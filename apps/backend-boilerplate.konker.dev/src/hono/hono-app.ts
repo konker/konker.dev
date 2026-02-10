@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 
 import { handler as fooHandlerCtor } from '../api/foo/handler.js';
 import { handler as rootHandlerCtor } from '../api/root/handler.js';
-import type { RuntimeLive } from '../deps/runtimeLive';
+import type { RuntimeLive } from '../deps/runtimeLive.js';
 import { API_ID, VERSION } from '../lib/consts.js';
 
 export const app = (runtime: RuntimeLive) => {

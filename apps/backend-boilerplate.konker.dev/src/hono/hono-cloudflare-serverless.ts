@@ -1,4 +1,4 @@
-import { runtimeLive } from '../deps/runtimeLive';
+import { runtimeLive } from '../deps/runtimeLive.js';
 import { app } from './hono-app.js';
 
 // --------------------------------------------------------------------------
