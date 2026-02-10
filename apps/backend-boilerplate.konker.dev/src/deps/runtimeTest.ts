@@ -1,6 +1,6 @@
 import { ManagedRuntime } from 'effect';
 
-import { liveLayer } from './liveLayer';
+import { layerLive } from './layerLive.js';
 
-export const runtimeTest = ManagedRuntime.make(liveLayer('backend-boilerplate'));
+export const runtimeTest = ManagedRuntime.make(layerLive('backend-boilerplate'));
 export type RuntimeTest = typeof runtimeTest;
