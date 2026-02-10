@@ -39,7 +39,7 @@ describe('root/core', () => {
         },
       },
       unit.core,
-      Effect.provide(layerTest(testData)),
+      Effect.provide(layerTest('backend-boilerplate-test', testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
@@ -82,7 +82,7 @@ describe('root/core', () => {
         },
       },
       unit.core,
-      Effect.provide(layerTest(testData)),
+      Effect.provide(layerTest('backend-boilerplate-test', testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({

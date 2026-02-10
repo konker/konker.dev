@@ -1,10 +1,11 @@
-import { NodeFileSystem } from '@effect/platform-node';
 import { Effect, pipe } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { layerTest } from '../../deps/layerTest';
 import * as unit from './core.js';
 
 describe('foo/core', () => {
+  const testData = [[123, 'widget-name', 42]];
   let oldEnv: NodeJS.ProcessEnv;
 
   beforeAll(() => {
@@ -37,7 +38,7 @@ describe('foo/core', () => {
         },
       },
       unit.core,
-      Effect.provide(NodeFileSystem.layer),
+      Effect.provide(layerTest('backend-boilerplate-test', testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
@@ -78,7 +79,7 @@ describe('foo/core', () => {
         },
       },
       unit.core,
-      Effect.provide(NodeFileSystem.layer),
+      Effect.provide(layerTest('backend-boilerplate-test', testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({

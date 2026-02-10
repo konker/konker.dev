@@ -1,6 +1,6 @@
 import { NodeSdk } from '@effect/opentelemetry';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { BatchSpanProcessor, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { Config, Effect, Layer, pipe } from 'effect';
 
 // --------------------------------------------------------------------------
@@ -18,4 +18,8 @@ export const OtelExporterLive = (serviceName: string) =>
   );
 
 // --------------------------------------------------------------------------
-export const OtelExporterTest = Layer.empty;
+export const OtelExporterTest = (serviceName: string) =>
+  NodeSdk.layer(() => ({
+    resource: { serviceName },
+    spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
+  }));

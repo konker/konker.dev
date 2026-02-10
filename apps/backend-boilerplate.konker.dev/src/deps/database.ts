@@ -5,6 +5,8 @@ import { PgClient } from '@effect/sql-pg';
 import { Config, ConfigError, Effect, Either, Layer, pipe, Schema } from 'effect';
 import { type ParseError, TreeFormatter } from 'effect/ParseResult';
 
+import { mockSqlClientLayer } from '../test/mock-sql-client';
+
 // --------------------------------------------------------------------------
 export const SslConfigSchema = Schema.parseJson(
   Schema.Union(
@@ -65,3 +67,6 @@ export const DatabaseLive = Layer.unwrapEffect(
     )
   )
 );
+
+// --------------------------------------------------------------------------
+export const DatabaseTest = (responseData: Array<unknown>) => mockSqlClientLayer(responseData);
