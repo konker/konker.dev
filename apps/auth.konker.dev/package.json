@@ -80,7 +80,7 @@
     "build:prod": "pnpm run build && pnpm deploy --filter @konker.dev/auth.konker.dev --prod ./.deploy",
     "build-container": "pnpm run build:prod && docker buildx build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG -f ./deployment/Dockerfile .",
     "push-container": "aws ecr get-login-password --region ${AWS_DEFAULT_REGION:-eu-west-1} | docker login --username AWS --password-stdin $AWS_ECR_REGISTRY && docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG",
-    "dev": "tsx watch src/hono/hono-node-server.ts",
+    "dev": "tsx watch src/server/hono-node-server.ts",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run fixme-check",
     "cd": "echo NOOP",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",

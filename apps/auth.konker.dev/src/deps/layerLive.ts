@@ -6,7 +6,6 @@ import { DatabaseLive } from './database.js';
 import { LoggerLive } from './logger.js';
 import { OtelExporterLive } from './otel.js';
 
-// --------------------------------------------------------------------------
 export const layerLive = (serviceName: string) =>
   pipe(
     Layer.mergeAll(LoggerLive, DatabaseLive, OtelExporterLive(serviceName)),
