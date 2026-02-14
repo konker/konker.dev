@@ -38,6 +38,7 @@ export default $config({
         DATABASE_NAME: process.env.DATABASE_NAME,
         DATABASE_SSL: process.env.DATABASE_SSL,
         OTEL_TRACE_EXPORTER_URL: process.env.OTEL_TRACE_EXPORTER_URL,
+        LOG_LEVEL: process.env.LOG_LEVEL,
       },
     });
 

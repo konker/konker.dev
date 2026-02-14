@@ -1,8 +1,6 @@
-import { Layer, ManagedRuntime } from 'effect';
-
+import { runtimeLive } from '../deps/runtimeLive.js';
 import { app } from './hono-app.js';
 
-const runtime = ManagedRuntime.make(Layer.empty);
-
+// --------------------------------------------------------------------------
 // No need for anything extra
-export const handler = app(runtime);
+export const handler = app(runtimeLive);

@@ -1,8 +1,7 @@
-import { Layer, ManagedRuntime } from 'effect';
 import { handle } from 'hono/aws-lambda';
 
+import { runtimeLive } from '../deps/runtimeLive.js';
 import { app } from './hono-app.js';
 
-const runtime = ManagedRuntime.make(Layer.empty);
-
-export const handler = handle(app(runtime));
+// --------------------------------------------------------------------------
+export const handler = handle(app(runtimeLive));

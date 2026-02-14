@@ -120,14 +120,6 @@
       "types": "./dist/http/contrib/momentoClientInit.d.ts",
       "import": "./dist/http/contrib/momentoClientInit.js"
     },
-    "./http/contrib/otelTraceExporterInit/index.ktest": {
-      "types": "./dist/http/contrib/otelTraceExporterInit/index.ktest.d.ts",
-      "import": "./dist/http/contrib/otelTraceExporterInit/index.ktest.js"
-    },
-    "./http/contrib/otelTraceExporterInit": {
-      "types": "./dist/http/contrib/otelTraceExporterInit/index.d.ts",
-      "import": "./dist/http/contrib/otelTraceExporterInit/index.js"
-    },
     "./http/contrib/pathParametersValidator": {
       "types": "./dist/http/contrib/pathParametersValidator.d.ts",
       "import": "./dist/http/contrib/pathParametersValidator.js"
@@ -135,10 +127,6 @@
     "./http/contrib/pathTokenAuthorizer": {
       "types": "./dist/http/contrib/pathTokenAuthorizer.d.ts",
       "import": "./dist/http/contrib/pathTokenAuthorizer.js"
-    },
-    "./http/contrib/provideLayer": {
-      "types": "./dist/http/contrib/provideLayer.d.ts",
-      "import": "./dist/http/contrib/provideLayer.js"
     },
     "./http/contrib/queryStringValidator": {
       "types": "./dist/http/contrib/queryStringValidator.d.ts",
@@ -155,18 +143,6 @@
     "./http/contrib/responseProcessor": {
       "types": "./dist/http/contrib/responseProcessor.d.ts",
       "import": "./dist/http/contrib/responseProcessor.js"
-    },
-    "./http/contrib/setLogLevel": {
-      "types": "./dist/http/contrib/setLogLevel.d.ts",
-      "import": "./dist/http/contrib/setLogLevel.js"
-    },
-    "./http/contrib/sqlClientInitPg": {
-      "types": "./dist/http/contrib/sqlClientInitPg/index.d.ts",
-      "import": "./dist/http/contrib/sqlClientInitPg/index.js"
-    },
-    "./http/contrib/sqlClientInitPg/lib": {
-      "types": "./dist/http/contrib/sqlClientInitPg/lib.d.ts",
-      "import": "./dist/http/contrib/sqlClientInitPg/lib.js"
     },
     "./http/contrib/standardRequestResponseAdapter": {
       "types": "./dist/http/contrib/standardRequestResponseAdapter.d.ts",

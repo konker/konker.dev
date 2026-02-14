@@ -1,10 +1,12 @@
-import { NodeFileSystem } from '@effect/platform-node';
 import { Effect, pipe } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { layerTest } from '../../deps/layerTest';
+import { mockEnv1 } from '../../test/fixtures/mock-env-1';
 import * as unit from './core.js';
 
 describe('foo/core', () => {
+  const testData = [[123, 'widget-name', 42]];
   let oldEnv: NodeJS.ProcessEnv;
 
   beforeAll(() => {
@@ -33,10 +35,11 @@ describe('foo/core', () => {
           DATABASE_NAME: 'database_dbname',
           DATABASE_SSL: true,
           OTEL_TRACE_EXPORTER_URL: 'http://test-exporter-url/',
+          LOG_LEVEL: 'Debug',
         },
       },
       unit.core,
-      Effect.provide(NodeFileSystem.layer),
+      Effect.provide(layerTest('backend-boilerplate-test', mockEnv1, testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
@@ -73,10 +76,11 @@ describe('foo/core', () => {
           DATABASE_NAME: 'database_dbname',
           DATABASE_SSL: true,
           OTEL_TRACE_EXPORTER_URL: 'http://test-exporter-url/',
+          LOG_LEVEL: 'Debug',
         },
       },
       unit.core,
-      Effect.provide(NodeFileSystem.layer),
+      Effect.provide(layerTest('backend-boilerplate-test', mockEnv1, testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
