@@ -2,6 +2,7 @@ import { Effect, pipe } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { layerTest } from '../../deps/layerTest';
+import { mockEnv1 } from '../../test/fixtures/mock-env-1';
 import * as unit from './core.js';
 
 describe('foo/core', () => {
@@ -38,7 +39,7 @@ describe('foo/core', () => {
         },
       },
       unit.core,
-      Effect.provide(layerTest('backend-boilerplate-test', testData)),
+      Effect.provide(layerTest('backend-boilerplate-test', mockEnv1, testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({
@@ -79,7 +80,7 @@ describe('foo/core', () => {
         },
       },
       unit.core,
-      Effect.provide(layerTest('backend-boilerplate-test', testData)),
+      Effect.provide(layerTest('backend-boilerplate-test', mockEnv1, testData)),
       Effect.runPromise
     );
     expect(actual).toStrictEqual({

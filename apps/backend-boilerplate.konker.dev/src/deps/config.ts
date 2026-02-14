@@ -1,6 +1,4 @@
-import { PlatformConfigProvider } from '@effect/platform';
-import { NodeFileSystem } from '@effect/platform-node';
-import { ConfigProvider, Effect, Layer } from 'effect';
+import { ConfigProvider, Layer } from 'effect';
 
 // --------------------------------------------------------------------------
 export const ConfigProviderLive = Layer.succeed(
@@ -9,9 +7,8 @@ export const ConfigProviderLive = Layer.succeed(
 );
 
 // --------------------------------------------------------------------------
-export const ConfigProviderTest = Layer.unwrapEffect(
-  PlatformConfigProvider.fromDotEnv('.env').pipe(
-    Effect.map(Layer.setConfigProvider),
-    Effect.provide(NodeFileSystem.layer)
-  )
-);
+export const ConfigProviderTest = (testEnv: Record<string, string>) =>
+  Layer.succeed(
+    ConfigProvider.ConfigProvider,
+    ConfigProvider.fromMap(new Map(Object.entries(testEnv))).pipe(ConfigProvider.constantCase)
+  );

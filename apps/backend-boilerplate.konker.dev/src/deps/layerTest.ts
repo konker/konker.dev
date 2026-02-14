@@ -7,9 +7,9 @@ import { LoggerTest } from './logger.js';
 import { OtelExporterTest } from './otel.js';
 
 // --------------------------------------------------------------------------
-export const layerTest = (serviceName: string, responseData: Array<unknown>) =>
+export const layerTest = (serviceName: string, env: Record<string, string>, responseData: Array<unknown>) =>
   pipe(
     Layer.mergeAll(LoggerTest, DatabaseTest(responseData), OtelExporterTest(serviceName)),
-    Layer.provideMerge(ConfigProviderTest),
+    Layer.provideMerge(ConfigProviderTest(env)),
     Layer.provideMerge(NodeFileSystem.layer)
   );
