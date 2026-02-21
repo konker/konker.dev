@@ -1,5 +1,5 @@
 /* eslint-disable fp/no-nil,fp/no-unused-expression */
-import { betterAuth } from 'better-auth';
+import { betterAuth } from 'src/lib/better-auth.js';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, jwt, oidcProvider, openAPI, twoFactor } from 'better-auth/plugins';
 
