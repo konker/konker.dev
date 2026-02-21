@@ -1,7 +1,7 @@
 /* eslint-disable fp/no-nil,fp/no-unused-expression */
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { admin, jwt, oidcProvider, twoFactor } from 'better-auth/plugins';
+import { admin, jwt, oidcProvider, openAPI, twoFactor } from 'better-auth/plugins';
 
 import { db } from '../database/index.js';
 import { API_ID } from './consts.js';
@@ -137,6 +137,7 @@ export const auth = betterAuth({
   },
   plugins: [
     admin(),
+    openAPI(),
     twoFactor({
       issuer: appName,
       otpOptions: {},

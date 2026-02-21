@@ -15,4 +15,5 @@ export const app = new Hono()
       credentials: true, // Required for better-auth cookies
     })
   )
+  // .get('/open-api', async (c) => c.json(await auth.api.generateOpenAPISchema()))
   .on(['POST', 'GET'], '/api/auth/*', (c) => auth.handler(c.req.raw));
