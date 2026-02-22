@@ -1,8 +1,9 @@
 /* eslint-disable fp/no-nil,fp/no-unused-expression */
-import { betterAuth } from 'src/lib/better-auth.js';
+import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, jwt, oidcProvider, openAPI, twoFactor } from 'better-auth/plugins';
 
+import * as dbSchema from '../database/better-auth.schema.js';
 import { db } from '../database/index.js';
 import { API_ID } from './consts.js';
 
@@ -78,6 +79,7 @@ export const auth = betterAuth({
   },
   database: drizzleAdapter(db, {
     provider: 'pg',
+    schema: dbSchema,
   }),
   trustedOrigins,
   emailAndPassword: {

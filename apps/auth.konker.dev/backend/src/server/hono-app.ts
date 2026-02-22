@@ -9,7 +9,7 @@ export const app = new Hono()
   .use(
     '*',
     cors({
-      origin: 'http://localhost:3002', // Your frontend URL
+      origin: 'http://localhost:4321', // Your frontend URL
       allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowHeaders: ['Content-Type', 'Authorization'],
       credentials: true, // Required for better-auth cookies
