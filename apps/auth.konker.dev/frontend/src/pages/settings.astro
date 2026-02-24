@@ -1,0 +1,10 @@
+---
+import { SettingsView } from '../components/auth/SettingsView';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Settings | auth.konker.dev">
+  <main class="min-h-screen p-6 md:p-10">
+    <SettingsView client:only="react" />
+  </main>
+</Layout>

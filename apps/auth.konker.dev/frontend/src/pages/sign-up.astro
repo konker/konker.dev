@@ -1,0 +1,12 @@
+---
+import { AuthViewCard } from '../components/auth/AuthViewCard';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Sign up | auth.konker.dev">
+  <main class="flex min-h-screen items-center justify-center p-6">
+    <section class="w-full max-w-md">
+      <AuthViewCard view="SIGN_UP" client:only="react" />
+    </section>
+  </main>
+</Layout>

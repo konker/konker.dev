@@ -3,6 +3,10 @@
   "include": [".astro/types.d.ts", "./**/*"],
   "exclude": ["www/", "Gulpfile.js", "eslint.config.mjs"],
   "compilerOptions": {
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   }
 }

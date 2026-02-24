@@ -1,12 +1,13 @@
 ---
-import { AuthViewCard } from '../components/auth/AuthViewCard';
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Sign in | auth.konker.dev">
-	<main class="flex min-h-screen items-center justify-center p-6">
-		<section class="w-full max-w-md">
-			<AuthViewCard client:only="react" />
-		</section>
-	</main>
+<Layout title="Redirecting | auth.konker.dev">
+  <meta http-equiv="refresh" content="0;url=/sign-in" />
+  <script>
+    window.location.replace('/sign-in');
+  </script>
+  <main class="flex min-h-screen items-center justify-center p-6 text-sm text-zinc-600">
+    Redirecting to sign in...
+  </main>
 </Layout>

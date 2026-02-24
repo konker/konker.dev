@@ -1,0 +1,12 @@
+---
+import { SignOutAction } from '../components/auth/SignOutAction';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Sign out | auth.konker.dev">
+  <main class="flex min-h-screen items-center justify-center p-6">
+    <section class="w-full max-w-md">
+      <SignOutAction client:only="react" />
+    </section>
+  </main>
+</Layout>

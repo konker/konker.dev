@@ -1,13 +1,17 @@
-import { AuthUIProvider, AuthView } from 'better-auth-ui';
+import { AuthView, type AuthViewPath } from 'better-auth-ui';
+import { Toaster } from 'sonner';
 
-import { authClient } from '../../lib/auth-client';
+import { AuthShell } from './AuthShell';
 
-export function AuthViewCard() {
+type AuthViewCardProps = {
+  view: AuthViewPath;
+};
+
+export function AuthViewCard({ view }: AuthViewCardProps) {
   return (
-    <AuthUIProvider authClient={authClient}>
-      <div className="mx-auto w-full max-w-md rounded-xl border border-zinc-200 bg-white/90 p-4 shadow-sm backdrop-blur-sm">
-        <AuthView view="SIGN_IN" />
-      </div>
-    </AuthUIProvider>
+    <AuthShell>
+      <AuthView view={view} />
+      <Toaster />
+    </AuthShell>
   );
 }
