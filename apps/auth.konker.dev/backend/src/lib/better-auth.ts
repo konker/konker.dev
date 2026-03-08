@@ -6,6 +6,7 @@ import { admin, jwt, oidcProvider, openAPI, twoFactor } from 'better-auth/plugin
 import * as dbSchema from '../database/better-auth.schema.js';
 import { db } from '../database/index.js';
 import { API_ID } from './consts.js';
+import { sendEmail } from './email.js';
 
 const parseBoolean = (value: string | undefined, defaultValue: boolean): boolean => {
   if (value === undefined) {
@@ -87,6 +88,25 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     resetPasswordTokenExpiresIn: parseNumber(process.env.BETTER_AUTH_RESET_PASSWORD_TOKEN_EXPIRES_SECONDS, 900),
     revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ url, user }: { url: string; user: { email: string } }, _request: unknown) => {
+      void sendEmail({
+        to: user.email,
+        subject: 'Reset your password',
+        textContent: `Click the link to reset your password: ${url}`,
+      });
+    },
+    onPasswordReset: async ({ user }: { user: { email: string } }, _request) => {
+      console.log(`Password for user ${user.email} has been reset.`);
+    },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ url, user }: { url: string; user: { email: string } }, _request: unknown) => {
+      void sendEmail({
+        to: user.email,
+        subject: 'Verify your email address',
+        textContent: `Click the link to verify your email: ${url}`,
+      });
+    },
   },
   socialProviders,
   session: {

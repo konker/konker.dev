@@ -38,6 +38,14 @@ export const ConfigSchema = Schema.Struct({
   otel: Schema.Struct({
     trace_exporter_url: Schema.String,
   }),
+  brevo: Schema.Struct({
+    api_url: Schema.String,
+    api_key: Schema.String,
+    sender: Schema.Struct({
+      email: Schema.String,
+      name: Schema.String,
+    }),
+  }),
   log: Schema.Struct({
     level: Schema.String,
   }),
