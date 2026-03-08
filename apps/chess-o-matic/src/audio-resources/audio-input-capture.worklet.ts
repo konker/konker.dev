@@ -1,10 +1,6 @@
-// audio-processor.worklet.ts
 // AudioWorklet processor for capturing microphone input
 
-/// <reference path="./audio-worklet.d.ts" />
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class AudioCaptureProcessor extends AudioWorkletProcessor {
+class AudioInputCaptureWorklet extends AudioWorkletProcessor {
   process(
     inputs: Float32Array[][],
     _outputs: Float32Array[][],
@@ -15,7 +11,7 @@ class AudioCaptureProcessor extends AudioWorkletProcessor {
     if (input && input.length > 0) {
       const channelData = input[0];
 
-      // Send audio data to main thread
+      // Send audio data to the main thread
       this.port.postMessage({
         type: 'audio',
         data: channelData,
@@ -27,4 +23,4 @@ class AudioCaptureProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('audio-capture-processor', AudioCaptureProcessor);
+registerProcessor('audio-input-capture', AudioInputCaptureWorklet);

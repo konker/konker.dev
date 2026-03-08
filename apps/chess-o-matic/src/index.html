@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess-o-Matic</title>
+  </head>
+  <body>
+    <h1>Chess-o-Matic</h1>
+    <p>Recognize chess moves using speech recognition</p>
+
+    <button id="startBtn">Start1</button>
+    <button id="stopBtn">Stop</button>
+    <hr />
+    <script type="module">
+      console.log("KONK90");
+      import { grammar } from "./grammar/chess-grammar-en.ts";
+      import { init, exit } from "./index.ts";
+
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+
+      startBtn.addEventListener("click", async () => init(['grammar']));
+      stopBtn.addEventListener("click", exit);
+    </script>
+  </body>
+</html>
