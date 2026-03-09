@@ -13,14 +13,12 @@
     <button id="stopBtn">Stop</button>
     <hr />
     <script type="module">
-      console.log("KONK90");
-      import { grammar } from "./grammar/chess-grammar-en.ts";
       import { init, exit } from "./index.ts";
 
       const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
 
-      startBtn.addEventListener("click", async () => init(['grammar']));
+      startBtn.addEventListener("click", init);
       stopBtn.addEventListener("click", exit);
     </script>
   </body>

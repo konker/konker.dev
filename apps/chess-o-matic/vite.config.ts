@@ -10,7 +10,6 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         { src: 'grammar/*.json', dest: 'grammar' },
-        { src: 'recognizer-model/*.zip', dest: 'recognizer-model' },
       ],
     }),
   ],

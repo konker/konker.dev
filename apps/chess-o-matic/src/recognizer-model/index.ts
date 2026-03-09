@@ -1,18 +1,19 @@
-import { createModel, KaldiRecognizer } from "vosk-browser";
-import { AUDIO_SAMPLE_RATE } from '../audio-resources';
+import type { KaldiRecognizer } from 'vosk-browser';
+import { createModel } from 'vosk-browser';
 
 export async function initRecognizerModel(
   modelUrl: string,
-  grammar: Array<string>,
+  grammar: ReadonlyArray<string>,
+  sampleRate: number
 ): Promise<KaldiRecognizer> {
-  console.log("Loading Vosk model...");
+  console.log(`Loading Vosk model at ${modelUrl}...`);
 
   // Load the model
   const model = await createModel(modelUrl);
-  console.log("Model loaded successfully");
+  console.log('Model loaded successfully');
 
   // Create recognizer with or without grammar
-  const recognizer = new model.KaldiRecognizer(AUDIO_SAMPLE_RATE, JSON.stringify(grammar));
+  const recognizer = new model.KaldiRecognizer(sampleRate, JSON.stringify(grammar));
   console.log(`Recognizer created with grammar (${grammar.length} phrases)`);
 
   return recognizer;
