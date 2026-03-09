@@ -2,8 +2,8 @@
 
 class AudioInputCaptureWorklet extends AudioWorkletProcessor {
   process(
-    inputs: Float32Array[][],
-    _outputs: Float32Array[][],
+    inputs: Array<Array<Float32Array>>,
+    _outputs: Array<Array<Float32Array>>,
     _parameters: Record<string, Float32Array>
   ): boolean {
     const input = inputs[0];

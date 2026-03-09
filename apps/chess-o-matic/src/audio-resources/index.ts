@@ -1,5 +1,3 @@
-export const AUDIO_SAMPLE_RATE = 16000 as const;
-
 // --------------------------------------------------------------------------
 export type AudioResourcesListening = {
   isListening: true;
@@ -15,9 +13,7 @@ export type AudioResourcesNotListening = {
   workletNode: null;
 };
 
-export type AudioResources =
-  | AudioResourcesListening
-  | AudioResourcesNotListening;
+export type AudioResources = AudioResourcesListening | AudioResourcesNotListening;
 
 // --------------------------------------------------------------------------
 export async function initAudioResources(): Promise<AudioResourcesListening> {
@@ -27,20 +23,18 @@ export async function initAudioResources(): Promise<AudioResourcesListening> {
       echoCancellation: true,
       noiseSuppression: true,
       autoGainControl: true,
-      sampleRate: AUDIO_SAMPLE_RATE,
     },
   });
 
-  // Create audio context
-  const audioContext = new AudioContext({ sampleRate: AUDIO_SAMPLE_RATE });
+  // Create audio context at the hardware's native sample rate to avoid
+  // a mismatch with the media stream (browsers ignore sampleRate constraints)
+  const audioContext = new AudioContext();
   const source = audioContext.createMediaStreamSource(mediaStream);
 
   // Load and create an AudioWorklet processor
-  await audioContext.audioWorklet.addModule(
-    new URL("./audio-input-capture.worklet.ts", import.meta.url).href,
-  );
+  await audioContext.audioWorklet.addModule(new URL('./audio-input-capture.worklet.ts', import.meta.url).href);
 
-  const workletNode = new AudioWorkletNode(audioContext, "audio-input-capture");
+  const workletNode = new AudioWorkletNode(audioContext, 'audio-input-capture');
 
   source.connect(workletNode);
   workletNode.connect(audioContext.destination);
@@ -56,9 +50,7 @@ export async function initAudioResources(): Promise<AudioResourcesListening> {
 }
 
 // --------------------------------------------------------------------------
-export function exitAudioResources(
-  audioResources: AudioResources,
-): AudioResourcesNotListening {
+export function exitAudioResources(audioResources: AudioResources): AudioResourcesNotListening {
   if (!audioResources.isListening) {
     return audioResources;
   }
@@ -77,7 +69,7 @@ export function exitAudioResources(
     audioResources.mediaStream.getTracks().forEach((track) => track.stop());
   }
 
-  console.log("Stopped listening");
+  console.log('Stopped listening');
 
   return {
     isListening: false,

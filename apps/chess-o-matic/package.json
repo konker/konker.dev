@@ -23,8 +23,24 @@
     "vosk-browser": "^0.0.8"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@effect/language-service": "^0.64.1",
+    "@eslint/compat": "^2.0.1",
+    "@eslint/js": "^9.39.2",
+    "@konker.dev/common-config": "^0.7.0",
+    "@vitest/coverage-istanbul": "^4.0.16",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
-    "typescript": "^5.0.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "leasot": "^14.4.0",
+    "madge": "^8.0.0",
+    "prettier": "^3.7.4",
+    "type-coverage": "^2.29.7",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0",
     "vite": "^7.2.4",
     "vite-plugin-static-copy": "^3.2.0"
   }
