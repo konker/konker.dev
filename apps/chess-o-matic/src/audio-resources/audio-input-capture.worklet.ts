@@ -1,25 +1,30 @@
-// AudioWorklet processor for capturing microphone input
+/* eslint-disable fp/no-this */
 
+// AudioWorklet processor for capturing microphone input
 class AudioInputCaptureWorklet extends AudioWorkletProcessor {
+  private static readonly AUDIO_MESSAGE_TYPE = 'audio';
+
   process(
     inputs: Array<Array<Float32Array>>,
     _outputs: Array<Array<Float32Array>>,
     _parameters: Record<string, Float32Array>
   ): boolean {
-    const input = inputs[0];
+    const firstInput = inputs[0];
+    const firstChannel = firstInput?.[0];
 
-    if (input && input.length > 0) {
-      const channelData = input[0];
-
-      // Send audio data to the main thread
-      this.port.postMessage({
-        type: 'audio',
-        data: channelData,
-      });
+    if (!firstChannel) {
+      return true;
     }
 
-    // Return true to keep the processor alive
+    this.postAudioMessage(firstChannel);
     return true;
+  }
+
+  private postAudioMessage(audioData: Float32Array): void {
+    this.port.postMessage({
+      type: AudioInputCaptureWorklet.AUDIO_MESSAGE_TYPE,
+      data: audioData,
+    });
   }
 }
 
