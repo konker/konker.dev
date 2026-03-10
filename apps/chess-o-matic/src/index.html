@@ -4,21 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chess-o-Matic</title>
+    <style>
+      body > div {
+        margin: 10px;
+      }
+
+      .board {
+        width: 500px;
+        height: 500px;
+      }
+
+      .cg-board {
+        background-color: #bfcfdd;
+      }
+    </style>
   </head>
   <body>
     <h1>Chess-o-Matic</h1>
     <p>Recognize chess moves using speech recognition</p>
 
+    <div class="board" id="board">BOARD</div>
+
+    <hr>
     <button id="startBtn">Start1</button>
     <button id="stopBtn">Stop</button>
     <hr />
     <script type="module">
       import { init, exit } from "./index.ts";
 
+      const board = document.getElementById("board");
       const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
 
-      startBtn.addEventListener("click", init);
+
+
+      startBtn.addEventListener("click", async () => init(board));
       stopBtn.addEventListener("click", exit);
     </script>
   </body>

@@ -1,6 +1,7 @@
+import type { Square } from 'chess.js';
 import { Chess } from 'chess.js';
 
-import { grammarSanMap } from '../grammar/chess-grammar-san-map-en';
+import { grammarSanMap, grammarStopWords } from '../grammar/chess-grammar-san-map-en';
 
 // --------------------------------------------------------------------------
 export type GameModelResources = {
@@ -43,6 +44,7 @@ export type GameMoveResult =
   | {
       readonly status: typeof GAME_MOVE_STATUS_OK;
       readonly san: string;
+      readonly move: [Square, Square];
     }
   | {
       readonly status: typeof GAME_MOVE_STATUS_ILLEGAL;
@@ -56,6 +58,7 @@ export function playMove(gameModelResources: GameModelResources, parserResult: G
     return {
       status: GAME_MOVE_STATUS_OK,
       san: parserResult.san,
+      move: [move.from, move.to],
     };
   } catch (_e: unknown) {
     return {
@@ -66,27 +69,27 @@ export function playMove(gameModelResources: GameModelResources, parserResult: G
 }
 
 // --------------------------------------------------------------------------
-export function gameModelParseInput(gameModelResources: GameModelResources, input: string): GameMoveParserResult {
-  // FIXME: remove non-essential words before lookup, e.g. check, mate, etc.
+export function sanitizeInputString(input: string): string {
+  // FIXME: strip out non-essential words before lookup, e.g. check, mate, etc.
+  return grammarStopWords.reduce((acc, val) => acc.replace(val, ''), input).trim();
+}
 
-  const san = grammarSanMap[input] ?? null;
+// --------------------------------------------------------------------------
+export function gameModelParseInput(gameModelResources: GameModelResources, input: string): GameMoveParserResult {
+  const sanitized = sanitizeInputString(input);
+
+  const san = grammarSanMap[sanitized] ?? null;
+
   if (san === null) {
     return {
       status: GAME_MOVE_PARSE_STATUS_IGNORE,
     };
   }
 
-  if (san === '_undo') {
+  if (['_undo', '_flip', '_resign'].includes(san)) {
     return {
       status: GAME_MOVE_PARSE_STATUS_CONTROL_ACTION,
-      action: '_undo',
-    };
-  }
-
-  if (san === '_resign') {
-    return {
-      status: GAME_MOVE_PARSE_STATUS_CONTROL_ACTION,
-      action: '_resign',
+      action: san,
     };
   }
 
@@ -99,21 +102,28 @@ export function gameModelParseInput(gameModelResources: GameModelResources, inpu
 // --------------------------------------------------------------------------
 export const GAME_MODEL_HANDLE_INPUT_STATUS_OK = 'ok';
 export const GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL = 'illegal';
+export const GAME_MODEL_HANDLE_INPUT_STATUS_CONTROL = 'control';
 export const GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE = 'ignore';
 
 export type GameModelHandleInputStatus =
   | typeof GAME_MODEL_HANDLE_INPUT_STATUS_OK
   | typeof GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL
+  | typeof GAME_MODEL_HANDLE_INPUT_STATUS_CONTROL
   | typeof GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE;
 
 export type GameModelHandleInputResult =
   | {
       status: typeof GAME_MODEL_HANDLE_INPUT_STATUS_OK;
       san: string;
+      move: [Square, Square];
     }
   | {
       status: typeof GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL;
       san: string;
+    }
+  | {
+      status: typeof GAME_MODEL_HANDLE_INPUT_STATUS_CONTROL;
+      action: string; // FIXME: make into union type
     }
   | {
       status: typeof GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE;
@@ -130,31 +140,45 @@ export function handleInput(gameModelResources: GameModelResources, input: strin
     }
 
     case GAME_MOVE_PARSE_STATUS_CONTROL_ACTION: {
-      if (parserResult.action === '_undo') {
-        gameModelResources.chess.undo();
-        return {
-          status: GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE,
-        };
-      }
-      if (parserResult.action === '_resign') {
-        // FIXME: this doesn't work
-        const san = gameModelResources.chess.turn() === 'w' ? '0-1' : '1-0';
-        const move = playMove(gameModelResources, {
-          status: GAME_MOVE_PARSE_STATUS_OK,
-          san,
-        });
-        if (move.status === GAME_MOVE_STATUS_ILLEGAL) {
+      switch (parserResult.action) {
+        case '_undo': {
+          const move = gameModelResources.chess.undo();
+          return move
+            ? {
+                status: GAME_MODEL_HANDLE_INPUT_STATUS_OK,
+                san: '_undo', // FIXME: not SAN
+                move: [move.to, move.from],
+              }
+            : { status: GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE };
+        }
+        case '_flip': {
           return {
-            status: GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL,
-            san,
+            status: GAME_MODEL_HANDLE_INPUT_STATUS_CONTROL,
+            action: '_flip',
           };
         }
+        case '_resign': {
+          // FIXME: this doesn't work
+          const san = gameModelResources.chess.turn() === 'w' ? '0-1' : '1-0';
+          const moveResult = playMove(gameModelResources, {
+            status: GAME_MOVE_PARSE_STATUS_OK,
+            san,
+          });
+          if (moveResult.status === GAME_MOVE_STATUS_ILLEGAL) {
+            return {
+              status: GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL,
+              san,
+            };
+          }
 
-        return {
-          status: GAME_MODEL_HANDLE_INPUT_STATUS_OK,
-          san,
-        };
+          return {
+            status: GAME_MODEL_HANDLE_INPUT_STATUS_OK,
+            san,
+            move: moveResult.move,
+          };
+        }
       }
+
       return {
         status: GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE,
       };
@@ -162,8 +186,8 @@ export function handleInput(gameModelResources: GameModelResources, input: strin
 
     case GAME_MOVE_PARSE_STATUS_OK:
     default: {
-      const move = playMove(gameModelResources, parserResult);
-      if (move.status === GAME_MOVE_STATUS_ILLEGAL) {
+      const moveResult = playMove(gameModelResources, parserResult);
+      if (moveResult.status === GAME_MOVE_STATUS_ILLEGAL) {
         return {
           status: GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL,
           san: parserResult.san,
@@ -173,6 +197,7 @@ export function handleInput(gameModelResources: GameModelResources, input: strin
       return {
         status: GAME_MODEL_HANDLE_INPUT_STATUS_OK,
         san: parserResult.san,
+        move: moveResult.move,
       };
     }
   }

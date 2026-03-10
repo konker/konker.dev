@@ -17,12 +17,6 @@
     "noEmit": false,
     "types": ["vite/client"]
   },
-  "include": [
-    "src/**/*.ts",
-    "vite.config.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
