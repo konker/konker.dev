@@ -15,12 +15,12 @@ let audioResources: AudioResources;
 let gameModelResources: GameModelResources;
 let gameViewResources: GameViewResources;
 
-export async function init(boardEl: HTMLElement) {
+export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
   console.log('INIT');
   audioResources = await initAudioResources();
   recognizer = await initRecognizerModel(MODEL_URL, Object.keys(grammarSanMap), audioResources.audioContext.sampleRate);
   gameModelResources = initGameModel();
-  gameViewResources = initGameView(boardEl);
+  gameViewResources = initGameView(boardEl, inputEl, pgnEl);
 
   // Pipe audio data from worklet to recognizer
   audioResources.workletNode.port.onmessage = (event) => {
@@ -34,7 +34,7 @@ export async function init(boardEl: HTMLElement) {
   recognizer.on('result', (message) => {
     if ('result' in message && 'text' in message.result && message.result.text !== '') {
       const handleInputResult = handleInput(gameModelResources, message.result.text);
-      handleGameViewUpdate(gameViewResources, handleInputResult);
+      handleGameViewUpdate(gameViewResources, gameModelResources, handleInputResult);
 
       console.log('R: ', message.result.text);
       console.log('Rh: ', handleInputResult);
