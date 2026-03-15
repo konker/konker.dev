@@ -34,8 +34,4 @@ export function moveComplete(
   rep.turn = gameModelResources.chess.turn() === 'w' ? 'white' : 'black';
   moveHighlight(rep, coords);
   gameModelResources.locked = false;
-
-  console.log('Ra: ', gameModelResources.chess.ascii());
-  console.log('Rp: ', gameModelResources.chess.pgn());
-  console.log('Rf: ', gameModelResources.chess.fen());
 }

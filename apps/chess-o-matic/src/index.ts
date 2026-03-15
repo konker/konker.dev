@@ -9,7 +9,12 @@ import {
   GAME_MODEL_EVALUATE_STATUS_OK,
   gameModelEvaluate,
 } from './game-model/evaluate';
-import type { GameModelEventControl, GameModelEventMoved, GameModelEventViewChanged } from './game-model/events';
+import type {
+  GameModelEventControl,
+  GameModelEventEvaluated,
+  GameModelEventMoved,
+  GameModelEventViewChanged,
+} from './game-model/events';
 import {
   GAME_MODEL_EVENT_TYPE_CONTROL,
   GAME_MODEL_EVENT_TYPE_EVALUATED,
@@ -34,12 +39,6 @@ export function tick(result: string) {
   const readResult = gameModelRead(result);
   const evaluateResult = gameModelEvaluate(gameModelResources, readResult);
 
-  // Notify everything that has happened
-  gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
-    type: GAME_MODEL_EVENT_TYPE_EVALUATED,
-    result: evaluateResult,
-  });
-
   // Notify if a legal move was made
   if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
     gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED, {
@@ -56,11 +55,11 @@ export function tick(result: string) {
     });
   }
 
-  console.log('R: ', result);
-  console.log('Rh: ', evaluateResult);
-  console.log('Ra: ', gameModelResources.chess.ascii());
-  console.log('Rp: ', gameModelResources.chess.pgn());
-  console.log('Rf: ', gameModelResources.chess.fen());
+  // Notify everything that has happened
+  gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
+    type: GAME_MODEL_EVENT_TYPE_EVALUATED,
+    result: evaluateResult,
+  });
 }
 
 export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
@@ -107,13 +106,12 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
   });
 
-  // If the view has made an update, make sure game model is in sync
+  // If the view has made an update, make sure the game model is in sync
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
     (event: GameModelEventViewChanged) => {
-      console.log('KONK70', event, typeof event.move === 'string');
-      gameModelEvaluate(
+      const evaluateResult = gameModelEvaluate(
         gameModelResources,
         typeof event.move === 'string'
           ? {
@@ -127,8 +125,25 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
               coords: event.move,
             }
       );
+
+      // Notify everything that has happened
+      gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
+        type: GAME_MODEL_EVENT_TYPE_EVALUATED,
+        result: evaluateResult,
+      });
     }
   );
+
+  // If something has happened, update the UI
+  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, (event: GameModelEventEvaluated) => {
+    console.log('KONK90', event);
+    console.log('Ra: ', gameModelResources.chess.ascii());
+    console.log('Rp: ', gameModelResources.chess.pgn());
+    console.log('Rf: ', gameModelResources.chess.fen());
+
+    gameViewResources.inputEl.innerHTML = `${event.result.sanitized} - ${event.result.status}`;
+    gameViewResources.pgnEl.innerHTML = gameModelResources.chess.pgn();
+  });
 }
 
 export async function exit() {

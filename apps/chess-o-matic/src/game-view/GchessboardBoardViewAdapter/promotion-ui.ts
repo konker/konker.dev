@@ -31,7 +31,6 @@ export function openPromotionDialog(
         : // Pawn capture
           `${coords[0][0]}x${coords[1]}=${role.toUpperCase()}`;
 
-      console.log('KONK90', coords, role, san);
       moveComplete(gameModelResources, rep, coords, san);
     };
   });
