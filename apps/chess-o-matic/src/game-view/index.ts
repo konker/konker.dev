@@ -5,8 +5,6 @@ import {
   GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL,
   GAME_MODEL_HANDLE_INPUT_STATUS_OK,
 } from '../game-model';
-import { ChessboardElementBoardViewAdapter } from './ChessboardElementBoardViewAdapter';
-import { ChessgroundBoardViewAdapter } from './ChessgroundBoardViewAdapter';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
 import type { BoardView } from './types';
 
@@ -18,9 +16,7 @@ export type GameViewResources = {
 
 export function initGameView(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement): GameViewResources {
   return {
-    // board: ChessboardElementBoardViewAdapter(boardEl),
     board: GchessboardBoardViewAdapter(boardEl),
-    // board: ChessgroundBoardViewAdapter(boardEl),
     inputEl,
     pgnEl,
   };

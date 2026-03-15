@@ -15,6 +15,17 @@ let audioResources: AudioResources;
 let gameModelResources: GameModelResources;
 let gameViewResources: GameViewResources;
 
+export function tick(result: string) {
+  const handleInputResult = handleInput(gameModelResources, result);
+  handleGameViewUpdate(gameViewResources, gameModelResources, handleInputResult);
+
+  console.log('R: ', result);
+  console.log('Rh: ', handleInputResult);
+  console.log('Ra: ', gameModelResources.chess.ascii());
+  console.log('Rp: ', gameModelResources.chess.pgn());
+  console.log('Rf: ', gameModelResources.chess.fen());
+}
+
 export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
   console.log('INIT');
   audioResources = await initAudioResources();
@@ -33,14 +44,7 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
 
   recognizer.on('result', (message) => {
     if ('result' in message && 'text' in message.result && message.result.text !== '') {
-      const handleInputResult = handleInput(gameModelResources, message.result.text);
-      handleGameViewUpdate(gameViewResources, gameModelResources, handleInputResult);
-
-      console.log('R: ', message.result.text);
-      console.log('Rh: ', handleInputResult);
-      console.log('Ra: ', gameModelResources.chess.ascii());
-      console.log('Rp: ', gameModelResources.chess.pgn());
-      console.log('Rf: ', gameModelResources.chess.fen());
+      tick(message.result.text);
     }
   });
 
