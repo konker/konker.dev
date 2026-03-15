@@ -9,21 +9,19 @@
         margin: 10px;
       }
 
-      .board {
+      .boardWrapper {
         width: 500px;
         height: 500px;
       }
 
-      .cg-board {
-        background-color: #bfcfdd;
-      }
+
     </style>
   </head>
   <body>
     <h1>Chess-o-Matic</h1>
     <p>Recognize chess moves using speech recognition</p>
 
-    <div class="board" id="board">BOARD</div>
+    <div class="boardWrapper" id="boardWrapper">BOARD</div>
 
     <div id="input">
       INPUT
@@ -39,7 +37,7 @@
     <script type="module">
       import { init, exit } from "./index.ts";
 
-      const board = document.getElementById("board");
+      const boardWrapper = document.getElementById("boardWrapper");
       const input = document.getElementById("input");
       const pgn = document.getElementById("pgn");
       const startBtn = document.getElementById("startBtn");
@@ -47,7 +45,7 @@
 
 
 
-      startBtn.addEventListener("click", async () => init(board, input, pgn));
+      startBtn.addEventListener("click", async () => init(boardWrapper, input, pgn));
       stopBtn.addEventListener("click", exit);
     </script>
   </body>
