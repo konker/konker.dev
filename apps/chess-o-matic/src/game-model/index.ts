@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 
-import type { GameModelEventListener, GameModelEventType } from './events';
+import type { GameModelEvent, GameModelEventListener, GameModelEventType } from './events';
 import { gameModelEventsEmptyListeners } from './events';
 import type { IsLegalMove } from './extras';
 import { chessIsLegalMove } from './extras';
@@ -9,7 +9,7 @@ import { chessIsLegalMove } from './extras';
 export type GameModelResources = {
   readonly chess: Chess;
   readonly isLegalMove: IsLegalMove;
-  readonly listeners: Map<GameModelEventType, Set<GameModelEventListener>>;
+  readonly listeners: Map<GameModelEventType, Set<GameModelEventListener<GameModelEvent>>>;
 };
 
 // --------------------------------------------------------------------------

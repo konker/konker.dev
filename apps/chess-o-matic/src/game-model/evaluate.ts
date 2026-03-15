@@ -11,6 +11,10 @@ import {
 import { GAME_INPUT_PARSE_STATUS_IGNORE } from './read';
 
 // --------------------------------------------------------------------------
+export const GAME_MODEL_CONTROL_ACTION_FLIP = '_flip';
+export type GameModelControlAction = typeof GAME_MODEL_CONTROL_ACTION_FLIP;
+
+// --------------------------------------------------------------------------
 export const GAME_MODEL_EVALUATE_STATUS_OK = 'ok';
 export const GAME_MODEL_EVALUATE_STATUS_ILLEGAL = 'illegal';
 export const GAME_MODEL_EVALUATE_STATUS_CONTROL = 'control';
@@ -22,25 +26,33 @@ export type GameModelEvaluateStatus =
   | typeof GAME_MODEL_EVALUATE_STATUS_CONTROL
   | typeof GAME_MODEL_EVALUATE_STATUS_IGNORE;
 
+export type GameModelEvaluateResultOk = {
+  status: typeof GAME_MODEL_EVALUATE_STATUS_OK;
+  sanitized: string;
+  move: [Square, Square];
+};
+
+export type GameModelEvaluateResultIllegal = {
+  status: typeof GAME_MODEL_EVALUATE_STATUS_ILLEGAL;
+  sanitized: string;
+};
+
+export type GameModelEvaluateResultControl = {
+  status: typeof GAME_MODEL_EVALUATE_STATUS_CONTROL;
+  sanitized: string;
+  action: GameModelControlAction;
+};
+
+export type GameModelEvaluateResultIgnore = {
+  status: typeof GAME_MODEL_EVALUATE_STATUS_IGNORE;
+  sanitized: string;
+};
+
 export type GameModelEvaluateResult =
-  | {
-      status: typeof GAME_MODEL_EVALUATE_STATUS_OK;
-      sanitized: string;
-      move: [Square, Square];
-    }
-  | {
-      status: typeof GAME_MODEL_EVALUATE_STATUS_ILLEGAL;
-      sanitized: string;
-    }
-  | {
-      status: typeof GAME_MODEL_EVALUATE_STATUS_CONTROL;
-      sanitized: string;
-      action: string; // FIXME: make into union type
-    }
-  | {
-      status: typeof GAME_MODEL_EVALUATE_STATUS_IGNORE;
-      sanitized: string;
-    };
+  | GameModelEvaluateResultOk
+  | GameModelEvaluateResultIllegal
+  | GameModelEvaluateResultControl
+  | GameModelEvaluateResultIgnore;
 
 // --------------------------------------------------------------------------
 export function gameModelEvaluate(
@@ -71,7 +83,7 @@ export function gameModelEvaluate(
           return {
             status: GAME_MODEL_EVALUATE_STATUS_CONTROL,
             sanitized: parserResult.sanitized,
-            action: '_flip',
+            action: GAME_MODEL_CONTROL_ACTION_FLIP,
           };
         }
         case '_resign': {
