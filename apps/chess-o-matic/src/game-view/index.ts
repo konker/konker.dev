@@ -1,12 +1,16 @@
 import type { GameModelResources } from '../game-model';
 import type { GameModelEvaluateResult } from '../game-model/evaluate';
-import { GAME_MODEL_EVALUATE_STATUS_IGNORE, GAME_MODEL_EVALUATE_STATUS_ILLEGAL } from '../game-model/evaluate';
-import { GAME_MODEL_EVALUATE_STATUS_CONTROL, GAME_MODEL_EVALUATE_STATUS_OK } from '../game-model/evaluate';
+import {
+  GAME_MODEL_EVALUATE_STATUS_CONTROL,
+  GAME_MODEL_EVALUATE_STATUS_IGNORE,
+  GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
+  GAME_MODEL_EVALUATE_STATUS_OK,
+} from '../game-model/evaluate';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
-import type { IGameBoardViewAdapter } from './IGameBoardViewAdapter';
+import type { BoardView } from './types';
 
 export type GameViewResources = {
-  readonly board: IGameBoardViewAdapter;
+  readonly board: BoardView;
   readonly inputEl: HTMLElement;
   readonly pgnEl: HTMLElement;
 };
@@ -18,7 +22,7 @@ export function initGameView(
   pgnEl: HTMLElement
 ): GameViewResources {
   return {
-    board: new GchessboardBoardViewAdapter(gameModelResources, boardEl),
+    board: GchessboardBoardViewAdapter(gameModelResources, boardEl),
     inputEl,
     pgnEl,
   };
