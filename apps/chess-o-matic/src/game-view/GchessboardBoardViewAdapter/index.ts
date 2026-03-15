@@ -38,7 +38,6 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
   rep.addEventListener('moveend', (e) => {
     const coords: [Square, Square] = [e.detail.from, e.detail.to];
     if (!gameModelResources.isLegalMove(coords)) {
-      console.log('KONK81', 'illegal', e.detail);
       rep.fen = gameModelResources.chess.fen();
       return e.preventDefault();
     }
@@ -47,7 +46,6 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
     const isPawn = piece?.type === 'p';
     const isPromotionRank = coords[1].endsWith('8') || coords[1].endsWith('1');
 
-    console.log('KONK80000', coords, piece, isPawn, isPromotionRank);
     if (isPawn && isPromotionRank) {
       gameModelResources.locked = true;
       rep.fen = gameModelResources.chess.fen();
@@ -58,7 +56,6 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
 
   rep.addEventListener('movefinished', (e) => {
     const coords: [Square, Square] = [e.detail.from, e.detail.to];
-    console.log('KONK82', coords);
     moveComplete(gameModelResources, rep, coords, `${coords[0]}-${coords[1]}`);
   });
 
