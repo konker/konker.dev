@@ -19,7 +19,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lichess-org/chessground": "^10.1.0",
     "chess.js": "^1.4.0",
     "gchessboard": "^1.4.0",
     "vosk-browser": "^0.0.8"

@@ -18,7 +18,7 @@ import {
   gameModelEventsAddListener,
   gameModelEventsNotifyListeners,
 } from './game-model/events';
-import { GAME_INPUT_PARSE_STATUS_OK_COORDS, gameModelRead } from './game-model/read';
+import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read';
 import type { GameViewResources } from './game-view';
 import { exitGameView, gameViewUpdateControl, gameViewUpdateMoved, initGameView } from './game-view';
 import { grammarSanMap } from './grammar/chess-grammar-san-map-en.js';
@@ -97,23 +97,36 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     console.error('Err:', message);
   });
 
+  // If a valid move has been made, update the view
   gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED, (event: GameModelEventMoved) => {
     gameViewUpdateMoved(gameViewResources, gameModelResources, event.result);
   });
 
+  // If a valid control command has been received, notify the view
   gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, (event: GameModelEventControl) => {
     gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
   });
 
+  // If the view has made an update, make sure game model is in sync
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
     (event: GameModelEventViewChanged) => {
-      gameModelEvaluate(gameModelResources, {
-        status: GAME_INPUT_PARSE_STATUS_OK_COORDS,
-        sanitized: `${event.move[0]} to ${event.move[1]}`,
-        coords: event.move,
-      });
+      console.log('KONK70', event, typeof event.move === 'string');
+      gameModelEvaluate(
+        gameModelResources,
+        typeof event.move === 'string'
+          ? {
+              status: GAME_INPUT_PARSE_STATUS_OK_SAN,
+              sanitized: event.move,
+              san: event.move,
+            }
+          : {
+              status: GAME_INPUT_PARSE_STATUS_OK_COORDS,
+              sanitized: `${event.move[0]} to ${event.move[1]}`,
+              coords: event.move,
+            }
+      );
     }
   );
 }

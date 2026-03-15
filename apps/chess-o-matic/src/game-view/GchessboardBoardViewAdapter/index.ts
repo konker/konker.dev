@@ -6,28 +6,16 @@ import type { GChessBoardElement } from 'gchessboard';
 
 import type { GameModelResources } from '../../game-model';
 import { START_FEN } from '../../game-model/consts';
-import { GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, gameModelEventsNotifyListeners } from '../../game-model/events';
 import type { BoardViewAdapter } from '../types';
+import { moveComplete, moveHighlight } from './helpers';
+import { openPromotionDialog } from './promotion-ui';
 
-export function moveHighlight(rep: GChessBoardElement, coords: [Square, Square]): void {
-  const [from, to] = coords;
-
-  // Remove the attribute from any square that currently has it
-  rep.shadowRoot?.querySelectorAll('[last-move]')?.forEach((sq) => sq.removeAttribute('last-move'));
-
-  // Find the new squares and add the attribute
-  const fromSq = rep.shadowRoot?.querySelector(`[data-square="${from}"]`);
-  const toSq = rep.shadowRoot?.querySelector(`[data-square="${to}"]`);
-
-  if (fromSq) fromSq.setAttribute('last-move', '');
-  if (toSq) toSq.setAttribute('last-move', '');
-}
-
+// --------------------------------------------------------------------------
 export const GchessboardBoardViewAdapter: BoardViewAdapter = (
   gameModelResources: GameModelResources,
-  boardEl: HTMLElement
+  _boardEl: HTMLElement
 ) => {
-  const rep = document.createElement('g-chess-board') as GChessBoardElement;
+  const rep = document.getElementById('board') as GChessBoardElement;
   rep.coordinates = 'outside';
   rep.turn = 'white';
   rep.interactive = true;
@@ -48,27 +36,31 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
   });
 
   rep.addEventListener('moveend', (e) => {
-    if (!gameModelResources.isLegalMove([e.detail.from, e.detail.to])) {
+    const coords: [Square, Square] = [e.detail.from, e.detail.to];
+    if (!gameModelResources.isLegalMove(coords)) {
+      console.log('KONK81', 'illegal', e.detail);
+      rep.fen = gameModelResources.chess.fen();
+      return e.preventDefault();
+    }
+
+    const piece = gameModelResources.chess.get(coords[0]);
+    const isPawn = piece?.type === 'p';
+    const isPromotionRank = coords[1].endsWith('8') || coords[1].endsWith('1');
+
+    console.log('KONK80000', coords, piece, isPawn, isPromotionRank);
+    if (isPawn && isPromotionRank) {
+      gameModelResources.locked = true;
+      rep.fen = gameModelResources.chess.fen();
       e.preventDefault();
+      openPromotionDialog(gameModelResources, rep, coords, piece.color);
     }
   });
 
   rep.addEventListener('movefinished', (e) => {
     const coords: [Square, Square] = [e.detail.from, e.detail.to];
-    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, {
-      type: GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
-      move: coords,
-    });
-    rep.fen = gameModelResources.chess.fen();
-    rep.turn = gameModelResources.chess.turn() === 'w' ? 'white' : 'black';
-    moveHighlight(rep, coords);
-
-    console.log('Ra: ', gameModelResources.chess.ascii());
-    console.log('Rp: ', gameModelResources.chess.pgn());
-    console.log('Rf: ', gameModelResources.chess.fen());
+    console.log('KONK82', coords);
+    moveComplete(gameModelResources, rep, coords, `${coords[0]}-${coords[1]}`);
   });
-
-  boardEl.replaceChildren(rep);
 
   return {
     move: (coords: [Square, Square], fen: string) => {

@@ -41,7 +41,7 @@ export type GameModelEventControl = {
 
 export type GameModelEventViewChanged = {
   type: typeof GAME_MODEL_EVENT_TYPE_VIEW_CHANGED;
-  move: [Square, Square];
+  move: [Square, Square] | string; // Coords or SAN
 };
 
 export type GameModelEventEnd = {

@@ -13,7 +13,7 @@ export const chessIsLegalMove = (chess: Chess): IsLegalMove => {
       const moveOptions =
         typeof arg === 'string'
           ? arg // It's a SAN string
-          : { from: arg[0], to: arg[1] };
+          : { from: arg[0], to: arg[1], promotion: 'q' };
 
       const move = chess.move(moveOptions);
 
@@ -23,7 +23,8 @@ export const chessIsLegalMove = (chess: Chess): IsLegalMove => {
         return true;
       }
       return false;
-    } catch {
+    } catch (e) {
+      console.error(e);
       return false;
     }
   };
