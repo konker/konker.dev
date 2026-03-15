@@ -1,10 +1,10 @@
-export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
-export type Rank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
-export type Coord = `${File}${Rank}`;
+import type { Square } from 'chess.js';
+
+import type { GameModelResources } from '../game-model';
 
 export type BoardView = {
-  readonly move: (orig: Coord, dest: Coord, fen: string) => void;
+  readonly move: (coords: [Square, Square], fen: string) => void;
   readonly toggleOrientation: () => void;
 };
 
-export type BoardViewAdapter = (boardEl: HTMLElement) => BoardView;
+export type BoardViewAdapter = (gameModelResources: GameModelResources, boardEl: HTMLElement) => BoardView;

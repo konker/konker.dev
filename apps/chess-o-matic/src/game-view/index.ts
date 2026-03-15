@@ -1,58 +1,56 @@
-import type { GameModelHandleInputResult, GameModelResources } from '../game-model';
-import {
-  GAME_MODEL_HANDLE_INPUT_STATUS_CONTROL,
-  GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE,
-  GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL,
-  GAME_MODEL_HANDLE_INPUT_STATUS_OK,
-} from '../game-model';
+import type { GameModelResources } from '../game-model';
+import type { GameModelEvaluateResult } from '../game-model/evaluate';
+import { GAME_MODEL_EVALUATE_STATUS_IGNORE, GAME_MODEL_EVALUATE_STATUS_ILLEGAL } from '../game-model/evaluate';
+import { GAME_MODEL_EVALUATE_STATUS_CONTROL, GAME_MODEL_EVALUATE_STATUS_OK } from '../game-model/evaluate';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
-import type { BoardView } from './types';
+import type { IGameBoardViewAdapter } from './IGameBoardViewAdapter';
 
 export type GameViewResources = {
-  readonly board: BoardView;
+  readonly board: IGameBoardViewAdapter;
   readonly inputEl: HTMLElement;
   readonly pgnEl: HTMLElement;
 };
 
-export function initGameView(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement): GameViewResources {
+export function initGameView(
+  gameModelResources: GameModelResources,
+  boardEl: HTMLElement,
+  inputEl: HTMLElement,
+  pgnEl: HTMLElement
+): GameViewResources {
   return {
-    board: GchessboardBoardViewAdapter(boardEl),
+    board: new GchessboardBoardViewAdapter(gameModelResources, boardEl),
     inputEl,
     pgnEl,
   };
 }
 
-export function handleGameViewUpdate(
+export function gameViewUpdate(
   gameViewResources: GameViewResources,
   gameModelResources: GameModelResources,
-  handleInputResult: GameModelHandleInputResult
+  evaluateResult: GameModelEvaluateResult
 ): GameViewResources {
-  switch (handleInputResult.status) {
-    case GAME_MODEL_HANDLE_INPUT_STATUS_OK: {
-      gameViewResources.board.move(
-        handleInputResult.move[0],
-        handleInputResult.move[1],
-        gameModelResources.chess.fen()
-      );
-      gameViewResources.inputEl.innerHTML = handleInputResult.sanitized;
+  switch (evaluateResult.status) {
+    case GAME_MODEL_EVALUATE_STATUS_OK: {
+      gameViewResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
+      gameViewResources.inputEl.innerHTML = evaluateResult.sanitized;
       gameViewResources.pgnEl.innerHTML = gameModelResources.chess.pgn();
       return gameViewResources;
     }
-    case GAME_MODEL_HANDLE_INPUT_STATUS_CONTROL: {
-      switch (handleInputResult.action) {
+    case GAME_MODEL_EVALUATE_STATUS_CONTROL: {
+      switch (evaluateResult.action) {
         case '_flip':
           gameViewResources.board.toggleOrientation();
-          gameViewResources.inputEl.innerHTML = handleInputResult.sanitized;
+          gameViewResources.inputEl.innerHTML = evaluateResult.sanitized;
           return gameViewResources;
       }
       return gameViewResources;
     }
-    case GAME_MODEL_HANDLE_INPUT_STATUS_ILLEGAL: {
-      gameViewResources.inputEl.innerHTML = handleInputResult.sanitized;
+    case GAME_MODEL_EVALUATE_STATUS_ILLEGAL: {
+      gameViewResources.inputEl.innerHTML = evaluateResult.sanitized;
       return gameViewResources;
     }
-    case GAME_MODEL_HANDLE_INPUT_STATUS_IGNORE: {
-      gameViewResources.inputEl.innerHTML = handleInputResult.sanitized;
+    case GAME_MODEL_EVALUATE_STATUS_IGNORE: {
+      gameViewResources.inputEl.innerHTML = evaluateResult.sanitized;
       return gameViewResources;
     }
   }
