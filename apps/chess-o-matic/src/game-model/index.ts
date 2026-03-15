@@ -97,7 +97,6 @@ export function sanitizeInputString(input: string): string {
 // --------------------------------------------------------------------------
 export function parseCoordMove(sanitized: string): [string, string] | null {
   const [from, to] = sanitized.split(' to ');
-  console.log('KONK90', from, to);
   if (from in grammarSanMap && to in grammarSanMap) {
     return [grammarSanMap[from]!, grammarSanMap[to]!];
   }
@@ -105,15 +104,17 @@ export function parseCoordMove(sanitized: string): [string, string] | null {
 }
 
 // --------------------------------------------------------------------------
-export function gameModelParseInput(gameModelResources: GameModelResources, input: string): GameInputParserResult {
+export function gameModelParseInput(_gameModelResources: GameModelResources, input: string): GameInputParserResult {
   const sanitized = sanitizeInputString(input);
 
   const move =
     sanitized in grammarSanMap
       ? grammarSanMap[sanitized]
-      : sanitized.includes(' to ')
-        ? parseCoordMove(sanitized)
-        : null;
+      : Object.values(grammarSanMap).includes(sanitized)
+        ? sanitized
+        : sanitized.includes(' to ')
+          ? parseCoordMove(sanitized)
+          : null;
 
   if (move === null) {
     return {
