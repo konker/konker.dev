@@ -28,7 +28,7 @@ export function playMove(
     const move =
       parserResult.status === GAME_INPUT_PARSE_STATUS_OK_SAN
         ? gameModelResources.chess.move(parserResult.san)
-        : gameModelResources.chess.move(parserResult.coords.join('-'));
+        : gameModelResources.chess.move({ from: parserResult.coords[0], to: parserResult.coords[1], promotion: 'q' });
     return {
       status: GAME_MOVE_STATUS_OK,
       sanitized: parserResult.sanitized,

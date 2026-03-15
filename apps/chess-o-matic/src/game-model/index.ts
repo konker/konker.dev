@@ -10,6 +10,7 @@ export type GameModelResources = {
   readonly chess: Chess;
   readonly isLegalMove: IsLegalMove;
   readonly listeners: Map<GameModelEventType, Set<GameModelEventListener<GameModelEvent>>>;
+  locked: boolean;
 };
 
 // --------------------------------------------------------------------------
@@ -20,6 +21,7 @@ export function initGameModel(): GameModelResources {
     chess,
     isLegalMove: chessIsLegalMove(chess),
     listeners: gameModelEventsEmptyListeners(),
+    locked: false,
   };
 }
 

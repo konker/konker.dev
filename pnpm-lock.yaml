@@ -250,9 +250,6 @@ importers:
 
   apps/chess-o-matic:
     dependencies:
-      '@lichess-org/chessground':
-        specifier: ^10.1.0
-        version: 10.1.0
       chess.js:
         specifier: ^1.4.0
         version: 1.4.0
@@ -3302,9 +3299,6 @@ packages:
 
   '@konker.dev/tiny-error-fp@0.1.12':
     resolution: {integrity: sha512-/rjkzaCYQ+z4+KG+qTGOLKlxWPbN2EPURusHF8wR8gWonTS9Oig5vd5NRBrJXArFwjRCvABhSCmdHFnNN5iz7Q==}
-
-  '@lichess-org/chessground@10.1.0':
-    resolution: {integrity: sha512-IbchkijrSvHs03cnSwT+U4oLkRGbpgsKjXyr1BsMA+eeE5u07w/N7kMj/b7XlJ8j10E3kj40GLSzfEoLQeZ+1w==}
 
   '@loaderkit/resolve@1.0.4':
     resolution: {integrity: sha512-rJzYKVcV4dxJv+vW6jlvagF8zvGxHJ2+HTr1e2qOejfmGhAApgJHl8Aog4mMszxceTRiKTTbnpgmTO1bEZHV/A==}
@@ -11567,8 +11561,6 @@ snapshots:
   '@konker.dev/tiny-error-fp@0.1.12':
     dependencies:
       effect: 3.19.14
-
-  '@lichess-org/chessground@10.1.0': {}
 
   '@loaderkit/resolve@1.0.4':
     dependencies:

@@ -1,7 +1,6 @@
 import type { GameModelResources } from '../game-model';
 import type { GameModelEvaluateResultControl, GameModelEvaluateResultOk } from '../game-model/evaluate';
 import { GAME_MODEL_CONTROL_ACTION_FLIP } from '../game-model/evaluate';
-import { ChessgroundBoardViewAdapter } from './ChessgroundBoardViewAdapter';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
 import type { BoardView } from './types';
 
@@ -20,8 +19,7 @@ export function initGameView(
   pgnEl: HTMLElement
 ): GameViewResources {
   return {
-    // board: GchessboardBoardViewAdapter(gameModelResources, boardEl),
-    board: ChessgroundBoardViewAdapter(gameModelResources, boardEl),
+    board: GchessboardBoardViewAdapter(gameModelResources, boardEl),
     inputEl,
     pgnEl,
   };
@@ -33,15 +31,22 @@ export function gameViewUpdateMoved(
   gameModelResources: GameModelResources,
   evaluateResult: GameModelEvaluateResultOk
 ): void {
+  if (gameModelResources.locked) {
+    return;
+  }
   gameViewResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
 }
 
 // --------------------------------------------------------------------------
 export function gameViewUpdateControl(
   gameViewResources: GameViewResources,
-  _gameModelResources: GameModelResources,
+  gameModelResources: GameModelResources,
   evaluateResult: GameModelEvaluateResultControl
 ): void {
+  if (gameModelResources.locked) {
+    return;
+  }
+
   switch (evaluateResult.action) {
     case GAME_MODEL_CONTROL_ACTION_FLIP:
       gameViewResources.board.toggleOrientation();
