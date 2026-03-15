@@ -15,13 +15,13 @@ export const ChessgroundBoardViewAdapter: BoardViewAdapter = (
   const rep = Chessground(boardEl, {
     orientation: 'white',
     coordinatesOnSquares: true,
-    movable: { free: false },
+    movable: { free: true },
     premovable: { enabled: false },
     predroppable: { enabled: false },
     highlight: { lastMove: true },
-    selectable: { enabled: false },
-    draggable: { enabled: false },
-    drawable: { enabled: false },
+    selectable: { enabled: true },
+    draggable: { enabled: true },
+    drawable: { enabled: true },
   });
 
   return {

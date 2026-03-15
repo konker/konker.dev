@@ -59,6 +59,7 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
       type: GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
       move: coords,
     });
+    rep.fen = gameModelResources.chess.fen();
     rep.turn = gameModelResources.chess.turn() === 'w' ? 'white' : 'black';
     moveHighlight(rep, coords);
 
@@ -75,6 +76,8 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
       moveHighlight(rep, coords);
       rep.turn = gameModelResources.chess.turn() === 'w' ? 'white' : 'black';
     },
-    toggleOrientation: () => (rep.orientation = rep.orientation === 'white' ? 'black' : 'white'),
+    toggleOrientation: () => {
+      rep.orientation = rep.orientation === 'white' ? 'black' : 'white';
+    },
   };
 };

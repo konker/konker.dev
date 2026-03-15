@@ -4,18 +4,23 @@ import type { AudioResources } from './audio-resources';
 import { exitAudioResources, initAudioResources } from './audio-resources';
 import type { GameModelResources } from './game-model';
 import { exitGameModel, initGameModel } from './game-model';
-import { GAME_MODEL_EVALUATE_STATUS_OK, gameModelEvaluate } from './game-model/evaluate';
-import type { GameModelEventEvaluated, GameModelEventViewChanged } from './game-model/events';
-import { GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, GameModelEvent } from './game-model/events';
 import {
+  GAME_MODEL_EVALUATE_STATUS_CONTROL,
+  GAME_MODEL_EVALUATE_STATUS_OK,
+  gameModelEvaluate,
+} from './game-model/evaluate';
+import type { GameModelEventControl, GameModelEventMoved, GameModelEventViewChanged } from './game-model/events';
+import {
+  GAME_MODEL_EVENT_TYPE_CONTROL,
   GAME_MODEL_EVENT_TYPE_EVALUATED,
+  GAME_MODEL_EVENT_TYPE_MOVED,
+  GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
   gameModelEventsAddListener,
   gameModelEventsNotifyListeners,
 } from './game-model/events';
 import { GAME_INPUT_PARSE_STATUS_OK_COORDS, gameModelRead } from './game-model/read';
 import type { GameViewResources } from './game-view';
-import { gameViewUpdate } from './game-view';
-import { exitGameView, initGameView } from './game-view';
+import { exitGameView, gameViewUpdateControl, gameViewUpdateMoved, initGameView } from './game-view';
 import { grammarSanMap } from './grammar/chess-grammar-san-map-en.js';
 import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
 import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
@@ -29,11 +34,27 @@ export function tick(result: string) {
   const readResult = gameModelRead(result);
   const evaluateResult = gameModelEvaluate(gameModelResources, readResult);
 
+  // Notify everything that has happened
   gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
     type: GAME_MODEL_EVENT_TYPE_EVALUATED,
     result: evaluateResult,
   });
-  // gameViewUpdate(gameViewResources, gameModelResources, evaluateResult);
+
+  // Notify if a legal move was made
+  if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
+    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED, {
+      type: GAME_MODEL_EVENT_TYPE_MOVED,
+      result: evaluateResult,
+    });
+  }
+
+  // Notify if a control action was made
+  if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_CONTROL) {
+    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, {
+      type: GAME_MODEL_EVENT_TYPE_CONTROL,
+      result: evaluateResult,
+    });
+  }
 
   console.log('R: ', result);
   console.log('Rh: ', evaluateResult);
@@ -76,15 +97,18 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     console.error('Err:', message);
   });
 
-  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, (event: GameModelEventEvaluated) => {
-    gameViewUpdate(gameViewResources, gameModelResources, event.result);
+  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED, (event: GameModelEventMoved) => {
+    gameViewUpdateMoved(gameViewResources, gameModelResources, event.result);
+  });
+
+  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, (event: GameModelEventControl) => {
+    gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
   });
 
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
     (event: GameModelEventViewChanged) => {
-      console.log('KONK70', event.move);
       gameModelEvaluate(gameModelResources, {
         status: GAME_INPUT_PARSE_STATUS_OK_COORDS,
         sanitized: `${event.move[0]} to ${event.move[1]}`,
