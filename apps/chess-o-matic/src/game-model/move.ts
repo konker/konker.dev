@@ -11,11 +11,13 @@ export const GAME_MOVE_STATUS_ILLEGAL = 'illegal';
 export type GameMoveResult =
   | {
       readonly status: typeof GAME_MOVE_STATUS_OK;
+      readonly input: string;
       readonly sanitized: string;
       readonly move: [Square, Square];
     }
   | {
       readonly status: typeof GAME_MOVE_STATUS_ILLEGAL;
+      readonly input: string;
       readonly sanitized: string;
     };
 
@@ -31,6 +33,7 @@ export function playMove(
         : gameModelResources.chess.move({ from: parserResult.coords[0], to: parserResult.coords[1], promotion: 'q' });
     return {
       status: GAME_MOVE_STATUS_OK,
+      input: parserResult.input,
       sanitized: parserResult.sanitized,
       move: [move.from, move.to],
     };
@@ -38,6 +41,7 @@ export function playMove(
   } catch (_: unknown) {
     return {
       status: GAME_MOVE_STATUS_ILLEGAL,
+      input: parserResult.input,
       sanitized: parserResult.sanitized,
     };
   }

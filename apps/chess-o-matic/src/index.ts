@@ -26,7 +26,7 @@ import {
 import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read';
 import type { GameViewResources } from './game-view';
 import { exitGameView, gameViewUpdateControl, gameViewUpdateMoved, initGameView } from './game-view';
-import { grammarSanMap } from './grammar/chess-grammar-san-map-en.js';
+import { chessGrammar } from './grammar/chess-grammar-san-map-en.js';
 import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
 import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
 
@@ -65,7 +65,7 @@ export function tick(result: string) {
 export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
   console.log('INIT');
   audioResources = await initAudioResources();
-  recognizer = await initRecognizerModel(MODEL_URL, Object.keys(grammarSanMap), audioResources.audioContext.sampleRate);
+  recognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioResources.audioContext.sampleRate);
   gameModelResources = initGameModel();
   gameViewResources = initGameView(gameModelResources, boardEl, inputEl, pgnEl);
 

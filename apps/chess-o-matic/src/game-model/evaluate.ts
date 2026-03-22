@@ -28,24 +28,32 @@ export type GameModelEvaluateStatus =
 
 export type GameModelEvaluateResultOk = {
   status: typeof GAME_MODEL_EVALUATE_STATUS_OK;
+  input: string;
   sanitized: string;
+  parsed: string | undefined;
   move: [Square, Square];
 };
 
 export type GameModelEvaluateResultIllegal = {
   status: typeof GAME_MODEL_EVALUATE_STATUS_ILLEGAL;
+  input: string;
   sanitized: string;
+  parsed: string | undefined;
 };
 
 export type GameModelEvaluateResultControl = {
   status: typeof GAME_MODEL_EVALUATE_STATUS_CONTROL;
+  input: string;
   sanitized: string;
   action: GameModelControlAction;
+  parsed: string | undefined;
 };
 
 export type GameModelEvaluateResultIgnore = {
   status: typeof GAME_MODEL_EVALUATE_STATUS_IGNORE;
+  input: string;
   sanitized: string;
+  parsed: string | undefined;
 };
 
 export type GameModelEvaluateResult =
@@ -63,48 +71,65 @@ export function gameModelEvaluate(
     case GAME_INPUT_PARSE_STATUS_IGNORE: {
       return {
         status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        input: parserResult.input,
         sanitized: parserResult.sanitized,
+        parsed: parserResult.parsed,
       };
     }
 
     case GAME_INPUT_PARSE_STATUS_CONTROL_ACTION: {
       switch (parserResult.action) {
-        case '_undo': {
+        case 'undo': {
           const move = gameModelResources.chess.undo();
           return move
             ? {
                 status: GAME_MODEL_EVALUATE_STATUS_OK,
+                input: parserResult.input,
                 sanitized: parserResult.sanitized,
+                parsed: parserResult.parsed,
                 move: [move.to, move.from], // Move back
               }
-            : { status: GAME_MODEL_EVALUATE_STATUS_IGNORE, sanitized: parserResult.sanitized };
+            : {
+                status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+                input: parserResult.input,
+                sanitized: parserResult.sanitized,
+                parsed: parserResult.parsed,
+              };
         }
-        case '_flip': {
+        case 'flip': {
           return {
             status: GAME_MODEL_EVALUATE_STATUS_CONTROL,
+            input: parserResult.input,
             sanitized: parserResult.sanitized,
+            parsed: parserResult.parsed,
             action: GAME_MODEL_CONTROL_ACTION_FLIP,
           };
         }
-        case '_resign': {
+        case 'resign': {
           // FIXME: this doesn't work
           const san = gameModelResources.chess.turn() === 'w' ? '0-1' : '1-0';
           const moveResult = playMove(gameModelResources, {
             status: GAME_INPUT_PARSE_STATUS_OK_SAN,
+            input: san,
             sanitized: san,
+            parsed: san,
             san,
           });
 
           if (moveResult.status === GAME_MOVE_STATUS_ILLEGAL) {
             return {
               status: GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
+              input: parserResult.input,
               sanitized: parserResult.sanitized,
+              parsed: parserResult.parsed,
             };
           }
 
           return {
             status: GAME_MODEL_EVALUATE_STATUS_OK,
+            input: parserResult.input,
             sanitized: parserResult.sanitized,
+            parsed: parserResult.parsed,
             move: moveResult.move,
           };
         }
@@ -112,7 +137,9 @@ export function gameModelEvaluate(
 
       return {
         status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        input: parserResult.input,
         sanitized: parserResult.sanitized,
+        parsed: parserResult.parsed,
       };
     }
 
@@ -123,13 +150,17 @@ export function gameModelEvaluate(
       if (moveResult.status === GAME_MOVE_STATUS_ILLEGAL) {
         return {
           status: GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
+          input: parserResult.input,
           sanitized: parserResult.sanitized,
+          parsed: parserResult.parsed,
         };
       }
 
       return {
         status: GAME_MODEL_EVALUATE_STATUS_OK,
+        input: parserResult.input,
         sanitized: parserResult.sanitized,
+        parsed: parserResult.parsed,
         move: moveResult.move,
       };
     }

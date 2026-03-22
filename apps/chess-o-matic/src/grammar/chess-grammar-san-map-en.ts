@@ -1,4 +1,51 @@
-export const grammarStopWords = ['check', 'checkmate', 'mate'];
+export const chessGrammarControlActions = ['undo', 'flip', 'resign'] as const;
+export const chessGrammarFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
+export const chessGrammarRanks = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'] as const;
+/*
+// prettier-ignore
+export const chessGrammarSquares = [
+  'a one', 'a two', 'a three', 'a four', 'a five', 'a six', 'a seven', 'a eight',
+  'b one', 'b two', 'b three', 'b four', 'b five', 'b six', 'b seven', 'b eight',
+  'c one', 'c two', 'c three', 'c four', 'c five', 'c six', 'c seven', 'c eight',
+  'd one', 'd two', 'd three', 'd four', 'd five', 'd six', 'd seven', 'd eight',
+  'e one', 'e two', 'e three', 'e four', 'e five', 'e six', 'e seven', 'e eight',
+  'f one', 'f two', 'f three', 'f four', 'f five', 'f six', 'f seven', 'f eight',
+  'g one', 'g two', 'g three', 'g four', 'g five', 'g six', 'g seven', 'g eight',
+  'h one', 'h two', 'h three', 'h four', 'h five', 'h six', 'h seven', 'h eight',
+];
+*/
+export const chessGrammaPieces = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'] as const;
+export const chessGrammarPieceSymbols = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
+export const chessGrammarConnectors = [
+  'move',
+  'from',
+  'to', // ambiguous with '2'
+  'takes',
+  'captures',
+  'castle',
+  'kingside',
+  'queenside',
+  'side',
+  'short',
+  'long',
+  'check',
+  'checkmate',
+  'mate',
+  'draw',
+  'promote',
+  'promotes',
+  'promotion',
+  'en passant',
+] as const;
+export const chessGrammar: Array<string> = [
+  '[unk]',
+  ...chessGrammarControlActions,
+  ...chessGrammarRanks,
+  ...chessGrammarFiles,
+  ...chessGrammaPieces,
+  ...chessGrammarPieceSymbols,
+  ...chessGrammarConnectors,
+] as const;
 
 export const grammarSanMap: Record<string, string | null> = {
   // Unknown
