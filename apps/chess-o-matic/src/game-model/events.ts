@@ -1,7 +1,7 @@
 import type { Square } from 'chess.js';
 
-import type { GameModelEvaluateResult, GameModelEvaluateResultControl, GameModelEvaluateResultOk } from './evaluate';
-import type { GameModelResources } from './index';
+import type { GameModelEvaluateResult, GameModelEvaluateResultControl, GameModelEvaluateResultOk } from './evaluate.js';
+import type { GameModelResources } from './index.js';
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_EVENT_TYPE_START = 'start' as const;
