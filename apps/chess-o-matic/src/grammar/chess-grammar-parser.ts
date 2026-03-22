@@ -4,6 +4,15 @@ import type { NonEmptyReadonlyArray } from '../lib';
 import { chessGrammarControlActions, chessGrammarFiles, chessGrammarPieceSymbols } from './chess-grammar-san-map-en';
 
 // --------------------------------------------------------------------------
+export function adjacentFiles(file: string): Array<string> {
+  const idx = chessGrammarFiles.indexOf(file as (typeof chessGrammarFiles)[number]);
+  if (idx === -1) return [];
+  return [chessGrammarFiles[idx - 1], chessGrammarFiles[idx + 1]].filter(
+    (f): f is string => f !== undefined,
+  );
+}
+
+// --------------------------------------------------------------------------
 export type SAN = string;
 export type ControlAction = string;
 export type SanCandidates = { readonly candidates: NonEmptyReadonlyArray<SAN> };
@@ -179,6 +188,14 @@ export function matchPieceMove(s: string): SanCandidates | undefined {
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
+    if (match2[1] === 'p') {
+      // Pawn captures require a source file; generate candidates from adjacent files
+      const targetFile = match2[2];
+      const targetRank = match2[3];
+      const candidates = adjacentFiles(targetFile).map((f) => `${f}x${targetFile}${targetRank}`);
+      if (candidates.length === 0) return undefined;
+      return { candidates: candidates as unknown as NonEmptyReadonlyArray<SAN> };
+    }
     return { candidates: [`${match2[1].toUpperCase()}x${match2[2]}${match2[3]}`] };
   }
 
