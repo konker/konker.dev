@@ -43,6 +43,16 @@ describe('chess-grammar-parser', () => {
     });
   });
 
+  describe('adjacentFiles', () => {
+    it('should return adjacent files', () => {
+      expect(unit.adjacentFiles('a')).toStrictEqual(['b']);
+      expect(unit.adjacentFiles('b')).toStrictEqual(['a', 'c']);
+      expect(unit.adjacentFiles('d')).toStrictEqual(['c', 'e']);
+      expect(unit.adjacentFiles('h')).toStrictEqual(['g']);
+      expect(unit.adjacentFiles('x')).toStrictEqual([]);
+    });
+  });
+
   describe('matchPawnMove', () => {
     it('should match pawn moves correctly', () => {
       // Simple pawn moves
@@ -113,6 +123,14 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchPieceMove('k captures d 3')).toStrictEqual({ candidates: ['Kxd3'] });
       expect(unit.matchPieceMove('q takes d 3')).toStrictEqual({ candidates: ['Qxd3'] });
       expect(unit.matchPieceMove('q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
+
+      // Pawn captures (generates candidates from adjacent files)
+      expect(unit.matchPieceMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.matchPieceMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.matchPieceMove('p takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchPieceMove('p captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchPieceMove('p takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.matchPieceMove('p captures e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
 
       // Piece with file
       expect(unit.matchPieceMove('r a d 3')).toStrictEqual({ candidates: ['Rad3'] });
@@ -229,6 +247,14 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchMove('q takes d 3')).toStrictEqual({ candidates: ['Qxd3'] });
       expect(unit.matchMove('q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
 
+      // matchPieceMove: pawn captures (generates candidates from adjacent files)
+      expect(unit.matchMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.matchMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.matchMove('p takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchMove('p captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchMove('p takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.matchMove('p captures e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+
       // matchPieceMove: piece with file
       expect(unit.matchMove('r a d 3')).toStrictEqual({ candidates: ['Rad3'] });
       expect(unit.matchMove('r a takes d 3')).toStrictEqual({ candidates: ['Raxd3'] });
@@ -342,6 +368,14 @@ describe('chess-grammar-parser', () => {
       expect(unit.parse('king captures d three')).toStrictEqual({ candidates: ['Kxd3'] });
       expect(unit.parse('queen takes d three')).toStrictEqual({ candidates: ['Qxd3'] });
       expect(unit.parse('queen captures d three')).toStrictEqual({ candidates: ['Qxd3'] });
+
+      // matchPieceMove: pawn captures (generates candidates from adjacent files)
+      expect(unit.parse('pawn takes h eight')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.parse('pawn captures h eight')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.parse('pawn takes a four')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.parse('pawn captures a four')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.parse('pawn takes e five')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.parse('pawn captures e five')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
 
       // matchPieceMove: piece with file
       expect(unit.parse('rook a d three')).toStrictEqual({ candidates: ['Rad3'] });
