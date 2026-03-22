@@ -1,7 +1,7 @@
 import type { Square } from 'chess.js';
 
 import type { GameModelResources } from './index';
-import type { GameInputParserResultOk } from './read';
+import type { GameInputParserResultOk, GameInputParserResultOkSan } from './read';
 import { GAME_INPUT_PARSE_STATUS_OK_SAN } from './read';
 
 // --------------------------------------------------------------------------
@@ -22,15 +22,14 @@ export type GameMoveResult =
     };
 
 // --------------------------------------------------------------------------
-export function playMove(
+export function playMoveCandidates(
   gameModelResources: GameModelResources,
-  parserResult: GameInputParserResultOk
+  parserResult: GameInputParserResultOkSan
 ): GameMoveResult {
   try {
-    const move =
-      parserResult.status === GAME_INPUT_PARSE_STATUS_OK_SAN
-        ? gameModelResources.chess.move(parserResult.san)
-        : gameModelResources.chess.move({ from: parserResult.coords[0], to: parserResult.coords[1], promotion: 'q' });
+    const moveCandidate =
+      parserResult.san.candidates.find(gameModelResources.isLegalMove) ?? parserResult.san.candidates[0];
+    const move = gameModelResources.chess.move(moveCandidate);
     return {
       status: GAME_MOVE_STATUS_OK,
       input: parserResult.input,
@@ -39,6 +38,36 @@ export function playMove(
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_: unknown) {
+    return {
+      status: GAME_MOVE_STATUS_ILLEGAL,
+      input: parserResult.input,
+      sanitized: parserResult.sanitized,
+    };
+  }
+}
+
+// --------------------------------------------------------------------------
+export function playMove(
+  gameModelResources: GameModelResources,
+  parserResult: GameInputParserResultOk
+): GameMoveResult {
+  try {
+    if (parserResult.status === GAME_INPUT_PARSE_STATUS_OK_SAN && parserResult.san.candidates.length > 1) {
+      return playMoveCandidates(gameModelResources, parserResult);
+    }
+
+    const move =
+      parserResult.status === GAME_INPUT_PARSE_STATUS_OK_SAN
+        ? gameModelResources.chess.move(parserResult.san.candidates[0])
+        : gameModelResources.chess.move({ from: parserResult.coords[0], to: parserResult.coords[1], promotion: 'q' });
+
+    return {
+      status: GAME_MOVE_STATUS_OK,
+      input: parserResult.input,
+      sanitized: parserResult.sanitized,
+      move: [move.from, move.to],
+    };
+  } catch {
     return {
       status: GAME_MOVE_STATUS_ILLEGAL,
       input: parserResult.input,

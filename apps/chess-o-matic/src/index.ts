@@ -116,12 +116,16 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
         typeof event.move === 'string'
           ? {
               status: GAME_INPUT_PARSE_STATUS_OK_SAN,
+              input: event.move,
               sanitized: event.move,
-              san: event.move,
+              parsed: event.move,
+              san: { candidates: [event.move] },
             }
           : {
               status: GAME_INPUT_PARSE_STATUS_OK_COORDS,
+              input: JSON.stringify(event.move),
               sanitized: `${event.move[0]} to ${event.move[1]}`,
+              parsed: JSON.stringify(event.move),
               coords: event.move,
             }
       );

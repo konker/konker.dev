@@ -113,7 +113,7 @@ export function gameModelEvaluate(
             input: san,
             sanitized: san,
             parsed: san,
-            san,
+            san: { candidates: [san] },
           });
 
           if (moveResult.status === GAME_MOVE_STATUS_ILLEGAL) {

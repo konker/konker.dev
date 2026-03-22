@@ -1,5 +1,6 @@
 import type { Square } from 'chess.js';
 
+import type { ControlAction, SanCandidates } from '../grammar/chess-grammar-parser';
 import { parse, sanitizeInputString } from '../grammar/chess-grammar-parser';
 import { chessGrammarControlActions } from '../grammar/chess-grammar-san-map-en';
 
@@ -21,7 +22,7 @@ export type GameInputParserResultOkSan = {
   readonly input: string;
   readonly sanitized: string;
   readonly parsed: string | undefined;
-  readonly san: string;
+  readonly san: SanCandidates;
 };
 export type GameInputParserResultOkCoords = {
   readonly status: typeof GAME_INPUT_PARSE_STATUS_OK_COORDS;
@@ -35,7 +36,7 @@ export type GameInputParserResultControlAction = {
   readonly input: string;
   readonly sanitized: string;
   readonly parsed: string | undefined;
-  readonly action: string;
+  readonly action: ControlAction;
 };
 export type GameInputParserResultIgnore = {
   readonly status: typeof GAME_INPUT_PARSE_STATUS_IGNORE;
@@ -77,21 +78,28 @@ export function gameModelRead(input: string): GameInputParserResult {
     };
   }
 
-  if (chessGrammarControlActions.includes(parsed as never)) {
-    return {
-      status: GAME_INPUT_PARSE_STATUS_CONTROL_ACTION,
-      input,
-      sanitized,
-      parsed,
-      action: parsed,
-    };
+  if (typeof parsed === 'string') {
+    return chessGrammarControlActions.includes(parsed as never)
+      ? {
+          status: GAME_INPUT_PARSE_STATUS_CONTROL_ACTION,
+          input,
+          sanitized,
+          parsed,
+          action: parsed,
+        }
+      : {
+          status: GAME_INPUT_PARSE_STATUS_IGNORE,
+          input,
+          sanitized,
+          parsed,
+        };
   }
 
   return {
     status: GAME_INPUT_PARSE_STATUS_OK_SAN,
     input,
     sanitized,
-    parsed,
+    parsed: JSON.stringify(parsed),
     san: parsed,
   };
 }
