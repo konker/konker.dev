@@ -1,15 +1,14 @@
-// --------------------------------------------------------------------------
 import type { Square } from 'chess.js';
 
-import {
-  chessGrammarControlActions,
-  chessGrammarFiles,
-  chessGrammarPieceSymbols,
-  chessGrammarRanks,
-} from './chess-grammar-san-map-en';
+import type { NonEmptyReadonlyArray } from '../lib';
+import { chessGrammarControlActions, chessGrammarFiles, chessGrammarPieceSymbols } from './chess-grammar-san-map-en';
 
+// --------------------------------------------------------------------------
 export type SAN = string;
+export type ControlAction = string;
+export type SanCandidates = { readonly candidates: NonEmptyReadonlyArray<SAN> };
 
+// --------------------------------------------------------------------------
 export const NUMBER_WORD_MAP = [
   [/one/gi, '1'],
   [/two/gi, '2'],
@@ -34,8 +33,6 @@ export const CHESS_RANK_NUMS = ['1', '2', '3', '4', '5', '6', '7', '8'] as const
 export const CHESS_PROMOTION_RANKS = ['1', '8'] as const;
 export const CHESS_PROMOTION_PIECES = ['n', 'b', 'r', 'q'] as const;
 
-export const W_MOVE = 'move' as const;
-export const W_FROM = 'from' as const;
 export const W_TO = '(?:to|2)' as const;
 export const W_TAKES = 'takes' as const;
 export const W_CAPTURES = 'captures' as const;
@@ -79,7 +76,7 @@ export function sanitizeInputString(input: string): string {
 }
 
 // --------------------------------------------------------------------------
-export function matchControlInstruction(s: string): string | undefined {
+export function matchControlInstruction(s: string): ControlAction | undefined {
   const res1 = [new RegExp(`^${CONTROL_ACTION_RE_S}$`)];
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
@@ -91,36 +88,36 @@ export function matchControlInstruction(s: string): string | undefined {
 }
 
 // --------------------------------------------------------------------------
-export function matchPawnMove(s: string): Square | undefined {
+export function matchPawnMove(s: string): SanCandidates | undefined {
   const res1 = [new RegExp(`^${SQUARE_RE_S}$`)];
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
-    return `${match1[1]}${match1[2]}` as Square;
+    return { candidates: [`${match1[1]}${match1[2]}`] };
   }
 
   const res2 = [
     new RegExp(`^${FILE_RE_S} ${W_TAKES} ${SQUARE_RE_S}$`),
     new RegExp(`^${FILE_RE_S} ${W_TAKES} ${SQUARE_RE_S} ${W_EN_PASSANT}$`),
     new RegExp(`^${FILE_RE_S} ${W_CAPTURES} ${SQUARE_RE_S}$`),
-    new RegExp(`^${FILE_RE_S} ${W_CAPTURES} ${SQUARE_RE_S}$ ${W_EN_PASSANT}`),
+    new RegExp(`^${FILE_RE_S} ${W_CAPTURES} ${SQUARE_RE_S} ${W_EN_PASSANT}$`),
   ];
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
-    return `${match2[1]}x${match2[2]}${match2[3]}` as Square;
+    return { candidates: [`${match2[1]}x${match2[2]}${match2[3]}`] };
   }
 
   return undefined;
 }
 
 // --------------------------------------------------------------------------
-export function matchPawnPromotionMove(s: string): SAN | undefined {
+export function matchPawnPromotionMove(s: string): SanCandidates | undefined {
   const res1 = [new RegExp(`^${PROMOTION_SQUARE_RE_S} ${W_PROMOTE}$`)];
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
-    return `${match1[1]}${match1[2]}=Q`;
+    return { candidates: [`${match1[1]}${match1[2]}=Q`] };
   }
 
   const res2 = [
@@ -130,7 +127,7 @@ export function matchPawnPromotionMove(s: string): SAN | undefined {
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
-    return `${match2[1]}${match2[2]}=${match2[3].toUpperCase()}`;
+    return { candidates: [`${match2[1]}${match2[2]}=${match2[3].toUpperCase()}`] };
   }
 
   const res3 = [
@@ -140,7 +137,7 @@ export function matchPawnPromotionMove(s: string): SAN | undefined {
   const matches3 = res3.map((re) => re.exec(s));
   const match3 = matches3.find((x) => x !== null);
   if (match3) {
-    return `${match3[1]}x${match3[2]}${match3[3]}=Q`;
+    return { candidates: [`${match3[1]}x${match3[2]}${match3[3]}=Q`] };
   }
 
   const res4 = [
@@ -150,19 +147,29 @@ export function matchPawnPromotionMove(s: string): SAN | undefined {
   const matches4 = res4.map((re) => re.exec(s));
   const match4 = matches4.find((x) => x !== null);
   if (match4) {
-    return `${match4[1]}x${match4[2]}${match4[3]}=${match4[4].toUpperCase()}`;
+    return { candidates: [`${match4[1]}x${match4[2]}${match4[3]}=${match4[4].toUpperCase()}`] };
   }
 
   return undefined;
 }
 
 // --------------------------------------------------------------------------
-export function matchPieceMove(s: string): SAN | undefined {
+export function matchPieceMove(s: string): SanCandidates | undefined {
   const res1 = [new RegExp(`^${PIECE_RE_S} ${SQUARE_RE_S}$`), new RegExp(`^${PIECE_RE_S} ${W_TO} ${SQUARE_RE_S}$`)];
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
-    return `${match1[1].toUpperCase()}${match1[2]}${match1[3]}`;
+    const san = match1[1] === 'p' ? `${match1[2]}${match1[3]}` : `${match1[1].toUpperCase()}${match1[2]}${match1[3]}`;
+
+    // Check if this could also be a rank-disambiguated move (e.g. "r 2 d 3" could be Rd3 or R2d3)
+    const rankAmbiguityRe = new RegExp(`^${PIECE_RE_S} ${RANK_RE_S} ${SQUARE_RE_S}$`);
+    const rankMatch = rankAmbiguityRe.exec(s);
+    if (rankMatch && rankMatch[1] !== 'p') {
+      const altSan = `${rankMatch[1].toUpperCase()}${rankMatch[2]}${rankMatch[3]}${rankMatch[4]}`;
+      return { candidates: [san, altSan] };
+    }
+
+    return { candidates: [san] };
   }
 
   const res2 = [
@@ -172,7 +179,7 @@ export function matchPieceMove(s: string): SAN | undefined {
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
-    return `${match2[1].toUpperCase()}x${match2[2]}${match2[3]}`;
+    return { candidates: [`${match2[1].toUpperCase()}x${match2[2]}${match2[3]}`] };
   }
 
   const res3 = [
@@ -184,7 +191,7 @@ export function matchPieceMove(s: string): SAN | undefined {
   const matches3 = res3.map((re) => re.exec(s));
   const match3 = matches3.find((x) => x !== null);
   if (match3) {
-    return `${match3[1].toUpperCase()}${match3[2]}${match3[3]}${match3[4]}`;
+    return { candidates: [`${match3[1].toUpperCase()}${match3[2]}${match3[3]}${match3[4]}`] };
   }
 
   const res4 = [
@@ -197,7 +204,7 @@ export function matchPieceMove(s: string): SAN | undefined {
   const matches4 = res4.map((re) => re.exec(s));
   const match4 = matches4.find((x) => x !== null);
   if (match4) {
-    return `${match4[1].toUpperCase()}${match4[2]}x${match4[3]}${match4[4]}`;
+    return { candidates: [`${match4[1].toUpperCase()}${match4[2]}x${match4[3]}${match4[4]}`] };
   }
 
   return undefined;
@@ -216,7 +223,7 @@ export function matchCoordMove(s: string): [Square, Square] | undefined {
 }
 
 // --------------------------------------------------------------------------
-export function matchCastleMove(s: string): SAN | undefined {
+export function matchCastleMove(s: string): SanCandidates | undefined {
   const res1 = [
     new RegExp(`^${W_CASTLE} ${W_KING_SIDE}$`),
     new RegExp(`^${W_KING_SIDE} ${W_CASTLE}$`),
@@ -226,7 +233,7 @@ export function matchCastleMove(s: string): SAN | undefined {
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
-    return `O-O`;
+    return { candidates: ['O-O'] };
   }
 
   const res2 = [
@@ -238,14 +245,14 @@ export function matchCastleMove(s: string): SAN | undefined {
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
-    return `O-O-O`;
+    return { candidates: ['O-O-O'] };
   }
 
   return undefined;
 }
 
 // --------------------------------------------------------------------------
-export function matchMove(s: string): SAN | Square | [Square, Square] | undefined {
+export function matchMove(s: string): SanCandidates | [Square, Square] | ControlAction | undefined {
   // eslint-disable-next-line fp/no-loops
   for (const matcherFn of [
     matchControlInstruction,
@@ -265,6 +272,6 @@ export function matchMove(s: string): SAN | Square | [Square, Square] | undefine
 }
 
 // --------------------------------------------------------------------------
-export function parse(s: string): SAN | Square | [Square, Square] | undefined {
+export function parse(s: string): SanCandidates | [Square, Square] | ControlAction | undefined {
   return matchMove(sanitizeInputString(s));
 }
