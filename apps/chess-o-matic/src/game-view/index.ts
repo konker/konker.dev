@@ -1,8 +1,8 @@
 import type { GameModelResources } from '../game-model';
-import type { GameModelEvaluateResultControl, GameModelEvaluateResultOk } from '../game-model/evaluate';
-import { GAME_MODEL_CONTROL_ACTION_FLIP } from '../game-model/evaluate';
+import type { GameModelEvaluateResultControl, GameModelEvaluateResultOk } from '../game-model/evaluate.js';
+import { GAME_MODEL_CONTROL_ACTION_FLIP } from '../game-model/evaluate.js';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
-import type { BoardView } from './types';
+import type { BoardView } from './types.js';
 
 // --------------------------------------------------------------------------
 export type GameViewResources = {

@@ -8,13 +8,13 @@ import {
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
   GAME_MODEL_EVALUATE_STATUS_OK,
   gameModelEvaluate,
-} from './game-model/evaluate';
+} from './game-model/evaluate.js';
 import type {
   GameModelEventControl,
   GameModelEventEvaluated,
   GameModelEventMoved,
   GameModelEventViewChanged,
-} from './game-model/events';
+} from './game-model/events.js';
 import {
   GAME_MODEL_EVENT_TYPE_CONTROL,
   GAME_MODEL_EVENT_TYPE_EVALUATED,
@@ -22,11 +22,11 @@ import {
   GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
   gameModelEventsAddListener,
   gameModelEventsNotifyListeners,
-} from './game-model/events';
-import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read';
+} from './game-model/events.js';
+import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read.js';
 import type { GameViewResources } from './game-view';
 import { exitGameView, gameViewUpdateControl, gameViewUpdateMoved, initGameView } from './game-view';
-import { chessGrammar } from './grammar/chess-grammar-san-map-en.js';
+import { chessGrammar } from './grammar/chess-grammar-en.js';
 import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
 import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
 

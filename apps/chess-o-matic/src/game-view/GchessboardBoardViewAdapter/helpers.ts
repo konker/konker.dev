@@ -2,7 +2,7 @@ import type { Square } from 'chess.js';
 import type { GChessBoardElement } from 'gchessboard';
 
 import type { GameModelResources } from '../../game-model';
-import { GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, gameModelEventsNotifyListeners } from '../../game-model/events';
+import { GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, gameModelEventsNotifyListeners } from '../../game-model/events.js';
 
 // --------------------------------------------------------------------------
 export function moveHighlight(rep: GChessBoardElement, coords: [Square, Square]): void {

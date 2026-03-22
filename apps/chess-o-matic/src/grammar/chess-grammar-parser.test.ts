@@ -43,6 +43,17 @@ describe('chess-grammar-parser', () => {
     });
   });
 
+  describe('defaultPromotion', () => {
+    it('should append =Q for promotion ranks', () => {
+      expect(unit.defaultPromotion('e8', '8')).toEqual('e8=Q');
+      expect(unit.defaultPromotion('e1', '1')).toEqual('e1=Q');
+      expect(unit.defaultPromotion('axb8', '8')).toEqual('axb8=Q');
+      expect(unit.defaultPromotion('axb1', '1')).toEqual('axb1=Q');
+      expect(unit.defaultPromotion('e4', '4')).toEqual('e4');
+      expect(unit.defaultPromotion('axb3', '3')).toEqual('axb3');
+    });
+  });
+
   describe('adjacentFiles', () => {
     it('should return adjacent files', () => {
       expect(unit.adjacentFiles('a')).toStrictEqual(['b']);
@@ -62,9 +73,13 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchPawnMove('d 5')).toStrictEqual({ candidates: ['d5'] });
       expect(unit.matchPawnMove('h 7')).toStrictEqual({ candidates: ['h7'] });
 
+      // Simple pawn moves to promotion rank (default Q)
+      expect(unit.matchPawnMove('a 8')).toStrictEqual({ candidates: ['a8=Q'] });
+      expect(unit.matchPawnMove('e 1')).toStrictEqual({ candidates: ['e1=Q'] });
+
       // Pawn captures
-      expect(unit.matchPawnMove('a takes b 1')).toStrictEqual({ candidates: ['axb1'] });
-      expect(unit.matchPawnMove('a captures b 1')).toStrictEqual({ candidates: ['axb1'] });
+      expect(unit.matchPawnMove('a takes b 1')).toStrictEqual({ candidates: ['axb1=Q'] });
+      expect(unit.matchPawnMove('a captures b 1')).toStrictEqual({ candidates: ['axb1=Q'] });
       expect(unit.matchPawnMove('e takes d 5')).toStrictEqual({ candidates: ['exd5'] });
       expect(unit.matchPawnMove('e captures d 5')).toStrictEqual({ candidates: ['exd5'] });
 
@@ -110,6 +125,8 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchPieceMove('r d 3')).toStrictEqual({ candidates: ['Rd3'] });
       expect(unit.matchPieceMove('q d 1')).toStrictEqual({ candidates: ['Qd1'] });
       expect(unit.matchPieceMove('p d 3')).toStrictEqual({ candidates: ['d3'] });
+      expect(unit.matchPieceMove('p d 8')).toStrictEqual({ candidates: ['d8=Q'] });
+      expect(unit.matchPieceMove('p e 1')).toStrictEqual({ candidates: ['e1=Q'] });
 
       // Verbose moves
       expect(unit.matchPieceMove('b to a 3')).toStrictEqual({ candidates: ['Ba3'] });
@@ -125,8 +142,8 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchPieceMove('q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
 
       // Pawn captures (generates candidates from adjacent files)
-      expect(unit.matchPieceMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8'] });
-      expect(unit.matchPieceMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.matchPieceMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.matchPieceMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
       expect(unit.matchPieceMove('p takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
       expect(unit.matchPieceMove('p captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
       expect(unit.matchPieceMove('p takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
@@ -211,9 +228,13 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchMove('d 5')).toStrictEqual({ candidates: ['d5'] });
       expect(unit.matchMove('h 7')).toStrictEqual({ candidates: ['h7'] });
 
+      // matchPawnMove: simple pawn moves to promotion rank (default Q)
+      expect(unit.matchMove('a 8')).toStrictEqual({ candidates: ['a8=Q'] });
+      expect(unit.matchMove('e 1')).toStrictEqual({ candidates: ['e1=Q'] });
+
       // matchPawnMove: pawn captures
-      expect(unit.matchMove('a takes b 1')).toStrictEqual({ candidates: ['axb1'] });
-      expect(unit.matchMove('a captures b 1')).toStrictEqual({ candidates: ['axb1'] });
+      expect(unit.matchMove('a takes b 1')).toStrictEqual({ candidates: ['axb1=Q'] });
+      expect(unit.matchMove('a captures b 1')).toStrictEqual({ candidates: ['axb1=Q'] });
       expect(unit.matchMove('e takes d 5')).toStrictEqual({ candidates: ['exd5'] });
       expect(unit.matchMove('e captures d 5')).toStrictEqual({ candidates: ['exd5'] });
 
@@ -233,6 +254,8 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchMove('r d 3')).toStrictEqual({ candidates: ['Rd3'] });
       expect(unit.matchMove('q d 1')).toStrictEqual({ candidates: ['Qd1'] });
       expect(unit.matchMove('p d 3')).toStrictEqual({ candidates: ['d3'] });
+      expect(unit.matchMove('p d 8')).toStrictEqual({ candidates: ['d8=Q'] });
+      expect(unit.matchMove('p e 1')).toStrictEqual({ candidates: ['e1=Q'] });
 
       // matchPieceMove: verbose moves
       expect(unit.matchMove('b to a 3')).toStrictEqual({ candidates: ['Ba3'] });
@@ -248,8 +271,8 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchMove('q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
 
       // matchPieceMove: pawn captures (generates candidates from adjacent files)
-      expect(unit.matchMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8'] });
-      expect(unit.matchMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.matchMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.matchMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
       expect(unit.matchMove('p takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
       expect(unit.matchMove('p captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
       expect(unit.matchMove('p takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
@@ -333,9 +356,13 @@ describe('chess-grammar-parser', () => {
       expect(unit.parse('d five')).toStrictEqual({ candidates: ['d5'] });
       expect(unit.parse('h seven')).toStrictEqual({ candidates: ['h7'] });
 
+      // matchPawnMove: simple pawn moves to promotion rank (default Q)
+      expect(unit.parse('a eight')).toStrictEqual({ candidates: ['a8=Q'] });
+      expect(unit.parse('e one')).toStrictEqual({ candidates: ['e1=Q'] });
+
       // matchPawnMove: pawn captures
-      expect(unit.parse('a takes b one')).toStrictEqual({ candidates: ['axb1'] });
-      expect(unit.parse('a captures b one')).toStrictEqual({ candidates: ['axb1'] });
+      expect(unit.parse('a takes b one')).toStrictEqual({ candidates: ['axb1=Q'] });
+      expect(unit.parse('a captures b one')).toStrictEqual({ candidates: ['axb1=Q'] });
       expect(unit.parse('e takes d five')).toStrictEqual({ candidates: ['exd5'] });
       expect(unit.parse('e captures d five')).toStrictEqual({ candidates: ['exd5'] });
 
@@ -355,6 +382,8 @@ describe('chess-grammar-parser', () => {
       expect(unit.parse('rook d three')).toStrictEqual({ candidates: ['Rd3'] });
       expect(unit.parse('queen d one')).toStrictEqual({ candidates: ['Qd1'] });
       expect(unit.parse('pawn d three')).toStrictEqual({ candidates: ['d3'] });
+      expect(unit.parse('pawn d eight')).toStrictEqual({ candidates: ['d8=Q'] });
+      expect(unit.parse('pawn e one')).toStrictEqual({ candidates: ['e1=Q'] });
 
       // matchPieceMove: verbose moves
       expect(unit.parse('bishop to a three')).toStrictEqual({ candidates: ['Ba3'] });
@@ -370,8 +399,8 @@ describe('chess-grammar-parser', () => {
       expect(unit.parse('queen captures d three')).toStrictEqual({ candidates: ['Qxd3'] });
 
       // matchPieceMove: pawn captures (generates candidates from adjacent files)
-      expect(unit.parse('pawn takes h eight')).toStrictEqual({ candidates: ['gxh8'] });
-      expect(unit.parse('pawn captures h eight')).toStrictEqual({ candidates: ['gxh8'] });
+      expect(unit.parse('pawn takes h eight')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.parse('pawn captures h eight')).toStrictEqual({ candidates: ['gxh8=Q'] });
       expect(unit.parse('pawn takes a four')).toStrictEqual({ candidates: ['bxa4'] });
       expect(unit.parse('pawn captures a four')).toStrictEqual({ candidates: ['bxa4'] });
       expect(unit.parse('pawn takes e five')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });

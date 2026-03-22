@@ -5,10 +5,10 @@ import type { Square } from 'chess.js';
 import type { GChessBoardElement } from 'gchessboard';
 
 import type { GameModelResources } from '../../game-model';
-import { START_FEN } from '../../game-model/consts';
-import type { BoardViewAdapter } from '../types';
-import { moveComplete, moveHighlight } from './helpers';
-import { openPromotionDialog } from './promotion-ui';
+import { START_FEN } from '../../game-model/consts.js';
+import type { BoardViewAdapter } from '../types.js';
+import { moveComplete, moveHighlight } from './helpers.js';
+import { openPromotionDialog } from './promotion-ui.js';
 
 // --------------------------------------------------------------------------
 export const GchessboardBoardViewAdapter: BoardViewAdapter = (

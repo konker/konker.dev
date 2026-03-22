@@ -2,7 +2,7 @@ import type { Square } from 'chess.js';
 import type { GChessBoardElement } from 'gchessboard';
 
 import type { GameModelResources } from '../../game-model';
-import { moveComplete } from './helpers';
+import { moveComplete } from './helpers.js';
 
 // --------------------------------------------------------------------------
 export function openPromotionDialog(

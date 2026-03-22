@@ -1,14 +1,14 @@
 import type { Square } from 'chess.js';
 
-import type { GameModelResources } from './index';
-import { GAME_MOVE_STATUS_ILLEGAL, playMove } from './move';
-import type { GameInputParserResult } from './read';
+import type { GameModelResources } from './index.js';
+import { GAME_MOVE_STATUS_ILLEGAL, playMove } from './move.js';
+import type { GameInputParserResult } from './read.js';
 import {
   GAME_INPUT_PARSE_STATUS_CONTROL_ACTION,
   GAME_INPUT_PARSE_STATUS_OK_COORDS,
   GAME_INPUT_PARSE_STATUS_OK_SAN,
-} from './read';
-import { GAME_INPUT_PARSE_STATUS_IGNORE } from './read';
+} from './read.js';
+import { GAME_INPUT_PARSE_STATUS_IGNORE } from './read.js';
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_CONTROL_ACTION_FLIP = '_flip';
@@ -39,6 +39,7 @@ export type GameModelEvaluateResultIllegal = {
   input: string;
   sanitized: string;
   parsed: string | undefined;
+  message: string;
 };
 
 export type GameModelEvaluateResultControl = {
@@ -122,6 +123,7 @@ export function gameModelEvaluate(
               input: parserResult.input,
               sanitized: parserResult.sanitized,
               parsed: parserResult.parsed,
+              message: moveResult.message,
             };
           }
 
@@ -153,6 +155,7 @@ export function gameModelEvaluate(
           input: parserResult.input,
           sanitized: parserResult.sanitized,
           parsed: parserResult.parsed,
+          message: moveResult.message,
         };
       }
 

@@ -1,15 +1,20 @@
 import type { Square } from 'chess.js';
 
-import type { NonEmptyReadonlyArray } from '../lib';
-import { chessGrammarControlActions, chessGrammarFiles, chessGrammarPieceSymbols } from './chess-grammar-san-map-en';
+import type { NonEmptyReadonlyArray } from '../lib.js';
+import type { ChessGrammarFile } from './chess-grammar-en.js';
+import { chessGrammarControlActions, chessGrammarFiles, chessGrammarPieceSymbols } from './chess-grammar-en.js';
 
 // --------------------------------------------------------------------------
-export function adjacentFiles(file: string): Array<string> {
-  const idx = chessGrammarFiles.indexOf(file as (typeof chessGrammarFiles)[number]);
-  if (idx === -1) return [];
-  return [chessGrammarFiles[idx - 1], chessGrammarFiles[idx + 1]].filter(
-    (f): f is string => f !== undefined,
-  );
+export function defaultPromotion(san: SAN, rank: string): SAN {
+  return CHESS_PROMOTION_RANKS.includes(rank as (typeof CHESS_PROMOTION_RANKS)[number]) ? `${san}=Q` : san;
+}
+
+export function adjacentFiles(file: string): ReadonlyArray<ChessGrammarFile> {
+  const idx = chessGrammarFiles.indexOf(file as ChessGrammarFile);
+  if (idx === -1) {
+    return [];
+  }
+  return [chessGrammarFiles[idx - 1], chessGrammarFiles[idx + 1]].filter((f): f is ChessGrammarFile => f !== undefined);
 }
 
 // --------------------------------------------------------------------------
@@ -102,7 +107,7 @@ export function matchPawnMove(s: string): SanCandidates | undefined {
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
-    return { candidates: [`${match1[1]}${match1[2]}`] };
+    return { candidates: [defaultPromotion(`${match1[1]}${match1[2]}`, match1[2])] };
   }
 
   const res2 = [
@@ -114,7 +119,7 @@ export function matchPawnMove(s: string): SanCandidates | undefined {
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
-    return { candidates: [`${match2[1]}x${match2[2]}${match2[3]}`] };
+    return { candidates: [defaultPromotion(`${match2[1]}x${match2[2]}${match2[3]}`, match2[3])] };
   }
 
   return undefined;
@@ -168,7 +173,10 @@ export function matchPieceMove(s: string): SanCandidates | undefined {
   const matches1 = res1.map((re) => re.exec(s));
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
-    const san = match1[1] === 'p' ? `${match1[2]}${match1[3]}` : `${match1[1].toUpperCase()}${match1[2]}${match1[3]}`;
+    const san =
+      match1[1] === 'p'
+        ? defaultPromotion(`${match1[2]}${match1[3]}`, match1[3])
+        : `${match1[1].toUpperCase()}${match1[2]}${match1[3]}`;
 
     // Check if this could also be a rank-disambiguated move (e.g. "r 2 d 3" could be Rd3 or R2d3)
     const rankAmbiguityRe = new RegExp(`^${PIECE_RE_S} ${RANK_RE_S} ${SQUARE_RE_S}$`);
@@ -192,7 +200,9 @@ export function matchPieceMove(s: string): SanCandidates | undefined {
       // Pawn captures require a source file; generate candidates from adjacent files
       const targetFile = match2[2];
       const targetRank = match2[3];
-      const candidates = adjacentFiles(targetFile).map((f) => `${f}x${targetFile}${targetRank}`);
+      const candidates = adjacentFiles(targetFile).map((f) =>
+        defaultPromotion(`${f}x${targetFile}${targetRank}`, targetRank)
+      );
       if (candidates.length === 0) return undefined;
       return { candidates: candidates as unknown as NonEmptyReadonlyArray<SAN> };
     }
