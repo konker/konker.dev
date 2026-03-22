@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
@@ -8,9 +8,7 @@ export default defineConfig({
     // HTTPS is required for microphone access in modern browsers
     basicSsl(),
     viteStaticCopy({
-      targets: [
-        { src: 'grammar/*.json', dest: 'grammar' },
-      ],
+      targets: [],
     }),
   ],
   server: {

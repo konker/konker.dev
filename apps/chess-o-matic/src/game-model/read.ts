@@ -1,6 +1,7 @@
 import type { Square } from 'chess.js';
 
-import { grammarSanMap, grammarStopWords } from '../grammar/chess-grammar-san-map-en';
+import { parse, sanitizeInputString } from '../grammar/chess-grammar-parser';
+import { chessGrammarControlActions } from '../grammar/chess-grammar-san-map-en';
 
 export const GAME_INPUT_PARSE_STATUS_OK_SAN = 'ok_san';
 export const GAME_INPUT_PARSE_STATUS_OK_COORDS = 'ok_coords';
@@ -17,21 +18,29 @@ export type GameInputParseStatus =
 // --------------------------------------------------------------------------
 export type GameInputParserResultOkSan = {
   readonly status: typeof GAME_INPUT_PARSE_STATUS_OK_SAN;
+  readonly input: string;
   readonly sanitized: string;
+  readonly parsed: string | undefined;
   readonly san: string;
 };
 export type GameInputParserResultOkCoords = {
   readonly status: typeof GAME_INPUT_PARSE_STATUS_OK_COORDS;
+  readonly input: string;
   readonly sanitized: string;
+  readonly parsed: string | undefined;
   readonly coords: [Square, Square];
 };
 export type GameInputParserResultControlAction = {
   readonly status: typeof GAME_INPUT_PARSE_STATUS_CONTROL_ACTION;
+  readonly input: string;
   readonly sanitized: string;
+  readonly parsed: string | undefined;
   readonly action: string;
 };
 export type GameInputParserResultIgnore = {
   readonly status: typeof GAME_INPUT_PARSE_STATUS_IGNORE;
+  readonly input: string;
+  readonly parsed: string | undefined;
   readonly sanitized: string;
 };
 
@@ -43,60 +52,46 @@ export type GameInputParserResult =
   | GameInputParserResultIgnore;
 
 // --------------------------------------------------------------------------
-export function sanitizeInputString(input: string): string {
-  // FIXME: strip out non-essential words before lookup, e.g. check, mate, etc.
-  return grammarStopWords.reduce((acc, val) => acc.replace(val, ''), input).trim();
-}
-
-// --------------------------------------------------------------------------
-export function parseCoordMove(sanitized: string): [Square, Square] | null {
-  const [from, to] = sanitized.split(' to ');
-  if (from in grammarSanMap && to in grammarSanMap) {
-    return [grammarSanMap[from] as Square, grammarSanMap[to] as Square];
-  }
-  return null;
-}
-
-// --------------------------------------------------------------------------
 // Convert a text input into a parser result
 export function gameModelRead(input: string): GameInputParserResult {
   const sanitized = sanitizeInputString(input);
 
-  const move =
-    sanitized in grammarSanMap
-      ? grammarSanMap[sanitized]
-      : Object.values(grammarSanMap).includes(sanitized)
-        ? sanitized
-        : sanitized.includes(' to ')
-          ? parseCoordMove(sanitized)
-          : null;
+  const parsed = parse(input);
 
-  if (move === null) {
+  if (parsed === undefined) {
     return {
       status: GAME_INPUT_PARSE_STATUS_IGNORE,
+      input,
       sanitized,
+      parsed,
     };
   }
 
-  if (Array.isArray(move)) {
+  if (Array.isArray(parsed)) {
     return {
       status: GAME_INPUT_PARSE_STATUS_OK_COORDS,
+      input,
       sanitized,
-      coords: move,
+      parsed: JSON.stringify(parsed),
+      coords: parsed,
     };
   }
 
-  if (['_undo', '_flip', '_resign'].includes(move)) {
+  if (chessGrammarControlActions.includes(parsed as never)) {
     return {
       status: GAME_INPUT_PARSE_STATUS_CONTROL_ACTION,
+      input,
       sanitized,
-      action: move,
+      parsed,
+      action: parsed,
     };
   }
 
   return {
     status: GAME_INPUT_PARSE_STATUS_OK_SAN,
+    input,
     sanitized,
-    san: move,
+    parsed,
+    san: parsed,
   };
 }
