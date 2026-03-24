@@ -1,6 +1,15 @@
+import type { AudioOutputResources } from '../audio-resources/output';
+import { playAudioOutputEventSound } from '../audio-resources/output';
+import { AUDIO_OUTPUT_EVENT_INVALID, AUDIO_OUTPUT_EVENT_MOVE_BOTTOM } from '../audio-resources/output/events';
 import type { GameModelResources } from '../game-model';
-import type { GameModelEvaluateResultControl, GameModelEvaluateResultOk } from '../game-model/evaluate.js';
+import type {
+  GameModelEvaluateResultControl,
+  GameModelEvaluateResultIgnore,
+  GameModelEvaluateResultIllegal,
+  GameModelEvaluateResultOk,
+} from '../game-model/evaluate.js';
 import { GAME_MODEL_CONTROL_ACTION_FLIP } from '../game-model/evaluate.js';
+import type { ComSettings } from '../settings';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
 import type { BoardView } from './types.js';
 
@@ -26,15 +35,34 @@ export function initGameView(
 }
 
 // --------------------------------------------------------------------------
-export function gameViewUpdateMoved(
+export async function gameViewUpdateMovedOk(
+  settings: ComSettings,
   gameViewResources: GameViewResources,
   gameModelResources: GameModelResources,
+  audioOutputResources: AudioOutputResources,
   evaluateResult: GameModelEvaluateResultOk
-): void {
+): Promise<void> {
   if (gameModelResources.locked) {
     return;
   }
   gameViewResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
+  console.log('KONK90', evaluateResult);
+  await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_MOVE_BOTTOM);
+}
+
+// --------------------------------------------------------------------------
+export async function gameViewUpdateMovedInvalid(
+  settings: ComSettings,
+  _gameViewResources: GameViewResources,
+  gameModelResources: GameModelResources,
+  audioOutputResources: AudioOutputResources,
+  evaluateResult: GameModelEvaluateResultIgnore | GameModelEvaluateResultIllegal
+): Promise<void> {
+  if (gameModelResources.locked) {
+    return;
+  }
+  console.log('KONK91', evaluateResult);
+  await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_INVALID);
 }
 
 // --------------------------------------------------------------------------

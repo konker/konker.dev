@@ -18,6 +18,7 @@ export const chessGrammarConnectors = [
   'from',
   'to', // ambiguous with '2'
   'takes',
+  'x',
   'captures',
   'castle',
   'kingside',
