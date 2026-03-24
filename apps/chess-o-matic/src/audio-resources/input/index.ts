@@ -1,22 +1,22 @@
 // --------------------------------------------------------------------------
-export type AudioResourcesListening = {
+export type AudioInputResourcesListening = {
   isListening: true;
   audioContext: AudioContext;
   mediaStream: MediaStream;
   workletNode: AudioWorkletNode;
 };
 
-export type AudioResourcesNotListening = {
+export type AudioInputResourcesNotListening = {
   isListening: false;
   audioContext: null;
   mediaStream: null;
   workletNode: null;
 };
 
-export type AudioResources = AudioResourcesListening | AudioResourcesNotListening;
+export type AudioInputResources = AudioInputResourcesListening | AudioInputResourcesNotListening;
 
 // --------------------------------------------------------------------------
-export async function initAudioResources(): Promise<AudioResourcesListening> {
+export async function initAudioInputResources(): Promise<AudioInputResourcesListening> {
   // Request microphone access
   const mediaStream = await navigator.mediaDevices.getUserMedia({
     audio: {
@@ -50,23 +50,23 @@ export async function initAudioResources(): Promise<AudioResourcesListening> {
 }
 
 // --------------------------------------------------------------------------
-export function exitAudioResources(audioResources: AudioResources): AudioResourcesNotListening {
-  if (!audioResources.isListening) {
-    return audioResources;
+export function exitAudioInputResources(audioOutputResources: AudioInputResources): AudioInputResourcesNotListening {
+  if (!audioOutputResources.isListening) {
+    return audioOutputResources;
   }
 
   // Clean up audio resources
-  if (audioResources.workletNode) {
-    audioResources.workletNode.disconnect();
-    audioResources.workletNode.port.onmessage = null;
+  if (audioOutputResources.workletNode) {
+    audioOutputResources.workletNode.disconnect();
+    audioOutputResources.workletNode.port.onmessage = null;
   }
 
-  if (audioResources.audioContext) {
-    void audioResources.audioContext.close();
+  if (audioOutputResources.audioContext) {
+    void audioOutputResources.audioContext.close();
   }
 
-  if (audioResources.mediaStream) {
-    audioResources.mediaStream.getTracks().forEach((track) => track.stop());
+  if (audioOutputResources.mediaStream) {
+    audioOutputResources.mediaStream.getTracks().forEach((track) => track.stop());
   }
 
   console.log('Stopped listening');

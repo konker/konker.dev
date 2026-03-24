@@ -68,7 +68,6 @@
     <hr>
 <!--    <button id="startBtn">Start1</button>-->
     <button id="stopBtn">Stop</button>
-    <button id="tickBtn">tick</button>
     <hr />
     <script type="module">
       import 'gchessboard'
@@ -79,13 +78,11 @@
       const pgn = document.getElementById("pgn");
       // const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
-      const tickBtn = document.getElementById("tickBtn");
 
 
 
       // startBtn.addEventListener("click", async () => init(boardWrapper, input, pgn));
       stopBtn.addEventListener("click", exit);
-      tickBtn.addEventListener('click', () => tick('e4'));
 
       // Expose to browser console
       window.tick = tick;

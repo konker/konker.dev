@@ -5,9 +5,9 @@ import * as unit from './chess-grammar-parser';
 describe('chess-grammar-parser', () => {
   describe('sanitizeInputString', () => {
     it('should remove stop words and normalize input', () => {
-      expect(unit.sanitizeInputString(' a  PAWN ')).toEqual('a p');
-      expect(unit.sanitizeInputString('a three pawn KNIGHT  bishop check')).toEqual('a 3 p n b');
-      expect(unit.sanitizeInputString('kniGHT checkmate')).toEqual('n');
+      expect(unit.sanitizeInputString(' a  PAWN ')).toEqual('a P');
+      expect(unit.sanitizeInputString('a three pawn KNIGHT  bishop check')).toEqual('a 3 P N B');
+      expect(unit.sanitizeInputString('kniGHT checkmate')).toEqual('N');
       expect(unit.sanitizeInputString('')).toEqual('');
     });
   });
@@ -25,10 +25,10 @@ describe('chess-grammar-parser', () => {
 
   describe('parsePieces', () => {
     it('should parse piece words into symbols as expected', () => {
-      expect(unit.parsePieces('pawn')).toEqual('p');
-      expect(unit.parsePieces('a pawn')).toEqual('a p');
-      expect(unit.parsePieces('a pawn knight bishop')).toEqual('a p n b');
-      expect(unit.parsePieces('pawnknightbishop')).toEqual('pnb');
+      expect(unit.parsePieces('pawn')).toEqual('P');
+      expect(unit.parsePieces('a pawn')).toEqual('a P');
+      expect(unit.parsePieces('a pawn knight bishop')).toEqual('a P N B');
+      expect(unit.parsePieces('pawnknightbishop')).toEqual('PNB');
       expect(unit.parsePieces('a five')).toEqual('a five');
       expect(unit.parseRanks('')).toEqual('');
     });
@@ -120,82 +120,82 @@ describe('chess-grammar-parser', () => {
   describe('matchPieceMove', () => {
     it('should match piece moves correctly', () => {
       // Concise moves
-      expect(unit.matchPieceMove('n a 3')).toStrictEqual({ candidates: ['Na3'] });
-      expect(unit.matchPieceMove('n b 3')).toStrictEqual({ candidates: ['Nb3'] });
-      expect(unit.matchPieceMove('r d 3')).toStrictEqual({ candidates: ['Rd3'] });
-      expect(unit.matchPieceMove('q d 1')).toStrictEqual({ candidates: ['Qd1'] });
-      expect(unit.matchPieceMove('p d 3')).toStrictEqual({ candidates: ['d3'] });
-      expect(unit.matchPieceMove('p d 8')).toStrictEqual({ candidates: ['d8=Q'] });
-      expect(unit.matchPieceMove('p e 1')).toStrictEqual({ candidates: ['e1=Q'] });
+      expect(unit.matchPieceMove('N a 3')).toStrictEqual({ candidates: ['Na3'] });
+      expect(unit.matchPieceMove('N b 3')).toStrictEqual({ candidates: ['Nb3'] });
+      expect(unit.matchPieceMove('R d 3')).toStrictEqual({ candidates: ['Rd3'] });
+      expect(unit.matchPieceMove('Q d 1')).toStrictEqual({ candidates: ['Qd1'] });
+      expect(unit.matchPieceMove('P d 3')).toStrictEqual({ candidates: ['d3'] });
+      expect(unit.matchPieceMove('P d 8')).toStrictEqual({ candidates: ['d8=Q'] });
+      expect(unit.matchPieceMove('P e 1')).toStrictEqual({ candidates: ['e1=Q'] });
 
       // Verbose moves
-      expect(unit.matchPieceMove('b to a 3')).toStrictEqual({ candidates: ['Ba3'] });
-      expect(unit.matchPieceMove('b 2 a 3')).toStrictEqual({ candidates: ['Ba3', 'B2a3'] });
-      expect(unit.matchPieceMove('b 2 b 3')).toStrictEqual({ candidates: ['Bb3', 'B2b3'] });
-      expect(unit.matchPieceMove('r 2 a 3')).toStrictEqual({ candidates: ['Ra3', 'R2a3'] });
-      expect(unit.matchPieceMove('q to d 1')).toStrictEqual({ candidates: ['Qd1'] });
-      expect(unit.matchPieceMove('p to b 2')).toStrictEqual({ candidates: ['b2'] });
-      expect(unit.matchPieceMove('p 2 b 2')).toStrictEqual({ candidates: ['b2'] });
-      expect(unit.matchPieceMove('k takes d 3')).toStrictEqual({ candidates: ['Kxd3'] });
-      expect(unit.matchPieceMove('k captures d 3')).toStrictEqual({ candidates: ['Kxd3'] });
-      expect(unit.matchPieceMove('q takes d 3')).toStrictEqual({ candidates: ['Qxd3'] });
-      expect(unit.matchPieceMove('q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
+      expect(unit.matchPieceMove('B to a 3')).toStrictEqual({ candidates: ['Ba3'] });
+      expect(unit.matchPieceMove('B 2 a 3')).toStrictEqual({ candidates: ['Ba3', 'B2a3'] });
+      expect(unit.matchPieceMove('B 2 b 3')).toStrictEqual({ candidates: ['Bb3', 'B2b3'] });
+      expect(unit.matchPieceMove('R 2 a 3')).toStrictEqual({ candidates: ['Ra3', 'R2a3'] });
+      expect(unit.matchPieceMove('Q to d 1')).toStrictEqual({ candidates: ['Qd1'] });
+      expect(unit.matchPieceMove('P to b 2')).toStrictEqual({ candidates: ['b2'] });
+      expect(unit.matchPieceMove('P 2 b 2')).toStrictEqual({ candidates: ['b2'] });
+      expect(unit.matchPieceMove('K takes d 3')).toStrictEqual({ candidates: ['Kxd3'] });
+      expect(unit.matchPieceMove('K captures d 3')).toStrictEqual({ candidates: ['Kxd3'] });
+      expect(unit.matchPieceMove('Q takes d 3')).toStrictEqual({ candidates: ['Qxd3'] });
+      expect(unit.matchPieceMove('Q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
 
       // Pawn captures (generates candidates from adjacent files)
-      expect(unit.matchPieceMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
-      expect(unit.matchPieceMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
-      expect(unit.matchPieceMove('p takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
-      expect(unit.matchPieceMove('p captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
-      expect(unit.matchPieceMove('p takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
-      expect(unit.matchPieceMove('p captures e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.matchPieceMove('P takes h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.matchPieceMove('P captures h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.matchPieceMove('P takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchPieceMove('P captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchPieceMove('P takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.matchPieceMove('P captures e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
 
       // Piece with file
-      expect(unit.matchPieceMove('r a d 3')).toStrictEqual({ candidates: ['Rad3'] });
-      expect(unit.matchPieceMove('r a takes d 3')).toStrictEqual({ candidates: ['Raxd3'] });
-      expect(unit.matchPieceMove('r a captures d 3')).toStrictEqual({ candidates: ['Raxd3'] });
-      expect(unit.matchPieceMove('r a to d 3')).toStrictEqual({ candidates: ['Rad3'] });
-      expect(unit.matchPieceMove('r a 2 d 3')).toStrictEqual({ candidates: ['Rad3'] });
+      expect(unit.matchPieceMove('R a d 3')).toStrictEqual({ candidates: ['Rad3'] });
+      expect(unit.matchPieceMove('R a takes d 3')).toStrictEqual({ candidates: ['Raxd3'] });
+      expect(unit.matchPieceMove('R a captures d 3')).toStrictEqual({ candidates: ['Raxd3'] });
+      expect(unit.matchPieceMove('R a to d 3')).toStrictEqual({ candidates: ['Rad3'] });
+      expect(unit.matchPieceMove('R a 2 d 3')).toStrictEqual({ candidates: ['Rad3'] });
 
-      expect(unit.matchPieceMove('b a d 3')).toStrictEqual({ candidates: ['Bad3'] });
-      expect(unit.matchPieceMove('b a b 2')).toStrictEqual({ candidates: ['Bab2'] });
-      expect(unit.matchPieceMove('b b b 2')).toStrictEqual({ candidates: ['Bbb2'] });
-      expect(unit.matchPieceMove('b a takes d 3')).toStrictEqual({ candidates: ['Baxd3'] });
-      expect(unit.matchPieceMove('b a captures d 3')).toStrictEqual({ candidates: ['Baxd3'] });
-      expect(unit.matchPieceMove('b a to d 3')).toStrictEqual({ candidates: ['Bad3'] });
-      expect(unit.matchPieceMove('b a 2 d 3')).toStrictEqual({ candidates: ['Bad3'] });
-      expect(unit.matchPieceMove('b a 2 b 3')).toStrictEqual({ candidates: ['Bab3'] });
+      expect(unit.matchPieceMove('B a d 3')).toStrictEqual({ candidates: ['Bad3'] });
+      expect(unit.matchPieceMove('B a b 2')).toStrictEqual({ candidates: ['Bab2'] });
+      expect(unit.matchPieceMove('B b b 2')).toStrictEqual({ candidates: ['Bbb2'] });
+      expect(unit.matchPieceMove('B a takes d 3')).toStrictEqual({ candidates: ['Baxd3'] });
+      expect(unit.matchPieceMove('B a captures d 3')).toStrictEqual({ candidates: ['Baxd3'] });
+      expect(unit.matchPieceMove('B a to d 3')).toStrictEqual({ candidates: ['Bad3'] });
+      expect(unit.matchPieceMove('B a 2 d 3')).toStrictEqual({ candidates: ['Bad3'] });
+      expect(unit.matchPieceMove('B a 2 b 3')).toStrictEqual({ candidates: ['Bab3'] });
 
       // Piece with rank
-      expect(unit.matchPieceMove('r 2 d 3')).toStrictEqual({ candidates: ['Rd3', 'R2d3'] });
-      expect(unit.matchPieceMove('r 3 d 3')).toStrictEqual({ candidates: ['R3d3'] });
-      expect(unit.matchPieceMove('b 3 b 3')).toStrictEqual({ candidates: ['B3b3'] });
-      expect(unit.matchPieceMove('r 2 takes d 3')).toStrictEqual({ candidates: ['R2xd3'] });
-      expect(unit.matchPieceMove('r 2 captures d 3')).toStrictEqual({ candidates: ['R2xd3'] });
-      expect(unit.matchPieceMove('r 2 to d 3')).toStrictEqual({ candidates: ['R2d3'] });
-      expect(unit.matchPieceMove('r 2 2 d 3')).toStrictEqual({ candidates: ['R2d3'] });
+      expect(unit.matchPieceMove('R 2 d 3')).toStrictEqual({ candidates: ['Rd3', 'R2d3'] });
+      expect(unit.matchPieceMove('R 3 d 3')).toStrictEqual({ candidates: ['R3d3'] });
+      expect(unit.matchPieceMove('B 3 b 3')).toStrictEqual({ candidates: ['B3b3'] });
+      expect(unit.matchPieceMove('R 2 takes d 3')).toStrictEqual({ candidates: ['R2xd3'] });
+      expect(unit.matchPieceMove('R 2 captures d 3')).toStrictEqual({ candidates: ['R2xd3'] });
+      expect(unit.matchPieceMove('R 2 to d 3')).toStrictEqual({ candidates: ['R2d3'] });
+      expect(unit.matchPieceMove('R 2 2 d 3')).toStrictEqual({ candidates: ['R2d3'] });
 
-      expect(unit.matchPieceMove('b 2 d 3')).toStrictEqual({ candidates: ['Bd3', 'B2d3'] });
-      expect(unit.matchPieceMove('b 3 d 3')).toStrictEqual({ candidates: ['B3d3'] });
-      expect(unit.matchPieceMove('b 2 takes d 3')).toStrictEqual({ candidates: ['B2xd3'] });
-      expect(unit.matchPieceMove('b 2 captures d 3')).toStrictEqual({ candidates: ['B2xd3'] });
-      expect(unit.matchPieceMove('b 2 to d 3')).toStrictEqual({ candidates: ['B2d3'] });
-      expect(unit.matchPieceMove('b 2 2 b 2')).toStrictEqual({ candidates: ['B2b2'] });
+      expect(unit.matchPieceMove('B 2 d 3')).toStrictEqual({ candidates: ['Bd3', 'B2d3'] });
+      expect(unit.matchPieceMove('B 3 d 3')).toStrictEqual({ candidates: ['B3d3'] });
+      expect(unit.matchPieceMove('B 2 takes d 3')).toStrictEqual({ candidates: ['B2xd3'] });
+      expect(unit.matchPieceMove('B 2 captures d 3')).toStrictEqual({ candidates: ['B2xd3'] });
+      expect(unit.matchPieceMove('B 2 to d 3')).toStrictEqual({ candidates: ['B2d3'] });
+      expect(unit.matchPieceMove('B 2 2 b 2')).toStrictEqual({ candidates: ['B2b2'] });
 
       // Non-matches
       expect(unit.matchPieceMove('a 2')).toEqual(undefined);
-      expect(unit.matchPieceMove('castle k side')).toEqual(undefined);
+      expect(unit.matchPieceMove('castle K side')).toEqual(undefined);
       expect(unit.matchPieceMove('invalid')).toEqual(undefined);
     });
   });
 
   describe('matchCastleMove', () => {
     it('should match castle moves correctly', () => {
-      expect(unit.matchCastleMove('castle k side')).toStrictEqual({ candidates: ['O-O'] });
-      expect(unit.matchCastleMove('castle q side')).toStrictEqual({ candidates: ['O-O-O'] });
-      expect(unit.matchCastleMove('k side castle')).toStrictEqual({ candidates: ['O-O'] });
+      expect(unit.matchCastleMove('castle K side')).toStrictEqual({ candidates: ['O-O'] });
+      expect(unit.matchCastleMove('castle Q side')).toStrictEqual({ candidates: ['O-O-O'] });
+      expect(unit.matchCastleMove('K side castle')).toStrictEqual({ candidates: ['O-O'] });
       expect(unit.matchCastleMove('long castle')).toStrictEqual({ candidates: ['O-O-O'] });
       expect(unit.matchCastleMove('castle long')).toStrictEqual({ candidates: ['O-O-O'] });
-      expect(unit.matchCastleMove('q side castle')).toStrictEqual({ candidates: ['O-O-O'] });
+      expect(unit.matchCastleMove('Q side castle')).toStrictEqual({ candidates: ['O-O-O'] });
       expect(unit.matchCastleMove('short castle')).toStrictEqual({ candidates: ['O-O'] });
       expect(unit.matchCastleMove('castle short')).toStrictEqual({ candidates: ['O-O'] });
     });
@@ -204,13 +204,13 @@ describe('chess-grammar-parser', () => {
   describe('matchPawnPromotionMove', () => {
     it('should match pawn promotion moves correctly', () => {
       expect(unit.matchPawnPromotionMove('a 8 promote')).toStrictEqual({ candidates: ['a8=Q'] });
-      expect(unit.matchPawnPromotionMove('a 8 b promotion')).toStrictEqual({ candidates: ['a8=B'] });
-      expect(unit.matchPawnPromotionMove('a 8 promote to r')).toStrictEqual({ candidates: ['a8=R'] });
-      expect(unit.matchPawnPromotionMove('a 8 promote to q')).toStrictEqual({ candidates: ['a8=Q'] });
+      expect(unit.matchPawnPromotionMove('a 8 B promotion')).toStrictEqual({ candidates: ['a8=B'] });
+      expect(unit.matchPawnPromotionMove('a 8 promote to R')).toStrictEqual({ candidates: ['a8=R'] });
+      expect(unit.matchPawnPromotionMove('a 8 promote to Q')).toStrictEqual({ candidates: ['a8=Q'] });
       expect(unit.matchPawnPromotionMove('a takes b 8 promote')).toStrictEqual({ candidates: ['axb8=Q'] });
       expect(unit.matchPawnPromotionMove('a captures b 8 promote')).toStrictEqual({ candidates: ['axb8=Q'] });
-      expect(unit.matchPawnPromotionMove('a takes b 8 n promotion')).toStrictEqual({ candidates: ['axb8=N'] });
-      expect(unit.matchPawnPromotionMove('a captures b 8 promote to r')).toStrictEqual({ candidates: ['axb8=R'] });
+      expect(unit.matchPawnPromotionMove('a takes b 8 N promotion')).toStrictEqual({ candidates: ['axb8=N'] });
+      expect(unit.matchPawnPromotionMove('a captures b 8 promote to R')).toStrictEqual({ candidates: ['axb8=R'] });
     });
   });
 
@@ -249,66 +249,66 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchMove('invalid')).toEqual(undefined);
 
       // matchPieceMove: concise moves
-      expect(unit.matchMove('n a 3')).toStrictEqual({ candidates: ['Na3'] });
-      expect(unit.matchMove('n b 3')).toStrictEqual({ candidates: ['Nb3'] });
-      expect(unit.matchMove('r d 3')).toStrictEqual({ candidates: ['Rd3'] });
-      expect(unit.matchMove('q d 1')).toStrictEqual({ candidates: ['Qd1'] });
-      expect(unit.matchMove('p d 3')).toStrictEqual({ candidates: ['d3'] });
-      expect(unit.matchMove('p d 8')).toStrictEqual({ candidates: ['d8=Q'] });
-      expect(unit.matchMove('p e 1')).toStrictEqual({ candidates: ['e1=Q'] });
+      expect(unit.matchMove('N a 3')).toStrictEqual({ candidates: ['Na3'] });
+      expect(unit.matchMove('N b 3')).toStrictEqual({ candidates: ['Nb3'] });
+      expect(unit.matchMove('R d 3')).toStrictEqual({ candidates: ['Rd3'] });
+      expect(unit.matchMove('Q d 1')).toStrictEqual({ candidates: ['Qd1'] });
+      expect(unit.matchMove('P d 3')).toStrictEqual({ candidates: ['d3'] });
+      expect(unit.matchMove('P d 8')).toStrictEqual({ candidates: ['d8=Q'] });
+      expect(unit.matchMove('P e 1')).toStrictEqual({ candidates: ['e1=Q'] });
 
       // matchPieceMove: verbose moves
-      expect(unit.matchMove('b to a 3')).toStrictEqual({ candidates: ['Ba3'] });
-      expect(unit.matchMove('b 2 a 3')).toStrictEqual({ candidates: ['Ba3', 'B2a3'] });
-      expect(unit.matchMove('b 2 b 3')).toStrictEqual({ candidates: ['Bb3', 'B2b3'] });
-      expect(unit.matchMove('r 2 a 3')).toStrictEqual({ candidates: ['Ra3', 'R2a3'] });
-      expect(unit.matchMove('q to d 1')).toStrictEqual({ candidates: ['Qd1'] });
-      expect(unit.matchMove('p to b 2')).toStrictEqual({ candidates: ['b2'] });
-      expect(unit.matchMove('p 2 b 2')).toStrictEqual({ candidates: ['b2'] });
-      expect(unit.matchMove('k takes d 3')).toStrictEqual({ candidates: ['Kxd3'] });
-      expect(unit.matchMove('k captures d 3')).toStrictEqual({ candidates: ['Kxd3'] });
-      expect(unit.matchMove('q takes d 3')).toStrictEqual({ candidates: ['Qxd3'] });
-      expect(unit.matchMove('q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
+      expect(unit.matchMove('B to a 3')).toStrictEqual({ candidates: ['Ba3'] });
+      expect(unit.matchMove('B 2 a 3')).toStrictEqual({ candidates: ['Ba3', 'B2a3'] });
+      expect(unit.matchMove('B 2 b 3')).toStrictEqual({ candidates: ['Bb3', 'B2b3'] });
+      expect(unit.matchMove('R 2 a 3')).toStrictEqual({ candidates: ['Ra3', 'R2a3'] });
+      expect(unit.matchMove('Q to d 1')).toStrictEqual({ candidates: ['Qd1'] });
+      expect(unit.matchMove('P to b 2')).toStrictEqual({ candidates: ['b2'] });
+      expect(unit.matchMove('P 2 b 2')).toStrictEqual({ candidates: ['b2'] });
+      expect(unit.matchMove('K takes d 3')).toStrictEqual({ candidates: ['Kxd3'] });
+      expect(unit.matchMove('K captures d 3')).toStrictEqual({ candidates: ['Kxd3'] });
+      expect(unit.matchMove('Q takes d 3')).toStrictEqual({ candidates: ['Qxd3'] });
+      expect(unit.matchMove('Q captures d 3')).toStrictEqual({ candidates: ['Qxd3'] });
 
       // matchPieceMove: pawn captures (generates candidates from adjacent files)
-      expect(unit.matchMove('p takes h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
-      expect(unit.matchMove('p captures h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
-      expect(unit.matchMove('p takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
-      expect(unit.matchMove('p captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
-      expect(unit.matchMove('p takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
-      expect(unit.matchMove('p captures e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.matchMove('P takes h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.matchMove('P captures h 8')).toStrictEqual({ candidates: ['gxh8=Q'] });
+      expect(unit.matchMove('P takes a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchMove('P captures a 4')).toStrictEqual({ candidates: ['bxa4'] });
+      expect(unit.matchMove('P takes e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
+      expect(unit.matchMove('P captures e 5')).toStrictEqual({ candidates: ['dxe5', 'fxe5'] });
 
       // matchPieceMove: piece with file
-      expect(unit.matchMove('r a d 3')).toStrictEqual({ candidates: ['Rad3'] });
-      expect(unit.matchMove('r a takes d 3')).toStrictEqual({ candidates: ['Raxd3'] });
-      expect(unit.matchMove('r a captures d 3')).toStrictEqual({ candidates: ['Raxd3'] });
-      expect(unit.matchMove('r a to d 3')).toStrictEqual({ candidates: ['Rad3'] });
-      expect(unit.matchMove('r a 2 d 3')).toStrictEqual({ candidates: ['Rad3'] });
+      expect(unit.matchMove('R a d 3')).toStrictEqual({ candidates: ['Rad3'] });
+      expect(unit.matchMove('R a takes d 3')).toStrictEqual({ candidates: ['Raxd3'] });
+      expect(unit.matchMove('R a captures d 3')).toStrictEqual({ candidates: ['Raxd3'] });
+      expect(unit.matchMove('R a to d 3')).toStrictEqual({ candidates: ['Rad3'] });
+      expect(unit.matchMove('R a 2 d 3')).toStrictEqual({ candidates: ['Rad3'] });
 
-      expect(unit.matchMove('b a d 3')).toStrictEqual({ candidates: ['Bad3'] });
-      expect(unit.matchMove('b a b 2')).toStrictEqual({ candidates: ['Bab2'] });
-      expect(unit.matchMove('b b b 2')).toStrictEqual({ candidates: ['Bbb2'] });
-      expect(unit.matchMove('b a takes d 3')).toStrictEqual({ candidates: ['Baxd3'] });
-      expect(unit.matchMove('b a captures d 3')).toStrictEqual({ candidates: ['Baxd3'] });
-      expect(unit.matchMove('b a to d 3')).toStrictEqual({ candidates: ['Bad3'] });
-      expect(unit.matchMove('b a 2 d 3')).toStrictEqual({ candidates: ['Bad3'] });
-      expect(unit.matchMove('b a 2 b 3')).toStrictEqual({ candidates: ['Bab3'] });
+      expect(unit.matchMove('B a d 3')).toStrictEqual({ candidates: ['Bad3'] });
+      expect(unit.matchMove('B a b 2')).toStrictEqual({ candidates: ['Bab2'] });
+      expect(unit.matchMove('B b b 2')).toStrictEqual({ candidates: ['Bbb2'] });
+      expect(unit.matchMove('B a takes d 3')).toStrictEqual({ candidates: ['Baxd3'] });
+      expect(unit.matchMove('B a captures d 3')).toStrictEqual({ candidates: ['Baxd3'] });
+      expect(unit.matchMove('B a to d 3')).toStrictEqual({ candidates: ['Bad3'] });
+      expect(unit.matchMove('B a 2 d 3')).toStrictEqual({ candidates: ['Bad3'] });
+      expect(unit.matchMove('B a 2 b 3')).toStrictEqual({ candidates: ['Bab3'] });
 
       // matchPieceMove: piece with rank
-      expect(unit.matchMove('r 2 d 3')).toStrictEqual({ candidates: ['Rd3', 'R2d3'] });
-      expect(unit.matchMove('r 3 d 3')).toStrictEqual({ candidates: ['R3d3'] });
-      expect(unit.matchMove('b 3 b 3')).toStrictEqual({ candidates: ['B3b3'] });
-      expect(unit.matchMove('r 2 takes d 3')).toStrictEqual({ candidates: ['R2xd3'] });
-      expect(unit.matchMove('r 2 captures d 3')).toStrictEqual({ candidates: ['R2xd3'] });
-      expect(unit.matchMove('r 2 to d 3')).toStrictEqual({ candidates: ['R2d3'] });
-      expect(unit.matchMove('r 2 2 d 3')).toStrictEqual({ candidates: ['R2d3'] });
+      expect(unit.matchMove('R 2 d 3')).toStrictEqual({ candidates: ['Rd3', 'R2d3'] });
+      expect(unit.matchMove('R 3 d 3')).toStrictEqual({ candidates: ['R3d3'] });
+      expect(unit.matchMove('B 3 b 3')).toStrictEqual({ candidates: ['B3b3'] });
+      expect(unit.matchMove('R 2 takes d 3')).toStrictEqual({ candidates: ['R2xd3'] });
+      expect(unit.matchMove('R 2 captures d 3')).toStrictEqual({ candidates: ['R2xd3'] });
+      expect(unit.matchMove('R 2 to d 3')).toStrictEqual({ candidates: ['R2d3'] });
+      expect(unit.matchMove('R 2 2 d 3')).toStrictEqual({ candidates: ['R2d3'] });
 
-      expect(unit.matchMove('b 2 d 3')).toStrictEqual({ candidates: ['Bd3', 'B2d3'] });
-      expect(unit.matchMove('b 3 d 3')).toStrictEqual({ candidates: ['B3d3'] });
-      expect(unit.matchMove('b 2 takes d 3')).toStrictEqual({ candidates: ['B2xd3'] });
-      expect(unit.matchMove('b 2 captures d 3')).toStrictEqual({ candidates: ['B2xd3'] });
-      expect(unit.matchMove('b 2 to d 3')).toStrictEqual({ candidates: ['B2d3'] });
-      expect(unit.matchMove('b 2 2 b 2')).toStrictEqual({ candidates: ['B2b2'] });
+      expect(unit.matchMove('B 2 d 3')).toStrictEqual({ candidates: ['Bd3', 'B2d3'] });
+      expect(unit.matchMove('B 3 d 3')).toStrictEqual({ candidates: ['B3d3'] });
+      expect(unit.matchMove('B 2 takes d 3')).toStrictEqual({ candidates: ['B2xd3'] });
+      expect(unit.matchMove('B 2 captures d 3')).toStrictEqual({ candidates: ['B2xd3'] });
+      expect(unit.matchMove('B 2 to d 3')).toStrictEqual({ candidates: ['B2d3'] });
+      expect(unit.matchMove('B 2 2 b 2')).toStrictEqual({ candidates: ['B2b2'] });
 
       // matchCoordMove
       expect(unit.matchMove('a 2 to a 3')).toStrictEqual(['a2', 'a3']);
@@ -321,24 +321,24 @@ describe('chess-grammar-parser', () => {
       expect(unit.matchMove('d 7 captures e 6')).toStrictEqual(['d7', 'e6']);
 
       // matchCastleMove
-      expect(unit.matchMove('castle k side')).toStrictEqual({ candidates: ['O-O'] });
-      expect(unit.matchMove('castle q side')).toStrictEqual({ candidates: ['O-O-O'] });
-      expect(unit.matchMove('k side castle')).toStrictEqual({ candidates: ['O-O'] });
+      expect(unit.matchMove('castle K side')).toStrictEqual({ candidates: ['O-O'] });
+      expect(unit.matchMove('castle Q side')).toStrictEqual({ candidates: ['O-O-O'] });
+      expect(unit.matchMove('K side castle')).toStrictEqual({ candidates: ['O-O'] });
       expect(unit.matchMove('long castle')).toStrictEqual({ candidates: ['O-O-O'] });
       expect(unit.matchMove('castle long')).toStrictEqual({ candidates: ['O-O-O'] });
-      expect(unit.matchMove('q side castle')).toStrictEqual({ candidates: ['O-O-O'] });
+      expect(unit.matchMove('Q side castle')).toStrictEqual({ candidates: ['O-O-O'] });
       expect(unit.matchMove('short castle')).toStrictEqual({ candidates: ['O-O'] });
       expect(unit.matchMove('castle short')).toStrictEqual({ candidates: ['O-O'] });
 
       // matchPawnPromotionMove
       expect(unit.matchMove('a 8 promote')).toStrictEqual({ candidates: ['a8=Q'] });
-      expect(unit.matchMove('a 8 b promotion')).toStrictEqual({ candidates: ['a8=B'] });
-      expect(unit.matchMove('a 8 promote to r')).toStrictEqual({ candidates: ['a8=R'] });
-      expect(unit.matchMove('a 8 promote to q')).toStrictEqual({ candidates: ['a8=Q'] });
+      expect(unit.matchMove('a 8 B promotion')).toStrictEqual({ candidates: ['a8=B'] });
+      expect(unit.matchMove('a 8 promote to R')).toStrictEqual({ candidates: ['a8=R'] });
+      expect(unit.matchMove('a 8 promote to Q')).toStrictEqual({ candidates: ['a8=Q'] });
       expect(unit.matchMove('a takes b 8 promote')).toStrictEqual({ candidates: ['axb8=Q'] });
       expect(unit.matchMove('a captures b 8 promote')).toStrictEqual({ candidates: ['axb8=Q'] });
-      expect(unit.matchMove('a takes b 8 n promotion')).toStrictEqual({ candidates: ['axb8=N'] });
-      expect(unit.matchMove('a captures b 8 promote to r')).toStrictEqual({ candidates: ['axb8=R'] });
+      expect(unit.matchMove('a takes b 8 N promotion')).toStrictEqual({ candidates: ['axb8=N'] });
+      expect(unit.matchMove('a captures b 8 promote to R')).toStrictEqual({ candidates: ['axb8=R'] });
     });
   });
 

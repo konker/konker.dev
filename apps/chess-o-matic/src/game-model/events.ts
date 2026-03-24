@@ -1,12 +1,19 @@
 import type { Square } from 'chess.js';
 
-import type { GameModelEvaluateResult, GameModelEvaluateResultControl, GameModelEvaluateResultOk } from './evaluate.js';
+import type {
+  GameModelEvaluateResult,
+  GameModelEvaluateResultControl,
+  GameModelEvaluateResultIgnore,
+  GameModelEvaluateResultIllegal,
+  GameModelEvaluateResultOk,
+} from './evaluate.js';
 import type { GameModelResources } from './index.js';
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_EVENT_TYPE_START = 'start' as const;
 export const GAME_MODEL_EVENT_TYPE_EVALUATED = 'evaluated' as const;
-export const GAME_MODEL_EVENT_TYPE_MOVED = 'moved' as const;
+export const GAME_MODEL_EVENT_TYPE_MOVED_OK = 'moved-ok' as const;
+export const GAME_MODEL_EVENT_TYPE_MOVED_INVALID = 'moved-invalid' as const;
 export const GAME_MODEL_EVENT_TYPE_CONTROL = 'control' as const;
 export const GAME_MODEL_EVENT_TYPE_VIEW_CHANGED = 'view-changed' as const;
 export const GAME_MODEL_EVENT_TYPE_END = 'end' as const;
@@ -14,7 +21,8 @@ export const GAME_MODEL_EVENT_TYPE_END = 'end' as const;
 export type GameModelEventType =
   | typeof GAME_MODEL_EVENT_TYPE_START
   | typeof GAME_MODEL_EVENT_TYPE_EVALUATED
-  | typeof GAME_MODEL_EVENT_TYPE_MOVED
+  | typeof GAME_MODEL_EVENT_TYPE_MOVED_OK
+  | typeof GAME_MODEL_EVENT_TYPE_MOVED_INVALID
   | typeof GAME_MODEL_EVENT_TYPE_CONTROL
   | typeof GAME_MODEL_EVENT_TYPE_VIEW_CHANGED
   | typeof GAME_MODEL_EVENT_TYPE_END;
@@ -29,9 +37,14 @@ export type GameModelEventEvaluated = {
   result: GameModelEvaluateResult;
 };
 
-export type GameModelEventMoved = {
-  type: typeof GAME_MODEL_EVENT_TYPE_MOVED;
+export type GameModelEventMovedOk = {
+  type: typeof GAME_MODEL_EVENT_TYPE_MOVED_OK;
   result: GameModelEvaluateResultOk;
+};
+
+export type GameModelEventMovedInvalid = {
+  type: typeof GAME_MODEL_EVENT_TYPE_MOVED_INVALID;
+  result: GameModelEvaluateResultIgnore | GameModelEvaluateResultIllegal;
 };
 
 export type GameModelEventControl = {
@@ -52,19 +65,21 @@ export type GameModelEventEnd = {
 export type GameModelEvent =
   | GameModelEventStart
   | GameModelEventEvaluated
-  | GameModelEventMoved
+  | GameModelEventMovedOk
+  | GameModelEventMovedInvalid
   | GameModelEventControl
   | GameModelEventViewChanged
   | GameModelEventEnd;
 
 // --------------------------------------------------------------------------
-export type GameModelEventListener<E extends GameModelEvent> = (event: E) => void;
+export type GameModelEventListener<E extends GameModelEvent> = (event: E) => Promise<void>;
 
 export function gameModelEventsEmptyListeners(): Map<GameModelEventType, Set<GameModelEventListener<GameModelEvent>>> {
   return new Map([
     [GAME_MODEL_EVENT_TYPE_START, new Set()],
     [GAME_MODEL_EVENT_TYPE_EVALUATED, new Set()],
-    [GAME_MODEL_EVENT_TYPE_MOVED, new Set()],
+    [GAME_MODEL_EVENT_TYPE_MOVED_OK, new Set()],
+    [GAME_MODEL_EVENT_TYPE_MOVED_INVALID, new Set()],
     [GAME_MODEL_EVENT_TYPE_CONTROL, new Set()],
     [GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, new Set()],
     [GAME_MODEL_EVENT_TYPE_END, new Set()],
@@ -86,12 +101,12 @@ export function gameModelEventsAddListener<E extends GameModelEvent>(
   };
 }
 
-export function gameModelEventsNotifyListeners<E extends GameModelEvent>(
+export async function gameModelEventsNotifyListeners<E extends GameModelEvent>(
   gameModelResources: GameModelResources,
   type: E['type'],
   event: E
-): void {
-  gameModelResources.listeners.get(event.type)?.forEach((listener) => {
-    listener(event);
-  });
+): Promise<void> {
+  const listeners = gameModelResources.listeners.get(event.type) ?? [];
+
+  await Promise.all([...listeners].map((listener) => listener(event)));
 }

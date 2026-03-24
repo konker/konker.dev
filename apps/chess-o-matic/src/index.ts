@@ -1,39 +1,49 @@
 import type { KaldiRecognizer } from 'vosk-browser';
 
-import type { AudioResources } from './audio-resources';
-import { exitAudioResources, initAudioResources } from './audio-resources';
+import type { AudioInputResources } from './audio-resources/input';
+import { exitAudioInputResources, initAudioInputResources } from './audio-resources/input';
+import type { AudioOutputResources } from './audio-resources/output';
+import { exitAudioOutputResources, initAudioOutputResources } from './audio-resources/output';
 import type { GameModelResources } from './game-model';
 import { exitGameModel, initGameModel } from './game-model';
 import {
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
+  GAME_MODEL_EVALUATE_STATUS_IGNORE,
+  GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
   GAME_MODEL_EVALUATE_STATUS_OK,
   gameModelEvaluate,
 } from './game-model/evaluate.js';
 import type {
   GameModelEventControl,
   GameModelEventEvaluated,
-  GameModelEventMoved,
+  GameModelEventMovedInvalid,
+  GameModelEventMovedOk,
   GameModelEventViewChanged,
 } from './game-model/events.js';
+import { GAME_MODEL_EVENT_TYPE_MOVED_INVALID } from './game-model/events.js';
 import {
   GAME_MODEL_EVENT_TYPE_CONTROL,
   GAME_MODEL_EVENT_TYPE_EVALUATED,
-  GAME_MODEL_EVENT_TYPE_MOVED,
+  GAME_MODEL_EVENT_TYPE_MOVED_OK,
   GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
   gameModelEventsAddListener,
   gameModelEventsNotifyListeners,
 } from './game-model/events.js';
 import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read.js';
 import type { GameViewResources } from './game-view';
-import { exitGameView, gameViewUpdateControl, gameViewUpdateMoved, initGameView } from './game-view';
+import { gameViewUpdateMovedInvalid } from './game-view';
+import { exitGameView, gameViewUpdateControl, gameViewUpdateMovedOk, initGameView } from './game-view';
 import { chessGrammar } from './grammar/chess-grammar-en.js';
 import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
 import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
+import { ComSettings } from './settings';
 
 let recognizer: KaldiRecognizer;
-let audioResources: AudioResources;
+let audioInputResources: AudioInputResources;
+let audioOutputResources: AudioOutputResources;
 let gameModelResources: GameModelResources;
 let gameViewResources: GameViewResources;
+let settings: ComSettings;
 
 export function tick(result: string) {
   const readResult = gameModelRead(result);
@@ -41,8 +51,19 @@ export function tick(result: string) {
 
   // Notify if a legal move was made
   if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED, {
-      type: GAME_MODEL_EVENT_TYPE_MOVED,
+    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
+      type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
+      result: evaluateResult,
+    });
+  }
+
+  // Notify if an invalid move was made
+  if (
+    evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_IGNORE ||
+    evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_ILLEGAL
+  ) {
+    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_INVALID, {
+      type: GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
       result: evaluateResult,
     });
   }
@@ -64,17 +85,19 @@ export function tick(result: string) {
 
 export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
   console.log('INIT');
-  audioResources = await initAudioResources();
-  recognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioResources.audioContext.sampleRate);
+  settings = new ComSettings();
+  audioInputResources = await initAudioInputResources();
+  audioOutputResources = await initAudioOutputResources();
+  recognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioInputResources.audioContext.sampleRate);
   gameModelResources = initGameModel();
   gameViewResources = initGameView(gameModelResources, boardEl, inputEl, pgnEl);
 
   // Pipe audio data from worklet to recognizer
-  audioResources.workletNode.port.onmessage = (event) => {
-    if (event.data.type === 'audio' && audioResources.isListening) {
+  audioInputResources.workletNode.port.onmessage = (event) => {
+    if (event.data.type === 'audio' && audioInputResources.isListening) {
       const audioData = event.data.data;
       // Send Float32Array directly to recognizer
-      recognizer.acceptWaveformFloat(audioData, audioResources.audioContext.sampleRate);
+      recognizer.acceptWaveformFloat(audioData, audioInputResources.audioContext.sampleRate);
     }
   };
 
@@ -97,20 +120,43 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
   });
 
   // If a valid move has been made, update the view
-  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED, (event: GameModelEventMoved) => {
-    gameViewUpdateMoved(gameViewResources, gameModelResources, event.result);
-  });
+  gameModelEventsAddListener(
+    gameModelResources,
+    GAME_MODEL_EVENT_TYPE_MOVED_OK,
+    async (event: GameModelEventMovedOk) => {
+      await gameViewUpdateMovedOk(settings, gameViewResources, gameModelResources, audioOutputResources, event.result);
+    }
+  );
+
+  // If a valid move has been made, update the view
+  gameModelEventsAddListener(
+    gameModelResources,
+    GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
+    async (event: GameModelEventMovedInvalid) => {
+      await gameViewUpdateMovedInvalid(
+        settings,
+        gameViewResources,
+        gameModelResources,
+        audioOutputResources,
+        event.result
+      );
+    }
+  );
 
   // If a valid control command has been received, notify the view
-  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, (event: GameModelEventControl) => {
-    gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
-  });
+  gameModelEventsAddListener(
+    gameModelResources,
+    GAME_MODEL_EVENT_TYPE_CONTROL,
+    async (event: GameModelEventControl) => {
+      gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
+    }
+  );
 
   // If the view has made an update, make sure the game model is in sync
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
-    (event: GameModelEventViewChanged) => {
+    async (event: GameModelEventViewChanged) => {
       const evaluateResult = gameModelEvaluate(
         gameModelResources,
         typeof event.move === 'string'
@@ -139,21 +185,25 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
   );
 
   // If something has happened, update the UI
-  gameModelEventsAddListener(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, (event: GameModelEventEvaluated) => {
-    console.log('KONK90', event);
-    console.log('Ra: ', gameModelResources.chess.ascii());
-    console.log('Rp: ', gameModelResources.chess.pgn());
-    console.log('Rf: ', gameModelResources.chess.fen());
+  gameModelEventsAddListener(
+    gameModelResources,
+    GAME_MODEL_EVENT_TYPE_EVALUATED,
+    async (event: GameModelEventEvaluated) => {
+      console.log('Ra: ', gameModelResources.chess.ascii());
+      console.log('Rp: ', gameModelResources.chess.pgn());
+      console.log('Rf: ', gameModelResources.chess.fen());
 
-    gameViewResources.inputEl.innerHTML = `${event.result.sanitized} - ${event.result.status}`;
-    gameViewResources.pgnEl.innerHTML = gameModelResources.chess.pgn();
-  });
+      gameViewResources.inputEl.innerHTML = `${event.result.sanitized} - ${event.result.status}`;
+      gameViewResources.pgnEl.innerHTML = gameModelResources.chess.pgn();
+    }
+  );
 }
 
 export async function exit() {
   console.log('EXIT');
   exitGameModel(gameModelResources);
-  audioResources = exitAudioResources(audioResources);
+  audioInputResources = exitAudioInputResources(audioInputResources);
+  audioOutputResources = exitAudioOutputResources(audioOutputResources);
   exitRecognizerModel(recognizer);
   exitGameView(gameViewResources);
 }

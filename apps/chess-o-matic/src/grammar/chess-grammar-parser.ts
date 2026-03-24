@@ -35,25 +35,25 @@ export const NUMBER_WORD_MAP = [
 ] as const;
 
 export const PIECE_WORD_MAP = [
-  [/pawn/, 'p'],
-  [/knight/, 'n'],
-  [/bishop/, 'b'],
-  [/rook/, 'r'],
-  [/queen/, 'q'],
-  [/king/, 'k'],
+  [/pawn/, 'P'],
+  [/knight/, 'N'],
+  [/bishop/, 'B'],
+  [/rook/, 'R'],
+  [/queen/, 'Q'],
+  [/king/, 'K'],
 ] as const;
 
 export const CHESS_RANK_NUMS = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 export const CHESS_PROMOTION_RANKS = ['1', '8'] as const;
-export const CHESS_PROMOTION_PIECES = ['n', 'b', 'r', 'q'] as const;
+export const CHESS_PROMOTION_PIECES = ['N', 'B', 'R', 'Q'] as const;
 
 export const W_TO = '(?:to|2)' as const;
 export const W_TAKES = 'takes' as const;
 export const W_CAPTURES = 'captures' as const;
 export const W_EN_PASSANT = 'en passant' as const;
 export const W_CASTLE = 'castle' as const;
-export const W_KING_SIDE = 'k side' as const;
-export const W_QUEEN_SIDE = 'q side' as const;
+export const W_KING_SIDE = 'K side' as const;
+export const W_QUEEN_SIDE = 'Q side' as const;
 export const W_SHORT = 'short' as const;
 export const W_LONG = 'long' as const;
 export const W_PROMOTION = 'promotion' as const;
@@ -68,7 +68,7 @@ export const RANK_RE_S = `([${CHESS_RANK_NUMS.join('')}])` as const;
 export const PROMOTION_RANK_RE_S = `([${CHESS_PROMOTION_RANKS.join('')}])` as const;
 export const SQUARE_RE_S = `${FILE_RE_S} ${RANK_RE_S}` as const;
 export const PROMOTION_SQUARE_RE_S = `${FILE_RE_S} ${PROMOTION_RANK_RE_S}` as const;
-export const PIECE_RE_S = `([${chessGrammarPieceSymbols.join('')}])` as const;
+export const PIECE_RE_S = `([${chessGrammarPieceSymbols.join('').toUpperCase()}])` as const;
 export const PROMOTION_PIECE_RE_S = `([${CHESS_PROMOTION_PIECES.join('')}])` as const;
 
 // --------------------------------------------------------------------------
@@ -174,14 +174,14 @@ export function matchPieceMove(s: string): SanCandidates | undefined {
   const match1 = matches1.find((x) => x !== null);
   if (match1) {
     const san =
-      match1[1] === 'p'
+      match1[1] === 'P'
         ? defaultPromotion(`${match1[2]}${match1[3]}`, match1[3])
         : `${match1[1].toUpperCase()}${match1[2]}${match1[3]}`;
 
     // Check if this could also be a rank-disambiguated move (e.g. "r 2 d 3" could be Rd3 or R2d3)
     const rankAmbiguityRe = new RegExp(`^${PIECE_RE_S} ${RANK_RE_S} ${SQUARE_RE_S}$`);
     const rankMatch = rankAmbiguityRe.exec(s);
-    if (rankMatch && rankMatch[1] !== 'p') {
+    if (rankMatch && rankMatch[1] !== 'P') {
       const altSan = `${rankMatch[1].toUpperCase()}${rankMatch[2]}${rankMatch[3]}${rankMatch[4]}`;
       return { candidates: [san, altSan] };
     }
@@ -196,7 +196,7 @@ export function matchPieceMove(s: string): SanCandidates | undefined {
   const matches2 = res2.map((re) => re.exec(s));
   const match2 = matches2.find((x) => x !== null);
   if (match2) {
-    if (match2[1] === 'p') {
+    if (match2[1] === 'P') {
       // Pawn captures require a source file; generate candidates from adjacent files
       const targetFile = match2[2];
       const targetRank = match2[3];
