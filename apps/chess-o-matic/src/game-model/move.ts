@@ -8,19 +8,21 @@ import { GAME_INPUT_PARSE_STATUS_OK_SAN } from './read.js';
 export const GAME_MOVE_STATUS_OK = 'ok';
 export const GAME_MOVE_STATUS_ILLEGAL = 'illegal';
 
-export type GameMoveResult =
-  | {
-      readonly status: typeof GAME_MOVE_STATUS_OK;
-      readonly input: string;
-      readonly sanitized: string;
-      readonly move: [Square, Square];
-    }
-  | {
-      readonly status: typeof GAME_MOVE_STATUS_ILLEGAL;
-      readonly input: string;
-      readonly sanitized: string;
-      readonly message: string;
-    };
+export type GameMoveResultOk = {
+  readonly status: typeof GAME_MOVE_STATUS_OK;
+  readonly input: string;
+  readonly sanitized: string;
+  readonly move: [Square, Square];
+};
+
+export type GameMoveResultIllegal = {
+  readonly status: typeof GAME_MOVE_STATUS_ILLEGAL;
+  readonly input: string;
+  readonly sanitized: string;
+  readonly message: string;
+};
+
+export type GameMoveResult = GameMoveResultOk | GameMoveResultIllegal;
 
 // --------------------------------------------------------------------------
 export function playMoveCandidates(

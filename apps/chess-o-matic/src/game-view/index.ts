@@ -1,4 +1,5 @@
 import type { AudioOutputResources } from '../audio-resources/output';
+import { resolveAudioOutputSoundEvent } from '../audio-resources/output';
 import { playAudioOutputEventSound } from '../audio-resources/output';
 import { AUDIO_OUTPUT_EVENT_INVALID, AUDIO_OUTPUT_EVENT_MOVE_BOTTOM } from '../audio-resources/output/events';
 import type { GameModelResources } from '../game-model';
@@ -46,8 +47,8 @@ export async function gameViewUpdateMovedOk(
     return;
   }
   gameViewResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
-  console.log('KONK90', evaluateResult);
-  await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_MOVE_BOTTOM);
+  const soundEvent = resolveAudioOutputSoundEvent(evaluateResult.flags);
+  await playAudioOutputEventSound(settings, audioOutputResources, soundEvent);
 }
 
 // --------------------------------------------------------------------------
@@ -61,7 +62,6 @@ export async function gameViewUpdateMovedInvalid(
   if (gameModelResources.locked) {
     return;
   }
-  console.log('KONK91', evaluateResult);
   await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_INVALID);
 }
 
