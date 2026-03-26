@@ -7,6 +7,8 @@ import type { GChessBoardElement } from 'gchessboard';
 import type { GameModelResources } from '../../game-model';
 import { START_FEN } from '../../game-model/consts.js';
 import type { BoardViewAdapter } from '../types.js';
+import { BOARD_COLOR_DARK } from '../types.js';
+import { BOARD_COLOR_LIGHT } from '../types.js';
 import { moveComplete, moveHighlight } from './helpers.js';
 import { openPromotionDialog } from './promotion-ui.js';
 
@@ -68,5 +70,6 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
     toggleOrientation: () => {
       rep.orientation = rep.orientation === 'white' ? 'black' : 'white';
     },
+    orientation: () => (rep.orientation == 'white' ? BOARD_COLOR_LIGHT : BOARD_COLOR_DARK),
   };
 };

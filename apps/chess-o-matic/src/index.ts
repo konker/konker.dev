@@ -47,7 +47,7 @@ let settings: ComSettings;
 
 export function tick(result: string) {
   const readResult = gameModelRead(result);
-  const evaluateResult = gameModelEvaluate(gameModelResources, readResult);
+  const evaluateResult = gameModelEvaluate(gameModelResources, gameViewResources, readResult);
 
   // Notify if a legal move was made
   if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
@@ -159,6 +159,7 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     async (event: GameModelEventViewChanged) => {
       const evaluateResult = gameModelEvaluate(
         gameModelResources,
+        gameViewResources,
         typeof event.move === 'string'
           ? {
               status: GAME_INPUT_PARSE_STATUS_OK_SAN,
