@@ -20,13 +20,13 @@ export function moveHighlight(rep: GChessBoardElement, coords: [Square, Square])
 }
 
 // --------------------------------------------------------------------------
-export function moveComplete(
+export async function moveComplete(
   gameModelResources: GameModelResources,
   rep: GChessBoardElement,
   coords: [Square, Square],
   san?: string
-): void {
-  gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, {
+): Promise<void> {
+  await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_VIEW_CHANGED, {
     type: GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
     move: san ?? coords,
   });

@@ -20,10 +20,10 @@ import type {
   GameModelEventMovedOk,
   GameModelEventViewChanged,
 } from './game-model/events.js';
-import { GAME_MODEL_EVENT_TYPE_MOVED_INVALID } from './game-model/events.js';
 import {
   GAME_MODEL_EVENT_TYPE_CONTROL,
   GAME_MODEL_EVENT_TYPE_EVALUATED,
+  GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
   GAME_MODEL_EVENT_TYPE_MOVED_OK,
   GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
   gameModelEventsAddListener,
@@ -31,8 +31,13 @@ import {
 } from './game-model/events.js';
 import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read.js';
 import type { GameViewResources } from './game-view';
-import { gameViewUpdateMovedInvalid } from './game-view';
-import { exitGameView, gameViewUpdateControl, gameViewUpdateMovedOk, initGameView } from './game-view';
+import {
+  exitGameView,
+  gameViewUpdateControl,
+  gameViewUpdateMovedInvalid,
+  gameViewUpdateMovedOk,
+  initGameView,
+} from './game-view';
 import { chessGrammar } from './grammar/chess-grammar-en.js';
 import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
 import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
@@ -45,13 +50,13 @@ let gameModelResources: GameModelResources;
 let gameViewResources: GameViewResources;
 let settings: ComSettings;
 
-export function tick(result: string) {
+export async function tick(result: string) {
   const readResult = gameModelRead(result);
   const evaluateResult = gameModelEvaluate(gameModelResources, gameViewResources, readResult);
 
   // Notify if a legal move was made
   if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
+    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
       type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
       result: evaluateResult,
     });
@@ -62,7 +67,7 @@ export function tick(result: string) {
     evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_IGNORE ||
     evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_ILLEGAL
   ) {
-    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_INVALID, {
+    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_INVALID, {
       type: GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
       result: evaluateResult,
     });
@@ -70,14 +75,14 @@ export function tick(result: string) {
 
   // Notify if a control action was made
   if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_CONTROL) {
-    gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, {
+    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, {
       type: GAME_MODEL_EVENT_TYPE_CONTROL,
       result: evaluateResult,
     });
   }
 
   // Notify everything that has happened
-  gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
+  await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
     type: GAME_MODEL_EVENT_TYPE_EVALUATED,
     result: evaluateResult,
   });
@@ -128,7 +133,7 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     }
   );
 
-  // If a valid move has been made, update the view
+  // If an invalid move has been made, update the view
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
@@ -143,12 +148,12 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     }
   );
 
-  // If a valid control command has been received, notify the view
+  // If a valid control command has been received, update the view
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_CONTROL,
     async (event: GameModelEventControl) => {
-      gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
+      await gameViewUpdateControl(gameViewResources, gameModelResources, event.result);
     }
   );
 
@@ -178,7 +183,7 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
       );
 
       // Notify everything that has happened
-      gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
+      await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
         type: GAME_MODEL_EVENT_TYPE_EVALUATED,
         result: evaluateResult,
       });
@@ -194,6 +199,7 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
       console.log('Rp: ', gameModelResources.chess.pgn());
       console.log('Rf: ', gameModelResources.chess.fen());
 
+      console.log('KONK50!!!');
       gameViewResources.inputEl.innerHTML = `${event.result.sanitized} - ${event.result.status}`;
       gameViewResources.pgnEl.innerHTML = gameModelResources.chess.pgn();
     }
