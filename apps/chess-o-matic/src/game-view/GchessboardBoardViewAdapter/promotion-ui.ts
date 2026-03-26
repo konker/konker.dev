@@ -22,7 +22,7 @@ export function openPromotionDialog(
     el.className = `promo-choice ${color === 'w' ? 'white-' : 'black-'}${role}`;
 
     // Handle the selection
-    el.onclick = () => {
+    el.onclick = async () => {
       promoDialog!.style.display = 'none';
 
       const san = coords[0].startsWith(coords[1][0])
@@ -31,7 +31,7 @@ export function openPromotionDialog(
         : // Pawn capture
           `${coords[0][0]}x${coords[1]}=${role.toUpperCase()}`;
 
-      moveComplete(gameModelResources, rep, coords, san);
+      await moveComplete(gameModelResources, rep, coords, san);
     };
   });
 }

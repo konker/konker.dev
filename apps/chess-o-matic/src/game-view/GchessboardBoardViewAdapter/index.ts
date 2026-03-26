@@ -56,9 +56,9 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
     }
   });
 
-  rep.addEventListener('movefinished', (e) => {
+  rep.addEventListener('movefinished', async (e) => {
     const coords: [Square, Square] = [e.detail.from, e.detail.to];
-    moveComplete(gameModelResources, rep, coords, `${coords[0]}-${coords[1]}`);
+    await moveComplete(gameModelResources, rep, coords, `${coords[0]}-${coords[1]}`);
   });
 
   return {
