@@ -38,6 +38,13 @@ export default tsEslint.config(
       '@typescript-eslint/no-empty-interface': 'off',
       'no-unused-vars': 'off',
       'sort-destructure-keys/sort-destructure-keys': 'error',
+
+      // Enforces that promises must be awaited or handled
+      '@typescript-eslint/no-floating-promises': 'error',
+      // Enforces that functions returned promises are marked async
+      '@typescript-eslint/promise-function-async': 'error',
+      // Prevents awaiting values that aren't promises
+      '@typescript-eslint/await-thenable': 'error',
     },
   },
   {
