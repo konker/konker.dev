@@ -108,5 +108,5 @@ export async function gameModelEventsNotifyListeners<E extends GameModelEvent>(
 ): Promise<void> {
   const listeners = gameModelResources.listeners.get(event.type) ?? [];
 
-  await Promise.all([...listeners].map((listener) => listener(event)));
+  await Promise.all([...listeners].map(async (listener) => listener(event)));
 }

@@ -3,15 +3,15 @@ import type { Square } from 'chess.js';
 import type { GameViewResources } from '../game-view';
 import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from '../game-view/types';
 import type { GameModelResources } from './index.js';
-import type { GAME_MOVE_STATUS_OK, GameMoveResult, GameMoveResultOk } from './move.js';
+import type { GameMoveResultOk } from './move.js';
 import { GAME_MOVE_STATUS_ILLEGAL, playMove } from './move.js';
 import type { GameInputParserResult } from './read.js';
 import {
   GAME_INPUT_PARSE_STATUS_CONTROL_ACTION,
+  GAME_INPUT_PARSE_STATUS_IGNORE,
   GAME_INPUT_PARSE_STATUS_OK_COORDS,
   GAME_INPUT_PARSE_STATUS_OK_SAN,
 } from './read.js';
-import { GAME_INPUT_PARSE_STATUS_IGNORE } from './read.js';
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_CONTROL_ACTION_FLIP = '_flip';

@@ -106,9 +106,9 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     }
   };
 
-  recognizer.on('result', (message) => {
+  recognizer.on('result', async (message) => {
     if ('result' in message && 'text' in message.result && message.result.text !== '') {
-      tick(message.result.text);
+      await tick(message.result.text);
     }
   });
 
