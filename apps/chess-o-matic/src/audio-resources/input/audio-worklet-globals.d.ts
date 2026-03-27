@@ -9,7 +9,4 @@ declare abstract class AudioWorkletProcessor {
   ): boolean;
 }
 
-declare function registerProcessor(
-  name: string,
-  processorCtor: new () => AudioWorkletProcessor
-): void;
+declare function registerProcessor(name: string, processorCtor: new () => AudioWorkletProcessor): void;

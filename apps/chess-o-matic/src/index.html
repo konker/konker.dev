@@ -31,25 +31,64 @@
       }
 
       /* Example classes that map to your custom piece URLs */
-      .white-q { background-image: url('game-view/pieces/staunty/queen.white.svg'); }
-      .white-r { background-image: url('game-view/pieces/staunty/rook.white.svg'); }
-      .white-b { background-image: url('game-view/pieces/staunty/bishop.white.svg'); }
-      .white-n { background-image: url('game-view/pieces/staunty/knight.white.svg'); }
-      .black-q { background-image: url('game-view/pieces/staunty/queen.black.svg'); }
-      .black-r { background-image: url('game-view/pieces/staunty/rook.black.svg'); }
-      .black-b { background-image: url('game-view/pieces/staunty/bishop.black.svg'); }
-      .black-n { background-image: url('game-view/pieces/staunty/knight.black.svg'); }
+      .white-q {
+        background-image: url('game-view/pieces/staunty/queen.white.svg');
+      }
+      .white-r {
+        background-image: url('game-view/pieces/staunty/rook.white.svg');
+      }
+      .white-b {
+        background-image: url('game-view/pieces/staunty/bishop.white.svg');
+      }
+      .white-n {
+        background-image: url('game-view/pieces/staunty/knight.white.svg');
+      }
+      .black-q {
+        background-image: url('game-view/pieces/staunty/queen.black.svg');
+      }
+      .black-r {
+        background-image: url('game-view/pieces/staunty/rook.black.svg');
+      }
+      .black-b {
+        background-image: url('game-view/pieces/staunty/bishop.black.svg');
+      }
+      .black-n {
+        background-image: url('game-view/pieces/staunty/knight.black.svg');
+      }
     </style>
   </head>
   <body>
     <h1>Chess-o-Matic</h1>
     <p>Recognize chess moves using speech recognition</p>
 
-    <div class="board-container" style="position: relative; width: 400px;">
+    <div class="board-container" style="position: relative; width: 400px">
       <g-chess-board id="board"></g-chess-board>
 
-      <div id="promotion-dialog" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 10; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 15px; border-radius: 8px; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+      <div
+        id="promotion-dialog"
+        style="
+          display: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 10;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          style="
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+          "
+        >
           <div class="promo-choice" data-piece="q" title="Queen"></div>
           <div class="promo-choice" data-piece="r" title="Rook"></div>
           <div class="promo-choice" data-piece="b" title="Bishop"></div>
@@ -58,36 +97,30 @@
       </div>
     </div>
 
-    <div id="input">
-      INPUT
-    </div>
-    <div id="pgn">
-      PGN
-    </div>
+    <div id="input">INPUT</div>
+    <div id="pgn">PGN</div>
 
-    <hr>
-<!--    <button id="startBtn">Start1</button>-->
+    <hr />
+    <!--    <button id="startBtn">Start1</button>-->
     <button id="stopBtn">Stop</button>
     <hr />
     <script type="module">
-      import 'gchessboard'
-      import { init, exit, tick } from "./index.ts";
+      import 'gchessboard';
+      import { init, exit, tick } from './index.ts';
 
-      const boardWrapper = document.getElementById("boardWrapper");
-      const input = document.getElementById("input");
-      const pgn = document.getElementById("pgn");
+      const boardWrapper = document.getElementById('boardWrapper');
+      const input = document.getElementById('input');
+      const pgn = document.getElementById('pgn');
       // const startBtn = document.getElementById("startBtn");
-      const stopBtn = document.getElementById("stopBtn");
-
-
+      const stopBtn = document.getElementById('stopBtn');
 
       // startBtn.addEventListener("click", async () => init(boardWrapper, input, pgn));
-      stopBtn.addEventListener("click", exit);
+      stopBtn.addEventListener('click', exit);
 
       // Expose to browser console
       window.tick = tick;
 
-      init(boardWrapper, input, pgn)
+      init(boardWrapper, input, pgn);
     </script>
   </body>
 </html>
