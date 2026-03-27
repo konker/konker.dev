@@ -1,0 +1,13 @@
+meta {
+  name: api.auth.konker.dev
+}
+
+auth {
+  mode: apikey
+}
+
+auth:apikey {
+  key: apiKeyCookie
+  value: {{apiKey}}
+  placement: header
+}

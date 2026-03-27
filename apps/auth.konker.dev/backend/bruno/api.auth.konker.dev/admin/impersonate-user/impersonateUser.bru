@@ -1,0 +1,297 @@
+meta {
+  name: impersonateUser
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/admin/impersonate-user
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "userId": ""
+  }
+}
+
+example {
+  name: 200 Response
+  description: Impersonation session created
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "session": {
+            "id": "",
+            "expiresAt": "",
+            "token": "",
+            "createdAt": "",
+            "updatedAt": "",
+            "ipAddress": "",
+            "userAgent": "",
+            "userId": "",
+            "impersonatedBy": ""
+          },
+          "user": {
+            "id": "",
+            "name": "",
+            "email": "",
+            "emailVerified": false,
+            "image": "",
+            "createdAt": "",
+            "updatedAt": "",
+            "role": "",
+            "banned": false,
+            "banReason": "",
+            "banExpires": "",
+            "twoFactorEnabled": false
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Bad Request. Usually due to missing parameters, or invalid parameters.
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "message": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized. Due to missing or invalid authentication.
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "message": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Forbidden. You do not have permission to access this resource or to perform this action.
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "message": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Not Found. The requested resource was not found.
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "message": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response
+  description: Too Many Requests. You have exceeded the rate limit. Try again later.
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "message": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 500 Response
+  description: Internal Server Error. This is a problem with the server that you cannot fix.
+  
+  request: {
+    url: {{baseUrl}}/admin/impersonate-user
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "userId": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 500
+      text: Internal Server Error
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "message": ""
+        }
+      '''
+    }
+  }
+}
