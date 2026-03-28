@@ -13,10 +13,10 @@ import { moveComplete, moveHighlight } from './helpers.js';
 import { openPromotionDialog } from './promotion-ui.js';
 
 // --------------------------------------------------------------------------
-export const GchessboardBoardViewAdapter: BoardViewAdapter = (
+export const GchessboardBoardViewAdapter: BoardViewAdapter = function GchessboardBoardViewAdapter(
   gameModelResources: GameModelResources,
   elements: BoardViewMountElements
-) => {
+): ReturnType<BoardViewAdapter> {
   const rep = elements.boardEl as GChessBoardElement;
   rep.coordinates = 'outside';
   rep.turn = 'white';
@@ -64,14 +64,16 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
   });
 
   return {
-    move: (coords: [Square, Square], fen: string) => {
+    move(coords: [Square, Square], fen: string): void {
       rep.fen = fen;
       moveHighlight(rep, coords);
       rep.turn = gameModelResources.chess.turn() === 'w' ? 'white' : 'black';
     },
-    toggleOrientation: () => {
+    toggleOrientation(): void {
       rep.orientation = rep.orientation === 'white' ? 'black' : 'white';
     },
-    orientation: () => (rep.orientation == 'white' ? BOARD_COLOR_LIGHT : BOARD_COLOR_DARK),
+    orientation(): typeof BOARD_COLOR_LIGHT | typeof BOARD_COLOR_DARK {
+      return rep.orientation == 'white' ? BOARD_COLOR_LIGHT : BOARD_COLOR_DARK;
+    },
   };
 };

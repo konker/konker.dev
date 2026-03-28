@@ -8,10 +8,7 @@ export default createHandler(() => (
         <head>
           <meta charset="utf-8" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
-          <meta
-            content="Voice-controlled chess for the web, built with SolidStart."
-            name="description"
-          />
+          <meta content="Voice-controlled chess for the web, built with SolidStart." name="description" />
           {assets}
         </head>
         <body>

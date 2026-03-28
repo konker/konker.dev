@@ -1,70 +1,73 @@
 import '../chess-o-matic.css';
 
-import { createSignal, onCleanup, onMount } from 'solid-js';
+import type { JSX } from 'solid-js';
+import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
-type ChessEngineModule = typeof import('../../../game-engine');
+import type { GameEngine } from '../../../game-engine';
+import { createGameEngine } from '../../../game-engine';
+import { ChessBoard } from './ChessBoard';
 
 type ChessOMaticAppProps = {
   readonly autoloadEngine?: boolean;
 };
 
-export function ChessOMaticApp(props: ChessOMaticAppProps) {
+export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   let boardEl: HTMLElement | undefined;
-  let inputEl: HTMLParagraphElement | undefined;
-  let pgnEl: HTMLPreElement | undefined;
   let promotionDialogEl: HTMLDivElement | undefined;
 
   const [errorMessage, setErrorMessage] = createSignal<string>();
   const [isInitializing, setIsInitializing] = createSignal(true);
   const [isListening, setIsListening] = createSignal(false);
   const [isSoundEnabled, setIsSoundEnabled] = createSignal(false);
-  const [statusMessage, setStatusMessage] = createSignal('Loading local speech model…');
+  const [lastInputResult, setLastInputResult] = createSignal('Loading local speech model…');
+  const [pgn, setPgn] = createSignal('No moves yet.');
 
-  let gameEngine: ChessEngineModule | undefined;
+  let gameEngine: GameEngine | undefined;
 
-  const syncAudioState = () => {
+  function syncAudioState(): void {
     if (!gameEngine) {
       return;
     }
 
-    setIsListening(gameEngine.gameEngineIsAudioInputOn());
-    setIsSoundEnabled(gameEngine.gameEngineIsAudioOutputOn());
-  };
+    setIsListening(gameEngine.isAudioInputOn());
+    setIsSoundEnabled(gameEngine.isAudioOutputOn());
+  }
 
   onMount(async () => {
     if (props.autoloadEngine === false) {
       setIsInitializing(false);
-      setStatusMessage('Component test mode');
+      setLastInputResult('Component test mode');
       return;
     }
 
-    if (!boardEl || !inputEl || !pgnEl || !promotionDialogEl) {
+    if (!boardEl || !promotionDialogEl) {
       setErrorMessage('The chess board failed to mount.');
       setIsInitializing(false);
       return;
     }
 
     try {
-      gameEngine = await import('../../../game-engine');
-      await gameEngine.gameEngineInit({
+      gameEngine = createGameEngine();
+      await gameEngine.init({
         boardEl,
-        inputEl,
-        pgnEl,
         promotionDialogEl,
         initialSettings: {
           audioInputOn: true,
           audioOutputOn: false,
         },
+        onUiStateChange: (state) => {
+          setLastInputResult(state.lastInputResult);
+          setPgn(state.pgn);
+        },
       });
 
       syncAudioState();
-      setStatusMessage('Ready for voice input');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown initialization error';
       setErrorMessage(
         `Unable to initialize Chess-o-Matic. Add the local Vosk model to public/models/vosk-model-small-en-us-0.15.zip and retry. (${message})`
       );
-      setStatusMessage('Initialization failed');
+      setLastInputResult('Initialization failed');
     } finally {
       setIsInitializing(false);
     }
@@ -72,67 +75,68 @@ export function ChessOMaticApp(props: ChessOMaticAppProps) {
 
   onCleanup(() => {
     if (gameEngine) {
-      void gameEngine.gameEngineExit();
+      void gameEngine.exit();
     }
   });
 
-  const toggleListening = async () => {
+  async function toggleListening(): Promise<void> {
     if (!gameEngine) {
       return;
     }
 
-    await gameEngine.gameEngineAudioInputToggle();
+    await gameEngine.audioInputToggle();
     syncAudioState();
-    setStatusMessage(gameEngine.gameEngineIsAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
-  };
+    setLastInputResult(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
+  }
 
-  const toggleSound = async () => {
+  async function toggleSound(): Promise<void> {
     if (!gameEngine) {
       return;
     }
 
-    await gameEngine.gameEngineAudioOutputToggle();
+    await gameEngine.audioOutputToggle();
     syncAudioState();
-    setStatusMessage(gameEngine.gameEngineIsAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
-  };
+    setLastInputResult(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
+  }
+
+  function setBoardElement(element: HTMLElement): void {
+    boardEl = element;
+  }
+
+  function setPromotionDialogElement(element: HTMLDivElement): void {
+    promotionDialogEl = element;
+  }
+
+  function renderErrorMessage(message: () => string): JSX.Element {
+    return <p>{message()}</p>;
+  }
 
   return (
     <main class="app-shell">
       <h1>Chess-o-Matic</h1>
 
-      <p>|{errorMessage() ? <p>{errorMessage()}</p> : null}|</p>
+      <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
       <div class="button-row">
-        <button kdisabled={isInitializing() || !!errorMessage()} onClick={() => void toggleListening()} type="button">
+        <button disabled={isInitializing() || !!errorMessage()} onClick={() => void toggleListening()} type="button">
           {isListening() ? 'Disable Audio Input' : 'Enable Audio Input'}
         </button>
 
-        <button kdisabled={isInitializing() || !!errorMessage()} onClick={() => void toggleSound()} type="button">
+        <button disabled={isInitializing() || !!errorMessage()} onClick={() => void toggleSound()} type="button">
           {isSoundEnabled() ? 'Disable Audio Output' : 'Enable Audio Output'}
         </button>
       </div>
-      <div class="board-frame">
-        <g-chess-board class="board" id="board" ref={boardEl} />
-        <div class="promotion-dialog" data-open="false" id="promotion-dialog" ref={promotionDialogEl}>
-          <div class="promotion-panel">
-            <button class="promo-choice" data-piece="q" title="Queen" type="button" />
-            <button class="promo-choice" data-piece="r" title="Rook" type="button" />
-            <button class="promo-choice" data-piece="b" title="Bishop" type="button" />
-            <button class="promo-choice" data-piece="n" title="Knight" type="button" />
-          </div>
-        </div>
-      </div>
-      <label class="field">
-        <span>PGN</span>
-        <textarea aria-label="PGN" readOnly ref={pgnEl}>
-          No moves yet.
-        </textarea>
-      </label>
+
+      <ChessBoard boardRef={setBoardElement} promotionDialogRef={setPromotionDialogElement} />
+
       <label class="field">
         <span>Last Input / Result</span>
-        <textarea aria-label="Last Input / Result" readOnly ref={inputEl}>
-          {statusMessage()}
-        </textarea>
+        <textarea aria-label="Last Input / Result" readOnly value={lastInputResult()} />
+      </label>
+
+      <label class="field">
+        <span>PGN</span>
+        <textarea aria-label="PGN" readOnly value={pgn()} />
       </label>
     </main>
   );

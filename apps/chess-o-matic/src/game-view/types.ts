@@ -16,7 +16,4 @@ export type BoardViewMountElements = {
   readonly promotionDialogEl: HTMLElement;
 };
 
-export type BoardViewAdapter = (
-  gameModelResources: GameModelResources,
-  elements: BoardViewMountElements
-) => BoardView;
+export type BoardViewAdapter = (gameModelResources: GameModelResources, elements: BoardViewMountElements) => BoardView;

@@ -16,14 +16,9 @@ import type { BoardView, BoardViewMountElements } from './types.js';
 // --------------------------------------------------------------------------
 export type GameViewResources = {
   readonly board: BoardView;
-  readonly inputEl: HTMLElement;
-  readonly pgnEl: HTMLElement;
 };
 
-export type GameViewElements = BoardViewMountElements & {
-  readonly inputEl: HTMLElement;
-  readonly pgnEl: HTMLElement;
-};
+export type GameViewElements = BoardViewMountElements;
 
 // --------------------------------------------------------------------------
 export async function initGameView(
@@ -32,8 +27,6 @@ export async function initGameView(
 ): Promise<GameViewResources> {
   return {
     board: GchessboardBoardViewAdapter(gameModelResources, elements),
-    inputEl: elements.inputEl,
-    pgnEl: elements.pgnEl,
   };
 }
 
