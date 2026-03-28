@@ -6,7 +6,7 @@ import type { GChessBoardElement } from 'gchessboard';
 
 import type { GameModelResources } from '../../game-model';
 import { START_FEN } from '../../game-model/consts.js';
-import type { BoardViewAdapter } from '../types.js';
+import type { BoardViewAdapter, BoardViewMountElements } from '../types.js';
 import { BOARD_COLOR_DARK } from '../types.js';
 import { BOARD_COLOR_LIGHT } from '../types.js';
 import { moveComplete, moveHighlight } from './helpers.js';
@@ -15,9 +15,9 @@ import { openPromotionDialog } from './promotion-ui.js';
 // --------------------------------------------------------------------------
 export const GchessboardBoardViewAdapter: BoardViewAdapter = (
   gameModelResources: GameModelResources,
-  _boardEl: HTMLElement
+  elements: BoardViewMountElements
 ) => {
-  const rep = document.getElementById('board') as GChessBoardElement;
+  const rep = elements.boardEl as GChessBoardElement;
   rep.coordinates = 'outside';
   rep.turn = 'white';
   rep.interactive = true;
@@ -52,7 +52,7 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = (
       gameModelResources.locked = true;
       rep.fen = gameModelResources.chess.fen();
       e.preventDefault();
-      openPromotionDialog(gameModelResources, rep, coords, piece.color);
+      openPromotionDialog(gameModelResources, rep, elements.promotionDialogEl, coords, piece.color);
     }
   });
 

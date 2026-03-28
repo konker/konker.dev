@@ -9,7 +9,6 @@ import {
   startAudioInput,
   stopAudioInput,
 } from '../audio-resources/input';
-import MODEL_URL from '../audio-resources/input/vosk-model-small-en-us-0.15.zip?url';
 import type { AudioOutputResources } from '../audio-resources/output';
 import { exitAudioOutput, initAudioOutput } from '../audio-resources/output';
 import type { GameModelResources } from '../game-model';
@@ -63,6 +62,9 @@ import {
 import { chessGrammar } from '../speech-recognizer-model/grammar/chess-grammar-en.js';
 
 // --------------------------------------------------------------------------
+const MODEL_URL = '/models/vosk-model-small-en-us-0.15.zip';
+
+// --------------------------------------------------------------------------
 let settings: ComSettings;
 let audioInputResources: AudioInputResources;
 let audioOutputResources: AudioOutputResources;
@@ -71,18 +73,32 @@ let gameViewResources: GameViewResources;
 let speechRecognizerResources: SpeechRecognizerResources;
 
 // --------------------------------------------------------------------------
-export async function gameEngineInit(
-  boardEl: HTMLElement,
-  inputEl: HTMLElement,
-  pgnEl: HTMLElement,
-  initialSettings?: Partial<ComSettings>
-) {
+export type GameEngineInitOptions = {
+  readonly boardEl: HTMLElement;
+  readonly inputEl: HTMLElement;
+  readonly pgnEl: HTMLElement;
+  readonly promotionDialogEl: HTMLElement;
+  readonly initialSettings?: Partial<ComSettings>;
+};
+
+export async function gameEngineInit({
+  boardEl,
+  inputEl,
+  pgnEl,
+  promotionDialogEl,
+  initialSettings,
+}: GameEngineInitOptions) {
   console.log('INIT');
   settings = await initComSettings(initialSettings);
   audioInputResources = await initAudioInput();
   audioOutputResources = await initAudioOutput();
   gameModelResources = await initGameModel();
-  gameViewResources = await initGameView(gameModelResources, boardEl, inputEl, pgnEl);
+  gameViewResources = await initGameView(gameModelResources, {
+    boardEl,
+    inputEl,
+    pgnEl,
+    promotionDialogEl,
+  });
   speechRecognizerResources = await initSpeechRecognizer(MODEL_URL);
 
   gameModelEventsAddListener(

@@ -11,7 +11,7 @@ import type {
 import { GAME_MODEL_CONTROL_ACTION_FLIP } from '../game-model/evaluate.js';
 import type { ComSettings } from '../settings';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
-import type { BoardView } from './types.js';
+import type { BoardView, BoardViewMountElements } from './types.js';
 
 // --------------------------------------------------------------------------
 export type GameViewResources = {
@@ -20,17 +20,20 @@ export type GameViewResources = {
   readonly pgnEl: HTMLElement;
 };
 
+export type GameViewElements = BoardViewMountElements & {
+  readonly inputEl: HTMLElement;
+  readonly pgnEl: HTMLElement;
+};
+
 // --------------------------------------------------------------------------
 export async function initGameView(
   gameModelResources: GameModelResources,
-  boardEl: HTMLElement,
-  inputEl: HTMLElement,
-  pgnEl: HTMLElement
+  elements: GameViewElements
 ): Promise<GameViewResources> {
   return {
-    board: GchessboardBoardViewAdapter(gameModelResources, boardEl),
-    inputEl,
-    pgnEl,
+    board: GchessboardBoardViewAdapter(gameModelResources, elements),
+    inputEl: elements.inputEl,
+    pgnEl: elements.pgnEl,
   };
 }
 

@@ -1,4 +1,3 @@
-// --------------------------------------------------------------------------
 export const AUDIO_INPUT_LISTENING_ON = 'listening' as const;
 export const AUDIO_INPUT_LISTENING_OFF = 'not-listening' as const;
 

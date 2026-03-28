@@ -11,4 +11,12 @@ export type BoardView = {
   readonly orientation: () => typeof BOARD_COLOR_LIGHT | typeof BOARD_COLOR_DARK;
 };
 
-export type BoardViewAdapter = (gameModelResources: GameModelResources, boardEl: HTMLElement) => BoardView;
+export type BoardViewMountElements = {
+  readonly boardEl: HTMLElement;
+  readonly promotionDialogEl: HTMLElement;
+};
+
+export type BoardViewAdapter = (
+  gameModelResources: GameModelResources,
+  elements: BoardViewMountElements
+) => BoardView;
