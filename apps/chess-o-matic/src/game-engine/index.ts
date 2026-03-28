@@ -1,25 +1,24 @@
-import type { KaldiRecognizer } from 'vosk-browser';
-
-import type { AudioInputResources } from './audio-resources/input';
-import { exitAudioInputResources, initAudioInputResources } from './audio-resources/input';
-import type { AudioOutputResources } from './audio-resources/output';
-import { exitAudioOutputResources, initAudioOutputResources } from './audio-resources/output';
-import type { GameModelResources } from './game-model';
-import { exitGameModel, initGameModel } from './game-model';
+import type { AudioInputResources } from '../audio-resources/input';
+import { exitAudioInputResources, initAudioInputResources } from '../audio-resources/input';
+import MODEL_URL from '../audio-resources/input/vosk-model-small-en-us-0.15.zip?url';
+import type { AudioOutputResources } from '../audio-resources/output';
+import { exitAudioOutputResources, initAudioOutputResources } from '../audio-resources/output';
+import type { GameModelResources } from '../game-model';
+import { exitGameModel, initGameModel } from '../game-model';
 import {
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
   GAME_MODEL_EVALUATE_STATUS_IGNORE,
   GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
   GAME_MODEL_EVALUATE_STATUS_OK,
   gameModelEvaluate,
-} from './game-model/evaluate.js';
+} from '../game-model/evaluate.js';
 import type {
   GameModelEventControl,
   GameModelEventEvaluated,
   GameModelEventMovedInvalid,
   GameModelEventMovedOk,
   GameModelEventViewChanged,
-} from './game-model/events.js';
+} from '../game-model/events.js';
 import {
   GAME_MODEL_EVENT_TYPE_CONTROL,
   GAME_MODEL_EVENT_TYPE_EVALUATED,
@@ -28,9 +27,13 @@ import {
   GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
   gameModelEventsAddListener,
   gameModelEventsNotifyListeners,
-} from './game-model/events.js';
-import { GAME_INPUT_PARSE_STATUS_OK_COORDS, GAME_INPUT_PARSE_STATUS_OK_SAN, gameModelRead } from './game-model/read.js';
-import type { GameViewResources } from './game-view';
+} from '../game-model/events.js';
+import {
+  GAME_INPUT_PARSE_STATUS_OK_COORDS,
+  GAME_INPUT_PARSE_STATUS_OK_SAN,
+  gameModelRead,
+} from '../game-model/read.js';
+import type { GameViewResources } from '../game-view';
 import {
   exitGameView,
   gameViewUpdateControl,
@@ -38,20 +41,18 @@ import {
   gameViewUpdateMovedOk,
   gameViewUpdateMovedSoundsOk,
   initGameView,
-} from './game-view';
-import { chessGrammar } from './grammar/chess-grammar-en.js';
-import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
-import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
-import { ComSettings } from './settings';
+} from '../game-view';
+import { chessGrammar } from '../grammar/chess-grammar-en.js';
+import { ComSettings } from '../settings';
 
-let speechRecognizer: KaldiRecognizer;
+// let speechRecognizer: KaldiRecognizer;
 let audioInputResources: AudioInputResources;
 let audioOutputResources: AudioOutputResources;
 let gameModelResources: GameModelResources;
 let gameViewResources: GameViewResources;
 let settings: ComSettings;
 
-export async function tick(result: string) {
+export async function gameEngineTick(result: string) {
   const readResult = gameModelRead(result);
   const evaluateResult = gameModelEvaluate(gameModelResources, gameViewResources, readResult);
 
@@ -89,12 +90,12 @@ export async function tick(result: string) {
   });
 }
 
-export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
+export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
   console.log('INIT');
   settings = new ComSettings();
-  audioInputResources = await initAudioInputResources();
   audioOutputResources = await initAudioOutputResources();
-  speechRecognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioInputResources.audioContext.sampleRate);
+  audioInputResources = await initAudioInputResources(MODEL_URL, chessGrammar);
+  // speechRecognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioInputResources.audioContext.sampleRate);
   gameModelResources = initGameModel();
   gameViewResources = initGameView(gameModelResources, boardEl, inputEl, pgnEl);
 
@@ -103,18 +104,18 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     if (event.data.type === 'audio' && audioInputResources.isListening) {
       const audioData = event.data.data;
       // Send Float32Array directly to recognizer
-      speechRecognizer.acceptWaveformFloat(audioData, audioInputResources.audioContext.sampleRate);
+      audioInputResources.recognizer.acceptWaveformFloat(audioData, audioInputResources.audioContext.sampleRate);
     }
   };
 
   // When speech recognizer matches an input, execute it
-  speechRecognizer.on('result', async (message) => {
+  audioInputResources.recognizer.on('result', async (message) => {
     if ('result' in message && 'text' in message.result && message.result.text !== '') {
       // TODO: consider adding a "cancel' word which, if it appears in the input, will mean the input is dropped
-      await tick(message.result.text);
+      await gameEngineTick(message.result.text);
     }
   });
-  speechRecognizer.on('error', (message) => {
+  audioInputResources.recognizer.on('error', (message) => {
     // FIXME: either do something useful, or remove this
     console.error('Err:', message);
   });
@@ -219,11 +220,11 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
   );
 }
 
-export async function exit() {
+export async function gameEngineExit() {
   console.log('EXIT');
   exitGameModel(gameModelResources);
   audioInputResources = exitAudioInputResources(audioInputResources);
   audioOutputResources = exitAudioOutputResources(audioOutputResources);
-  exitRecognizerModel(speechRecognizer);
+  // exitRecognizerModel(speechRecognizer);
   exitGameView(gameViewResources);
 }

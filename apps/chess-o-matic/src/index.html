@@ -106,7 +106,7 @@
     <hr />
     <script type="module">
       import 'gchessboard';
-      import { init, exit, tick } from './index.ts';
+      import { gameEngineInit, gameEngineExit, gameEngineTick  } from './game-engine/index.ts';
 
       const boardWrapper = document.getElementById('boardWrapper');
       const input = document.getElementById('input');
@@ -115,12 +115,12 @@
       const stopBtn = document.getElementById('stopBtn');
 
       // startBtn.addEventListener("click", async () => init(boardWrapper, input, pgn));
-      stopBtn.addEventListener('click', exit);
+      stopBtn.addEventListener('click', gameEngineExit);
 
       // Expose to browser console
-      window.tick = tick;
+      window.tick = gameEngineTick;
 
-      init(boardWrapper, input, pgn);
+      gameEngineInit(boardWrapper, input, pgn);
     </script>
   </body>
 </html>

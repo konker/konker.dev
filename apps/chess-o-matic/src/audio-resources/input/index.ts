@@ -1,9 +1,13 @@
 // --------------------------------------------------------------------------
+import type { KaldiRecognizer } from 'vosk-browser';
+import { createModel } from 'vosk-browser';
+
 export type AudioInputResourcesListening = {
   isListening: true;
   audioContext: AudioContext;
   mediaStream: MediaStream;
   workletNode: AudioWorkletNode;
+  recognizer: KaldiRecognizer;
 };
 
 export type AudioInputResourcesNotListening = {
@@ -11,12 +15,16 @@ export type AudioInputResourcesNotListening = {
   audioContext: null;
   mediaStream: null;
   workletNode: null;
+  recognizer: null;
 };
 
 export type AudioInputResources = AudioInputResourcesListening | AudioInputResourcesNotListening;
 
 // --------------------------------------------------------------------------
-export async function initAudioInputResources(): Promise<AudioInputResourcesListening> {
+export async function initAudioInputResources(
+  modelUrl: string,
+  grammar: ReadonlyArray<string>
+): Promise<AudioInputResourcesListening> {
   // Request microphone access
   const mediaStream = await navigator.mediaDevices.getUserMedia({
     audio: {
@@ -39,6 +47,16 @@ export async function initAudioInputResources(): Promise<AudioInputResourcesList
   source.connect(workletNode);
   workletNode.connect(audioContext.destination);
 
+  console.log(`Loading Vosk model at ${modelUrl}...`);
+
+  // Load the model
+  const model = await createModel(modelUrl);
+  console.log('Model loaded successfully');
+
+  // Create recognizer with or without grammar
+  const recognizer = new model.KaldiRecognizer(audioContext.sampleRate, JSON.stringify(grammar));
+  console.log(`Recognizer created with grammar (${grammar.length} phrases)`);
+
   const isListening = true;
 
   return {
@@ -46,28 +64,31 @@ export async function initAudioInputResources(): Promise<AudioInputResourcesList
     audioContext,
     mediaStream,
     isListening,
+    recognizer,
   };
 }
 
 // --------------------------------------------------------------------------
-export function exitAudioInputResources(audioOutputResources: AudioInputResources): AudioInputResourcesNotListening {
-  if (!audioOutputResources.isListening) {
-    return audioOutputResources;
+export function exitAudioInputResources(audioInputResources: AudioInputResources): AudioInputResourcesNotListening {
+  if (!audioInputResources.isListening) {
+    return audioInputResources;
   }
 
   // Clean up audio resources
-  if (audioOutputResources.workletNode) {
-    audioOutputResources.workletNode.disconnect();
-    audioOutputResources.workletNode.port.onmessage = null;
+  if (audioInputResources.workletNode) {
+    audioInputResources.workletNode.disconnect();
+    audioInputResources.workletNode.port.onmessage = null;
   }
 
-  if (audioOutputResources.audioContext) {
-    void audioOutputResources.audioContext.close();
+  if (audioInputResources.audioContext) {
+    void audioInputResources.audioContext.close();
   }
 
-  if (audioOutputResources.mediaStream) {
-    audioOutputResources.mediaStream.getTracks().forEach((track) => track.stop());
+  if (audioInputResources.mediaStream) {
+    audioInputResources.mediaStream.getTracks().forEach((track) => track.stop());
   }
+  // Retrieve the final result before stopping (triggers a result event)
+  audioInputResources.recognizer.retrieveFinalResult();
 
   console.log('Stopped listening');
 
@@ -76,5 +97,6 @@ export function exitAudioInputResources(audioOutputResources: AudioInputResource
     audioContext: null,
     mediaStream: null,
     workletNode: null,
+    recognizer: null,
   };
 }
