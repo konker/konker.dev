@@ -1,8 +1,17 @@
+import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
+
 import type { AudioInputResources } from '../audio-resources/input';
-import { exitAudioInputResources, initAudioInputResources } from '../audio-resources/input';
+import {
+  AUDIO_INPUT_LISTENING_OFF,
+  AUDIO_INPUT_LISTENING_ON,
+  exitAudioInput,
+  initAudioInput,
+  startAudioInput,
+  stopAudioInput,
+} from '../audio-resources/input';
 import MODEL_URL from '../audio-resources/input/vosk-model-small-en-us-0.15.zip?url';
 import type { AudioOutputResources } from '../audio-resources/output';
-import { exitAudioOutputResources, initAudioOutputResources } from '../audio-resources/output';
+import { exitAudioOutput, initAudioOutput } from '../audio-resources/output';
 import type { GameModelResources } from '../game-model';
 import { exitGameModel, initGameModel } from '../game-model';
 import {
@@ -42,92 +51,40 @@ import {
   gameViewUpdateMovedSoundsOk,
   initGameView,
 } from '../game-view';
-import { chessGrammar } from '../grammar/chess-grammar-en.js';
-import { ComSettings } from '../settings';
+import type { ComSettings } from '../settings';
+import { initComSettings } from '../settings';
+import type { SpeechRecognizerResources } from '../speech-recognizer-model';
+import {
+  exitSpeechRecognizer,
+  initSpeechRecognizer,
+  startSpeechRecognizer,
+  stopSpeechRecognizer,
+} from '../speech-recognizer-model';
+import { chessGrammar } from '../speech-recognizer-model/grammar/chess-grammar-en.js';
 
-// let speechRecognizer: KaldiRecognizer;
+// --------------------------------------------------------------------------
+let settings: ComSettings;
 let audioInputResources: AudioInputResources;
 let audioOutputResources: AudioOutputResources;
 let gameModelResources: GameModelResources;
 let gameViewResources: GameViewResources;
-let settings: ComSettings;
+let speechRecognizerResources: SpeechRecognizerResources;
 
-export async function gameEngineTick(result: string) {
-  const readResult = gameModelRead(result);
-  const evaluateResult = gameModelEvaluate(gameModelResources, gameViewResources, readResult);
-
-  // Notify if a legal move was made
-  if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
-      type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
-      result: evaluateResult,
-    });
-  }
-
-  // Notify if an invalid move was made
-  if (
-    evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_IGNORE ||
-    evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_ILLEGAL
-  ) {
-    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_INVALID, {
-      type: GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
-      result: evaluateResult,
-    });
-  }
-
-  // Notify if a control action was made
-  if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_CONTROL) {
-    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, {
-      type: GAME_MODEL_EVENT_TYPE_CONTROL,
-      result: evaluateResult,
-    });
-  }
-
-  // Notify everything that has happened
-  await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
-    type: GAME_MODEL_EVENT_TYPE_EVALUATED,
-    result: evaluateResult,
-  });
-}
-
-export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HTMLElement) {
+// --------------------------------------------------------------------------
+export async function gameEngineInit(
+  boardEl: HTMLElement,
+  inputEl: HTMLElement,
+  pgnEl: HTMLElement,
+  initialSettings?: Partial<ComSettings>
+) {
   console.log('INIT');
-  settings = new ComSettings();
-  audioOutputResources = await initAudioOutputResources();
-  audioInputResources = await initAudioInputResources(MODEL_URL, chessGrammar);
-  // speechRecognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioInputResources.audioContext.sampleRate);
-  gameModelResources = initGameModel();
-  gameViewResources = initGameView(gameModelResources, boardEl, inputEl, pgnEl);
+  settings = await initComSettings(initialSettings);
+  audioInputResources = await initAudioInput();
+  audioOutputResources = await initAudioOutput();
+  gameModelResources = await initGameModel();
+  gameViewResources = await initGameView(gameModelResources, boardEl, inputEl, pgnEl);
+  speechRecognizerResources = await initSpeechRecognizer(MODEL_URL);
 
-  // Pipe audio data from worklet to recognizer
-  audioInputResources.workletNode.port.onmessage = (event) => {
-    if (event.data.type === 'audio' && audioInputResources.isListening) {
-      const audioData = event.data.data;
-      // Send Float32Array directly to recognizer
-      audioInputResources.recognizer.acceptWaveformFloat(audioData, audioInputResources.audioContext.sampleRate);
-    }
-  };
-
-  // When speech recognizer matches an input, execute it
-  audioInputResources.recognizer.on('result', async (message) => {
-    if ('result' in message && 'text' in message.result && message.result.text !== '') {
-      // TODO: consider adding a "cancel' word which, if it appears in the input, will mean the input is dropped
-      await gameEngineTick(message.result.text);
-    }
-  });
-  audioInputResources.recognizer.on('error', (message) => {
-    // FIXME: either do something useful, or remove this
-    console.error('Err:', message);
-  });
-  /*[XXX: noisy]
-  recognizer.on('partialresult', (message) => {
-    if ('result' in message && 'partial' in message.result && message.result.partial !== '') {
-      console.log('P: ', message.result.partial);
-    }
-  });
-  */
-
-  // If a valid move has been made, update the view
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_MOVED_OK,
@@ -136,7 +93,6 @@ export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement,
     }
   );
 
-  // If an invalid move has been made, update the view
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
@@ -151,7 +107,6 @@ export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement,
     }
   );
 
-  // If a valid control command has been received, update the view
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_CONTROL,
@@ -160,7 +115,6 @@ export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement,
     }
   );
 
-  // If the view has made an update, make sure the game model is in sync
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_VIEW_CHANGED,
@@ -185,7 +139,6 @@ export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement,
             }
       );
 
-      // We only expect valid moves to make it this far, so only handle the OK case
       if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
         await gameViewUpdateMovedSoundsOk(
           settings,
@@ -196,7 +149,6 @@ export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement,
         );
       }
 
-      // Notify everything that has happened
       await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
         type: GAME_MODEL_EVENT_TYPE_EVALUATED,
         result: evaluateResult,
@@ -204,27 +156,164 @@ export async function gameEngineInit(boardEl: HTMLElement, inputEl: HTMLElement,
     }
   );
 
-  // If something has happened, update the UI
   gameModelEventsAddListener(
     gameModelResources,
     GAME_MODEL_EVENT_TYPE_EVALUATED,
     async (event: GameModelEventEvaluated) => {
+      console.log('Ev: ', event);
       console.log('Ra: ', gameModelResources.chess.ascii());
       console.log('Rp: ', gameModelResources.chess.pgn());
       console.log('Rf: ', gameModelResources.chess.fen());
 
-      console.log('KONK50!!!');
       gameViewResources.inputEl.innerHTML = `${event.result.sanitized} - ${event.result.status}`;
       gameViewResources.pgnEl.innerHTML = gameModelResources.chess.pgn();
     }
   );
+
+  if (settings.audioInputOn) {
+    await gameEngineAudioInputOn();
+  }
+  if (settings.audioOutputOn) {
+    await gameEngineAudioOutputOn();
+  }
 }
 
+// --------------------------------------------------------------------------
 export async function gameEngineExit() {
   console.log('EXIT');
-  exitGameModel(gameModelResources);
-  audioInputResources = exitAudioInputResources(audioInputResources);
-  audioOutputResources = exitAudioOutputResources(audioOutputResources);
-  // exitRecognizerModel(speechRecognizer);
-  exitGameView(gameViewResources);
+  await exitGameModel(gameModelResources);
+  await gameEngineAudioInputOff();
+  await exitAudioInput(audioInputResources);
+  await exitSpeechRecognizer(speechRecognizerResources);
+  await exitAudioOutput(audioOutputResources);
+  await exitGameView(gameViewResources);
+}
+
+// --------------------------------------------------------------------------
+export async function gameEngineTick(result: string) {
+  const readResult = gameModelRead(result);
+  const evaluateResult = gameModelEvaluate(gameModelResources, gameViewResources, readResult);
+
+  if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
+    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
+      type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
+      result: evaluateResult,
+    });
+  }
+
+  if (
+    evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_IGNORE ||
+    evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_ILLEGAL
+  ) {
+    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_INVALID, {
+      type: GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
+      result: evaluateResult,
+    });
+  }
+
+  if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_CONTROL) {
+    await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_CONTROL, {
+      type: GAME_MODEL_EVENT_TYPE_CONTROL,
+      result: evaluateResult,
+    });
+  }
+
+  await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
+    type: GAME_MODEL_EVENT_TYPE_EVALUATED,
+    result: evaluateResult,
+  });
+}
+
+// --------------------------------------------------------------------------
+export const recognizerCallbackResult = async (message: RecognizerMessage) => {
+  if ('result' in message && 'text' in message.result && message.result.text !== '') {
+    await gameEngineTick(message.result.text);
+  }
+};
+
+export const recognizerCallbackError = async (message: RecognizerMessage) => {
+  console.error('Err:', message);
+};
+
+// --------------------------------------------------------------------------
+export async function gameEngineAudioInputOn() {
+  if (audioInputResources.status === AUDIO_INPUT_LISTENING_ON) {
+    console.warn(
+      '[chess-o-matic][game-engine] WARNING: gameEngineAudioInputOn called when audio input is on: ignoring.'
+    );
+    settings.audioInputOn = true;
+    return;
+  }
+
+  audioInputResources = await startAudioInput();
+
+  const nextSpeechRecognizerResources = await startSpeechRecognizer(
+    speechRecognizerResources,
+    audioInputResources.audioContext.sampleRate,
+    chessGrammar
+  );
+
+  audioInputResources.workletNode.port.onmessage = (event) => {
+    if (event.data.type === 'audio' && audioInputResources.status === AUDIO_INPUT_LISTENING_ON) {
+      const audioData = event.data.data;
+      nextSpeechRecognizerResources.recognizer.acceptWaveformFloat(
+        audioData,
+        audioInputResources.audioContext.sampleRate
+      );
+    }
+  };
+
+  nextSpeechRecognizerResources.recognizer.on('result', recognizerCallbackResult);
+  nextSpeechRecognizerResources.recognizer.on('error', recognizerCallbackError);
+
+  speechRecognizerResources = nextSpeechRecognizerResources;
+  settings.audioInputOn = true;
+}
+
+// --------------------------------------------------------------------------
+export async function gameEngineAudioInputOff(): Promise<void> {
+  if (audioInputResources.status === AUDIO_INPUT_LISTENING_OFF) {
+    console.warn(
+      '[chess-o-matic][game-engine] WARNING: gameEngineAudioInputOff called when input audio is off: ignoring.'
+    );
+    return;
+  }
+
+  audioInputResources.workletNode.port.onmessage = null;
+  speechRecognizerResources = await stopSpeechRecognizer(speechRecognizerResources);
+  audioInputResources = await stopAudioInput(audioInputResources);
+  settings.audioInputOn = false;
+}
+
+// --------------------------------------------------------------------------
+export function gameEngineIsAudioInputOn(): boolean {
+  return audioInputResources.status === AUDIO_INPUT_LISTENING_ON;
+}
+
+// --------------------------------------------------------------------------
+export async function gameEngineAudioInputToggle(): Promise<void> {
+  if (gameEngineIsAudioInputOn()) {
+    return await gameEngineAudioInputOff();
+  }
+  return await gameEngineAudioInputOn();
+}
+
+// --------------------------------------------------------------------------
+export async function gameEngineAudioOutputOn() {
+  settings.audioOutputOn = true;
+}
+
+// --------------------------------------------------------------------------
+export async function gameEngineAudioOutputOff(): Promise<void> {
+  settings.audioOutputOn = false;
+}
+
+// --------------------------------------------------------------------------
+export function gameEngineIsAudioOutputOn(): boolean {
+  return settings.audioOutputOn;
+}
+
+// --------------------------------------------------------------------------
+export async function gameEngineAudioOutputToggle(): Promise<void> {
+  settings.audioOutputOn = !settings.audioOutputOn;
 }

@@ -14,7 +14,7 @@
         height: 500px;
       }
 
-      /* Style the promotion buttons using your custom piece images */
+      /* Style the promotion buttons using custom piece images */
       .promo-choice {
         width: 60px;
         height: 60px;
@@ -30,7 +30,7 @@
         background-color: #f0f0f0;
       }
 
-      /* Example classes that map to your custom piece URLs */
+      /* Classes that map to custom piece URLs */
       .white-q {
         background-image: url('game-view/pieces/staunty/queen.white.svg');
       }
@@ -101,26 +101,39 @@
     <div id="pgn">PGN</div>
 
     <hr />
-    <!--    <button id="startBtn">Start1</button>-->
+    <button id="startBtn">Start</button>
     <button id="stopBtn">Stop</button>
+    <button id="soundOnBtn">Sound On</button>
+    <button id="soundOffBtn">Sound Off</button>
     <hr />
     <script type="module">
       import 'gchessboard';
-      import { gameEngineInit, gameEngineExit, gameEngineTick  } from './game-engine/index.ts';
+      import {
+        gameEngineInit,
+        gameEngineAudioInputOn,
+        gameEngineAudioInputOff,
+        gameEngineAudioOutputOn,
+        gameEngineAudioOutputOff,
+        gameEngineTick,
+      } from './game-engine/index.ts';
 
       const boardWrapper = document.getElementById('boardWrapper');
       const input = document.getElementById('input');
       const pgn = document.getElementById('pgn');
-      // const startBtn = document.getElementById("startBtn");
+      const startBtn = document.getElementById('startBtn');
       const stopBtn = document.getElementById('stopBtn');
+      const soundOnBtn = document.getElementById('soundOnBtn');
+      const soundOffBtn = document.getElementById('soundOffBtn');
 
-      // startBtn.addEventListener("click", async () => init(boardWrapper, input, pgn));
-      stopBtn.addEventListener('click', gameEngineExit);
+      startBtn.addEventListener('click', async () => await gameEngineAudioInputOn());
+      stopBtn.addEventListener('click', async () => await gameEngineAudioInputOff());
+      soundOnBtn.addEventListener('click', async () => await gameEngineAudioOutputOn());
+      soundOffBtn.addEventListener('click', async () => await gameEngineAudioOutputOff());
 
       // Expose to browser console
       window.tick = gameEngineTick;
 
-      gameEngineInit(boardWrapper, input, pgn);
+      gameEngineInit(boardWrapper, input, pgn, { audioInputOn: true, audioOutputOn: false });
     </script>
   </body>
 </html>
