@@ -1,8 +1,8 @@
 import type { Square } from 'chess.js';
 
-import { chessGrammarControlActions } from '../grammar/chess-grammar-en.js';
-import type { ControlAction, SanCandidates } from '../grammar/chess-grammar-parser.js';
-import { parse, sanitizeInputString } from '../grammar/chess-grammar-parser.js';
+import { chessGrammarControlActions } from '../speech-recognizer-model/grammar/chess-grammar-en.js';
+import type { ControlAction, SanCandidates } from '../speech-recognizer-model/grammar/chess-grammar-parser.js';
+import { parse, sanitizeInputString } from '../speech-recognizer-model/grammar/chess-grammar-parser.js';
 
 export const GAME_INPUT_PARSE_STATUS_OK_SAN = 'ok_san';
 export const GAME_INPUT_PARSE_STATUS_OK_COORDS = 'ok_coords';

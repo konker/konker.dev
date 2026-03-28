@@ -1,8 +1,8 @@
 import type { Square } from 'chess.js';
 
-import type { NonEmptyReadonlyArray } from '../lib.js';
-import type { ChessGrammarFile } from './chess-grammar-en.js';
-import { chessGrammarControlActions, chessGrammarFiles, chessGrammarPieceSymbols } from './chess-grammar-en.js';
+import type { NonEmptyReadonlyArray } from '../../lib';
+import type { ChessGrammarFile } from './chess-grammar-en';
+import { chessGrammarControlActions, chessGrammarFiles, chessGrammarPieceSymbols } from './chess-grammar-en';
 
 // --------------------------------------------------------------------------
 export function defaultPromotion(san: SAN, rank: string): SAN {

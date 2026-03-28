@@ -18,10 +18,15 @@ export type AudioOutputResources = {
 };
 
 // --------------------------------------------------------------------------
-export async function initAudioOutputResources(): Promise<AudioOutputResources> {
+export async function initAudioOutput(): Promise<AudioOutputResources> {
   return {
     audioOutputEventSoundMap: standardAudioOutputEventSoundMap,
   };
+}
+
+// --------------------------------------------------------------------------
+export async function exitAudioOutput(_audioOutputResources: AudioOutputResources): Promise<void> {
+  return;
 }
 
 // --------------------------------------------------------------------------
@@ -56,16 +61,11 @@ export async function playAudioOutputEventSound(
   AudioOutputResources: AudioOutputResources,
   event: AudioOutputEvent
 ): Promise<void> {
-  if (settings.soundsOn) {
+  if (settings.audioOutputOn) {
     const audio = AudioOutputResources.audioOutputEventSoundMap[event];
     if (audio) {
       audio.currentTime = 0;
       await audio.play();
     }
   }
-}
-
-// --------------------------------------------------------------------------
-export function exitAudioOutputResources(audioOutputResources: AudioOutputResources): AudioOutputResources {
-  return audioOutputResources;
 }

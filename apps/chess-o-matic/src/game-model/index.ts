@@ -16,7 +16,7 @@ export type GameModelResources = {
 };
 
 // --------------------------------------------------------------------------
-export function initGameModel(): GameModelResources {
+export async function initGameModel(): Promise<GameModelResources> {
   const chess = new Chess();
 
   return {
@@ -29,6 +29,6 @@ export function initGameModel(): GameModelResources {
 }
 
 // --------------------------------------------------------------------------
-export function exitGameModel(_gameModelResources: GameModelResources): void {
+export async function exitGameModel(_gameModelResources: GameModelResources): Promise<void> {
   return;
 }

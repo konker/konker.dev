@@ -21,17 +21,22 @@ export type GameViewResources = {
 };
 
 // --------------------------------------------------------------------------
-export function initGameView(
+export async function initGameView(
   gameModelResources: GameModelResources,
   boardEl: HTMLElement,
   inputEl: HTMLElement,
   pgnEl: HTMLElement
-): GameViewResources {
+): Promise<GameViewResources> {
   return {
     board: GchessboardBoardViewAdapter(gameModelResources, boardEl),
     inputEl,
     pgnEl,
   };
+}
+
+// --------------------------------------------------------------------------
+export async function exitGameView(_gameViewResource: GameViewResources): Promise<void> {
+  return;
 }
 
 // --------------------------------------------------------------------------
@@ -123,9 +128,4 @@ export async function gameViewUpdateControl(
       break;
   }
   await gameViewUpdateControlSounds(gameViewResources, gameModelResources, evaluateResult);
-}
-
-// --------------------------------------------------------------------------
-export function exitGameView(_gameViewResource: GameViewResources): void {
-  return;
 }

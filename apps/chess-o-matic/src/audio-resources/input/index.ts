@@ -1,30 +1,43 @@
 // --------------------------------------------------------------------------
-import type { KaldiRecognizer } from 'vosk-browser';
-import { createModel } from 'vosk-browser';
+export const AUDIO_INPUT_LISTENING_ON = 'listening' as const;
+export const AUDIO_INPUT_LISTENING_OFF = 'not-listening' as const;
 
-export type AudioInputResourcesListening = {
-  isListening: true;
+export type AudioInputResourcesListeningOn = {
+  status: typeof AUDIO_INPUT_LISTENING_ON;
   audioContext: AudioContext;
   mediaStream: MediaStream;
   workletNode: AudioWorkletNode;
-  recognizer: KaldiRecognizer;
 };
 
-export type AudioInputResourcesNotListening = {
-  isListening: false;
+export type AudioInputResourcesListeningOff = {
+  status: typeof AUDIO_INPUT_LISTENING_OFF;
   audioContext: null;
   mediaStream: null;
   workletNode: null;
-  recognizer: null;
 };
 
-export type AudioInputResources = AudioInputResourcesListening | AudioInputResourcesNotListening;
+export type AudioInputResources = AudioInputResourcesListeningOn | AudioInputResourcesListeningOff;
 
 // --------------------------------------------------------------------------
-export async function initAudioInputResources(
-  modelUrl: string,
-  grammar: ReadonlyArray<string>
-): Promise<AudioInputResourcesListening> {
+export const AUDIO_INPUT_RESOURCES_NOT_LISTENING: AudioInputResourcesListeningOff = {
+  status: AUDIO_INPUT_LISTENING_OFF,
+  audioContext: null,
+  mediaStream: null,
+  workletNode: null,
+} as const;
+
+// --------------------------------------------------------------------------
+export async function initAudioInput(): Promise<AudioInputResourcesListeningOff> {
+  return AUDIO_INPUT_RESOURCES_NOT_LISTENING;
+}
+
+// --------------------------------------------------------------------------
+export async function exitAudioInput(audioInputResources: AudioInputResources): Promise<void> {
+  await stopAudioInput(audioInputResources);
+}
+
+// --------------------------------------------------------------------------
+export async function startAudioInput(): Promise<AudioInputResourcesListeningOn> {
   // Request microphone access
   const mediaStream = await navigator.mediaDevices.getUserMedia({
     audio: {
@@ -47,30 +60,21 @@ export async function initAudioInputResources(
   source.connect(workletNode);
   workletNode.connect(audioContext.destination);
 
-  console.log(`Loading Vosk model at ${modelUrl}...`);
-
-  // Load the model
-  const model = await createModel(modelUrl);
-  console.log('Model loaded successfully');
-
-  // Create recognizer with or without grammar
-  const recognizer = new model.KaldiRecognizer(audioContext.sampleRate, JSON.stringify(grammar));
-  console.log(`Recognizer created with grammar (${grammar.length} phrases)`);
-
-  const isListening = true;
-
+  console.log('Started listening');
   return {
+    status: AUDIO_INPUT_LISTENING_ON,
     workletNode,
     audioContext,
     mediaStream,
-    isListening,
-    recognizer,
   };
 }
 
 // --------------------------------------------------------------------------
-export function exitAudioInputResources(audioInputResources: AudioInputResources): AudioInputResourcesNotListening {
-  if (!audioInputResources.isListening) {
+export async function stopAudioInput(
+  audioInputResources: AudioInputResources
+): Promise<AudioInputResourcesListeningOff> {
+  if (audioInputResources.status === AUDIO_INPUT_LISTENING_OFF) {
+    console.warn('[chesss-o-matic][audio-input] WARN: stopAudioInput called when not listening: ignoring.');
     return audioInputResources;
   }
 
@@ -87,16 +91,7 @@ export function exitAudioInputResources(audioInputResources: AudioInputResources
   if (audioInputResources.mediaStream) {
     audioInputResources.mediaStream.getTracks().forEach((track) => track.stop());
   }
-  // Retrieve the final result before stopping (triggers a result event)
-  audioInputResources.recognizer.retrieveFinalResult();
 
   console.log('Stopped listening');
-
-  return {
-    isListening: false,
-    audioContext: null,
-    mediaStream: null,
-    workletNode: null,
-    recognizer: null,
-  };
+  return AUDIO_INPUT_RESOURCES_NOT_LISTENING;
 }
