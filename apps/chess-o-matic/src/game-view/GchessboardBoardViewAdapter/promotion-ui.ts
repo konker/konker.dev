@@ -8,13 +8,13 @@ import { moveComplete } from './helpers.js';
 export function openPromotionDialog(
   gameModelResources: GameModelResources,
   rep: GChessBoardElement,
+  promotionDialogEl: HTMLElement,
   coords: [Square, Square],
   color: 'b' | 'w'
 ) {
-  const promoDialog = document.getElementById('promotion-dialog');
-  promoDialog!.style.display = 'flex';
+  promotionDialogEl.setAttribute('data-open', 'true');
 
-  const choices = promoDialog!.querySelectorAll('.promo-choice');
+  const choices = promotionDialogEl.querySelectorAll('.promo-choice');
   choices.forEach((el: any) => {
     const role = el.dataset.piece;
 
@@ -23,7 +23,7 @@ export function openPromotionDialog(
 
     // Handle the selection
     el.onclick = async () => {
-      promoDialog!.style.display = 'none';
+      promotionDialogEl.setAttribute('data-open', 'false');
 
       const san = coords[0].startsWith(coords[1][0])
         ? // Pawn push

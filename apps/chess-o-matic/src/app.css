@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: dark;
+  --page-bg: #111827;
+  --page-bg-accent: #1f2937;
+  --panel-bg: rgb(15 23 42 / 0.72);
+  --panel-border: rgb(148 163 184 / 0.28);
+  --text-main: #e5eefc;
+  --text-muted: #9fb0c9;
+  --brand: #c59d5f;
+  --brand-strong: #f5d89b;
+  --board-shadow: 0 24px 80px rgb(8 15 28 / 0.45);
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at top, rgb(197 157 95 / 0.18), transparent 28rem),
+    linear-gradient(160deg, var(--page-bg) 0%, var(--page-bg-accent) 48%, #020617 100%);
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+}
+
+button {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(145deg, rgb(15 23 42 / 0.86), rgb(30 41 59 / 0.74));
+  box-shadow: var(--board-shadow);
+}
+
+.hero-card::after {
+  position: absolute;
+  inset: auto -5rem -7rem auto;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(245 216 155 / 0.32) 0%, transparent 70%);
+  content: '';
+}

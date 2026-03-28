@@ -4,6 +4,8 @@ node_modules/
 # build output
 dist/
 www/
+**/.output/
+**/.vinxi/
 
 # Coverage directory used by tools like istanbul
 coverage
