@@ -36,6 +36,7 @@ import {
   gameViewUpdateControl,
   gameViewUpdateMovedInvalid,
   gameViewUpdateMovedOk,
+  gameViewUpdateMovedSoundsOk,
   initGameView,
 } from './game-view';
 import { chessGrammar } from './grammar/chess-grammar-en.js';
@@ -43,7 +44,7 @@ import { exitRecognizerModel, initRecognizerModel } from './recognizer-model';
 import MODEL_URL from './recognizer-model/vosk-model-small-en-us-0.15.zip?url';
 import { ComSettings } from './settings';
 
-let recognizer: KaldiRecognizer;
+let speechRecognizer: KaldiRecognizer;
 let audioInputResources: AudioInputResources;
 let audioOutputResources: AudioOutputResources;
 let gameModelResources: GameModelResources;
@@ -93,7 +94,7 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
   settings = new ComSettings();
   audioInputResources = await initAudioInputResources();
   audioOutputResources = await initAudioOutputResources();
-  recognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioInputResources.audioContext.sampleRate);
+  speechRecognizer = await initRecognizerModel(MODEL_URL, chessGrammar, audioInputResources.audioContext.sampleRate);
   gameModelResources = initGameModel();
   gameViewResources = initGameView(gameModelResources, boardEl, inputEl, pgnEl);
 
@@ -102,16 +103,21 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     if (event.data.type === 'audio' && audioInputResources.isListening) {
       const audioData = event.data.data;
       // Send Float32Array directly to recognizer
-      recognizer.acceptWaveformFloat(audioData, audioInputResources.audioContext.sampleRate);
+      speechRecognizer.acceptWaveformFloat(audioData, audioInputResources.audioContext.sampleRate);
     }
   };
 
-  recognizer.on('result', async (message) => {
+  // When speech recognizer matches an input, execute it
+  speechRecognizer.on('result', async (message) => {
     if ('result' in message && 'text' in message.result && message.result.text !== '') {
+      // TODO: consider adding a "cancel' word which, if it appears in the input, will mean the input is dropped
       await tick(message.result.text);
     }
   });
-
+  speechRecognizer.on('error', (message) => {
+    // FIXME: either do something useful, or remove this
+    console.error('Err:', message);
+  });
   /*[XXX: noisy]
   recognizer.on('partialresult', (message) => {
     if ('result' in message && 'partial' in message.result && message.result.partial !== '') {
@@ -119,10 +125,6 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
     }
   });
   */
-
-  recognizer.on('error', (message) => {
-    console.error('Err:', message);
-  });
 
   // If a valid move has been made, update the view
   gameModelEventsAddListener(
@@ -182,6 +184,17 @@ export async function init(boardEl: HTMLElement, inputEl: HTMLElement, pgnEl: HT
             }
       );
 
+      // We only expect valid moves to make it this far, so only handle the OK case
+      if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
+        await gameViewUpdateMovedSoundsOk(
+          settings,
+          gameViewResources,
+          gameModelResources,
+          audioOutputResources,
+          evaluateResult
+        );
+      }
+
       // Notify everything that has happened
       await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
         type: GAME_MODEL_EVENT_TYPE_EVALUATED,
@@ -211,6 +224,6 @@ export async function exit() {
   exitGameModel(gameModelResources);
   audioInputResources = exitAudioInputResources(audioInputResources);
   audioOutputResources = exitAudioOutputResources(audioOutputResources);
-  exitRecognizerModel(recognizer);
+  exitRecognizerModel(speechRecognizer);
   exitGameView(gameViewResources);
 }
