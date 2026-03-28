@@ -12,6 +12,7 @@ export default [
       '**/.sst/',
       '**/sst.config.ts',
       'sst-env.d.ts',
+      'src/env.d.ts',
     ],
   },
   {
