@@ -83,10 +83,10 @@ export type GameEngineInitOptions = {
 
 export async function gameEngineInit({
   boardEl,
+  initialSettings,
   inputEl,
   pgnEl,
   promotionDialogEl,
-  initialSettings,
 }: GameEngineInitOptions) {
   console.log('INIT');
   settings = await initComSettings(initialSettings);
