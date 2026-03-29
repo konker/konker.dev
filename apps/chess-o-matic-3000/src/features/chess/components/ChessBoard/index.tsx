@@ -5,10 +5,10 @@ import type { Square } from 'chess.js';
 import type { GChessBoardElement } from 'gchessboard';
 import { RotateCw } from 'lucide-solid';
 import type { JSX } from 'solid-js';
-import { onCleanup, onMount } from 'solid-js';
+import { createEffect, onCleanup, onMount } from 'solid-js';
 
+import type { GameBoardOrientation } from '../../../../domain/game/types';
 import type { ChessBoardController } from './controller';
-import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from './controller';
 
 type ChessBoardProps = {
   readonly fen: string;
@@ -16,19 +16,13 @@ type ChessBoardProps = {
   readonly getPromotionPieceColor: (coords: [Square, Square]) => 'b' | 'w' | undefined;
   readonly onMove: (move: [Square, Square] | string) => Promise<void> | void;
   readonly onReady: (controller: ChessBoardController | undefined) => void;
+  readonly onToggleOrientation: () => void;
+  readonly orientation: GameBoardOrientation;
 };
 
 export function ChessBoard(props: ChessBoardProps): JSX.Element {
   let boardEl: GChessBoardElement | undefined;
   let promotionDialogEl: HTMLDivElement | undefined;
-
-  function toggleBoardOrientation(): void {
-    if (!boardEl) {
-      return;
-    }
-
-    boardEl.orientation = boardEl.orientation === 'white' ? 'black' : 'white';
-  }
 
   function clearMoveHighlight(board: GChessBoardElement): void {
     board.shadowRoot?.querySelectorAll('[last-move]')?.forEach((square) => square.removeAttribute('last-move'));
@@ -99,6 +93,7 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     board.coordinates = 'outside';
     board.interactive = true;
     board.fen = props.fen;
+    board.orientation = props.orientation;
     setBoardTurnFromFen(board, props.fen);
 
     const highlightStyle = document.createElement('style');
@@ -153,12 +148,6 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
         }
         setBoardTurnFromFen(board, fen);
       },
-      toggleOrientation(): void {
-        board.orientation = board.orientation === 'white' ? 'black' : 'white';
-      },
-      orientation() {
-        return board.orientation === 'white' ? BOARD_COLOR_LIGHT : BOARD_COLOR_DARK;
-      },
     });
 
     onCleanup(() => {
@@ -169,9 +158,17 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     });
   });
 
+  createEffect(() => {
+    if (!boardEl) {
+      return;
+    }
+
+    boardEl.orientation = props.orientation;
+  });
+
   return (
     <div class="flex flex-col gap-2">
-      <button class="flex items-center gap-2" onClick={toggleBoardOrientation} type="button">
+      <button class="flex items-center gap-2" onClick={props.onToggleOrientation} type="button">
         <RotateCw class="h-4 w-4" />
         <span>Toggle Board Orientation</span>
       </button>

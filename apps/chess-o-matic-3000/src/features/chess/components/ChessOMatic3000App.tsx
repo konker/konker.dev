@@ -10,6 +10,8 @@ import type { ScoreSheetData } from '../../../application/types/scoresheet';
 import { SCORESHEET_EMPTY } from '../../../application/types/scoresheet';
 import type { GameMetadataData } from '../../../domain/game/metadata';
 import { GAME_METADATA_EMPTY } from '../../../domain/game/metadata';
+import type { GameBoardOrientation } from '../../../domain/game/types';
+import { GAME_BOARD_ORIENTATION_WHITE } from '../../../domain/game/types';
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';
 import { START_FEN } from '../../../game-model/consts';
@@ -47,6 +49,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const [currentPly, setCurrentPly] = createSignal(0);
   const [scoresheetData, setScoresheetData] = createSignal<ScoreSheetData>(SCORESHEET_EMPTY);
   const [gameMetadata, setGameMetadata] = createSignal<GameMetadataData>(GAME_METADATA_EMPTY);
+  const [boardOrientation, setBoardOrientation] = createSignal<GameBoardOrientation>(GAME_BOARD_ORIENTATION_WHITE);
   const [canGoBackward, setCanGoBackward] = createSignal(false);
   const [canGoForward, setCanGoForward] = createSignal(false);
 
@@ -75,6 +78,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           setCanGoBackward(state.canGoBackward);
           setCanGoForward(state.canGoForward);
           setCurrentPly(state.currentPly);
+          setBoardOrientation(state.boardOrientation);
           setLastInputSanitized(state.lastInputSanitized);
           setLastMoveSan(state.lastMoveSan);
           setLastInputEvaluateStatus(state.lastInputEvaluateStatus);
@@ -182,6 +186,8 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           isLegalMove={gameEngine.isLegalMove}
           onMove={gameEngine.handleBoardMove}
           onReady={(controller) => void setBoardController(controller)}
+          onToggleOrientation={() => gameEngine.toggleBoardOrientation()}
+          orientation={boardOrientation()}
         />
       </CollapsibleSection>
 

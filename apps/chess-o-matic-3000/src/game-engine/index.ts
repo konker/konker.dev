@@ -1,6 +1,8 @@
 import type { Square } from 'chess.js';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
+import type { ChessBoardController } from '../application/ports/ChessBoardController';
+import { moveHistoryToPgnMoveList, moveHistoryToScoreSheetData, resolveGameMoveFlags } from '../application/selectors';
 import type { PgnMoveListData } from '../application/types/pgn';
 import type { ScoreSheetData } from '../application/types/scoresheet';
 import type { AudioInputResources } from '../audio-input';
@@ -16,9 +18,8 @@ import type { AudioOutputResources } from '../audio-output';
 import { boardAdapterUpdateMovedSoundsOk, exitAudioOutput, initAudioOutput } from '../audio-output';
 import type { GameMetadataData } from '../domain/game/metadata';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
-import type { ChessBoardController } from '../features/chess/components/ChessBoard/controller';
-import { moveHistoryToPgnMoveList } from '../features/chess/components/PgnPanel/move-history-to-pgn-move-list';
-import { moveHistoryToScoreSheetData } from '../features/chess/components/ScoreSheet/move-history-to-scoresheet-data';
+import type { GameBoardOrientation } from '../domain/game/types';
+import { GAME_BOARD_ORIENTATION_WHITE } from '../domain/game/types';
 import type { GameModelResources } from '../game-model';
 import {
   exitGameModel,
@@ -73,6 +74,7 @@ export type GameEngineUiState = {
   readonly canGoBackward: boolean;
   readonly canGoForward: boolean;
   readonly currentPly: number;
+  readonly boardOrientation: GameBoardOrientation;
   readonly pgn: string;
   readonly pgnMoveList: PgnMoveListData;
   readonly fen: string;
@@ -93,6 +95,7 @@ export type GameEngine = {
   readonly exit: () => Promise<void>;
   readonly attachBoardController: (controller: ChessBoardController | undefined) => Promise<void>;
   readonly setGameMetadata: (metadata: GameMetadataData) => void;
+  readonly toggleBoardOrientation: () => void;
   readonly goToStart: () => void;
   readonly goToPly: (ply: number) => void;
   readonly stepBackward: () => void;
@@ -116,6 +119,7 @@ export function createGameEngine(): GameEngine {
   let chessBoardController: ChessBoardController | undefined;
   let onUiStateChange: ((state: GameEngineUiState) => void) | undefined;
   let gameMetadata: GameMetadataData = GAME_METADATA_EMPTY;
+  let boardOrientation: GameBoardOrientation = GAME_BOARD_ORIENTATION_WHITE;
 
   function emitUiState(state: GameEngineUiState): void {
     onUiStateChange?.(state);
@@ -132,6 +136,7 @@ export function createGameEngine(): GameEngine {
       canGoBackward: gameModelCanGoBackward(model),
       canGoForward: gameModelCanGoForward(model),
       currentPly: model.currentPly,
+      boardOrientation,
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
       lastInputEvaluateStatus: status,
@@ -224,8 +229,9 @@ export function createGameEngine(): GameEngine {
     const state = requireInitialized();
 
     if (result.status === GAME_MODEL_EVALUATE_STATUS_OK) {
+      const flags = resolveGameMoveFlags(state.gameModelResources.chess, boardOrientation);
       syncBoardPosition();
-      await boardAdapterUpdateMovedSoundsOk(state.settings, state.audioOutputResources, result);
+      await boardAdapterUpdateMovedSoundsOk(state.settings, state.audioOutputResources, flags);
       await gameModelEventsNotifyListeners(state.gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
         type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
         result,
@@ -241,7 +247,7 @@ export function createGameEngine(): GameEngine {
 
     if (result.status === GAME_MODEL_EVALUATE_STATUS_CONTROL) {
       if (result.action === GAME_MODEL_CONTROL_ACTION_FLIP) {
-        requireBoardController().toggleOrientation();
+        toggleBoardOrientation();
       }
 
       if (result.action === GAME_MODEL_CONTROL_ACTION_UNDO) {
@@ -259,11 +265,9 @@ export function createGameEngine(): GameEngine {
 
   async function evaluateBoardMove(move: [Square, Square] | string): Promise<void> {
     const state = requireInitialized();
-    const boardController = requireBoardController();
 
     const evaluateResult = gameModelEvaluate(
       state.gameModelResources,
-      boardController,
       typeof move === 'string'
         ? {
             status: GAME_INPUT_PARSE_STATUS_OK_SAN,
@@ -286,9 +290,8 @@ export function createGameEngine(): GameEngine {
 
   async function gameEngineTick(result: string): Promise<void> {
     const state = requireInitialized();
-    const boardController = requireBoardController();
     const readResult = gameModelRead(result);
-    const evaluateResult = gameModelEvaluate(state.gameModelResources, boardController, readResult);
+    const evaluateResult = gameModelEvaluate(state.gameModelResources, readResult);
     await handleMoveResult(evaluateResult);
   }
 
@@ -375,6 +378,7 @@ export function createGameEngine(): GameEngine {
     speechRecognizerResources = undefined;
     chessBoardController = undefined;
     onUiStateChange = undefined;
+    boardOrientation = GAME_BOARD_ORIENTATION_WHITE;
   }
 
   async function attachBoardController(controller: ChessBoardController | undefined): Promise<void> {
@@ -446,6 +450,22 @@ export function createGameEngine(): GameEngine {
       gameModelResources,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
       'Game metadata updated',
+      '',
+      gameModelResources.chess.history().at(-1) ?? ''
+    );
+  }
+
+  function toggleBoardOrientation(): void {
+    boardOrientation = boardOrientation === 'white' ? 'black' : 'white';
+
+    if (!gameModelResources) {
+      return;
+    }
+
+    emitCurrentUiState(
+      gameModelResources,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'Board orientation updated',
       '',
       gameModelResources.chess.history().at(-1) ?? ''
     );
@@ -544,6 +564,7 @@ export function createGameEngine(): GameEngine {
     exit,
     attachBoardController,
     setGameMetadata,
+    toggleBoardOrientation,
     goToStart: navigateToStart,
     goToPly: navigateToPly,
     stepBackward: navigateStepBackward,
