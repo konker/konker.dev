@@ -3,12 +3,12 @@ import '../chess-o-matic.css';
 import type { JSX } from 'solid-js';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
-import type { BoardAdapterMountElements } from '../../../board-adapter/types';
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';
 import { START_FEN } from '../../../game-model/consts';
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
+import type { ChessBoardController } from './ChessBoard/controller';
 import { ChessBoard } from './ChessBoard';
 
 type ChessOMaticAppProps = {
@@ -91,18 +91,14 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
     setLastInputResultMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
   }
 
-  async function mountBoard(elements: BoardAdapterMountElements): Promise<void> {
+  async function setBoardController(controller: ChessBoardController | undefined): Promise<void> {
     try {
-      await gameEngine.mountBoard(elements);
+      await gameEngine.attachBoardController(controller);
       syncAudioState();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown board mount error';
-      setErrorMessage(`The chess board failed to mount. (${message})`);
+      const message = error instanceof Error ? error.message : 'Unknown board controller error';
+      setErrorMessage(`The chess board failed to initialize. (${message})`);
     }
-  }
-
-  async function unmountBoard(): Promise<void> {
-    await gameEngine.unmountBoard();
   }
 
   function renderErrorMessage(message: () => string): JSX.Element {
@@ -152,7 +148,12 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
 
       <div id="scoresheet">{JSON.stringify(scoresheet())}</div>
 
-      <ChessBoard mountBoard={mountBoard} unmountBoard={unmountBoard} />
+      <ChessBoard
+        getPromotionPieceColor={gameEngine.getPromotionPieceColor}
+        isLegalMove={gameEngine.isLegalMove}
+        onMove={gameEngine.handleBoardMove}
+        onReady={(controller) => void setBoardController(controller)}
+      />
 
       <label class="field">
         <span>PGN</span>

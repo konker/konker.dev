@@ -1,0 +1,36 @@
+g-chess-board::part(piece-wp) {
+  background-image: url('./pieces/staunty/pawn.white.svg');
+}
+g-chess-board::part(piece-bp) {
+  background-image: url('./pieces/staunty/pawn.black.svg');
+}
+g-chess-board::part(piece-wn) {
+  background-image: url('./pieces/staunty/knight.white.svg');
+}
+g-chess-board::part(piece-bn) {
+  background-image: url('./pieces/staunty/knight.black.svg');
+}
+g-chess-board::part(piece-wb) {
+  background-image: url('./pieces/staunty/bishop.white.svg');
+}
+g-chess-board::part(piece-bb) {
+  background-image: url('./pieces/staunty/bishop.black.svg');
+}
+g-chess-board::part(piece-wr) {
+  background-image: url('./pieces/staunty/rook.white.svg');
+}
+g-chess-board::part(piece-br) {
+  background-image: url('./pieces/staunty/rook.black.svg');
+}
+g-chess-board::part(piece-wq) {
+  background-image: url('./pieces/staunty/queen.white.svg');
+}
+g-chess-board::part(piece-bq) {
+  background-image: url('./pieces/staunty/queen.black.svg');
+}
+g-chess-board::part(piece-wk) {
+  background-image: url('./pieces/staunty/king.white.svg');
+}
+g-chess-board::part(piece-bk) {
+  background-image: url('./pieces/staunty/king.black.svg');
+}
