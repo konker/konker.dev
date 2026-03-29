@@ -1,6 +1,6 @@
-import type { GameRecord } from '../../domain/game/types';
+import type { ExternalOpenRequest } from '../types/export';
 
 export type ExternalOpen = {
-  readonly openChessDotCom: (game: GameRecord) => Promise<void>;
-  readonly openLichess: (game: GameRecord) => Promise<void>;
+  readonly openChessDotCom: (request: ExternalOpenRequest) => Promise<void>;
+  readonly openLichess: (request: ExternalOpenRequest) => Promise<void>;
 };

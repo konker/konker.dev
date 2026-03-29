@@ -1,5 +1,6 @@
 import type { GameMetadataData } from '../../domain/game/metadata';
 import type { GameBoardOrientation, GameId } from '../../domain/game/types';
+import type { ScoreSheetExportFormat } from './export';
 
 export type AppCommandNewGame = {
   readonly type: 'newGame';
@@ -22,6 +23,27 @@ export type AppCommandLoadGame = {
 export type AppCommandDeleteGame = {
   readonly type: 'deleteGame';
   readonly gameId: GameId;
+};
+
+export type AppCommandExportGamePgn = {
+  readonly type: 'exportGamePgn';
+  readonly gameId?: GameId;
+};
+
+export type AppCommandExportGameScoreSheet = {
+  readonly type: 'exportGameScoreSheet';
+  readonly gameId?: GameId;
+  readonly format?: ScoreSheetExportFormat;
+};
+
+export type AppCommandOpenGameInLichess = {
+  readonly type: 'openGameInLichess';
+  readonly gameId?: GameId;
+};
+
+export type AppCommandOpenGameInChessDotCom = {
+  readonly type: 'openGameInChessDotCom';
+  readonly gameId?: GameId;
 };
 
 export type AppCommandMakeMove = {
@@ -64,6 +86,10 @@ export type AppCommand =
   | AppCommandSaveGame
   | AppCommandLoadGame
   | AppCommandDeleteGame
+  | AppCommandExportGamePgn
+  | AppCommandExportGameScoreSheet
+  | AppCommandOpenGameInLichess
+  | AppCommandOpenGameInChessDotCom
   | AppCommandMakeMove
   | AppCommandGoToPly
   | AppCommandSetMetadata

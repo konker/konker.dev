@@ -1,10 +1,24 @@
 import type { Square } from 'chess.js';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
+import { createBrowserExternalOpen } from '../application/adapters/browser/BrowserExternalOpen';
+import { createBrowserFileExport } from '../application/adapters/browser/BrowserFileExport';
 import { createBrowserGameStorage } from '../application/adapters/browser/BrowserGameStorage';
 import type { ChessBoardController } from '../application/ports/ChessBoardController';
+import type { ExternalOpen } from '../application/ports/ExternalOpen';
+import type { FileExport } from '../application/ports/FileExport';
 import type { GameStorage } from '../application/ports/GameStorage';
-import { moveHistoryToPgnMoveList, moveHistoryToScoreSheetData, resolveGameMoveFlags } from '../application/selectors';
+import {
+  applyGameMetadata,
+  gameRecordToPgn,
+  gameRecordToPgnExportDocument,
+  gameRecordToScoreSheetExportDocument,
+  moveHistoryToPgnMoveList,
+  moveHistoryToScoreSheetData,
+  resolveGameMoveFlags,
+} from '../application/selectors';
+import type { ScoreSheetExportFormat } from '../application/types/export';
+import { SCORE_SHEET_EXPORT_FORMAT_TEXT } from '../application/types/export';
 import type { PgnMoveListData } from '../application/types/pgn';
 import { PGN_MOVE_LIST_EMPTY } from '../application/types/pgn';
 import type { ScoreSheetData } from '../application/types/scoresheet';
@@ -77,8 +91,6 @@ import {
   stopSpeechRecognizer,
 } from '../speech-recognizer';
 import { chessGrammar } from '../speech-recognizer/grammar/chess-grammar-en.js';
-import { applyGameMetadata } from './game-metadata';
-
 const MODEL_URL = '/models/vosk-model-small-en-us-0.15.zip';
 
 export type GameEngineUiState = {
@@ -132,6 +144,10 @@ export type GameEngine = {
   readonly saveCurrentGame: () => Promise<void>;
   readonly loadSavedGame: (gameId: GameId) => Promise<void>;
   readonly listSavedGames: () => Promise<PersistedSavedGameIndex>;
+  readonly exportGamePgn: (gameId?: GameId) => Promise<void>;
+  readonly exportGameScoreSheet: (gameId?: GameId, format?: ScoreSheetExportFormat) => Promise<void>;
+  readonly openGameInLichess: (gameId?: GameId) => Promise<void>;
+  readonly openGameInChessDotCom: (gameId?: GameId) => Promise<void>;
   readonly setGameMetadata: (metadata: GameMetadataData) => void;
   readonly toggleBoardOrientation: () => void;
   readonly goToStart: () => void;
@@ -151,10 +167,14 @@ export type GameEngine = {
 };
 
 type CreateGameEngineDeps = {
+  readonly externalOpen?: ExternalOpen;
+  readonly fileExport?: FileExport;
   readonly gameStorage?: GameStorage;
 };
 
 export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
+  const externalOpen = deps.externalOpen ?? createBrowserExternalOpen();
+  const fileExport = deps.fileExport ?? createBrowserFileExport();
   const gameStorage = deps.gameStorage ?? createBrowserGameStorage();
   let appState: AppState | undefined;
   let audioInputResources: AudioInputResources | undefined;
@@ -194,6 +214,22 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     }
 
     return appState;
+  }
+
+  async function resolveGameRecord(gameId?: GameId) {
+    const state = requireInitialized();
+
+    if (!gameId || state.appState.currentGame.id === gameId) {
+      return state.appState.currentGame;
+    }
+
+    const savedGame = await gameStorage.loadGame(gameId);
+
+    if (!savedGame) {
+      throw new Error(`Saved game not found: ${gameId}`);
+    }
+
+    return savedGame;
   }
 
   function syncGameModelFromAppState(state: AppState, model: GameModelResources): void {
@@ -703,6 +739,33 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     return gameStorage.loadSavedGameIndex();
   }
 
+  async function exportGamePgn(gameId?: GameId): Promise<void> {
+    const game = await resolveGameRecord(gameId);
+    await fileExport.exportPgn(gameRecordToPgnExportDocument(game));
+  }
+
+  async function exportGameScoreSheet(
+    gameId?: GameId,
+    format: ScoreSheetExportFormat = SCORE_SHEET_EXPORT_FORMAT_TEXT
+  ): Promise<void> {
+    const game = await resolveGameRecord(gameId);
+    await fileExport.exportScoreSheet(gameRecordToScoreSheetExportDocument(game, format));
+  }
+
+  async function openGameInLichess(gameId?: GameId): Promise<void> {
+    const game = await resolveGameRecord(gameId);
+    await externalOpen.openLichess({
+      pgn: gameRecordToPgn(game),
+    });
+  }
+
+  async function openGameInChessDotCom(gameId?: GameId): Promise<void> {
+    const game = await resolveGameRecord(gameId);
+    await externalOpen.openChessDotCom({
+      pgn: gameRecordToPgn(game),
+    });
+  }
+
   function setGameMetadata(metadata: GameMetadataData): void {
     if (!gameModelResources || !appState) {
       return;
@@ -875,6 +938,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     saveCurrentGame,
     loadSavedGame,
     listSavedGames,
+    exportGamePgn,
+    exportGameScoreSheet,
+    openGameInLichess,
+    openGameInChessDotCom,
     setGameMetadata,
     toggleBoardOrientation,
     goToStart: navigateToStart,
