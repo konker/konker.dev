@@ -9,13 +9,19 @@ import type { AudioInputResources } from '../audio-input';
 import {
   AUDIO_INPUT_LISTENING_OFF,
   AUDIO_INPUT_LISTENING_ON,
+  audioInputIsSupported,
   exitAudioInput,
   initAudioInput,
   startAudioInput,
   stopAudioInput,
 } from '../audio-input';
 import type { AudioOutputResources } from '../audio-output';
-import { boardAdapterUpdateMovedSoundsOk, exitAudioOutput, initAudioOutput } from '../audio-output';
+import {
+  audioOutputIsSupported,
+  boardAdapterUpdateMovedSoundsOk,
+  exitAudioOutput,
+  initAudioOutput,
+} from '../audio-output';
 import type { GameMetadataData } from '../domain/game/metadata';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
 import type { GameBoardOrientation } from '../domain/game/types';
@@ -106,6 +112,8 @@ export type GameEngine = {
   readonly handleBoardMove: (move: [Square, Square] | string) => Promise<void>;
   readonly audioInputToggle: () => Promise<void>;
   readonly audioOutputToggle: () => Promise<void>;
+  readonly canUseAudioInput: () => boolean;
+  readonly canUseAudioOutput: () => boolean;
   readonly isAudioInputOn: () => boolean;
   readonly isAudioOutputOn: () => boolean;
 };
@@ -185,15 +193,8 @@ export function createGameEngine(): GameEngine {
     audioInputResources: AudioInputResources;
     audioOutputResources: AudioOutputResources;
     gameModelResources: GameModelResources;
-    speechRecognizerResources: SpeechRecognizerResources;
   } {
-    if (
-      !settings ||
-      !audioInputResources ||
-      !audioOutputResources ||
-      !gameModelResources ||
-      !speechRecognizerResources
-    ) {
+    if (!settings || !audioInputResources || !audioOutputResources || !gameModelResources) {
       throw new Error('Game engine is not initialized.');
     }
 
@@ -202,7 +203,6 @@ export function createGameEngine(): GameEngine {
       audioInputResources,
       audioOutputResources,
       gameModelResources,
-      speechRecognizerResources,
     };
   }
 
@@ -305,37 +305,61 @@ export function createGameEngine(): GameEngine {
     console.error('Err:', message);
   }
 
+  async function ensureSpeechRecognizerResources(): Promise<SpeechRecognizerResources> {
+    if (speechRecognizerResources) {
+      return speechRecognizerResources;
+    }
+
+    speechRecognizerResources = await initSpeechRecognizer(MODEL_URL);
+    return speechRecognizerResources;
+  }
+
   async function audioInputOn(): Promise<void> {
     const state = requireInitialized();
     requireBoardController();
+
+    if (!canUseAudioInput()) {
+      throw new Error('Speech input is not supported in this browser.');
+    }
 
     if (state.audioInputResources.status === AUDIO_INPUT_LISTENING_ON) {
       state.settings.audioInputOn = true;
       return;
     }
 
-    audioInputResources = await startAudioInput();
+    const baseSpeechRecognizerResources = await ensureSpeechRecognizerResources();
 
-    const nextSpeechRecognizerResources = await startSpeechRecognizer(
-      state.speechRecognizerResources,
-      audioInputResources.audioContext.sampleRate,
-      chessGrammar
-    );
+    try {
+      audioInputResources = await startAudioInput();
 
-    audioInputResources.workletNode.port.onmessage = (event) => {
-      if (event.data.type === 'audio' && audioInputResources?.status === AUDIO_INPUT_LISTENING_ON) {
-        nextSpeechRecognizerResources.recognizer.acceptWaveformFloat(
-          event.data.data,
-          audioInputResources.audioContext.sampleRate
-        );
+      const nextSpeechRecognizerResources = await startSpeechRecognizer(
+        baseSpeechRecognizerResources,
+        audioInputResources.audioContext.sampleRate,
+        chessGrammar
+      );
+
+      audioInputResources.workletNode.port.onmessage = (event) => {
+        if (event.data.type === 'audio' && audioInputResources?.status === AUDIO_INPUT_LISTENING_ON) {
+          nextSpeechRecognizerResources.recognizer.acceptWaveformFloat(
+            event.data.data,
+            audioInputResources.audioContext.sampleRate
+          );
+        }
+      };
+
+      nextSpeechRecognizerResources.recognizer.on('result', recognizerCallbackResult);
+      nextSpeechRecognizerResources.recognizer.on('error', recognizerCallbackError);
+
+      speechRecognizerResources = nextSpeechRecognizerResources;
+      state.settings.audioInputOn = true;
+    } catch (error) {
+      if (audioInputResources?.status === AUDIO_INPUT_LISTENING_ON) {
+        audioInputResources = await stopAudioInput(audioInputResources);
       }
-    };
 
-    nextSpeechRecognizerResources.recognizer.on('result', recognizerCallbackResult);
-    nextSpeechRecognizerResources.recognizer.on('error', recognizerCallbackError);
-
-    speechRecognizerResources = nextSpeechRecognizerResources;
-    state.settings.audioInputOn = true;
+      state.settings.audioInputOn = false;
+      throw error;
+    }
   }
 
   async function audioInputOff(): Promise<void> {
@@ -346,19 +370,15 @@ export function createGameEngine(): GameEngine {
     }
 
     state.audioInputResources.workletNode.port.onmessage = null;
-    speechRecognizerResources = await stopSpeechRecognizer(state.speechRecognizerResources);
+    if (speechRecognizerResources) {
+      speechRecognizerResources = await stopSpeechRecognizer(speechRecognizerResources);
+    }
     audioInputResources = await stopAudioInput(state.audioInputResources);
     state.settings.audioInputOn = false;
   }
 
   async function exit(): Promise<void> {
-    if (
-      !settings ||
-      !audioInputResources ||
-      !audioOutputResources ||
-      !gameModelResources ||
-      !speechRecognizerResources
-    ) {
+    if (!settings || !audioInputResources || !audioOutputResources || !gameModelResources) {
       return;
     }
 
@@ -368,7 +388,9 @@ export function createGameEngine(): GameEngine {
 
     await exitGameModel(gameModelResources);
     await exitAudioInput(audioInputResources);
-    await exitSpeechRecognizer(speechRecognizerResources);
+    if (speechRecognizerResources) {
+      await exitSpeechRecognizer(speechRecognizerResources);
+    }
     await exitAudioOutput(audioOutputResources);
 
     settings = undefined;
@@ -391,7 +413,12 @@ export function createGameEngine(): GameEngine {
     syncBoardPosition();
 
     if (controller && settings?.audioInputOn) {
-      await audioInputOn();
+      try {
+        await audioInputOn();
+      } catch (error) {
+        console.warn('[chess-o-matic-3000][game-engine] Unable to restart speech input after board attach.', error);
+        settings.audioInputOn = false;
+      }
     }
   }
 
@@ -409,7 +436,19 @@ export function createGameEngine(): GameEngine {
   }
 
   async function audioOutputToggle(): Promise<void> {
+    if (!canUseAudioOutput()) {
+      throw new Error('Audio output is not supported in this browser.');
+    }
+
     requireInitialized().settings.audioOutputOn = !requireInitialized().settings.audioOutputOn;
+  }
+
+  function canUseAudioInput(): boolean {
+    return audioInputIsSupported();
+  }
+
+  function canUseAudioOutput(): boolean {
+    return audioOutputIsSupported();
   }
 
   function isAudioOutputOn(): boolean {
@@ -540,7 +579,6 @@ export function createGameEngine(): GameEngine {
     audioInputResources = await initAudioInput();
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
-    speechRecognizerResources = await initSpeechRecognizer(MODEL_URL);
     applyGameMetadata(gameModelResources.chess, gameMetadata);
 
     gameModelEventsAddListener(
@@ -575,6 +613,8 @@ export function createGameEngine(): GameEngine {
     handleBoardMove,
     audioInputToggle,
     audioOutputToggle,
+    canUseAudioInput,
+    canUseAudioOutput,
     isAudioInputOn,
     isAudioOutputOn,
   };
