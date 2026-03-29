@@ -43,6 +43,17 @@ export const PIECE_WORD_MAP = [
   [/king/, 'K'],
 ] as const;
 
+export const DISAMBIGUATOR_MAP = [
+  [/alpha/, 'a'],
+  [/beta/, 'b'],
+  [/charlie/, 'c'],
+  [/delta/, 'd'],
+  [/echo/, 'e'],
+  [/foxtrot/, 'f'],
+  [/golf/, 'g'],
+  [/hotel/, 'h'],
+] as const;
+
 export const CHESS_RANK_NUMS = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 export const CHESS_PROMOTION_RANKS = ['1', '8'] as const;
 export const CHESS_PROMOTION_PIECES = ['N', 'B', 'R', 'Q'] as const;
@@ -82,11 +93,16 @@ export function parsePieces(s: string): string {
 }
 
 // --------------------------------------------------------------------------
+export function parseDisambiguators(s: string): string {
+  return DISAMBIGUATOR_MAP.reduce((acc, [regex, replacement]) => acc.replace(regex, replacement), s);
+}
+
+// --------------------------------------------------------------------------
 export function sanitizeInputString(input: string): string {
   const cleanInput = STOP_WORDS.reduce((acc, val) => acc.replace(val, ''), input.trim().toLowerCase())
     .trim()
     .replace(/\s+/g, ' ');
-  return parseRanks(parsePieces(cleanInput));
+  return parseRanks(parsePieces(parseDisambiguators(cleanInput)));
 }
 
 // --------------------------------------------------------------------------

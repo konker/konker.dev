@@ -1,6 +1,15 @@
-import type { GameMoveFlags } from '../../game-model/evaluate';
-import type { ComSettings } from '../../settings';
+import type { GameModelResources } from '../game-model';
+import type {
+  GameModelEvaluateResultControl,
+  GameModelEvaluateResultIgnore,
+  GameModelEvaluateResultIllegal,
+  GameModelEvaluateResultOk,
+  GameMoveFlags,
+} from '../game-model/evaluate';
+import type { GameViewResources } from '../game-view';
+import type { ComSettings } from '../settings';
 import type { AudioOutputEvent } from './events';
+import { AUDIO_OUTPUT_EVENT_INVALID } from './events';
 import { AUDIO_OUTPUT_EVENT_MOVE_TOP } from './events';
 import { AUDIO_OUTPUT_EVENT_END_OTHER } from './events';
 import { AUDIO_OUTPUT_EVENT_PROMOTION } from './events';
@@ -30,26 +39,26 @@ export async function exitAudioOutput(_audioOutputResources: AudioOutputResource
 }
 
 // --------------------------------------------------------------------------
-export function resolveAudioOutputSoundEvent(_gameMoveFlags: GameMoveFlags): AudioOutputEvent {
-  if (_gameMoveFlags.isCheckmate) {
+export function resolveAudioOutputSoundEvent(gameMoveFlags: GameMoveFlags): AudioOutputEvent {
+  if (gameMoveFlags.isCheckmate) {
     return AUDIO_OUTPUT_EVENT_END_CHECKMATE;
   }
-  if (_gameMoveFlags.isCheck) {
+  if (gameMoveFlags.isCheck) {
     return AUDIO_OUTPUT_EVENT_CHECK;
   }
-  if (_gameMoveFlags.isCapture) {
+  if (gameMoveFlags.isCapture) {
     return AUDIO_OUTPUT_EVENT_CAPTURE;
   }
-  if (_gameMoveFlags.isCastle) {
+  if (gameMoveFlags.isCastle) {
     return AUDIO_OUTPUT_EVENT_CASTLE;
   }
-  if (_gameMoveFlags.isPromotion) {
+  if (gameMoveFlags.isPromotion) {
     return AUDIO_OUTPUT_EVENT_PROMOTION;
   }
-  if (_gameMoveFlags.isEnd) {
+  if (gameMoveFlags.isEnd) {
     return AUDIO_OUTPUT_EVENT_END_OTHER;
   }
-  if (_gameMoveFlags.isBottomMove) {
+  if (gameMoveFlags.isBottomMove) {
     return AUDIO_OUTPUT_EVENT_MOVE_BOTTOM;
   }
   return AUDIO_OUTPUT_EVENT_MOVE_TOP;
@@ -68,4 +77,32 @@ export async function playAudioOutputEventSound(
       await audio.play();
     }
   }
+}
+
+// --------------------------------------------------------------------------
+export async function gameViewUpdateMovedSoundsOk(
+  settings: ComSettings,
+  audioOutputResources: AudioOutputResources,
+  evaluateResult: GameModelEvaluateResultOk
+): Promise<void> {
+  const soundEvent = resolveAudioOutputSoundEvent(evaluateResult.flags);
+  await playAudioOutputEventSound(settings, audioOutputResources, soundEvent);
+}
+
+// --------------------------------------------------------------------------
+export async function gameViewUpdateMovedSoundsInvalid(
+  settings: ComSettings,
+  audioOutputResources: AudioOutputResources,
+  _evaluateResult: GameModelEvaluateResultIgnore | GameModelEvaluateResultIllegal
+): Promise<void> {
+  await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_INVALID);
+}
+
+// --------------------------------------------------------------------------
+export async function gameViewUpdateControlSounds(
+  _settings: ComSettings,
+  _audioOutputResources: AudioOutputResources,
+  _evaluateResult: GameModelEvaluateResultControl
+): Promise<void> {
+  return;
 }

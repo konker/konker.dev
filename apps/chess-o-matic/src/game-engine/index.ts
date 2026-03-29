@@ -1,6 +1,7 @@
+import { parsePgn } from 'chessops/pgn';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
-import type { AudioInputResources } from '../audio-resources/input';
+import type { AudioInputResources } from '../audio-input';
 import {
   AUDIO_INPUT_LISTENING_OFF,
   AUDIO_INPUT_LISTENING_ON,
@@ -8,11 +9,12 @@ import {
   initAudioInput,
   startAudioInput,
   stopAudioInput,
-} from '../audio-resources/input';
-import type { AudioOutputResources } from '../audio-resources/output';
-import { exitAudioOutput, initAudioOutput } from '../audio-resources/output';
+} from '../audio-input';
+import type { AudioOutputResources } from '../audio-output';
+import { exitAudioOutput, gameViewUpdateMovedSoundsOk, initAudioOutput } from '../audio-output';
 import type { GameModelResources } from '../game-model';
 import { exitGameModel, initGameModel } from '../game-model';
+import type { GameModelEvaluateStatus } from '../game-model/evaluate.js';
 import {
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
   GAME_MODEL_EVALUATE_STATUS_IGNORE,
@@ -47,7 +49,6 @@ import {
   gameViewUpdateControl,
   gameViewUpdateMovedInvalid,
   gameViewUpdateMovedOk,
-  gameViewUpdateMovedSoundsOk,
   initGameView,
 } from '../game-view';
 import type { ComSettings } from '../settings';
@@ -66,7 +67,12 @@ const MODEL_URL = '/models/vosk-model-small-en-us-0.15.zip';
 // --------------------------------------------------------------------------
 export type GameEngineUiState = {
   readonly pgn: string;
-  readonly lastInputResult: string;
+  readonly fen: string;
+  readonly lastMoveSan: string;
+  readonly lastInputSanitized: string;
+  readonly lastInputEvaluateStatus: GameModelEvaluateStatus;
+  readonly lastInputResultMessage: string;
+  readonly scoresheet: unknown;
 };
 
 export type GameEngineInitOptions = {
@@ -307,8 +313,13 @@ export function createGameEngine(): GameEngine {
     const nextGameViewResources = gameViewResources;
 
     emitUiState({
-      lastInputResult: 'Waiting for input…',
-      pgn: nextGameModelResources.chess.pgn() || 'No moves yet.',
+      lastInputSanitized: '',
+      lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      lastMoveSan: '',
+      lastInputResultMessage: 'No moves',
+      fen: nextGameModelResources.chess.fen(),
+      pgn: nextGameModelResources.chess.pgn(),
+      scoresheet: {},
     });
 
     gameModelEventsAddListener(
@@ -343,7 +354,13 @@ export function createGameEngine(): GameEngine {
       nextGameModelResources,
       GAME_MODEL_EVENT_TYPE_CONTROL,
       async (event: GameModelEventControl) => {
-        await gameViewUpdateControl(nextGameViewResources, nextGameModelResources, event.result);
+        await gameViewUpdateControl(
+          nextSettings,
+          nextGameViewResources,
+          nextGameModelResources,
+          nextAudioOutputResources,
+          event.result
+        );
       }
     );
 
@@ -372,13 +389,7 @@ export function createGameEngine(): GameEngine {
         );
 
         if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-          await gameViewUpdateMovedSoundsOk(
-            nextSettings,
-            nextGameViewResources,
-            nextGameModelResources,
-            nextAudioOutputResources,
-            evaluateResult
-          );
+          await gameViewUpdateMovedSoundsOk(nextSettings, nextAudioOutputResources, evaluateResult);
         }
 
         await gameModelEventsNotifyListeners(nextGameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
@@ -393,8 +404,13 @@ export function createGameEngine(): GameEngine {
       GAME_MODEL_EVENT_TYPE_EVALUATED,
       async (event: GameModelEventEvaluated) => {
         emitUiState({
-          lastInputResult: `${event.result.sanitized} - ${event.result.status}`,
-          pgn: nextGameModelResources.chess.pgn() || 'No moves yet.',
+          lastInputSanitized: event.result.sanitized,
+          lastMoveSan: nextGameModelResources.chess.history().at(-1) ?? '',
+          lastInputEvaluateStatus: event.result.status,
+          lastInputResultMessage: event.result.status,
+          fen: nextGameModelResources.chess.fen(),
+          pgn: nextGameModelResources.chess.pgn(),
+          scoresheet: [...(parsePgn(nextGameModelResources.chess.pgn())?.[0]?.moves?.mainline() ?? [])],
         });
       }
     );

@@ -5,6 +5,9 @@ import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';
+import { START_FEN } from '../../../game-model/consts';
+import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
+import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
 import { ChessBoard } from './ChessBoard';
 
 type ChessOMaticAppProps = {
@@ -16,11 +19,18 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   let promotionDialogEl: HTMLDivElement | undefined;
 
   const [errorMessage, setErrorMessage] = createSignal<string>();
+  const [lastInputResultMessage, setLastInputResultMessage] = createSignal('Loading local speech model…');
   const [isInitializing, setIsInitializing] = createSignal(true);
   const [isListening, setIsListening] = createSignal(false);
   const [isSoundEnabled, setIsSoundEnabled] = createSignal(false);
-  const [lastInputResult, setLastInputResult] = createSignal('Loading local speech model…');
-  const [pgn, setPgn] = createSignal('No moves yet.');
+  const [lastInputEvaluateStatus, setLastInputEvaluateStatus] = createSignal<GameModelEvaluateStatus>(
+    GAME_MODEL_EVALUATE_STATUS_IGNORE
+  );
+  const [lastInputSanitized, setLastInputSanitized] = createSignal('');
+  const [lastMoveSan, setLastMoveSan] = createSignal('');
+  const [fen, setFen] = createSignal(START_FEN);
+  const [pgn, setPgn] = createSignal('');
+  const [scoresheet, setScoresheet] = createSignal<unknown>({});
 
   let gameEngine: GameEngine | undefined;
 
@@ -36,7 +46,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   onMount(async () => {
     if (props.autoloadEngine === false) {
       setIsInitializing(false);
-      setLastInputResult('Component test mode');
+      setLastInputResultMessage('Component test mode');
+      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
       return;
     }
 
@@ -56,8 +67,13 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
           audioOutputOn: false,
         },
         onUiStateChange: (state) => {
-          setLastInputResult(state.lastInputResult);
+          setLastInputSanitized(state.lastInputSanitized);
+          setLastMoveSan(state.lastMoveSan);
+          setLastInputEvaluateStatus(state.lastInputEvaluateStatus);
+          setLastInputResultMessage('');
+          setFen(state.fen);
           setPgn(state.pgn);
+          setScoresheet(state.scoresheet);
         },
       });
 
@@ -67,7 +83,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
       setErrorMessage(
         `Unable to initialize Chess-o-Matic. Add the local Vosk model to public/models/vosk-model-small-en-us-0.15.zip and retry. (${message})`
       );
-      setLastInputResult('Initialization failed');
+      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
+      setLastInputResultMessage('Initialization failed');
     } finally {
       setIsInitializing(false);
     }
@@ -86,7 +103,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
 
     await gameEngine.audioInputToggle();
     syncAudioState();
-    setLastInputResult(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
+    setLastInputResultMessage(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
   }
 
   async function toggleSound(): Promise<void> {
@@ -96,7 +113,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
 
     await gameEngine.audioOutputToggle();
     syncAudioState();
-    setLastInputResult(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
+    setLastInputResultMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
   }
 
   function setBoardElement(element: HTMLElement): void {
@@ -111,11 +128,36 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
     return <p>{message()}</p>;
   }
 
+  function renderLastMoveSan(): string {
+    return lastMoveSan() || 'No move yet';
+  }
+
+  function renderLastInputSanitized(): string {
+    return lastInputSanitized() || 'No input yet';
+  }
+
   return (
     <main class="app-shell">
       <h1>Chess-o-Matic</h1>
 
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
+
+      <div data-status={lastInputEvaluateStatus()} id="status">
+        <div class="status-meta">
+          <span>Status</span>
+          <span aria-label="Last Input Evaluate Status">{lastInputEvaluateStatus()}</span>
+        </div>
+        <div class="status-primary" aria-label="Last Input SAN">
+          {renderLastMoveSan()}
+        </div>
+        <div class="status-message" aria-label="Last Input Message">
+          {lastInputResultMessage()}
+        </div>
+        <div class="status-secondary">
+          <span>Heard</span>
+          <span aria-label="Last Input Sanitized">{renderLastInputSanitized()}</span>
+        </div>
+      </div>
 
       <div class="button-row">
         <button disabled={isInitializing() || !!errorMessage()} onClick={() => void toggleListening()} type="button">
@@ -127,16 +169,18 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         </button>
       </div>
 
-      <ChessBoard boardRef={setBoardElement} promotionDialogRef={setPromotionDialogElement} />
+      <div id="scoresheet">{JSON.stringify(scoresheet())}</div>
 
-      <label class="field">
-        <span>Last Input / Result</span>
-        <textarea aria-label="Last Input / Result" readOnly value={lastInputResult()} />
-      </label>
+      <ChessBoard boardRef={setBoardElement} promotionDialogRef={setPromotionDialogElement} />
 
       <label class="field">
         <span>PGN</span>
         <textarea aria-label="PGN" readOnly value={pgn()} />
+      </label>
+
+      <label class="field">
+        <span>FEN</span>
+        <div aria-label="FEN">{fen()}</div>
       </label>
     </main>
   );

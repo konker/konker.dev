@@ -15,8 +15,9 @@ describe('ChessOMaticApp', () => {
     expect(root.textContent).toContain('Enable Audio Input');
     expect(root.textContent).toContain('Enable Audio Output');
     expect(root.textContent).toContain('PGN');
-    expect(root.textContent).toContain('Last Input / Result');
-    expect((root.querySelector('[aria-label="Last Input / Result"]') as HTMLTextAreaElement | null)?.value).toContain(
+    expect(root.textContent).toContain('Status');
+    expect(root.textContent).toContain('Heard');
+    expect((root.querySelector('[aria-label="Last Input Message"]') as HTMLElement | null)?.textContent).toContain(
       'Component test mode'
     );
   });

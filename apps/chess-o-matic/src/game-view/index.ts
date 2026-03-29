@@ -1,6 +1,9 @@
-import type { AudioOutputResources } from '../audio-resources/output';
-import { playAudioOutputEventSound, resolveAudioOutputSoundEvent } from '../audio-resources/output';
-import { AUDIO_OUTPUT_EVENT_INVALID } from '../audio-resources/output/events';
+import type { AudioOutputResources } from '../audio-output';
+import {
+  gameViewUpdateControlSounds,
+  gameViewUpdateMovedSoundsInvalid,
+  gameViewUpdateMovedSoundsOk,
+} from '../audio-output';
 import type { GameModelResources } from '../game-model';
 import type {
   GameModelEvaluateResultControl,
@@ -36,20 +39,6 @@ export async function exitGameView(_gameViewResource: GameViewResources): Promis
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateMovedSoundsOk(
-  settings: ComSettings,
-  gameViewResources: GameViewResources,
-  gameModelResources: GameModelResources,
-  audioOutputResources: AudioOutputResources,
-  evaluateResult: GameModelEvaluateResultOk
-): Promise<void> {
-  if (gameModelResources.locked) {
-    return;
-  }
-  const soundEvent = resolveAudioOutputSoundEvent(evaluateResult.flags);
-  await playAudioOutputEventSound(settings, audioOutputResources, soundEvent);
-}
-
 export async function gameViewUpdateMovedOk(
   settings: ComSettings,
   gameViewResources: GameViewResources,
@@ -61,26 +50,10 @@ export async function gameViewUpdateMovedOk(
     return;
   }
   gameViewResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
-  await gameViewUpdateMovedSoundsOk(
-    settings,
-    gameViewResources,
-    gameModelResources,
-    audioOutputResources,
-    evaluateResult
-  );
+  await gameViewUpdateMovedSoundsOk(settings, audioOutputResources, evaluateResult);
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateMovedSoundsInvalid(
-  settings: ComSettings,
-  _gameViewResources: GameViewResources,
-  _gameModelResources: GameModelResources,
-  audioOutputResources: AudioOutputResources,
-  _evaluateResult: GameModelEvaluateResultIgnore | GameModelEvaluateResultIllegal
-): Promise<void> {
-  await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_INVALID);
-}
-
 export async function gameViewUpdateMovedInvalid(
   settings: ComSettings,
   _gameViewResources: GameViewResources,
@@ -91,27 +64,15 @@ export async function gameViewUpdateMovedInvalid(
   if (gameModelResources.locked) {
     return;
   }
-  await gameViewUpdateMovedSoundsInvalid(
-    settings,
-    _gameViewResources,
-    gameModelResources,
-    audioOutputResources,
-    evaluateResult
-  );
+  await gameViewUpdateMovedSoundsInvalid(settings, audioOutputResources, evaluateResult);
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateControlSounds(
-  _gameViewResources: GameViewResources,
-  _gameModelResources: GameModelResources,
-  _evaluateResult: GameModelEvaluateResultControl
-): Promise<void> {
-  return;
-}
-
 export async function gameViewUpdateControl(
+  settings: ComSettings,
   gameViewResources: GameViewResources,
   gameModelResources: GameModelResources,
+  audioOutputResources: AudioOutputResources,
   evaluateResult: GameModelEvaluateResultControl
 ): Promise<void> {
   if (gameModelResources.locked) {
@@ -123,5 +84,5 @@ export async function gameViewUpdateControl(
       gameViewResources.board.toggleOrientation();
       break;
   }
-  await gameViewUpdateControlSounds(gameViewResources, gameModelResources, evaluateResult);
+  await gameViewUpdateControlSounds(settings, audioOutputResources, evaluateResult);
 }
