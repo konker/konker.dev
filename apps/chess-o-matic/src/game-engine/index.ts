@@ -1,5 +1,4 @@
 import type { Square } from 'chess.js';
-import { parsePgn } from 'chessops/pgn';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
 import type { AudioInputResources } from '../audio-input';
@@ -14,6 +13,9 @@ import {
 import type { AudioOutputResources } from '../audio-output';
 import { boardAdapterUpdateMovedSoundsOk, exitAudioOutput, initAudioOutput } from '../audio-output';
 import type { ChessBoardController } from '../features/chess/components/ChessBoard/controller';
+import { pgnToScoreSheetData } from '../features/chess/components/ScoreSheet/pgn-to-scoresheet-data';
+import type { ScoreSheetData } from '../features/chess/components/ScoreSheet/types';
+import { SCORESHEET_EMPTY } from '../features/chess/components/ScoreSheet/types';
 import type { GameModelResources } from '../game-model';
 import { exitGameModel, initGameModel } from '../game-model';
 import type {
@@ -62,7 +64,7 @@ export type GameEngineUiState = {
   readonly lastInputSanitized: string;
   readonly lastInputEvaluateStatus: GameModelEvaluateStatus;
   readonly lastInputResultMessage: string;
-  readonly scoresheet: unknown;
+  readonly scoresheetData: ScoreSheetData;
 };
 
 export type GameEngineInitOptions = {
@@ -158,7 +160,7 @@ export function createGameEngine(): GameEngine {
       lastInputResultMessage: getResultMessage(result, model),
       fen: model.chess.fen(),
       pgn: model.chess.pgn(),
-      scoresheet: [...(parsePgn(model.chess.pgn())?.[0]?.moves?.mainline() ?? [])],
+      scoresheetData: pgnToScoreSheetData(model.chess.pgn()),
     });
   }
 
@@ -397,7 +399,7 @@ export function createGameEngine(): GameEngine {
       lastInputResultMessage: 'No moves',
       fen: gameModelResources.chess.fen(),
       pgn: gameModelResources.chess.pgn(),
-      scoresheet: {},
+      scoresheetData: SCORESHEET_EMPTY,
     });
 
     if (settings.audioInputOn && chessBoardController) {

@@ -10,6 +10,9 @@ import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
+import { ScoreSheet } from './ScoreSheet';
+import type { ScoreSheetData } from './ScoreSheet/types';
+import { SCORESHEET_EMPTY } from './ScoreSheet/types';
 
 type ChessOMaticAppProps = {
   readonly autoloadEngine?: boolean;
@@ -28,7 +31,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   const [lastMoveSan, setLastMoveSan] = createSignal('');
   const [fen, setFen] = createSignal(START_FEN);
   const [pgn, setPgn] = createSignal('');
-  const [scoresheet, setScoresheet] = createSignal<unknown>({});
+  const [scoresheetData, setScoresheetData] = createSignal<ScoreSheetData>(SCORESHEET_EMPTY);
 
   const gameEngine: GameEngine = createGameEngine();
 
@@ -58,7 +61,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
           setLastInputResultMessage(state.lastInputResultMessage);
           setFen(state.fen);
           setPgn(state.pgn);
-          setScoresheet(state.scoresheet);
+          setScoresheetData(state.scoresheetData);
         },
       });
 
@@ -146,7 +149,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         </button>
       </div>
 
-      <div id="scoresheet">{JSON.stringify(scoresheet())}</div>
+      <ScoreSheet scoresheet={scoresheetData()} />
 
       <ChessBoard
         fen={fen()}
