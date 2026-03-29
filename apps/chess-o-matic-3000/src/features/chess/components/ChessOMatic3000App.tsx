@@ -4,18 +4,9 @@ import { Binary, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucid
 import type { JSX } from 'solid-js';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
-import type { PgnMoveListData } from '../../../application/types/pgn';
-import { PGN_MOVE_LIST_EMPTY } from '../../../application/types/pgn';
-import type { ScoreSheetData } from '../../../application/types/scoresheet';
-import { SCORESHEET_EMPTY } from '../../../application/types/scoresheet';
 import type { GameMetadataData } from '../../../domain/game/metadata';
-import { GAME_METADATA_EMPTY } from '../../../domain/game/metadata';
-import type { GameBoardOrientation } from '../../../domain/game/types';
-import { GAME_BOARD_ORIENTATION_WHITE } from '../../../domain/game/types';
-import type { GameEngine } from '../../../game-engine';
-import { createGameEngine } from '../../../game-engine';
-import { START_FEN } from '../../../game-model/consts';
-import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
+import type { GameEngine, GameEngineUiState } from '../../../game-engine';
+import { createGameEngine, GAME_ENGINE_UI_STATE_EMPTY } from '../../../game-engine';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
@@ -34,26 +25,15 @@ type ChessOMaticAppProps = {
 
 export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const [errorMessage, setErrorMessage] = createSignal<string>();
-  const [lastInputResultMessage, setLastInputResultMessage] = createSignal('Starting app…');
   const [isInitializing, setIsInitializing] = createSignal(true);
   const [isListening, setIsListening] = createSignal(false);
   const [isListeningAvailable, setIsListeningAvailable] = createSignal(false);
   const [isSoundEnabled, setIsSoundEnabled] = createSignal(false);
   const [isSoundAvailable, setIsSoundAvailable] = createSignal(false);
-  const [lastInputEvaluateStatus, setLastInputEvaluateStatus] = createSignal<GameModelEvaluateStatus>(
-    GAME_MODEL_EVALUATE_STATUS_IGNORE
-  );
-  const [lastInputSanitized, setLastInputSanitized] = createSignal('');
-  const [lastMoveSan, setLastMoveSan] = createSignal('');
-  const [fen, setFen] = createSignal(START_FEN);
-  const [pgn, setPgn] = createSignal('');
-  const [pgnMoveList, setPgnMoveList] = createSignal<PgnMoveListData>(PGN_MOVE_LIST_EMPTY);
-  const [currentPly, setCurrentPly] = createSignal(0);
-  const [scoresheetData, setScoresheetData] = createSignal<ScoreSheetData>(SCORESHEET_EMPTY);
-  const [gameMetadata, setGameMetadata] = createSignal<GameMetadataData>(GAME_METADATA_EMPTY);
-  const [boardOrientation, setBoardOrientation] = createSignal<GameBoardOrientation>(GAME_BOARD_ORIENTATION_WHITE);
-  const [canGoBackward, setCanGoBackward] = createSignal(false);
-  const [canGoForward, setCanGoForward] = createSignal(false);
+  const [uiState, setUiState] = createSignal<GameEngineUiState>({
+    ...GAME_ENGINE_UI_STATE_EMPTY,
+    lastInputResultMessage: 'Starting app…',
+  });
 
   const gameEngine: GameEngine = createGameEngine();
 
@@ -67,8 +47,11 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   onMount(async () => {
     if (props.autoloadEngine === false) {
       setIsInitializing(false);
-      setLastInputResultMessage('Component test mode');
-      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: 'Component test mode',
+      }));
       return;
     }
 
@@ -79,28 +62,19 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           audioOutputOn: false,
         },
         onUiStateChange: (state) => {
-          setCanGoBackward(state.canGoBackward);
-          setCanGoForward(state.canGoForward);
-          setCurrentPly(state.currentPly);
-          setBoardOrientation(state.boardOrientation);
-          setLastInputSanitized(state.lastInputSanitized);
-          setLastMoveSan(state.lastMoveSan);
-          setLastInputEvaluateStatus(state.lastInputEvaluateStatus);
-          setLastInputResultMessage(state.lastInputResultMessage);
-          setFen(state.fen);
-          setPgn(state.pgn);
-          setPgnMoveList(state.pgnMoveList);
-          setScoresheetData(state.scoresheetData);
+          setUiState(state);
         },
       });
 
       syncAudioState();
-      setLastInputResultMessage('No moves');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown initialization error';
       setErrorMessage(`Unable to initialize Chess-o-matic 3000. (${message})`);
-      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
-      setLastInputResultMessage('Initialization failed');
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: 'Initialization failed',
+      }));
     } finally {
       setIsInitializing(false);
     }
@@ -114,12 +88,19 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     try {
       await gameEngine.audioInputToggle();
       syncAudioState();
-      setLastInputResultMessage(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused',
+      }));
     } catch (error) {
       syncAudioState();
       const message = error instanceof Error ? error.message : 'Unknown speech input error';
-      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
-      setLastInputResultMessage(`Speech input unavailable. ${message}`);
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: `Speech input unavailable. ${message}`,
+      }));
     }
   }
 
@@ -127,12 +108,19 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     try {
       await gameEngine.audioOutputToggle();
       syncAudioState();
-      setLastInputResultMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted',
+      }));
     } catch (error) {
       syncAudioState();
       const message = error instanceof Error ? error.message : 'Unknown audio output error';
-      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
-      setLastInputResultMessage(`Audio output unavailable. ${message}`);
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: `Audio output unavailable. ${message}`,
+      }));
     }
   }
 
@@ -151,7 +139,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   }
 
   function handleMetadataChange(metadata: GameMetadataData): void {
-    setGameMetadata(metadata);
     gameEngine.setGameMetadata(metadata);
   }
 
@@ -162,16 +149,16 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
       <StatusPanel
-        lastMoveSan={lastMoveSan()}
-        message={lastInputResultMessage()}
-        sanitizedInput={lastInputSanitized()}
-        status={lastInputEvaluateStatus()}
+        lastMoveSan={uiState().lastMoveSan}
+        message={uiState().lastInputResultMessage}
+        sanitizedInput={uiState().lastInputSanitized}
+        status={uiState().lastInputEvaluateStatus}
       />
 
       <div class="flex flex-wrap items-start justify-between gap-3">
         <GameNavigationPanel
-          canGoBackward={canGoBackward()}
-          canGoForward={canGoForward()}
+          canGoBackward={uiState().canGoBackward}
+          canGoForward={uiState().canGoForward}
           disabled={isInitializing() || !!errorMessage()}
           onGoToEnd={() => gameEngine.goToEnd()}
           onGoToStart={() => gameEngine.goToStart()}
@@ -191,31 +178,40 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       </div>
 
       <CollapsibleSection icon={SlidersHorizontal} open title="Info">
-        <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
+        <GameMetadata metadata={uiState().gameMetadata} onMetadataChange={handleMetadataChange} />
       </CollapsibleSection>
 
       <CollapsibleSection icon={NotebookPen} open title="Scoresheet">
-        <ScoreSheet currentPly={currentPly()} onGoToPly={gameEngine.goToPly} scoresheet={scoresheetData()} />
+        <ScoreSheet
+          currentPly={uiState().currentPly}
+          onGoToPly={gameEngine.goToPly}
+          scoresheet={uiState().scoresheetData}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection icon={Grid3x3} open title="Board">
         <ChessBoard
-          fen={fen()}
+          fen={uiState().fen}
           getPromotionPieceColor={gameEngine.getPromotionPieceColor}
           isLegalMove={gameEngine.isLegalMove}
           onMove={gameEngine.handleBoardMove}
           onReady={(controller) => void setBoardController(controller)}
           onToggleOrientation={() => gameEngine.toggleBoardOrientation()}
-          orientation={boardOrientation()}
+          orientation={uiState().boardOrientation}
         />
       </CollapsibleSection>
 
       <CollapsibleSection icon={FileText} title="PGN">
-        <PgnPanel currentPly={currentPly()} onGoToPly={gameEngine.goToPly} pgn={pgn()} pgnMoveList={pgnMoveList()} />
+        <PgnPanel
+          currentPly={uiState().currentPly}
+          onGoToPly={gameEngine.goToPly}
+          pgn={uiState().pgn}
+          pgnMoveList={uiState().pgnMoveList}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection icon={Binary} title="FEN">
-        <FenPanel fen={fen()} />
+        <FenPanel fen={uiState().fen} />
       </CollapsibleSection>
     </main>
   );
