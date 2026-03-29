@@ -1,7 +1,7 @@
 {
-  "name": "chess-o-matic",
+  "name": "chess-o-matic-3000",
   "version": "1.0.0",
-  "description": "Chess-o-Matic web app",
+  "description": "Chess-o-matic 3000 web app",
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",

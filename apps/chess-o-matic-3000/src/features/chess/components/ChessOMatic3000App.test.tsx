@@ -5,17 +5,17 @@ vi.mock('./ChessBoard', () => ({
   ChessBoard: () => <div data-testid="mock-chess-board">Mock ChessBoard</div>,
 }));
 
-import { ChessOMaticApp } from './ChessOMaticApp';
+import { ChessOMatic3000App } from './ChessOMatic3000App';
 
-describe('ChessOMaticApp', () => {
+describe('ChessOMatic3000App', () => {
   it('renders the SolidStart app shell without booting the chess engine in tests', async () => {
     const root = document.createElement('div');
     document.body.append(root);
 
-    render(() => ChessOMaticApp({ autoloadEngine: false }), root);
+    render(() => ChessOMatic3000App({ autoloadEngine: false }), root);
     await Promise.resolve();
 
-    expect(root.textContent).toContain('Chess-o-Matic');
+    expect(root.textContent).toContain('Chess-o-matic 3000');
     expect(root.textContent).toContain('Speech');
     expect(root.textContent).toContain('Sounds');
     expect(root.textContent).toContain('PGN');

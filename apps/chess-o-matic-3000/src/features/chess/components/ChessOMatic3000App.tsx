@@ -30,7 +30,7 @@ type ChessOMaticAppProps = {
   readonly autoloadEngine?: boolean;
 };
 
-export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
+export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const [errorMessage, setErrorMessage] = createSignal<string>();
   const [lastInputResultMessage, setLastInputResultMessage] = createSignal('Loading local speech model…');
   const [isInitializing, setIsInitializing] = createSignal(true);
@@ -90,7 +90,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown initialization error';
       setErrorMessage(
-        `Unable to initialize Chess-o-Matic. Add the local Vosk model to public/models/vosk-model-small-en-us-0.15.zip and retry. (${message})`
+        `Unable to initialize Chess-o-matic 3000. Add the local Vosk model to public/models/vosk-model-small-en-us-0.15.zip and retry. (${message})`
       );
       setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
       setLastInputResultMessage('Initialization failed');
@@ -136,7 +136,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
 
   return (
     <main class="mx-auto flex max-w-3xl flex-col gap-4 p-4 sm:p-3">
-      <h1>Chess-o-Matic</h1>
+      <h1>Chess-o-matic 3000</h1>
 
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
