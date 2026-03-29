@@ -15,6 +15,8 @@ import { boardAdapterUpdateMovedSoundsOk, exitAudioOutput, initAudioOutput } fro
 import type { ChessBoardController } from '../features/chess/components/ChessBoard/controller';
 import type { GameMetadataData } from '../features/chess/components/GameMetadata/types';
 import { GAME_METADATA_EMPTY } from '../features/chess/components/GameMetadata/types';
+import { moveHistoryToPgnMoveList } from '../features/chess/components/PgnPanel/move-history-to-pgn-move-list';
+import type { PgnMoveListData } from '../features/chess/components/PgnPanel/types';
 import { pgnToScoreSheetData } from '../features/chess/components/ScoreSheet/pgn-to-scoresheet-data';
 import type { ScoreSheetData } from '../features/chess/components/ScoreSheet/types';
 import type { GameModelResources } from '../game-model';
@@ -24,6 +26,7 @@ import {
   gameModelCanGoForward,
   gameModelCurrentMove,
   gameModelGoToEnd,
+  gameModelGoToPly,
   gameModelGoToStart,
   gameModelStepBackward,
   gameModelStepForward,
@@ -69,7 +72,9 @@ const MODEL_URL = '/models/vosk-model-small-en-us-0.15.zip';
 export type GameEngineUiState = {
   readonly canGoBackward: boolean;
   readonly canGoForward: boolean;
+  readonly currentPly: number;
   readonly pgn: string;
+  readonly pgnMoveList: PgnMoveListData;
   readonly fen: string;
   readonly lastMoveSan: string;
   readonly lastInputSanitized: string;
@@ -89,6 +94,7 @@ export type GameEngine = {
   readonly attachBoardController: (controller: ChessBoardController | undefined) => Promise<void>;
   readonly setGameMetadata: (metadata: GameMetadataData) => void;
   readonly goToStart: () => void;
+  readonly goToPly: (ply: number) => void;
   readonly stepBackward: () => void;
   readonly stepForward: () => void;
   readonly goToEnd: () => void;
@@ -125,12 +131,14 @@ export function createGameEngine(): GameEngine {
     emitUiState({
       canGoBackward: gameModelCanGoBackward(model),
       canGoForward: gameModelCanGoForward(model),
+      currentPly: model.currentPly,
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
       lastInputEvaluateStatus: status,
       lastInputResultMessage: message,
       fen: model.chess.fen(),
       pgn: model.chess.pgn(),
+      pgnMoveList: moveHistoryToPgnMoveList(model.moveHistory),
       scoresheetData: pgnToScoreSheetData(model.chess.pgn()),
     });
   }
@@ -487,6 +495,14 @@ export function createGameEngine(): GameEngine {
     emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game end', '', model.chess.history().at(-1) ?? '');
   }
 
+  function navigateToPly(ply: number): void {
+    const model = requireInitialized().gameModelResources;
+    gameModelGoToPly(model, ply);
+    applyGameMetadata(model.chess, gameMetadata);
+    syncBoardPosition();
+    emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'Moved to selected ply', '', model.chess.history().at(-1) ?? '');
+  }
+
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
     if (settings) {
       await exit();
@@ -523,6 +539,7 @@ export function createGameEngine(): GameEngine {
     attachBoardController,
     setGameMetadata,
     goToStart: navigateToStart,
+    goToPly: navigateToPly,
     stepBackward: navigateStepBackward,
     stepForward: navigateStepForward,
     goToEnd: navigateToEnd,

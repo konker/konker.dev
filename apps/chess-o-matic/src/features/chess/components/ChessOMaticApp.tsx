@@ -18,6 +18,8 @@ import { GameMetadata } from './GameMetadata';
 import type { GameMetadataData } from './GameMetadata/types';
 import { GAME_METADATA_EMPTY } from './GameMetadata/types';
 import { PgnPanel } from './PgnPanel';
+import type { PgnMoveListData } from './PgnPanel/types';
+import { PGN_MOVE_LIST_EMPTY } from './PgnPanel/types';
 import { ScoreSheet } from './ScoreSheet';
 import type { ScoreSheetData } from './ScoreSheet/types';
 import { SCORESHEET_EMPTY } from './ScoreSheet/types';
@@ -40,6 +42,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   const [lastMoveSan, setLastMoveSan] = createSignal('');
   const [fen, setFen] = createSignal(START_FEN);
   const [pgn, setPgn] = createSignal('');
+  const [pgnMoveList, setPgnMoveList] = createSignal<PgnMoveListData>(PGN_MOVE_LIST_EMPTY);
+  const [currentPly, setCurrentPly] = createSignal(0);
   const [scoresheetData, setScoresheetData] = createSignal<ScoreSheetData>(SCORESHEET_EMPTY);
   const [gameMetadata, setGameMetadata] = createSignal<GameMetadataData>(GAME_METADATA_EMPTY);
   const [canGoBackward, setCanGoBackward] = createSignal(false);
@@ -69,12 +73,14 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onUiStateChange: (state) => {
           setCanGoBackward(state.canGoBackward);
           setCanGoForward(state.canGoForward);
+          setCurrentPly(state.currentPly);
           setLastInputSanitized(state.lastInputSanitized);
           setLastMoveSan(state.lastMoveSan);
           setLastInputEvaluateStatus(state.lastInputEvaluateStatus);
           setLastInputResultMessage(state.lastInputResultMessage);
           setFen(state.fen);
           setPgn(state.pgn);
+          setPgnMoveList(state.pgnMoveList);
           setScoresheetData(state.scoresheetData);
         },
       });
@@ -177,7 +183,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
       </CollapsibleSection>
 
       <CollapsibleSection title="PGN">
-        <PgnPanel pgn={pgn()} />
+        <PgnPanel currentPly={currentPly()} onGoToPly={gameEngine.goToPly} pgn={pgn()} pgnMoveList={pgnMoveList()} />
       </CollapsibleSection>
 
       <CollapsibleSection title="FEN">
