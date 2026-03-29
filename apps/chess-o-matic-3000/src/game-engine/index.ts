@@ -1,7 +1,9 @@
 import type { Square } from 'chess.js';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
+import { createBrowserGameStorage } from '../application/adapters/browser/BrowserGameStorage';
 import type { ChessBoardController } from '../application/ports/ChessBoardController';
+import type { GameStorage } from '../application/ports/GameStorage';
 import { moveHistoryToPgnMoveList, moveHistoryToScoreSheetData, resolveGameMoveFlags } from '../application/selectors';
 import type { PgnMoveListData } from '../application/types/pgn';
 import { PGN_MOVE_LIST_EMPTY } from '../application/types/pgn';
@@ -26,8 +28,8 @@ import {
 } from '../audio-output';
 import type { GameMetadataData } from '../domain/game/metadata';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
-import type { AppState, GameBoardOrientation } from '../domain/game/types';
-import { createDefaultAppState, GAME_BOARD_ORIENTATION_WHITE } from '../domain/game/types';
+import type { AppState, GameBoardOrientation, GameId, PersistedSavedGameIndex } from '../domain/game/types';
+import { createDefaultAppState, createEmptyGameRecord, GAME_BOARD_ORIENTATION_WHITE } from '../domain/game/types';
 import type { GameModelResources } from '../game-model';
 import {
   exitGameModel,
@@ -125,6 +127,11 @@ export type GameEngine = {
   readonly init: (options: GameEngineInitOptions) => Promise<void>;
   readonly exit: () => Promise<void>;
   readonly attachBoardController: (controller: ChessBoardController | undefined) => Promise<void>;
+  readonly newGame: () => Promise<void>;
+  readonly resetGame: () => Promise<void>;
+  readonly saveCurrentGame: () => Promise<void>;
+  readonly loadSavedGame: (gameId: GameId) => Promise<void>;
+  readonly listSavedGames: () => Promise<PersistedSavedGameIndex>;
   readonly setGameMetadata: (metadata: GameMetadataData) => void;
   readonly toggleBoardOrientation: () => void;
   readonly goToStart: () => void;
@@ -143,7 +150,12 @@ export type GameEngine = {
   readonly isAudioOutputOn: () => boolean;
 };
 
-export function createGameEngine(): GameEngine {
+type CreateGameEngineDeps = {
+  readonly gameStorage?: GameStorage;
+};
+
+export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
+  const gameStorage = deps.gameStorage ?? createBrowserGameStorage();
   let appState: AppState | undefined;
   let audioInputResources: AudioInputResources | undefined;
   let audioOutputResources: AudioOutputResources | undefined;
@@ -166,6 +178,14 @@ export function createGameEngine(): GameEngine {
         audioOutputEnabled: initialSettings.audioOutputOn ?? nextAppState.settings.audioOutputEnabled,
       },
     };
+  }
+
+  function createGameId(): GameId {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+
+    return `game-${Date.now()}`;
   }
 
   function requireAppState(): AppState {
@@ -196,6 +216,14 @@ export function createGameEngine(): GameEngine {
         updatedAt: new Date().toISOString(),
       },
     };
+  }
+
+  async function persistAppState(): Promise<void> {
+    if (!appState) {
+      return;
+    }
+
+    await gameStorage.saveAppState(appState);
   }
 
   function emitCurrentUiState(
@@ -307,6 +335,7 @@ export function createGameEngine(): GameEngine {
     if (result.status === GAME_MODEL_EVALUATE_STATUS_OK) {
       syncAppStateFromGameModel(state.appState, state.gameModelResources);
       const nextState = requireAppState();
+      await persistAppState();
       const flags = resolveGameMoveFlags(state.gameModelResources.chess, nextState.currentGame.orientation);
       syncBoardPosition();
       await boardAdapterUpdateMovedSoundsOk(currentComSettings(nextState), state.audioOutputResources, flags);
@@ -332,6 +361,7 @@ export function createGameEngine(): GameEngine {
         gameModelStepBackward(state.gameModelResources);
         syncAppStateFromGameModel(state.appState, state.gameModelResources);
         applyGameMetadata(state.gameModelResources.chess, requireAppState().currentGame.metadata);
+        await persistAppState();
         syncBoardPosition();
       }
     }
@@ -409,6 +439,7 @@ export function createGameEngine(): GameEngine {
           audioInputEnabled: true,
         },
       };
+      await persistAppState();
       return;
     }
 
@@ -443,6 +474,7 @@ export function createGameEngine(): GameEngine {
           audioInputEnabled: true,
         },
       };
+      await persistAppState();
     } catch (error) {
       if (audioInputResources?.status === AUDIO_INPUT_LISTENING_ON) {
         audioInputResources = await stopAudioInput(audioInputResources);
@@ -455,6 +487,7 @@ export function createGameEngine(): GameEngine {
           audioInputEnabled: false,
         },
       };
+      await persistAppState();
       throw error;
     }
   }
@@ -478,6 +511,7 @@ export function createGameEngine(): GameEngine {
         audioInputEnabled: false,
       },
     };
+    await persistAppState();
   }
 
   async function exit(): Promise<void> {
@@ -526,6 +560,7 @@ export function createGameEngine(): GameEngine {
             audioInputEnabled: false,
           },
         };
+        await persistAppState();
       }
     }
   }
@@ -556,6 +591,7 @@ export function createGameEngine(): GameEngine {
         audioOutputEnabled: !state.appState.settings.audioOutputEnabled,
       },
     };
+    await persistAppState();
   }
 
   function canUseAudioInput(): boolean {
@@ -592,6 +628,81 @@ export function createGameEngine(): GameEngine {
     await evaluateBoardMove(move);
   }
 
+  async function newGame(): Promise<void> {
+    const state = requireInitialized();
+    const nextAppState: AppState = {
+      ...state.appState,
+      currentGame: createEmptyGameRecord(new Date().toISOString(), createGameId()),
+    };
+
+    appState = nextAppState;
+    syncGameModelFromAppState(nextAppState, state.gameModelResources);
+    syncBoardPosition();
+    await persistAppState();
+    emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'New game', '', '');
+  }
+
+  async function resetGame(): Promise<void> {
+    const state = requireInitialized();
+    const nextAppState: AppState = {
+      ...state.appState,
+      currentGame: createEmptyGameRecord(new Date().toISOString(), state.appState.currentGame.id),
+    };
+
+    appState = nextAppState;
+    syncGameModelFromAppState(nextAppState, state.gameModelResources);
+    syncBoardPosition();
+    await persistAppState();
+    emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'Game reset', '', '');
+  }
+
+  async function saveCurrentGame(): Promise<void> {
+    const state = requireInitialized();
+    await gameStorage.saveGame(state.appState.currentGame);
+
+    appState = {
+      ...state.appState,
+      savedGameIds: [
+        state.appState.currentGame.id,
+        ...state.appState.savedGameIds.filter((savedGameId) => savedGameId !== state.appState.currentGame.id),
+      ],
+    };
+
+    await persistAppState();
+  }
+
+  async function loadSavedGame(gameId: GameId): Promise<void> {
+    const state = requireInitialized();
+    const savedGame = await gameStorage.loadGame(gameId);
+
+    if (!savedGame) {
+      throw new Error(`Saved game not found: ${gameId}`);
+    }
+
+    const nextAppState: AppState = {
+      ...state.appState,
+      currentGame: savedGame,
+      savedGameIds: [gameId, ...state.appState.savedGameIds.filter((savedGameId) => savedGameId !== gameId)],
+    };
+
+    appState = nextAppState;
+    syncGameModelFromAppState(nextAppState, state.gameModelResources);
+    syncBoardPosition();
+    await persistAppState();
+    emitCurrentUiState(
+      nextAppState,
+      state.gameModelResources,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'Saved game loaded',
+      '',
+      ''
+    );
+  }
+
+  async function listSavedGames(): Promise<PersistedSavedGameIndex> {
+    return gameStorage.loadSavedGameIndex();
+  }
+
   function setGameMetadata(metadata: GameMetadataData): void {
     if (!gameModelResources || !appState) {
       return;
@@ -606,6 +717,7 @@ export function createGameEngine(): GameEngine {
       },
     };
     applyGameMetadata(gameModelResources.chess, appState.currentGame.metadata);
+    void persistAppState();
     emitCurrentUiState(
       appState,
       gameModelResources,
@@ -630,6 +742,7 @@ export function createGameEngine(): GameEngine {
       },
     };
 
+    void persistAppState();
     emitCurrentUiState(
       appState,
       gameModelResources,
@@ -647,6 +760,7 @@ export function createGameEngine(): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
+    void persistAppState();
     emitCurrentUiState(requireAppState(), model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game start', '', '');
   }
 
@@ -657,6 +771,7 @@ export function createGameEngine(): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
+    void persistAppState();
     emitCurrentUiState(
       requireAppState(),
       model,
@@ -674,6 +789,7 @@ export function createGameEngine(): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
+    void persistAppState();
     emitCurrentUiState(
       requireAppState(),
       model,
@@ -691,6 +807,7 @@ export function createGameEngine(): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
+    void persistAppState();
     emitCurrentUiState(
       requireAppState(),
       model,
@@ -708,6 +825,7 @@ export function createGameEngine(): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
+    void persistAppState();
     emitCurrentUiState(
       requireAppState(),
       model,
@@ -725,7 +843,7 @@ export function createGameEngine(): GameEngine {
 
     onUiStateChange = onStateChange;
 
-    appState = createInitialAppState(initialSettings);
+    appState = (await gameStorage.loadAppState()) ?? createInitialAppState(initialSettings);
     audioInputResources = await initAudioInput();
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
@@ -741,6 +859,7 @@ export function createGameEngine(): GameEngine {
 
     emitCurrentUiState(appState, gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'No moves', '', '');
     syncBoardPosition();
+    await persistAppState();
 
     if (appState.settings.audioInputEnabled && chessBoardController) {
       await audioInputOn();
@@ -751,6 +870,11 @@ export function createGameEngine(): GameEngine {
     init,
     exit,
     attachBoardController,
+    newGame,
+    resetGame,
+    saveCurrentGame,
+    loadSavedGame,
+    listSavedGames,
     setGameMetadata,
     toggleBoardOrientation,
     goToStart: navigateToStart,
