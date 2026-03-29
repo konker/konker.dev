@@ -35,6 +35,7 @@ export async function initGameView(
 
 // --------------------------------------------------------------------------
 export async function exitGameView(_gameViewResource: GameViewResources): Promise<void> {
+  _gameViewResource.board.dispose();
   return;
 }
 
