@@ -1,6 +1,7 @@
 import type { Square } from 'chess.js';
 
 import type { GameModelResources } from './index.js';
+import { gameModelPushHistoryMove } from './index.js';
 import type { GameInputParserResultOk, GameInputParserResultOkSan } from './read.js';
 import { GAME_INPUT_PARSE_STATUS_OK_SAN } from './read.js';
 
@@ -32,6 +33,10 @@ export function playMoveCandidates(
   const moveCandidate =
     parserResult.san.candidates.find(gameModelResources.isLegalMove) ?? parserResult.san.candidates[0];
   const moveResult = gameModelResources.chessMoveSafe(moveCandidate);
+
+  if (moveResult.ok) {
+    gameModelPushHistoryMove(gameModelResources, moveResult.move);
+  }
 
   return moveResult.ok
     ? {
@@ -65,6 +70,10 @@ export function playMove(
           to: parserResult.coords[1],
           promotion: 'q',
         });
+
+  if (moveResult.ok) {
+    gameModelPushHistoryMove(gameModelResources, moveResult.move);
+  }
 
   return moveResult.ok
     ? {

@@ -15,7 +15,8 @@ import {
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_CONTROL_ACTION_FLIP = '_flip';
-export type GameModelControlAction = typeof GAME_MODEL_CONTROL_ACTION_FLIP;
+export const GAME_MODEL_CONTROL_ACTION_UNDO = '_undo';
+export type GameModelControlAction = typeof GAME_MODEL_CONTROL_ACTION_FLIP | typeof GAME_MODEL_CONTROL_ACTION_UNDO;
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_EVALUATE_STATUS_OK = 'ok';
@@ -143,22 +144,13 @@ export function gameModelEvaluate(
     case GAME_INPUT_PARSE_STATUS_CONTROL_ACTION: {
       switch (parserResult.action) {
         case 'undo': {
-          const move = gameModelResources.chess.undo();
-          return move
-            ? {
-                status: GAME_MODEL_EVALUATE_STATUS_OK,
-                input: parserResult.input,
-                sanitized: parserResult.sanitized,
-                parsed: parserResult.parsed,
-                move: [move.to, move.from], // Move back
-                flags: DEFAULT_GAME_MODEL_FLAGS,
-              }
-            : {
-                status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-                input: parserResult.input,
-                sanitized: parserResult.sanitized,
-                parsed: parserResult.parsed,
-              };
+          return {
+            status: GAME_MODEL_EVALUATE_STATUS_CONTROL,
+            input: parserResult.input,
+            sanitized: parserResult.sanitized,
+            parsed: parserResult.parsed,
+            action: GAME_MODEL_CONTROL_ACTION_UNDO,
+          };
         }
         case 'flip': {
           return {
