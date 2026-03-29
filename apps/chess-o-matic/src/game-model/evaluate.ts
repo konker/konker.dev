@@ -1,7 +1,7 @@
 import type { Square } from 'chess.js';
 
-import type { GameViewResources } from '../game-view';
-import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from '../game-view/types';
+import type { BoardAdapterResources } from '../board-adapter';
+import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from '../board-adapter/types';
 import type { GameModelResources } from './index.js';
 import type { GameMoveResultOk } from './move.js';
 import { GAME_MOVE_STATUS_ILLEGAL, playMove } from './move.js';
@@ -94,11 +94,11 @@ export type GameModelEvaluateResult =
 // --------------------------------------------------------------------------
 export function gameModelResolveMoveFlags(
   gameModelResources: GameModelResources,
-  gameViewResources: GameViewResources,
+  boardAdapterResources: BoardAdapterResources,
   _moveResult: GameMoveResultOk
 ): GameMoveFlags {
   const lastMoveSan = gameModelResources.chess.history().at(-1);
-  const boardOrientation = gameViewResources.board.orientation();
+  const boardOrientation = boardAdapterResources.board.orientation();
   const lastMoveColor = gameModelResources.chess.turn();
 
   const isCheckmate = gameModelResources.chess.isCheckmate();
@@ -127,7 +127,7 @@ export function gameModelResolveMoveFlags(
 // --------------------------------------------------------------------------
 export function gameModelEvaluate(
   gameModelResources: GameModelResources,
-  gameViewResources: GameViewResources,
+  boardAdapterResources: BoardAdapterResources,
   parserResult: GameInputParserResult
 ): GameModelEvaluateResult {
   switch (parserResult.status) {
@@ -228,9 +228,9 @@ export function gameModelEvaluate(
         input: parserResult.input,
         sanitized: parserResult.sanitized,
         parsed: parserResult.parsed,
-        move: moveResult.move,
-        flags: gameModelResolveMoveFlags(gameModelResources, gameViewResources, moveResult),
-      };
+            move: moveResult.move,
+            flags: gameModelResolveMoveFlags(gameModelResources, boardAdapterResources, moveResult),
+          };
     }
   }
 }
