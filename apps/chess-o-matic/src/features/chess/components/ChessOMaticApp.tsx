@@ -13,6 +13,7 @@ import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
+import { GameControlPanel } from './GameControlPanel';
 import { GameMetadata } from './GameMetadata';
 import type { GameMetadataData } from './GameMetadata/types';
 import { GAME_METADATA_EMPTY } from './GameMetadata/types';
@@ -41,6 +42,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   const [pgn, setPgn] = createSignal('');
   const [scoresheetData, setScoresheetData] = createSignal<ScoreSheetData>(SCORESHEET_EMPTY);
   const [gameMetadata, setGameMetadata] = createSignal<GameMetadataData>(GAME_METADATA_EMPTY);
+  const [canGoBackward, setCanGoBackward] = createSignal(false);
+  const [canGoForward, setCanGoForward] = createSignal(false);
 
   const gameEngine: GameEngine = createGameEngine();
 
@@ -64,6 +67,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
           audioOutputOn: false,
         },
         onUiStateChange: (state) => {
+          setCanGoBackward(state.canGoBackward);
+          setCanGoForward(state.canGoForward);
           setLastInputSanitized(state.lastInputSanitized);
           setLastMoveSan(state.lastMoveSan);
           setLastInputEvaluateStatus(state.lastInputEvaluateStatus);
@@ -141,6 +146,16 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         isSoundEnabled={isSoundEnabled()}
         onToggleListening={() => void toggleListening()}
         onToggleSound={() => void toggleSound()}
+      />
+
+      <GameControlPanel
+        canGoBackward={canGoBackward()}
+        canGoForward={canGoForward()}
+        disabled={isInitializing() || !!errorMessage()}
+        onGoToEnd={() => gameEngine.goToEnd()}
+        onGoToStart={() => gameEngine.goToStart()}
+        onStepBackward={() => gameEngine.stepBackward()}
+        onStepForward={() => gameEngine.stepForward()}
       />
 
       <CollapsibleSection open title="Game Metadata">

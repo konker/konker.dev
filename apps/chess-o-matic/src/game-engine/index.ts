@@ -18,14 +18,21 @@ import { GAME_METADATA_EMPTY } from '../features/chess/components/GameMetadata/t
 import { pgnToScoreSheetData } from '../features/chess/components/ScoreSheet/pgn-to-scoresheet-data';
 import type { ScoreSheetData } from '../features/chess/components/ScoreSheet/types';
 import type { GameModelResources } from '../game-model';
-import { exitGameModel, initGameModel } from '../game-model';
-import type {
-  GameModelEvaluateResult,
-  GameModelEvaluateResultOk,
-  GameModelEvaluateStatus,
-} from '../game-model/evaluate.js';
+import {
+  exitGameModel,
+  gameModelCanGoBackward,
+  gameModelCanGoForward,
+  gameModelCurrentMove,
+  gameModelGoToEnd,
+  gameModelGoToStart,
+  gameModelStepBackward,
+  gameModelStepForward,
+  initGameModel,
+} from '../game-model';
+import type { GameModelEvaluateResult, GameModelEvaluateStatus } from '../game-model/evaluate.js';
 import {
   GAME_MODEL_CONTROL_ACTION_FLIP,
+  GAME_MODEL_CONTROL_ACTION_UNDO,
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
   GAME_MODEL_EVALUATE_STATUS_IGNORE,
   GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
@@ -60,6 +67,8 @@ import { applyGameMetadata } from './game-metadata';
 const MODEL_URL = '/models/vosk-model-small-en-us-0.15.zip';
 
 export type GameEngineUiState = {
+  readonly canGoBackward: boolean;
+  readonly canGoForward: boolean;
   readonly pgn: string;
   readonly fen: string;
   readonly lastMoveSan: string;
@@ -79,6 +88,10 @@ export type GameEngine = {
   readonly exit: () => Promise<void>;
   readonly attachBoardController: (controller: ChessBoardController | undefined) => Promise<void>;
   readonly setGameMetadata: (metadata: GameMetadataData) => void;
+  readonly goToStart: () => void;
+  readonly stepBackward: () => void;
+  readonly stepForward: () => void;
+  readonly goToEnd: () => void;
   readonly isLegalMove: (coords: [Square, Square]) => boolean;
   readonly getPromotionPieceColor: (coords: [Square, Square]) => 'b' | 'w' | undefined;
   readonly handleBoardMove: (move: [Square, Square] | string) => Promise<void>;
@@ -110,6 +123,8 @@ export function createGameEngine(): GameEngine {
     lastMoveSan: string
   ): void {
     emitUiState({
+      canGoBackward: gameModelCanGoBackward(model),
+      canGoForward: gameModelCanGoForward(model),
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
       lastInputEvaluateStatus: status,
@@ -120,6 +135,16 @@ export function createGameEngine(): GameEngine {
     });
   }
 
+  function syncBoardPosition(): void {
+    if (!gameModelResources || !chessBoardController) {
+      return;
+    }
+
+    const currentMove = gameModelCurrentMove(gameModelResources);
+    const lastMove = currentMove ? ([currentMove.from, currentMove.to] as [Square, Square]) : undefined;
+    chessBoardController.renderPosition(gameModelResources.chess.fen(), lastMove);
+  }
+
   function getResultMessage(result: GameModelEvaluateResult, model: GameModelResources): string {
     switch (result.status) {
       case GAME_MODEL_EVALUATE_STATUS_OK:
@@ -127,7 +152,15 @@ export function createGameEngine(): GameEngine {
       case GAME_MODEL_EVALUATE_STATUS_ILLEGAL:
         return result.message;
       case GAME_MODEL_EVALUATE_STATUS_CONTROL:
-        return result.action === GAME_MODEL_CONTROL_ACTION_FLIP ? 'Board flipped' : 'Control action applied';
+        if (result.action === GAME_MODEL_CONTROL_ACTION_FLIP) {
+          return 'Board flipped';
+        }
+
+        if (result.action === GAME_MODEL_CONTROL_ACTION_UNDO) {
+          return 'Moved back one ply';
+        }
+
+        return 'Control action applied';
       case GAME_MODEL_EVALUATE_STATUS_IGNORE:
       default:
         return result.sanitized === '' ? 'No input' : 'Input ignored';
@@ -168,11 +201,6 @@ export function createGameEngine(): GameEngine {
     return chessBoardController;
   }
 
-  function syncBoardMove(result: GameModelEvaluateResultOk): void {
-    const model = requireInitialized().gameModelResources;
-    requireBoardController().move([result.move[0], result.move[1]], model.chess.fen());
-  }
-
   async function handleEvaluatedResult(result: GameModelEvaluateResult): Promise<void> {
     const model = requireInitialized().gameModelResources;
     emitCurrentUiState(
@@ -188,7 +216,7 @@ export function createGameEngine(): GameEngine {
     const state = requireInitialized();
 
     if (result.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-      syncBoardMove(result);
+      syncBoardPosition();
       await boardAdapterUpdateMovedSoundsOk(state.settings, state.audioOutputResources, result);
       await gameModelEventsNotifyListeners(state.gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
         type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
@@ -206,6 +234,12 @@ export function createGameEngine(): GameEngine {
     if (result.status === GAME_MODEL_EVALUATE_STATUS_CONTROL) {
       if (result.action === GAME_MODEL_CONTROL_ACTION_FLIP) {
         requireBoardController().toggleOrientation();
+      }
+
+      if (result.action === GAME_MODEL_CONTROL_ACTION_UNDO) {
+        gameModelStepBackward(state.gameModelResources);
+        applyGameMetadata(state.gameModelResources.chess, gameMetadata);
+        syncBoardPosition();
       }
     }
 
@@ -342,6 +376,7 @@ export function createGameEngine(): GameEngine {
     }
 
     chessBoardController = controller;
+    syncBoardPosition();
 
     if (controller && settings?.audioInputOn) {
       await audioInputOn();
@@ -408,6 +443,50 @@ export function createGameEngine(): GameEngine {
     );
   }
 
+  function navigateToStart(): void {
+    const model = requireInitialized().gameModelResources;
+    gameModelGoToStart(model);
+    applyGameMetadata(model.chess, gameMetadata);
+    syncBoardPosition();
+    emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game start', '', '');
+  }
+
+  function navigateStepBackward(): void {
+    const model = requireInitialized().gameModelResources;
+    gameModelStepBackward(model);
+    applyGameMetadata(model.chess, gameMetadata);
+    syncBoardPosition();
+    emitCurrentUiState(
+      model,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'Moved back one ply',
+      '',
+      model.chess.history().at(-1) ?? ''
+    );
+  }
+
+  function navigateStepForward(): void {
+    const model = requireInitialized().gameModelResources;
+    gameModelStepForward(model);
+    applyGameMetadata(model.chess, gameMetadata);
+    syncBoardPosition();
+    emitCurrentUiState(
+      model,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'Moved forward one ply',
+      '',
+      model.chess.history().at(-1) ?? ''
+    );
+  }
+
+  function navigateToEnd(): void {
+    const model = requireInitialized().gameModelResources;
+    gameModelGoToEnd(model);
+    applyGameMetadata(model.chess, gameMetadata);
+    syncBoardPosition();
+    emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game end', '', model.chess.history().at(-1) ?? '');
+  }
+
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
     if (settings) {
       await exit();
@@ -431,6 +510,7 @@ export function createGameEngine(): GameEngine {
     );
 
     emitCurrentUiState(gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'No moves', '', '');
+    syncBoardPosition();
 
     if (settings.audioInputOn && chessBoardController) {
       await audioInputOn();
@@ -442,6 +522,10 @@ export function createGameEngine(): GameEngine {
     exit,
     attachBoardController,
     setGameMetadata,
+    goToStart: navigateToStart,
+    stepBackward: navigateStepBackward,
+    stepForward: navigateStepForward,
+    goToEnd: navigateToEnd,
     isLegalMove,
     getPromotionPieceColor,
     handleBoardMove,

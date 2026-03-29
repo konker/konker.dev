@@ -29,10 +29,14 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     boardEl.orientation = boardEl.orientation === 'white' ? 'black' : 'white';
   }
 
+  function clearMoveHighlight(board: GChessBoardElement): void {
+    board.shadowRoot?.querySelectorAll('[last-move]')?.forEach((square) => square.removeAttribute('last-move'));
+  }
+
   function moveHighlight(board: GChessBoardElement, coords: [Square, Square]): void {
     const [from, to] = coords;
 
-    board.shadowRoot?.querySelectorAll('[last-move]')?.forEach((square) => square.removeAttribute('last-move'));
+    clearMoveHighlight(board);
 
     const fromSquare = board.shadowRoot?.querySelector(`[data-square="${from}"]`);
     const toSquare = board.shadowRoot?.querySelector(`[data-square="${to}"]`);
@@ -139,9 +143,13 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     board.addEventListener('movefinished', handleMoveFinished);
 
     props.onReady({
-      move(coords: [Square, Square], fen: string): void {
+      renderPosition(fen: string, lastMove?: [Square, Square]): void {
         board.fen = fen;
-        moveHighlight(board, coords);
+        if (lastMove) {
+          moveHighlight(board, lastMove);
+        } else {
+          clearMoveHighlight(board);
+        }
         setBoardTurnFromFen(board, fen);
       },
       toggleOrientation(): void {
@@ -167,40 +175,40 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
       </button>
 
       <div class="relative">
-      <g-chess-board class="block aspect-square w-full max-w-[34rem]" id="board" ref={boardEl} />
-      <div
-        class="promotion-dialog absolute inset-0 hidden items-center justify-center bg-black/30 data-[open=true]:flex"
-        data-open="false"
-        id="promotion-dialog"
-        ref={promotionDialogEl}
-      >
-        <div class="grid w-full max-w-[14rem] grid-cols-2 gap-2 bg-white p-2">
-          <button
-            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
-            data-piece="q"
-            title="Queen"
-            type="button"
-          />
-          <button
-            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
-            data-piece="r"
-            title="Rook"
-            type="button"
-          />
-          <button
-            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
-            data-piece="b"
-            title="Bishop"
-            type="button"
-          />
-          <button
-            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
-            data-piece="n"
-            title="Knight"
-            type="button"
-          />
+        <g-chess-board class="block aspect-square w-full max-w-[34rem]" id="board" ref={boardEl} />
+        <div
+          class="promotion-dialog absolute inset-0 hidden items-center justify-center bg-black/30 data-[open=true]:flex"
+          data-open="false"
+          id="promotion-dialog"
+          ref={promotionDialogEl}
+        >
+          <div class="grid w-full max-w-[14rem] grid-cols-2 gap-2 bg-white p-2">
+            <button
+              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              data-piece="q"
+              title="Queen"
+              type="button"
+            />
+            <button
+              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              data-piece="r"
+              title="Rook"
+              type="button"
+            />
+            <button
+              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              data-piece="b"
+              title="Bishop"
+              type="button"
+            />
+            <button
+              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              data-piece="n"
+              title="Knight"
+              type="button"
+            />
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );

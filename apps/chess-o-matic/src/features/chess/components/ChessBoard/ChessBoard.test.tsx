@@ -2,8 +2,8 @@ import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
 import { START_FEN } from '../../../../game-model/consts';
-import { ChessBoard } from './index';
 import type { ChessBoardController } from './controller';
+import { ChessBoard } from './index';
 
 describe('ChessBoard', () => {
   it('renders the gchessboard wrapper, reports a controller, and toggles orientation from the button', async () => {
