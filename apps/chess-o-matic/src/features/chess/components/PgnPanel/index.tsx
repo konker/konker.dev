@@ -35,7 +35,15 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
   }
 
   function renderMoveClasses(item: PgnMoveListItem): string {
-    return props.currentPly === item.ply ? 'border-black bg-slate-200' : 'border-slate-300 bg-white';
+    if (props.currentPly === item.ply) {
+      return 'border-black bg-slate-200 font-semibold';
+    }
+
+    if (props.currentPly < item.ply) {
+      return 'border-slate-300 bg-white text-slate-400';
+    }
+
+    return 'border-slate-300 bg-white';
   }
 
   function switchToMovesTab(): void {

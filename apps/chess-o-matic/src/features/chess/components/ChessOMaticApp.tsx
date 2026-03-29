@@ -170,7 +170,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
       </CollapsibleSection>
 
       <CollapsibleSection icon={NotebookPen} open title="Scoresheet">
-        <ScoreSheet scoresheet={scoresheetData()} />
+        <ScoreSheet currentPly={currentPly()} onGoToPly={gameEngine.goToPly} scoresheet={scoresheetData()} />
       </CollapsibleSection>
 
       <CollapsibleSection icon={Grid3x3} open title="Board">
