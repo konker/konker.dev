@@ -4,6 +4,8 @@ import { For } from 'solid-js';
 import type { ScoreSheetData, ScoreSheetDataItem } from './types';
 
 type ScoreSheetProps = {
+  readonly currentPly: number;
+  readonly onGoToPly: (ply: number) => void;
   readonly scoresheet: ScoreSheetData;
 };
 
@@ -12,6 +14,18 @@ const SCORESHEET_MIN_ROWS = 10;
 export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
   function renderBlackMove(item: ScoreSheetDataItem): string {
     return item[1] === '*' ? '' : item[1];
+  }
+
+  function renderMoveClasses(ply: number): string {
+    if (props.currentPly === ply) {
+      return 'font-semibold underline';
+    }
+
+    if (props.currentPly < ply) {
+      return 'text-slate-400';
+    }
+
+    return '';
   }
 
   function createDisplayRows(): Array<ScoreSheetDataItem | undefined> {
@@ -28,11 +42,35 @@ export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
           {(item, index) => (
             <div
               aria-label="Scoresheet Row"
-              class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-4 border-b border-black text-sm leading-6"
+              class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-6 border-b border-black text-sm leading-6"
             >
               <span class="tabular-nums">{index() + 1}.</span>
-              <span>{item ? item[0] : ''}</span>
-              <span>{item ? renderBlackMove(item) : ''}</span>
+              <span>
+                {item ? (
+                  <button
+                    class={`block w-full text-left text-sm ${renderMoveClasses(index() * 2 + 1)}`}
+                    onClick={() => props.onGoToPly(index() * 2 + 1)}
+                    type="button"
+                  >
+                    {item[0]}
+                  </button>
+                ) : (
+                  ''
+                )}
+              </span>
+              <span>
+                {item && item[1] !== '*' ? (
+                  <button
+                    class={`block w-full text-left text-sm ${renderMoveClasses(index() * 2 + 2)}`}
+                    onClick={() => props.onGoToPly(index() * 2 + 2)}
+                    type="button"
+                  >
+                    {renderBlackMove(item)}
+                  </button>
+                ) : (
+                  ''
+                )}
+              </span>
             </div>
           )}
         </For>

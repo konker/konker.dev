@@ -17,7 +17,7 @@ import type { GameMetadataData } from '../features/chess/components/GameMetadata
 import { GAME_METADATA_EMPTY } from '../features/chess/components/GameMetadata/types';
 import { moveHistoryToPgnMoveList } from '../features/chess/components/PgnPanel/move-history-to-pgn-move-list';
 import type { PgnMoveListData } from '../features/chess/components/PgnPanel/types';
-import { pgnToScoreSheetData } from '../features/chess/components/ScoreSheet/pgn-to-scoresheet-data';
+import { moveHistoryToScoreSheetData } from '../features/chess/components/ScoreSheet/move-history-to-scoresheet-data';
 import type { ScoreSheetData } from '../features/chess/components/ScoreSheet/types';
 import type { GameModelResources } from '../game-model';
 import {
@@ -139,7 +139,7 @@ export function createGameEngine(): GameEngine {
       fen: model.chess.fen(),
       pgn: model.chess.pgn(),
       pgnMoveList: moveHistoryToPgnMoveList(model.moveHistory),
-      scoresheetData: pgnToScoreSheetData(model.chess.pgn()),
+      scoresheetData: moveHistoryToScoreSheetData(model.moveHistory),
     });
   }
 
