@@ -30,7 +30,9 @@ export function FenPanel(props: FenPanelProps): JSX.Element {
           <span>{isCopied() ? 'Copied' : 'Copy FEN'}</span>
         </button>
       </div>
-      <div aria-label="FEN">{props.fen}</div>
+      <div aria-label="FEN" class="h-32 overflow-auto break-all">
+        {props.fen}
+      </div>
     </div>
   );
 }
