@@ -89,6 +89,12 @@ export function gameModelGoToEnd(gameModelResources: GameModelResources): void {
   rebuildGameModelChess(gameModelResources);
 }
 
+export function gameModelGoToPly(gameModelResources: GameModelResources, ply: number): void {
+  const nextPly = Math.max(0, Math.min(ply, gameModelResources.moveHistory.length));
+  gameModelResources.currentPly = nextPly;
+  rebuildGameModelChess(gameModelResources);
+}
+
 export function gameModelCurrentMove(gameModelResources: GameModelResources): GameHistoryMove | undefined {
   return gameModelResources.moveHistory.at(gameModelResources.currentPly - 1);
 }
