@@ -3,9 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { START_FEN } from '../../../../game-model/consts';
 import { ChessBoard } from './index';
+import type { ChessBoardController } from './controller';
 
 describe('ChessBoard', () => {
-  it('renders the gchessboard wrapper and reports a controller when mounted', async () => {
+  it('renders the gchessboard wrapper, reports a controller, and toggles orientation from the button', async () => {
     const root = document.createElement('div');
     document.body.append(root);
 
@@ -34,6 +35,16 @@ describe('ChessBoard', () => {
 
     expect(root.querySelector('g-chess-board')).not.toBeNull();
     expect(onReady).toHaveBeenCalled();
+
+    const controller = onReady.mock.calls[0]?.[0] as ChessBoardController | undefined;
+    const toggleButton = root.querySelector('button[type="button"]') as HTMLButtonElement | null;
+
+    expect(controller?.orientation()).toBe('light');
+    expect(toggleButton?.textContent).toContain('Toggle Board Orientation');
+
+    toggleButton?.click();
+
+    expect(controller?.orientation()).toBe('dark');
 
     // eslint-disable-next-line fp/no-delete
     delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
