@@ -147,23 +147,25 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         status={lastInputEvaluateStatus()}
       />
 
-      <ControlsPanel
-        disabled={isInitializing() || !!errorMessage()}
-        isListening={isListening()}
-        isSoundEnabled={isSoundEnabled()}
-        onToggleListening={() => void toggleListening()}
-        onToggleSound={() => void toggleSound()}
-      />
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <GameNavigationPanel
+          canGoBackward={canGoBackward()}
+          canGoForward={canGoForward()}
+          disabled={isInitializing() || !!errorMessage()}
+          onGoToEnd={() => gameEngine.goToEnd()}
+          onGoToStart={() => gameEngine.goToStart()}
+          onStepBackward={() => gameEngine.stepBackward()}
+          onStepForward={() => gameEngine.stepForward()}
+        />
 
-      <GameNavigationPanel
-        canGoBackward={canGoBackward()}
-        canGoForward={canGoForward()}
-        disabled={isInitializing() || !!errorMessage()}
-        onGoToEnd={() => gameEngine.goToEnd()}
-        onGoToStart={() => gameEngine.goToStart()}
-        onStepBackward={() => gameEngine.stepBackward()}
-        onStepForward={() => gameEngine.stepForward()}
-      />
+        <ControlsPanel
+          disabled={isInitializing() || !!errorMessage()}
+          isListening={isListening()}
+          isSoundEnabled={isSoundEnabled()}
+          onToggleListening={() => void toggleListening()}
+          onToggleSound={() => void toggleSound()}
+        />
+      </div>
 
       <CollapsibleSection icon={SlidersHorizontal} open title="Info">
         <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
