@@ -31,4 +31,17 @@ describe('createBrowserFileExport', () => {
     expect(click).toHaveBeenCalledTimes(1);
     expect(revokeObjectUrl).toHaveBeenCalledWith('blob:game');
   });
+
+  it('rejects PDF scoresheet export in the browser adapter for now', async () => {
+    const fileExport = createBrowserFileExport();
+
+    await expect(
+      fileExport.exportScoreSheet({
+        content: '1. e4 e5',
+        fileName: 'scoresheet.pdf',
+        format: 'pdf',
+        mimeType: 'application/pdf',
+      })
+    ).rejects.toThrow('PDF scoresheet export is not supported by the browser adapter yet.');
+  });
 });

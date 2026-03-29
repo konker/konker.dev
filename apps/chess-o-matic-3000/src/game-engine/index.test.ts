@@ -155,4 +155,14 @@ describe('createGameEngine persistence', () => {
       pgn: expect.stringContaining('1. e4 e5'),
     });
   });
+
+  it('rejects export requests for missing saved games', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({});
+
+    await expect(gameEngine.exportGamePgn('missing-game')).rejects.toThrow('Saved game not found: missing-game');
+    await expect(gameEngine.openGameInLichess('missing-game')).rejects.toThrow('Saved game not found: missing-game');
+  });
 });

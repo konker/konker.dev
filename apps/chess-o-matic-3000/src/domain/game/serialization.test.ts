@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { GAME_METADATA_EMPTY } from './metadata';
-import { deserializeAppState, migratePersistedAppState, serializeAppState } from './serialization';
+import {
+  deserializeAppState,
+  deserializeSavedGameIndex,
+  migratePersistedAppState,
+  migratePersistedSavedGameIndex,
+  serializeAppState,
+} from './serialization';
 import { createDefaultAppState } from './types';
 
 describe('game serialization', () => {
@@ -57,6 +63,22 @@ describe('game serialization', () => {
     });
   });
 
+  it('clamps current ply to the available move history length', () => {
+    const restored = migratePersistedAppState({
+      currentGame: {
+        createdAt: '2026-03-30T00:00:00.000Z',
+        currentPly: 99,
+        id: 'game-1',
+        moveHistory: [{ from: 'e2', san: 'e4', to: 'e4' }],
+        schemaVersion: 1,
+      },
+      savedGameIds: [],
+      schemaVersion: 1,
+    });
+
+    expect(restored.currentGame.currentPly).toBe(1);
+  });
+
   it('rejects unsupported schema versions', () => {
     expect(() =>
       migratePersistedAppState({
@@ -94,5 +116,34 @@ describe('game serialization', () => {
     };
 
     expect(migratePersistedAppState(payload)).toEqual(payload);
+  });
+
+  it('migrates saved-game indexes with schema version 1', () => {
+    const payload = {
+      savedGames: [
+        {
+          black: 'Bob',
+          createdAt: '2026-03-30T00:00:00.000Z',
+          event: 'League Match',
+          id: 'game-1',
+          moveCount: 42,
+          updatedAt: '2026-03-30T00:10:00.000Z',
+          white: 'Alice',
+        },
+      ],
+      schemaVersion: 1,
+    };
+
+    expect(migratePersistedSavedGameIndex(payload)).toEqual(payload);
+    expect(deserializeSavedGameIndex(JSON.stringify(payload))).toEqual(payload);
+  });
+
+  it('rejects unsupported saved-game index schema versions', () => {
+    expect(() =>
+      migratePersistedSavedGameIndex({
+        savedGames: [],
+        schemaVersion: 999,
+      })
+    ).toThrow('Unsupported saved game index schema version: 999.');
   });
 });

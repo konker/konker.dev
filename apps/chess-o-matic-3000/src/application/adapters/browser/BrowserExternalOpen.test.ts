@@ -16,4 +16,16 @@ describe('createBrowserExternalOpen', () => {
     expect(writeClipboardText).toHaveBeenCalledWith('1. e4 e5');
     expect(openWindow).toHaveBeenCalledWith('https://lichess.org/paste');
   });
+
+  it('still opens the target page when clipboard writing is unavailable', async () => {
+    const openWindow = vi.fn();
+    const externalOpen = createBrowserExternalOpen({
+      openWindow,
+      writeClipboardText: undefined,
+    });
+
+    await externalOpen.openChessDotCom({ pgn: '1. d4 d5' });
+
+    expect(openWindow).toHaveBeenCalledWith('https://www.chess.com/analysis');
+  });
 });
