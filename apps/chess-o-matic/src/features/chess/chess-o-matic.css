@@ -1,38 +1,5 @@
-.board-frame {
-  position: relative;
-}
-
-.promotion-dialog {
-  position: absolute;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgb(0 0 0 / 0.3);
-}
-
-.promotion-dialog[data-open='true'] {
-  display: flex;
-}
-
-.promotion-panel {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  width: min(100%, 14rem);
-  padding: 0.5rem;
-  background: white;
-}
-
 .promo-choice {
-  width: 100%;
-  aspect-ratio: 1;
-  cursor: pointer;
-  background-position: center;
   background-size: 82%;
-  background-repeat: no-repeat;
-  border: 1px solid #000;
-  background-color: white;
 }
 
 .white-q {
