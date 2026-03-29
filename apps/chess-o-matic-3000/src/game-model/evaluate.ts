@@ -1,9 +1,6 @@
 import type { Square } from 'chess.js';
 
-import type { ChessBoardController } from '../features/chess/components/ChessBoard/controller';
-import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from '../features/chess/components/ChessBoard/controller';
 import type { GameModelResources } from './index.js';
-import type { GameMoveResultOk } from './move.js';
 import { GAME_MOVE_STATUS_ILLEGAL, playMove } from './move.js';
 import type { GameInputParserResult } from './read.js';
 import {
@@ -30,37 +27,12 @@ export type GameModelEvaluateStatus =
   | typeof GAME_MODEL_EVALUATE_STATUS_CONTROL
   | typeof GAME_MODEL_EVALUATE_STATUS_IGNORE;
 
-// --------------------------------------------------------------------------
-export type GameMoveFlags = {
-  readonly isCapture: boolean;
-  readonly isCheck: boolean;
-  readonly isCastle: boolean;
-  readonly isPromotion: boolean;
-  readonly isBottomMove: boolean;
-  readonly isCheckmate: boolean;
-  readonly isDraw: boolean;
-  readonly isEnd: boolean;
-};
-
-export const DEFAULT_GAME_MODEL_FLAGS: GameMoveFlags = {
-  isCapture: false,
-  isCheck: false,
-  isCastle: false,
-  isPromotion: false,
-  isBottomMove: true,
-  isCheckmate: false,
-  isDraw: false,
-  isEnd: false,
-} as const;
-
-// --------------------------------------------------------------------------
 export type GameModelEvaluateResultOk = {
   readonly status: typeof GAME_MODEL_EVALUATE_STATUS_OK;
   readonly input: string;
   readonly sanitized: string;
   readonly parsed: string | undefined;
   readonly move: [Square, Square];
-  readonly flags: GameMoveFlags;
 };
 
 export type GameModelEvaluateResultIllegal = {
@@ -92,43 +64,8 @@ export type GameModelEvaluateResult =
   | GameModelEvaluateResultControl
   | GameModelEvaluateResultIgnore;
 
-// --------------------------------------------------------------------------
-export function gameModelResolveMoveFlags(
-  gameModelResources: GameModelResources,
-  chessBoardController: ChessBoardController,
-  _moveResult: GameMoveResultOk
-): GameMoveFlags {
-  const lastMoveSan = gameModelResources.chess.history().at(-1);
-  const boardOrientation = chessBoardController.orientation();
-  const lastMoveColor = gameModelResources.chess.turn();
-
-  const isCheckmate = gameModelResources.chess.isCheckmate();
-  const isCheck = gameModelResources.chess.isCheck();
-  const isCapture = lastMoveSan?.includes('x') ?? false;
-  const isCastle = lastMoveSan?.includes('O-O') ?? false;
-  const isPromotion = lastMoveSan?.includes('=') ?? false;
-  const isBottomMove =
-    (boardOrientation === BOARD_COLOR_LIGHT && lastMoveColor === 'b') ||
-    (boardOrientation === BOARD_COLOR_DARK && lastMoveColor === 'w');
-  const isDraw = gameModelResources.chess.isDraw();
-  const isEnd = gameModelResources.chess.isGameOver();
-
-  return {
-    isCheckmate,
-    isCheck,
-    isCapture,
-    isCastle,
-    isPromotion,
-    isBottomMove,
-    isDraw,
-    isEnd,
-  };
-}
-
-// --------------------------------------------------------------------------
 export function gameModelEvaluate(
   gameModelResources: GameModelResources,
-  chessBoardController: ChessBoardController,
   parserResult: GameInputParserResult
 ): GameModelEvaluateResult {
   switch (parserResult.status) {
@@ -188,7 +125,6 @@ export function gameModelEvaluate(
             sanitized: parserResult.sanitized,
             parsed: parserResult.parsed,
             move: moveResult.move,
-            flags: DEFAULT_GAME_MODEL_FLAGS,
           };
         }
       }
@@ -221,7 +157,6 @@ export function gameModelEvaluate(
         sanitized: parserResult.sanitized,
         parsed: parserResult.parsed,
         move: moveResult.move,
-        flags: gameModelResolveMoveFlags(gameModelResources, chessBoardController, moveResult),
       };
     }
   }

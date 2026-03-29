@@ -1,9 +1,8 @@
+import type { GameMoveFlags } from '../application/types/game-move-flags';
 import type {
   GameModelEvaluateResultControl,
   GameModelEvaluateResultIgnore,
   GameModelEvaluateResultIllegal,
-  GameModelEvaluateResultOk,
-  GameMoveFlags,
 } from '../game-model/evaluate';
 import type { ComSettings } from '../settings';
 import type { AudioOutputEvent } from './events';
@@ -83,9 +82,9 @@ export async function playAudioOutputEventSound(
 export async function boardAdapterUpdateMovedSoundsOk(
   settings: ComSettings,
   audioOutputResources: AudioOutputResources,
-  evaluateResult: GameModelEvaluateResultOk
+  flags: GameMoveFlags
 ): Promise<void> {
-  const soundEvent = resolveAudioOutputSoundEvent(evaluateResult.flags);
+  const soundEvent = resolveAudioOutputSoundEvent(flags);
   await playAudioOutputEventSound(settings, audioOutputResources, soundEvent);
 }
 

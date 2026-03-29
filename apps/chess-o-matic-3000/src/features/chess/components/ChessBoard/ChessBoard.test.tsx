@@ -1,6 +1,9 @@
+import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { GameBoardOrientation } from '../../../../domain/game/types';
+import { GAME_BOARD_ORIENTATION_WHITE } from '../../../../domain/game/types';
 import { START_FEN } from '../../../../game-model/consts';
 import type { ChessBoardController } from './controller';
 import { ChessBoard } from './index';
@@ -17,6 +20,7 @@ describe('ChessBoard', () => {
     });
 
     const onReady = vi.fn();
+    const [orientation, setOrientation] = createSignal<GameBoardOrientation>(GAME_BOARD_ORIENTATION_WHITE);
 
     render(
       () => (
@@ -26,6 +30,8 @@ describe('ChessBoard', () => {
           isLegalMove={() => true}
           onMove={async () => Promise.resolve()}
           onReady={onReady}
+          onToggleOrientation={() => setOrientation((current) => (current === 'white' ? 'black' : 'white'))}
+          orientation={orientation()}
         />
       ),
       root
@@ -38,13 +44,16 @@ describe('ChessBoard', () => {
 
     const controller = onReady.mock.calls[0]?.[0] as ChessBoardController | undefined;
     const toggleButton = root.querySelector('button[type="button"]') as HTMLButtonElement | null;
+    const board = root.querySelector('g-chess-board') as { orientation?: string } | null;
 
-    expect(controller?.orientation()).toBe('light');
+    expect(controller).toBeDefined();
     expect(toggleButton?.textContent).toContain('Toggle Board Orientation');
+    expect(board?.orientation).toBe('white');
 
     toggleButton?.click();
+    await Promise.resolve();
 
-    expect(controller?.orientation()).toBe('dark');
+    expect(board?.orientation).toBe('black');
 
     // eslint-disable-next-line fp/no-delete
     delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
