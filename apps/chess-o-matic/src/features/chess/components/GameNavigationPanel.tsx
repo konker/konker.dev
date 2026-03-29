@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, SkipBack, SkipForward } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 
-type GameControlPanelProps = {
+type GameNavigationPanelProps = {
   readonly canGoBackward: boolean;
   readonly canGoForward: boolean;
   readonly disabled: boolean;
@@ -11,7 +11,7 @@ type GameControlPanelProps = {
   readonly onStepForward: () => void;
 };
 
-export function GameControlPanel(props: GameControlPanelProps): JSX.Element {
+export function GameNavigationPanel(props: GameNavigationPanelProps): JSX.Element {
   return (
     <div class="flex flex-wrap gap-3">
       <button

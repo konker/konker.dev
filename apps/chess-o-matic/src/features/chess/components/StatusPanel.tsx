@@ -21,7 +21,7 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
         return 'border-l-blue-600';
       case 'ignore':
       default:
-        return 'border-l-amber-700';
+        return 'border-l-slate-400';
     }
   }
 

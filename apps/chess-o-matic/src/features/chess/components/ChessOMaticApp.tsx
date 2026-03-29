@@ -14,10 +14,10 @@ import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
-import { GameControlPanel } from './GameControlPanel';
 import { GameMetadata } from './GameMetadata';
 import type { GameMetadataData } from './GameMetadata/types';
 import { GAME_METADATA_EMPTY } from './GameMetadata/types';
+import { GameNavigationPanel } from './GameNavigationPanel';
 import { PgnPanel } from './PgnPanel';
 import type { PgnMoveListData } from './PgnPanel/types';
 import { PGN_MOVE_LIST_EMPTY } from './PgnPanel/types';
@@ -155,7 +155,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onToggleSound={() => void toggleSound()}
       />
 
-      <GameControlPanel
+      <GameNavigationPanel
         canGoBackward={canGoBackward()}
         canGoForward={canGoForward()}
         disabled={isInitializing() || !!errorMessage()}
