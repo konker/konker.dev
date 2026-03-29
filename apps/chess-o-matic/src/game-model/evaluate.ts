@@ -1,7 +1,7 @@
 import type { Square } from 'chess.js';
 
-import type { BoardAdapterResources } from '../board-adapter';
-import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from '../board-adapter/types';
+import type { ChessBoardController } from '../features/chess/components/ChessBoard/controller';
+import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from '../features/chess/components/ChessBoard/controller';
 import type { GameModelResources } from './index.js';
 import type { GameMoveResultOk } from './move.js';
 import { GAME_MOVE_STATUS_ILLEGAL, playMove } from './move.js';
@@ -94,11 +94,11 @@ export type GameModelEvaluateResult =
 // --------------------------------------------------------------------------
 export function gameModelResolveMoveFlags(
   gameModelResources: GameModelResources,
-  boardAdapterResources: BoardAdapterResources,
+  chessBoardController: ChessBoardController,
   _moveResult: GameMoveResultOk
 ): GameMoveFlags {
   const lastMoveSan = gameModelResources.chess.history().at(-1);
-  const boardOrientation = boardAdapterResources.board.orientation();
+  const boardOrientation = chessBoardController.orientation();
   const lastMoveColor = gameModelResources.chess.turn();
 
   const isCheckmate = gameModelResources.chess.isCheckmate();
@@ -127,7 +127,7 @@ export function gameModelResolveMoveFlags(
 // --------------------------------------------------------------------------
 export function gameModelEvaluate(
   gameModelResources: GameModelResources,
-  boardAdapterResources: BoardAdapterResources,
+  chessBoardController: ChessBoardController,
   parserResult: GameInputParserResult
 ): GameModelEvaluateResult {
   switch (parserResult.status) {
@@ -229,7 +229,7 @@ export function gameModelEvaluate(
         sanitized: parserResult.sanitized,
         parsed: parserResult.parsed,
             move: moveResult.move,
-            flags: gameModelResolveMoveFlags(gameModelResources, boardAdapterResources, moveResult),
+            flags: gameModelResolveMoveFlags(gameModelResources, chessBoardController, moveResult),
           };
     }
   }
