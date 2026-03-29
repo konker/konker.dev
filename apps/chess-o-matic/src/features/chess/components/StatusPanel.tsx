@@ -1,4 +1,5 @@
 import type { JSX } from 'solid-js';
+import { Info } from 'lucide-solid';
 
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 
@@ -31,7 +32,10 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
       id="status"
     >
       <div class="flex justify-between gap-4 text-sm text-slate-600">
-        <span>Status</span>
+        <span class="flex items-center gap-2">
+          <Info class="h-4 w-4" />
+          <span>Status</span>
+        </span>
         <span aria-label="Last Input Evaluate Status">{props.status}</span>
       </div>
       <div aria-label="Last Input SAN" class="text-2xl font-bold leading-tight">

@@ -2,6 +2,7 @@ import '../chess-o-matic.css';
 
 import type { JSX } from 'solid-js';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { Binary, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';
@@ -164,15 +165,15 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onStepForward={() => gameEngine.stepForward()}
       />
 
-      <CollapsibleSection open title="Game Metadata">
+      <CollapsibleSection icon={SlidersHorizontal} open title="Game Metadata">
         <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
       </CollapsibleSection>
 
-      <CollapsibleSection open title="Scoresheet">
+      <CollapsibleSection icon={NotebookPen} open title="Scoresheet">
         <ScoreSheet scoresheet={scoresheetData()} />
       </CollapsibleSection>
 
-      <CollapsibleSection open title="Board">
+      <CollapsibleSection icon={Grid3x3} open title="Board">
         <ChessBoard
           fen={fen()}
           getPromotionPieceColor={gameEngine.getPromotionPieceColor}
@@ -182,11 +183,11 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="PGN">
+      <CollapsibleSection icon={FileText} title="PGN">
         <PgnPanel currentPly={currentPly()} onGoToPly={gameEngine.goToPly} pgn={pgn()} pgnMoveList={pgnMoveList()} />
       </CollapsibleSection>
 
-      <CollapsibleSection title="FEN">
+      <CollapsibleSection icon={Binary} title="FEN">
         <FenPanel fen={fen()} />
       </CollapsibleSection>
     </main>
