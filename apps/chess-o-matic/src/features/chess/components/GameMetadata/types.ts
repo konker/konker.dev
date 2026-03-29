@@ -9,6 +9,7 @@ export type GameMetadataData = {
   readonly event: string;
   readonly round: string;
   readonly site: string;
+  readonly termination: string;
   readonly timeControl: string;
   readonly white: PlayerMetadata;
 };
@@ -22,6 +23,7 @@ export const GAME_METADATA_EMPTY: GameMetadataData = {
   event: '',
   round: '',
   site: '',
+  termination: '',
   timeControl: '',
   white: {
     elo: '',

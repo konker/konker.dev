@@ -86,7 +86,6 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
   return (
     <div class="flex flex-col gap-2">
       <div class="flex items-center gap-2">
-        <span>PGN</span>
         <button class="flex items-center gap-2" onClick={() => void copyPgn()} type="button">
           <Show when={isCopied()} fallback={<Copy class="h-4 w-4" />}>
             <CopyCheck class="h-4 w-4" />

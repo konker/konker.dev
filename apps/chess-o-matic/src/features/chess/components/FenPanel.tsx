@@ -22,7 +22,6 @@ export function FenPanel(props: FenPanelProps): JSX.Element {
   return (
     <div class="flex flex-col gap-2">
       <div class="flex items-center gap-2">
-        <span>FEN</span>
         <button class="flex items-center gap-2" onClick={() => void copyFen()} type="button">
           <Show when={isCopied()} fallback={<Copy class="h-4 w-4" />}>
             <CopyCheck class="h-4 w-4" />

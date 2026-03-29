@@ -1,4 +1,4 @@
-import { Badge, Calendar, Clock3, Hash, MapPin, Trophy, User } from 'lucide-solid';
+import { Calendar, Clock3, Hash, MapPin, Trophy, User } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 
 import type { GameMetadataData } from './types';
@@ -7,6 +7,17 @@ type GameMetadataProps = {
   readonly metadata: GameMetadataData;
   readonly onMetadataChange: (metadata: GameMetadataData) => void;
 };
+
+const TERMINATION_OPTIONS = [
+  'abandoned',
+  'adjudication',
+  'death',
+  'emergency',
+  'normal',
+  'rules infraction',
+  'time forfeit',
+  'unterminated',
+] as const;
 
 export function GameMetadata(props: GameMetadataProps): JSX.Element {
   function updateField<K extends keyof GameMetadataData>(field: K, value: GameMetadataData[K]): void {
@@ -34,8 +45,6 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
 
   return (
     <section aria-label="Game Metadata" class="flex flex-col gap-3">
-      <h2>Game Metadata</h2>
-
       <div class="grid gap-3 sm:grid-cols-2">
         <label class="flex flex-col gap-1">
           {renderLabel(<Trophy class="h-4 w-4" />, 'Event')}
@@ -69,14 +78,28 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
             value={props.metadata.round}
           />
         </label>
-        <label class="flex flex-col gap-1 sm:col-span-2">
-          {renderLabel(<Clock3 class="h-4 w-4" />, 'Time Control')}
-          <input
-            onInput={(event) => updateField('timeControl', event.currentTarget.value)}
-            type="text"
-            value={props.metadata.timeControl}
-          />
-        </label>
+        <div class="grid gap-3 sm:col-span-2 sm:grid-cols-2">
+          <label class="flex flex-col gap-1">
+            {renderLabel(<Clock3 class="h-4 w-4" />, 'Time Control')}
+            <input
+              onInput={(event) => updateField('timeControl', event.currentTarget.value)}
+              type="text"
+              value={props.metadata.timeControl}
+            />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span>Termination</span>
+            <select
+              onInput={(event) => updateField('termination', event.currentTarget.value)}
+              value={props.metadata.termination}
+            >
+              <option value=""></option>
+              {TERMINATION_OPTIONS.map(function renderOption(option): JSX.Element {
+                return <option value={option}>{option}</option>;
+              })}
+            </select>
+          </label>
+        </div>
       </div>
 
       <div class="grid gap-3 sm:grid-cols-2">
@@ -85,22 +108,20 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
             <User class="h-4 w-4" />
             <span>White</span>
           </h2>
-          <label class="flex flex-col gap-1">
-            {renderLabel(<User class="h-4 w-4" />, 'White Name')}
+          <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
             <input
               onInput={(event) => updatePlayerField('white', 'name', event.currentTarget.value)}
+              placeholder="Name"
               type="text"
               value={props.metadata.white.name}
             />
-          </label>
-          <label class="flex flex-col gap-1">
-            {renderLabel(<Badge class="h-4 w-4" />, 'White Elo')}
             <input
               onInput={(event) => updatePlayerField('white', 'elo', event.currentTarget.value)}
+              placeholder="Elo"
               type="text"
               value={props.metadata.white.elo}
             />
-          </label>
+          </div>
         </div>
 
         <div class="flex flex-col gap-3">
@@ -108,22 +129,20 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
             <User class="h-4 w-4" />
             <span>Black</span>
           </h2>
-          <label class="flex flex-col gap-1">
-            {renderLabel(<User class="h-4 w-4" />, 'Black Name')}
+          <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
             <input
               onInput={(event) => updatePlayerField('black', 'name', event.currentTarget.value)}
+              placeholder="Name"
               type="text"
               value={props.metadata.black.name}
             />
-          </label>
-          <label class="flex flex-col gap-1">
-            {renderLabel(<Badge class="h-4 w-4" />, 'Black Elo')}
             <input
               onInput={(event) => updatePlayerField('black', 'elo', event.currentTarget.value)}
+              placeholder="Elo"
               type="text"
               value={props.metadata.black.elo}
             />
-          </label>
+          </div>
         </div>
       </div>
     </section>
