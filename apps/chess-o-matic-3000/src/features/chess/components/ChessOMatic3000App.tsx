@@ -4,6 +4,12 @@ import { Binary, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucid
 import type { JSX } from 'solid-js';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
+import type { PgnMoveListData } from '../../../application/types/pgn';
+import { PGN_MOVE_LIST_EMPTY } from '../../../application/types/pgn';
+import type { ScoreSheetData } from '../../../application/types/scoresheet';
+import { SCORESHEET_EMPTY } from '../../../application/types/scoresheet';
+import type { GameMetadataData } from '../../../domain/game/metadata';
+import { GAME_METADATA_EMPTY } from '../../../domain/game/metadata';
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';
 import { START_FEN } from '../../../game-model/consts';
@@ -15,15 +21,9 @@ import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
 import { GameMetadata } from './GameMetadata';
-import type { GameMetadataData } from './GameMetadata/types';
-import { GAME_METADATA_EMPTY } from './GameMetadata/types';
 import { GameNavigationPanel } from './GameNavigationPanel';
 import { PgnPanel } from './PgnPanel';
-import type { PgnMoveListData } from './PgnPanel/types';
-import { PGN_MOVE_LIST_EMPTY } from './PgnPanel/types';
 import { ScoreSheet } from './ScoreSheet';
-import type { ScoreSheetData } from './ScoreSheet/types';
-import { SCORESHEET_EMPTY } from './ScoreSheet/types';
 import { StatusPanel } from './StatusPanel';
 
 type ChessOMaticAppProps = {

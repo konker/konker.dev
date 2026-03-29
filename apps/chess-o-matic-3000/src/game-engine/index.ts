@@ -1,6 +1,8 @@
 import type { Square } from 'chess.js';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
+import type { PgnMoveListData } from '../application/types/pgn';
+import type { ScoreSheetData } from '../application/types/scoresheet';
 import type { AudioInputResources } from '../audio-input';
 import {
   AUDIO_INPUT_LISTENING_OFF,
@@ -12,13 +14,11 @@ import {
 } from '../audio-input';
 import type { AudioOutputResources } from '../audio-output';
 import { boardAdapterUpdateMovedSoundsOk, exitAudioOutput, initAudioOutput } from '../audio-output';
+import type { GameMetadataData } from '../domain/game/metadata';
+import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
 import type { ChessBoardController } from '../features/chess/components/ChessBoard/controller';
-import type { GameMetadataData } from '../features/chess/components/GameMetadata/types';
-import { GAME_METADATA_EMPTY } from '../features/chess/components/GameMetadata/types';
 import { moveHistoryToPgnMoveList } from '../features/chess/components/PgnPanel/move-history-to-pgn-move-list';
-import type { PgnMoveListData } from '../features/chess/components/PgnPanel/types';
 import { moveHistoryToScoreSheetData } from '../features/chess/components/ScoreSheet/move-history-to-scoresheet-data';
-import type { ScoreSheetData } from '../features/chess/components/ScoreSheet/types';
 import type { GameModelResources } from '../game-model';
 import {
   exitGameModel,

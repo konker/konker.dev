@@ -3,3 +3,4 @@ sst-env.d.ts
 src/database/drizzle
 .output
 .vinxi
+assets/**/*
