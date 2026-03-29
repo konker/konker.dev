@@ -1,8 +1,8 @@
 import type { AudioOutputResources } from '../audio-output';
 import {
-  gameViewUpdateControlSounds,
-  gameViewUpdateMovedSoundsInvalid,
-  gameViewUpdateMovedSoundsOk,
+  boardAdapterUpdateControlSounds,
+  boardAdapterUpdateMovedSoundsInvalid,
+  boardAdapterUpdateMovedSoundsOk,
 } from '../audio-output';
 import type { GameModelResources } from '../game-model';
 import type {
@@ -14,35 +14,35 @@ import type {
 import { GAME_MODEL_CONTROL_ACTION_FLIP } from '../game-model/evaluate.js';
 import type { ComSettings } from '../settings';
 import { GchessboardBoardViewAdapter } from './GchessboardBoardViewAdapter';
-import type { BoardView, BoardViewMountElements } from './types.js';
+import type { BoardAdapterMountElements, BoardView } from './types.js';
+
+export type { BoardAdapterMountElements, BoardView } from './types.js';
 
 // --------------------------------------------------------------------------
-export type GameViewResources = {
+export type BoardAdapterResources = {
   readonly board: BoardView;
 };
 
-export type GameViewElements = BoardViewMountElements;
-
 // --------------------------------------------------------------------------
-export async function initGameView(
+export async function initBoardAdapter(
   gameModelResources: GameModelResources,
-  elements: GameViewElements
-): Promise<GameViewResources> {
+  elements: BoardAdapterMountElements
+): Promise<BoardAdapterResources> {
   return {
     board: GchessboardBoardViewAdapter(gameModelResources, elements),
   };
 }
 
 // --------------------------------------------------------------------------
-export async function exitGameView(_gameViewResource: GameViewResources): Promise<void> {
-  _gameViewResource.board.dispose();
+export async function exitBoardAdapter(boardAdapterResources: BoardAdapterResources): Promise<void> {
+  boardAdapterResources.board.dispose();
   return;
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateMovedOk(
+export async function boardAdapterUpdateMovedOk(
   settings: ComSettings,
-  gameViewResources: GameViewResources,
+  boardAdapterResources: BoardAdapterResources,
   gameModelResources: GameModelResources,
   audioOutputResources: AudioOutputResources,
   evaluateResult: GameModelEvaluateResultOk
@@ -50,14 +50,14 @@ export async function gameViewUpdateMovedOk(
   if (gameModelResources.locked) {
     return;
   }
-  gameViewResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
-  await gameViewUpdateMovedSoundsOk(settings, audioOutputResources, evaluateResult);
+  boardAdapterResources.board.move([evaluateResult.move[0], evaluateResult.move[1]], gameModelResources.chess.fen());
+  await boardAdapterUpdateMovedSoundsOk(settings, audioOutputResources, evaluateResult);
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateMovedInvalid(
+export async function boardAdapterUpdateMovedInvalid(
   settings: ComSettings,
-  _gameViewResources: GameViewResources,
+  _boardAdapterResources: BoardAdapterResources,
   gameModelResources: GameModelResources,
   audioOutputResources: AudioOutputResources,
   evaluateResult: GameModelEvaluateResultIgnore | GameModelEvaluateResultIllegal
@@ -65,13 +65,13 @@ export async function gameViewUpdateMovedInvalid(
   if (gameModelResources.locked) {
     return;
   }
-  await gameViewUpdateMovedSoundsInvalid(settings, audioOutputResources, evaluateResult);
+  await boardAdapterUpdateMovedSoundsInvalid(settings, audioOutputResources, evaluateResult);
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateControl(
+export async function boardAdapterUpdateControl(
   settings: ComSettings,
-  gameViewResources: GameViewResources,
+  boardAdapterResources: BoardAdapterResources,
   gameModelResources: GameModelResources,
   audioOutputResources: AudioOutputResources,
   evaluateResult: GameModelEvaluateResultControl
@@ -82,8 +82,8 @@ export async function gameViewUpdateControl(
 
   switch (evaluateResult.action) {
     case GAME_MODEL_CONTROL_ACTION_FLIP:
-      gameViewResources.board.toggleOrientation();
+      boardAdapterResources.board.toggleOrientation();
       break;
   }
-  await gameViewUpdateControlSounds(settings, audioOutputResources, evaluateResult);
+  await boardAdapterUpdateControlSounds(settings, audioOutputResources, evaluateResult);
 }

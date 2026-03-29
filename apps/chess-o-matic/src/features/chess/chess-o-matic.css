@@ -36,33 +36,33 @@
 }
 
 .white-q {
-  background-image: url('../../game-view/pieces/staunty/queen.white.svg');
+  background-image: url('../../board-adapter/pieces/staunty/queen.white.svg');
 }
 
 .white-r {
-  background-image: url('../../game-view/pieces/staunty/rook.white.svg');
+  background-image: url('../../board-adapter/pieces/staunty/rook.white.svg');
 }
 
 .white-b {
-  background-image: url('../../game-view/pieces/staunty/bishop.white.svg');
+  background-image: url('../../board-adapter/pieces/staunty/bishop.white.svg');
 }
 
 .white-n {
-  background-image: url('../../game-view/pieces/staunty/knight.white.svg');
+  background-image: url('../../board-adapter/pieces/staunty/knight.white.svg');
 }
 
 .black-q {
-  background-image: url('../../game-view/pieces/staunty/queen.black.svg');
+  background-image: url('../../board-adapter/pieces/staunty/queen.black.svg');
 }
 
 .black-r {
-  background-image: url('../../game-view/pieces/staunty/rook.black.svg');
+  background-image: url('../../board-adapter/pieces/staunty/rook.black.svg');
 }
 
 .black-b {
-  background-image: url('../../game-view/pieces/staunty/bishop.black.svg');
+  background-image: url('../../board-adapter/pieces/staunty/bishop.black.svg');
 }
 
 .black-n {
-  background-image: url('../../game-view/pieces/staunty/knight.black.svg');
+  background-image: url('../../board-adapter/pieces/staunty/knight.black.svg');
 }

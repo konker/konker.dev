@@ -11,7 +11,15 @@ import {
   stopAudioInput,
 } from '../audio-input';
 import type { AudioOutputResources } from '../audio-output';
-import { exitAudioOutput, gameViewUpdateMovedSoundsOk, initAudioOutput } from '../audio-output';
+import { boardAdapterUpdateMovedSoundsOk, exitAudioOutput, initAudioOutput } from '../audio-output';
+import type { BoardAdapterMountElements, BoardAdapterResources } from '../board-adapter';
+import {
+  boardAdapterUpdateControl,
+  boardAdapterUpdateMovedInvalid,
+  boardAdapterUpdateMovedOk,
+  exitBoardAdapter,
+  initBoardAdapter,
+} from '../board-adapter';
 import type { GameModelResources } from '../game-model';
 import { exitGameModel, initGameModel } from '../game-model';
 import type { GameModelEvaluateResult, GameModelEvaluateStatus } from '../game-model/evaluate.js';
@@ -44,14 +52,6 @@ import {
   GAME_INPUT_PARSE_STATUS_OK_SAN,
   gameModelRead,
 } from '../game-model/read.js';
-import type { GameViewResources } from '../game-view';
-import {
-  exitGameView,
-  gameViewUpdateControl,
-  gameViewUpdateMovedInvalid,
-  gameViewUpdateMovedOk,
-  initGameView,
-} from '../game-view';
 import type { ComSettings } from '../settings';
 import { initComSettings } from '../settings';
 import type { SpeechRecognizerResources } from '../speech-recognizer-model';
@@ -77,8 +77,6 @@ export type GameEngineUiState = {
 };
 
 export type GameEngineInitOptions = {
-  readonly boardEl: HTMLElement;
-  readonly promotionDialogEl: HTMLElement;
   readonly initialSettings?: Partial<ComSettings>;
   readonly onUiStateChange?: (state: GameEngineUiState) => void;
 };
@@ -86,6 +84,8 @@ export type GameEngineInitOptions = {
 export type GameEngine = {
   readonly init: (options: GameEngineInitOptions) => Promise<void>;
   readonly exit: () => Promise<void>;
+  readonly mountBoard: (elements: BoardAdapterMountElements) => Promise<void>;
+  readonly unmountBoard: () => Promise<void>;
   readonly audioInputToggle: () => Promise<void>;
   readonly audioOutputToggle: () => Promise<void>;
   readonly isAudioInputOn: () => boolean;
@@ -98,18 +98,16 @@ export function createGameEngine(): GameEngine {
   let audioInputResources: AudioInputResources | undefined;
   let audioOutputResources: AudioOutputResources | undefined;
   let gameModelResources: GameModelResources | undefined;
-  let gameViewResources: GameViewResources | undefined;
+  let boardAdapterResources: BoardAdapterResources | undefined;
   let speechRecognizerResources: SpeechRecognizerResources | undefined;
+  let pendingBoardMountElements: BoardAdapterMountElements | undefined;
   let onUiStateChange: ((state: GameEngineUiState) => void) | undefined;
 
   function emitUiState(state: GameEngineUiState): void {
     onUiStateChange?.(state);
   }
 
-  function getResultMessage(
-    result: GameModelEvaluateResult,
-    gameModelResources: GameModelResources
-  ): string {
+  function getResultMessage(result: GameModelEvaluateResult, gameModelResources: GameModelResources): string {
     switch (result.status) {
       case GAME_MODEL_EVALUATE_STATUS_OK:
         return gameModelResources.chess.history().at(-1) ?? 'Move accepted';
@@ -128,7 +126,6 @@ export function createGameEngine(): GameEngine {
     audioInputResources: AudioInputResources;
     audioOutputResources: AudioOutputResources;
     gameModelResources: GameModelResources;
-    gameViewResources: GameViewResources;
     speechRecognizerResources: SpeechRecognizerResources;
   } {
     if (
@@ -136,7 +133,6 @@ export function createGameEngine(): GameEngine {
       !audioInputResources ||
       !audioOutputResources ||
       !gameModelResources ||
-      !gameViewResources ||
       !speechRecognizerResources
     ) {
       throw new Error('Game engine is not initialized.');
@@ -147,16 +143,34 @@ export function createGameEngine(): GameEngine {
       audioInputResources,
       audioOutputResources,
       gameModelResources,
-      gameViewResources,
       speechRecognizerResources,
+    };
+  }
+
+  function requireBoardMounted(): {
+    settings: ComSettings;
+    audioInputResources: AudioInputResources;
+    audioOutputResources: AudioOutputResources;
+    gameModelResources: GameModelResources;
+    boardAdapterResources: BoardAdapterResources;
+    speechRecognizerResources: SpeechRecognizerResources;
+  } {
+    const coreState = requireInitialized();
+    if (!boardAdapterResources) {
+      throw new Error('Board adapter is not mounted.');
+    }
+
+    return {
+      ...coreState,
+      boardAdapterResources,
     };
   }
 
   // --------------------------------------------------------------------------
   async function gameEngineTick(result: string): Promise<void> {
-    const { gameModelResources, gameViewResources } = requireInitialized();
+    const { boardAdapterResources, gameModelResources } = requireBoardMounted();
     const readResult = gameModelRead(result);
-    const evaluateResult = gameModelEvaluate(gameModelResources, gameViewResources, readResult);
+    const evaluateResult = gameModelEvaluate(gameModelResources, boardAdapterResources, readResult);
 
     if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
       await gameModelEventsNotifyListeners(gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
@@ -201,7 +215,7 @@ export function createGameEngine(): GameEngine {
 
   // --------------------------------------------------------------------------
   async function audioInputOn(): Promise<void> {
-    const state = requireInitialized();
+    const state = requireBoardMounted();
 
     if (state.audioInputResources.status === AUDIO_INPUT_LISTENING_ON) {
       console.warn(
@@ -258,25 +272,29 @@ export function createGameEngine(): GameEngine {
       !audioInputResources ||
       !audioOutputResources ||
       !gameModelResources ||
-      !gameViewResources ||
       !speechRecognizerResources
     ) {
       return;
     }
 
     await exitGameModel(gameModelResources);
-    await audioInputOff();
+    if (isAudioInputOn()) {
+      await audioInputOff();
+    }
     await exitAudioInput(audioInputResources);
     await exitSpeechRecognizer(speechRecognizerResources);
     await exitAudioOutput(audioOutputResources);
-    await exitGameView(gameViewResources);
+    if (boardAdapterResources) {
+      await exitBoardAdapter(boardAdapterResources);
+    }
 
     settings = undefined;
     audioInputResources = undefined;
     audioOutputResources = undefined;
     gameModelResources = undefined;
-    gameViewResources = undefined;
+    boardAdapterResources = undefined;
     speechRecognizerResources = undefined;
+    pendingBoardMountElements = undefined;
     onUiStateChange = undefined;
   }
 
@@ -304,12 +322,41 @@ export function createGameEngine(): GameEngine {
   }
 
   // --------------------------------------------------------------------------
-  async function init({
-    boardEl,
-    initialSettings,
-    onUiStateChange: onStateChange,
-    promotionDialogEl,
-  }: GameEngineInitOptions): Promise<void> {
+  async function mountBoard(elements: BoardAdapterMountElements): Promise<void> {
+    pendingBoardMountElements = elements;
+
+    if (!gameModelResources) {
+      return;
+    }
+
+    if (boardAdapterResources) {
+      if (isAudioInputOn()) {
+        await audioInputOff();
+      }
+      await exitBoardAdapter(boardAdapterResources);
+    }
+
+    boardAdapterResources = await initBoardAdapter(gameModelResources, elements);
+
+    if (settings?.audioInputOn) {
+      await audioInputOn();
+    }
+  }
+
+  async function unmountBoard(): Promise<void> {
+    pendingBoardMountElements = undefined;
+
+    if (isAudioInputOn()) {
+      await audioInputOff();
+    }
+
+    if (boardAdapterResources) {
+      await exitBoardAdapter(boardAdapterResources);
+      boardAdapterResources = undefined;
+    }
+  }
+
+  async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
     if (settings) {
       await exit();
     }
@@ -320,15 +367,10 @@ export function createGameEngine(): GameEngine {
     audioInputResources = await initAudioInput();
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
-    gameViewResources = await initGameView(gameModelResources, {
-      boardEl,
-      promotionDialogEl,
-    });
     speechRecognizerResources = await initSpeechRecognizer(MODEL_URL);
     const nextSettings = settings;
     const nextAudioOutputResources = audioOutputResources;
     const nextGameModelResources = gameModelResources;
-    const nextGameViewResources = gameViewResources;
 
     emitUiState({
       lastInputSanitized: '',
@@ -344,9 +386,9 @@ export function createGameEngine(): GameEngine {
       nextGameModelResources,
       GAME_MODEL_EVENT_TYPE_MOVED_OK,
       async (event: GameModelEventMovedOk) => {
-        await gameViewUpdateMovedOk(
+        await boardAdapterUpdateMovedOk(
           nextSettings,
-          nextGameViewResources,
+          requireBoardMounted().boardAdapterResources,
           nextGameModelResources,
           nextAudioOutputResources,
           event.result
@@ -358,9 +400,9 @@ export function createGameEngine(): GameEngine {
       nextGameModelResources,
       GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
       async (event: GameModelEventMovedInvalid) => {
-        await gameViewUpdateMovedInvalid(
+        await boardAdapterUpdateMovedInvalid(
           nextSettings,
-          nextGameViewResources,
+          requireBoardMounted().boardAdapterResources,
           nextGameModelResources,
           nextAudioOutputResources,
           event.result
@@ -372,9 +414,9 @@ export function createGameEngine(): GameEngine {
       nextGameModelResources,
       GAME_MODEL_EVENT_TYPE_CONTROL,
       async (event: GameModelEventControl) => {
-        await gameViewUpdateControl(
+        await boardAdapterUpdateControl(
           nextSettings,
-          nextGameViewResources,
+          requireBoardMounted().boardAdapterResources,
           nextGameModelResources,
           nextAudioOutputResources,
           event.result
@@ -388,7 +430,7 @@ export function createGameEngine(): GameEngine {
       async (event: GameModelEventViewChanged) => {
         const evaluateResult = gameModelEvaluate(
           nextGameModelResources,
-          nextGameViewResources,
+          requireBoardMounted().boardAdapterResources,
           typeof event.move === 'string'
             ? {
                 status: GAME_INPUT_PARSE_STATUS_OK_SAN,
@@ -407,7 +449,7 @@ export function createGameEngine(): GameEngine {
         );
 
         if (evaluateResult.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-          await gameViewUpdateMovedSoundsOk(nextSettings, nextAudioOutputResources, evaluateResult);
+          await boardAdapterUpdateMovedSoundsOk(nextSettings, nextAudioOutputResources, evaluateResult);
         }
 
         await gameModelEventsNotifyListeners(nextGameModelResources, GAME_MODEL_EVENT_TYPE_EVALUATED, {
@@ -417,30 +459,32 @@ export function createGameEngine(): GameEngine {
       }
     );
 
-      gameModelEventsAddListener(
-        nextGameModelResources,
-        GAME_MODEL_EVENT_TYPE_EVALUATED,
-        async (event: GameModelEventEvaluated) => {
-          emitUiState({
-            lastInputSanitized: event.result.sanitized,
-            lastMoveSan: nextGameModelResources.chess.history().at(-1) ?? '',
-            lastInputEvaluateStatus: event.result.status,
-            lastInputResultMessage: getResultMessage(event.result, nextGameModelResources),
-            fen: nextGameModelResources.chess.fen(),
-            pgn: nextGameModelResources.chess.pgn(),
-            scoresheet: [...(parsePgn(nextGameModelResources.chess.pgn())?.[0]?.moves?.mainline() ?? [])],
+    gameModelEventsAddListener(
+      nextGameModelResources,
+      GAME_MODEL_EVENT_TYPE_EVALUATED,
+      async (event: GameModelEventEvaluated) => {
+        emitUiState({
+          lastInputSanitized: event.result.sanitized,
+          lastMoveSan: nextGameModelResources.chess.history().at(-1) ?? '',
+          lastInputEvaluateStatus: event.result.status,
+          lastInputResultMessage: getResultMessage(event.result, nextGameModelResources),
+          fen: nextGameModelResources.chess.fen(),
+          pgn: nextGameModelResources.chess.pgn(),
+          scoresheet: [...(parsePgn(nextGameModelResources.chess.pgn())?.[0]?.moves?.mainline() ?? [])],
         });
       }
     );
 
-    if (settings.audioInputOn) {
-      await audioInputOn();
+    if (pendingBoardMountElements) {
+      await mountBoard(pendingBoardMountElements);
     }
   }
 
   return {
     init,
     exit,
+    mountBoard,
+    unmountBoard,
     audioInputToggle,
     audioOutputToggle,
     isAudioInputOn,

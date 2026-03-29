@@ -12,9 +12,12 @@ export type BoardView = {
   readonly dispose: () => void;
 };
 
-export type BoardViewMountElements = {
+export type BoardAdapterMountElements = {
   readonly boardEl: HTMLElement;
   readonly promotionDialogEl: HTMLElement;
 };
 
-export type BoardViewAdapter = (gameModelResources: GameModelResources, elements: BoardViewMountElements) => BoardView;
+export type BoardViewAdapter = (
+  gameModelResources: GameModelResources,
+  elements: BoardAdapterMountElements
+) => BoardView;

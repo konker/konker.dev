@@ -6,7 +6,6 @@ import type {
   GameModelEvaluateResultOk,
   GameMoveFlags,
 } from '../game-model/evaluate';
-import type { GameViewResources } from '../game-view';
 import type { ComSettings } from '../settings';
 import type { AudioOutputEvent } from './events';
 import { AUDIO_OUTPUT_EVENT_INVALID } from './events';
@@ -80,7 +79,7 @@ export async function playAudioOutputEventSound(
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateMovedSoundsOk(
+export async function boardAdapterUpdateMovedSoundsOk(
   settings: ComSettings,
   audioOutputResources: AudioOutputResources,
   evaluateResult: GameModelEvaluateResultOk
@@ -90,7 +89,7 @@ export async function gameViewUpdateMovedSoundsOk(
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateMovedSoundsInvalid(
+export async function boardAdapterUpdateMovedSoundsInvalid(
   settings: ComSettings,
   audioOutputResources: AudioOutputResources,
   _evaluateResult: GameModelEvaluateResultIgnore | GameModelEvaluateResultIllegal
@@ -99,7 +98,7 @@ export async function gameViewUpdateMovedSoundsInvalid(
 }
 
 // --------------------------------------------------------------------------
-export async function gameViewUpdateControlSounds(
+export async function boardAdapterUpdateControlSounds(
   _settings: ComSettings,
   _audioOutputResources: AudioOutputResources,
   _evaluateResult: GameModelEvaluateResultControl

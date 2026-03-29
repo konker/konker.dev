@@ -3,6 +3,7 @@ import '../chess-o-matic.css';
 import type { JSX } from 'solid-js';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
+import type { BoardAdapterMountElements } from '../../../board-adapter/types';
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';
 import { START_FEN } from '../../../game-model/consts';
@@ -15,9 +16,6 @@ type ChessOMaticAppProps = {
 };
 
 export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
-  let boardEl: HTMLElement | undefined;
-  let promotionDialogEl: HTMLDivElement | undefined;
-
   const [errorMessage, setErrorMessage] = createSignal<string>();
   const [lastInputResultMessage, setLastInputResultMessage] = createSignal('Loading local speech model…');
   const [isInitializing, setIsInitializing] = createSignal(true);
@@ -32,13 +30,9 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   const [pgn, setPgn] = createSignal('');
   const [scoresheet, setScoresheet] = createSignal<unknown>({});
 
-  let gameEngine: GameEngine | undefined;
+  const gameEngine: GameEngine = createGameEngine();
 
   function syncAudioState(): void {
-    if (!gameEngine) {
-      return;
-    }
-
     setIsListening(gameEngine.isAudioInputOn());
     setIsSoundEnabled(gameEngine.isAudioOutputOn());
   }
@@ -51,17 +45,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
       return;
     }
 
-    if (!boardEl || !promotionDialogEl) {
-      setErrorMessage('The chess board failed to mount.');
-      setIsInitializing(false);
-      return;
-    }
-
     try {
-      gameEngine = createGameEngine();
       await gameEngine.init({
-        boardEl,
-        promotionDialogEl,
         initialSettings: {
           audioInputOn: true,
           audioOutputOn: false,
@@ -70,7 +55,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
           setLastInputSanitized(state.lastInputSanitized);
           setLastMoveSan(state.lastMoveSan);
           setLastInputEvaluateStatus(state.lastInputEvaluateStatus);
-          setLastInputResultMessage('');
+          setLastInputResultMessage(state.lastInputResultMessage);
           setFen(state.fen);
           setPgn(state.pgn);
           setScoresheet(state.scoresheet);
@@ -91,37 +76,33 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   });
 
   onCleanup(() => {
-    if (gameEngine) {
-      void gameEngine.exit();
-    }
+    void gameEngine.exit();
   });
 
   async function toggleListening(): Promise<void> {
-    if (!gameEngine) {
-      return;
-    }
-
     await gameEngine.audioInputToggle();
     syncAudioState();
     setLastInputResultMessage(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
   }
 
   async function toggleSound(): Promise<void> {
-    if (!gameEngine) {
-      return;
-    }
-
     await gameEngine.audioOutputToggle();
     syncAudioState();
     setLastInputResultMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
   }
 
-  function setBoardElement(element: HTMLElement): void {
-    boardEl = element;
+  async function mountBoard(elements: BoardAdapterMountElements): Promise<void> {
+    try {
+      await gameEngine.mountBoard(elements);
+      syncAudioState();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown board mount error';
+      setErrorMessage(`The chess board failed to mount. (${message})`);
+    }
   }
 
-  function setPromotionDialogElement(element: HTMLDivElement): void {
-    promotionDialogEl = element;
+  async function unmountBoard(): Promise<void> {
+    await gameEngine.unmountBoard();
   }
 
   function renderErrorMessage(message: () => string): JSX.Element {
@@ -171,7 +152,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
 
       <div id="scoresheet">{JSON.stringify(scoresheet())}</div>
 
-      <ChessBoard boardRef={setBoardElement} promotionDialogRef={setPromotionDialogElement} />
+      <ChessBoard mountBoard={mountBoard} unmountBoard={unmountBoard} />
 
       <label class="field">
         <span>PGN</span>
