@@ -500,7 +500,13 @@ export function createGameEngine(): GameEngine {
     gameModelGoToPly(model, ply);
     applyGameMetadata(model.chess, gameMetadata);
     syncBoardPosition();
-    emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'Moved to selected ply', '', model.chess.history().at(-1) ?? '');
+    emitCurrentUiState(
+      model,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'Moved to selected ply',
+      '',
+      model.chess.history().at(-1) ?? ''
+    );
   }
 
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
