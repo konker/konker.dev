@@ -1,8 +1,8 @@
 import '../chess-o-matic.css';
 
+import { Binary, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
-import { Binary, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 
 import type { GameEngine } from '../../../game-engine';
 import { createGameEngine } from '../../../game-engine';

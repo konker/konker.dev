@@ -1,5 +1,5 @@
-import type { JSX } from 'solid-js';
 import { ChevronDown, ChevronRight } from 'lucide-solid';
+import type { JSX } from 'solid-js';
 import type { Component } from 'solid-js';
 
 type CollapsibleSectionProps = {
