@@ -1,6 +1,7 @@
 import type { Move, Square } from 'chess.js';
 import { Chess } from 'chess.js';
 
+import type { GameMoveRecord } from '../domain/game/types';
 import type { GameModelEvent, GameModelEventListener, GameModelEventType } from './events.js';
 import { gameModelEventsEmptyListeners } from './events.js';
 import type { ChessMoveSafe, IsLegalMove } from './extras.js';
@@ -8,9 +9,8 @@ import { chessMoveSafe } from './extras.js';
 import { chessIsLegalMove } from './extras.js';
 
 // --------------------------------------------------------------------------
-export type GameHistoryMove = {
+export type GameHistoryMove = GameMoveRecord & {
   readonly from: Square;
-  readonly san: string;
   readonly to: Square;
 };
 
@@ -97,6 +97,36 @@ export function gameModelGoToPly(gameModelResources: GameModelResources, ply: nu
 
 export function gameModelCurrentMove(gameModelResources: GameModelResources): GameHistoryMove | undefined {
   return gameModelResources.moveHistory.at(gameModelResources.currentPly - 1);
+}
+
+export function gameModelLoadState(
+  gameModelResources: GameModelResources,
+  state: {
+    readonly currentPly: number;
+    readonly moveHistory: Array<GameMoveRecord>;
+  }
+): void {
+  gameModelResources.moveHistory = state.moveHistory.map((move) => ({
+    from: move.from as Square,
+    san: move.san,
+    to: move.to as Square,
+  }));
+  gameModelResources.currentPly = Math.max(0, Math.min(state.currentPly, gameModelResources.moveHistory.length));
+  rebuildGameModelChess(gameModelResources);
+}
+
+export function gameModelSnapshotState(gameModelResources: GameModelResources): {
+  readonly currentPly: number;
+  readonly moveHistory: Array<GameMoveRecord>;
+} {
+  return {
+    currentPly: gameModelResources.currentPly,
+    moveHistory: gameModelResources.moveHistory.map((move) => ({
+      from: move.from,
+      san: move.san,
+      to: move.to,
+    })),
+  };
 }
 
 // --------------------------------------------------------------------------

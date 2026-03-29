@@ -4,7 +4,9 @@ import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 import type { ChessBoardController } from '../application/ports/ChessBoardController';
 import { moveHistoryToPgnMoveList, moveHistoryToScoreSheetData, resolveGameMoveFlags } from '../application/selectors';
 import type { PgnMoveListData } from '../application/types/pgn';
+import { PGN_MOVE_LIST_EMPTY } from '../application/types/pgn';
 import type { ScoreSheetData } from '../application/types/scoresheet';
+import { SCORESHEET_EMPTY } from '../application/types/scoresheet';
 import type { AudioInputResources } from '../audio-input';
 import {
   AUDIO_INPUT_LISTENING_OFF,
@@ -24,8 +26,8 @@ import {
 } from '../audio-output';
 import type { GameMetadataData } from '../domain/game/metadata';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
-import type { GameBoardOrientation } from '../domain/game/types';
-import { GAME_BOARD_ORIENTATION_WHITE } from '../domain/game/types';
+import type { AppState, GameBoardOrientation } from '../domain/game/types';
+import { createDefaultAppState, GAME_BOARD_ORIENTATION_WHITE } from '../domain/game/types';
 import type { GameModelResources } from '../game-model';
 import {
   exitGameModel,
@@ -35,10 +37,13 @@ import {
   gameModelGoToEnd,
   gameModelGoToPly,
   gameModelGoToStart,
+  gameModelLoadState,
+  gameModelSnapshotState,
   gameModelStepBackward,
   gameModelStepForward,
   initGameModel,
 } from '../game-model';
+import { START_FEN } from '../game-model/consts';
 import type { GameModelEvaluateResult, GameModelEvaluateStatus } from '../game-model/evaluate.js';
 import {
   GAME_MODEL_CONTROL_ACTION_FLIP,
@@ -62,8 +67,6 @@ import {
   GAME_INPUT_PARSE_STATUS_OK_SAN,
   gameModelRead,
 } from '../game-model/read.js';
-import type { ComSettings } from '../settings';
-import { initComSettings } from '../settings';
 import type { SpeechRecognizerResources } from '../speech-recognizer';
 import {
   exitSpeechRecognizer,
@@ -84,6 +87,7 @@ export type GameEngineUiState = {
   readonly pgn: string;
   readonly pgnMoveList: PgnMoveListData;
   readonly fen: string;
+  readonly gameMetadata: GameMetadataData;
   readonly lastMoveSan: string;
   readonly lastInputSanitized: string;
   readonly lastInputEvaluateStatus: GameModelEvaluateStatus;
@@ -91,8 +95,29 @@ export type GameEngineUiState = {
   readonly scoresheetData: ScoreSheetData;
 };
 
+export const GAME_ENGINE_UI_STATE_EMPTY: GameEngineUiState = {
+  boardOrientation: GAME_BOARD_ORIENTATION_WHITE,
+  canGoBackward: false,
+  canGoForward: false,
+  currentPly: 0,
+  fen: START_FEN,
+  gameMetadata: GAME_METADATA_EMPTY,
+  lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+  lastInputResultMessage: 'No moves',
+  lastInputSanitized: '',
+  lastMoveSan: '',
+  pgn: '',
+  pgnMoveList: PGN_MOVE_LIST_EMPTY,
+  scoresheetData: SCORESHEET_EMPTY,
+} as const;
+
+type GameEngineInitialSettings = {
+  readonly audioInputOn?: boolean;
+  readonly audioOutputOn?: boolean;
+};
+
 export type GameEngineInitOptions = {
-  readonly initialSettings?: Partial<ComSettings>;
+  readonly initialSettings?: GameEngineInitialSettings;
   readonly onUiStateChange?: (state: GameEngineUiState) => void;
 };
 
@@ -119,21 +144,62 @@ export type GameEngine = {
 };
 
 export function createGameEngine(): GameEngine {
-  let settings: ComSettings | undefined;
+  let appState: AppState | undefined;
   let audioInputResources: AudioInputResources | undefined;
   let audioOutputResources: AudioOutputResources | undefined;
   let gameModelResources: GameModelResources | undefined;
   let speechRecognizerResources: SpeechRecognizerResources | undefined;
   let chessBoardController: ChessBoardController | undefined;
   let onUiStateChange: ((state: GameEngineUiState) => void) | undefined;
-  let gameMetadata: GameMetadataData = GAME_METADATA_EMPTY;
-  let boardOrientation: GameBoardOrientation = GAME_BOARD_ORIENTATION_WHITE;
 
   function emitUiState(state: GameEngineUiState): void {
     onUiStateChange?.(state);
   }
 
+  function createInitialAppState(initialSettings: GameEngineInitialSettings = {}): AppState {
+    const nextAppState = createDefaultAppState();
+
+    return {
+      ...nextAppState,
+      settings: {
+        audioInputEnabled: initialSettings.audioInputOn ?? nextAppState.settings.audioInputEnabled,
+        audioOutputEnabled: initialSettings.audioOutputOn ?? nextAppState.settings.audioOutputEnabled,
+      },
+    };
+  }
+
+  function requireAppState(): AppState {
+    if (!appState) {
+      throw new Error('Game engine state is not initialized.');
+    }
+
+    return appState;
+  }
+
+  function syncGameModelFromAppState(state: AppState, model: GameModelResources): void {
+    gameModelLoadState(model, {
+      currentPly: state.currentGame.currentPly,
+      moveHistory: state.currentGame.moveHistory,
+    });
+    applyGameMetadata(model.chess, state.currentGame.metadata);
+  }
+
+  function syncAppStateFromGameModel(state: AppState, model: GameModelResources): void {
+    const snapshot = gameModelSnapshotState(model);
+
+    appState = {
+      ...state,
+      currentGame: {
+        ...state.currentGame,
+        currentPly: snapshot.currentPly,
+        moveHistory: snapshot.moveHistory,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  }
+
   function emitCurrentUiState(
+    state: AppState,
     model: GameModelResources,
     status: GameModelEvaluateStatus,
     message: string,
@@ -144,12 +210,13 @@ export function createGameEngine(): GameEngine {
       canGoBackward: gameModelCanGoBackward(model),
       canGoForward: gameModelCanGoForward(model),
       currentPly: model.currentPly,
-      boardOrientation,
+      boardOrientation: state.currentGame.orientation,
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
       lastInputEvaluateStatus: status,
       lastInputResultMessage: message,
       fen: model.chess.fen(),
+      gameMetadata: state.currentGame.metadata,
       pgn: model.chess.pgn(),
       pgnMoveList: moveHistoryToPgnMoveList(model.moveHistory),
       scoresheetData: moveHistoryToScoreSheetData(model.moveHistory),
@@ -188,18 +255,25 @@ export function createGameEngine(): GameEngine {
     }
   }
 
+  function currentComSettings(state: AppState): { readonly audioInputOn: boolean; readonly audioOutputOn: boolean } {
+    return {
+      audioInputOn: state.settings.audioInputEnabled,
+      audioOutputOn: state.settings.audioOutputEnabled,
+    };
+  }
+
   function requireInitialized(): {
-    settings: ComSettings;
+    appState: AppState;
     audioInputResources: AudioInputResources;
     audioOutputResources: AudioOutputResources;
     gameModelResources: GameModelResources;
   } {
-    if (!settings || !audioInputResources || !audioOutputResources || !gameModelResources) {
+    if (!appState || !audioInputResources || !audioOutputResources || !gameModelResources) {
       throw new Error('Game engine is not initialized.');
     }
 
     return {
-      settings,
+      appState,
       audioInputResources,
       audioOutputResources,
       gameModelResources,
@@ -215,8 +289,10 @@ export function createGameEngine(): GameEngine {
   }
 
   async function handleEvaluatedResult(result: GameModelEvaluateResult): Promise<void> {
-    const model = requireInitialized().gameModelResources;
+    const state = requireInitialized();
+    const model = state.gameModelResources;
     emitCurrentUiState(
+      state.appState,
       model,
       result.status,
       getResultMessage(result, model),
@@ -229,9 +305,11 @@ export function createGameEngine(): GameEngine {
     const state = requireInitialized();
 
     if (result.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-      const flags = resolveGameMoveFlags(state.gameModelResources.chess, boardOrientation);
+      syncAppStateFromGameModel(state.appState, state.gameModelResources);
+      const nextState = requireAppState();
+      const flags = resolveGameMoveFlags(state.gameModelResources.chess, nextState.currentGame.orientation);
       syncBoardPosition();
-      await boardAdapterUpdateMovedSoundsOk(state.settings, state.audioOutputResources, flags);
+      await boardAdapterUpdateMovedSoundsOk(currentComSettings(nextState), state.audioOutputResources, flags);
       await gameModelEventsNotifyListeners(state.gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
         type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
         result,
@@ -252,7 +330,8 @@ export function createGameEngine(): GameEngine {
 
       if (result.action === GAME_MODEL_CONTROL_ACTION_UNDO) {
         gameModelStepBackward(state.gameModelResources);
-        applyGameMetadata(state.gameModelResources.chess, gameMetadata);
+        syncAppStateFromGameModel(state.appState, state.gameModelResources);
+        applyGameMetadata(state.gameModelResources.chess, requireAppState().currentGame.metadata);
         syncBoardPosition();
       }
     }
@@ -323,7 +402,13 @@ export function createGameEngine(): GameEngine {
     }
 
     if (state.audioInputResources.status === AUDIO_INPUT_LISTENING_ON) {
-      state.settings.audioInputOn = true;
+      appState = {
+        ...state.appState,
+        settings: {
+          ...state.appState.settings,
+          audioInputEnabled: true,
+        },
+      };
       return;
     }
 
@@ -351,13 +436,25 @@ export function createGameEngine(): GameEngine {
       nextSpeechRecognizerResources.recognizer.on('error', recognizerCallbackError);
 
       speechRecognizerResources = nextSpeechRecognizerResources;
-      state.settings.audioInputOn = true;
+      appState = {
+        ...state.appState,
+        settings: {
+          ...state.appState.settings,
+          audioInputEnabled: true,
+        },
+      };
     } catch (error) {
       if (audioInputResources?.status === AUDIO_INPUT_LISTENING_ON) {
         audioInputResources = await stopAudioInput(audioInputResources);
       }
 
-      state.settings.audioInputOn = false;
+      appState = {
+        ...state.appState,
+        settings: {
+          ...state.appState.settings,
+          audioInputEnabled: false,
+        },
+      };
       throw error;
     }
   }
@@ -374,11 +471,17 @@ export function createGameEngine(): GameEngine {
       speechRecognizerResources = await stopSpeechRecognizer(speechRecognizerResources);
     }
     audioInputResources = await stopAudioInput(state.audioInputResources);
-    state.settings.audioInputOn = false;
+    appState = {
+      ...state.appState,
+      settings: {
+        ...state.appState.settings,
+        audioInputEnabled: false,
+      },
+    };
   }
 
   async function exit(): Promise<void> {
-    if (!settings || !audioInputResources || !audioOutputResources || !gameModelResources) {
+    if (!appState || !audioInputResources || !audioOutputResources || !gameModelResources) {
       return;
     }
 
@@ -393,14 +496,13 @@ export function createGameEngine(): GameEngine {
     }
     await exitAudioOutput(audioOutputResources);
 
-    settings = undefined;
+    appState = undefined;
     audioInputResources = undefined;
     audioOutputResources = undefined;
     gameModelResources = undefined;
     speechRecognizerResources = undefined;
     chessBoardController = undefined;
     onUiStateChange = undefined;
-    boardOrientation = GAME_BOARD_ORIENTATION_WHITE;
   }
 
   async function attachBoardController(controller: ChessBoardController | undefined): Promise<void> {
@@ -412,12 +514,18 @@ export function createGameEngine(): GameEngine {
     chessBoardController = controller;
     syncBoardPosition();
 
-    if (controller && settings?.audioInputOn) {
+    if (controller && appState?.settings.audioInputEnabled) {
       try {
         await audioInputOn();
       } catch (error) {
         console.warn('[chess-o-matic-3000][game-engine] Unable to restart speech input after board attach.', error);
-        settings.audioInputOn = false;
+        appState = {
+          ...requireAppState(),
+          settings: {
+            ...requireAppState().settings,
+            audioInputEnabled: false,
+          },
+        };
       }
     }
   }
@@ -440,7 +548,14 @@ export function createGameEngine(): GameEngine {
       throw new Error('Audio output is not supported in this browser.');
     }
 
-    requireInitialized().settings.audioOutputOn = !requireInitialized().settings.audioOutputOn;
+    const state = requireInitialized();
+    appState = {
+      ...state.appState,
+      settings: {
+        ...state.appState.settings,
+        audioOutputEnabled: !state.appState.settings.audioOutputEnabled,
+      },
+    };
   }
 
   function canUseAudioInput(): boolean {
@@ -452,7 +567,7 @@ export function createGameEngine(): GameEngine {
   }
 
   function isAudioOutputOn(): boolean {
-    return settings?.audioOutputOn ?? false;
+    return appState?.settings.audioOutputEnabled ?? false;
   }
 
   function isLegalMove(coords: [Square, Square]): boolean {
@@ -478,14 +593,21 @@ export function createGameEngine(): GameEngine {
   }
 
   function setGameMetadata(metadata: GameMetadataData): void {
-    gameMetadata = metadata;
-
-    if (!gameModelResources) {
+    if (!gameModelResources || !appState) {
       return;
     }
 
-    applyGameMetadata(gameModelResources.chess, gameMetadata);
+    appState = {
+      ...appState,
+      currentGame: {
+        ...appState.currentGame,
+        metadata,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+    applyGameMetadata(gameModelResources.chess, appState.currentGame.metadata);
     emitCurrentUiState(
+      appState,
       gameModelResources,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
       'Game metadata updated',
@@ -495,13 +617,21 @@ export function createGameEngine(): GameEngine {
   }
 
   function toggleBoardOrientation(): void {
-    boardOrientation = boardOrientation === 'white' ? 'black' : 'white';
-
-    if (!gameModelResources) {
+    if (!gameModelResources || !appState) {
       return;
     }
 
+    appState = {
+      ...appState,
+      currentGame: {
+        ...appState.currentGame,
+        orientation: appState.currentGame.orientation === 'white' ? 'black' : 'white',
+        updatedAt: new Date().toISOString(),
+      },
+    };
+
     emitCurrentUiState(
+      appState,
       gameModelResources,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
       'Board orientation updated',
@@ -511,19 +641,24 @@ export function createGameEngine(): GameEngine {
   }
 
   function navigateToStart(): void {
-    const model = requireInitialized().gameModelResources;
+    const state = requireInitialized();
+    const model = state.gameModelResources;
     gameModelGoToStart(model);
-    applyGameMetadata(model.chess, gameMetadata);
+    syncAppStateFromGameModel(state.appState, model);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
-    emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game start', '', '');
+    emitCurrentUiState(requireAppState(), model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game start', '', '');
   }
 
   function navigateStepBackward(): void {
-    const model = requireInitialized().gameModelResources;
+    const state = requireInitialized();
+    const model = state.gameModelResources;
     gameModelStepBackward(model);
-    applyGameMetadata(model.chess, gameMetadata);
+    syncAppStateFromGameModel(state.appState, model);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
     emitCurrentUiState(
+      requireAppState(),
       model,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
       'Moved back one ply',
@@ -533,11 +668,14 @@ export function createGameEngine(): GameEngine {
   }
 
   function navigateStepForward(): void {
-    const model = requireInitialized().gameModelResources;
+    const state = requireInitialized();
+    const model = state.gameModelResources;
     gameModelStepForward(model);
-    applyGameMetadata(model.chess, gameMetadata);
+    syncAppStateFromGameModel(state.appState, model);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
     emitCurrentUiState(
+      requireAppState(),
       model,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
       'Moved forward one ply',
@@ -547,19 +685,31 @@ export function createGameEngine(): GameEngine {
   }
 
   function navigateToEnd(): void {
-    const model = requireInitialized().gameModelResources;
+    const state = requireInitialized();
+    const model = state.gameModelResources;
     gameModelGoToEnd(model);
-    applyGameMetadata(model.chess, gameMetadata);
+    syncAppStateFromGameModel(state.appState, model);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
-    emitCurrentUiState(model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game end', '', model.chess.history().at(-1) ?? '');
+    emitCurrentUiState(
+      requireAppState(),
+      model,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'At game end',
+      '',
+      model.chess.history().at(-1) ?? ''
+    );
   }
 
   function navigateToPly(ply: number): void {
-    const model = requireInitialized().gameModelResources;
+    const state = requireInitialized();
+    const model = state.gameModelResources;
     gameModelGoToPly(model, ply);
-    applyGameMetadata(model.chess, gameMetadata);
+    syncAppStateFromGameModel(state.appState, model);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
     syncBoardPosition();
     emitCurrentUiState(
+      requireAppState(),
       model,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
       'Moved to selected ply',
@@ -569,17 +719,17 @@ export function createGameEngine(): GameEngine {
   }
 
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
-    if (settings) {
+    if (appState) {
       await exit();
     }
 
     onUiStateChange = onStateChange;
 
-    settings = await initComSettings(initialSettings);
+    appState = createInitialAppState(initialSettings);
     audioInputResources = await initAudioInput();
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
-    applyGameMetadata(gameModelResources.chess, gameMetadata);
+    syncGameModelFromAppState(appState, gameModelResources);
 
     gameModelEventsAddListener(
       gameModelResources,
@@ -589,10 +739,10 @@ export function createGameEngine(): GameEngine {
       }
     );
 
-    emitCurrentUiState(gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'No moves', '', '');
+    emitCurrentUiState(appState, gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'No moves', '', '');
     syncBoardPosition();
 
-    if (settings.audioInputOn && chessBoardController) {
+    if (appState.settings.audioInputEnabled && chessBoardController) {
       await audioInputOn();
     }
   }
