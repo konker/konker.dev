@@ -116,30 +116,48 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
     return lastInputSanitized() || 'No input yet';
   }
 
+  function renderStatusClasses(): string {
+    switch (lastInputEvaluateStatus()) {
+      case 'ok':
+        return 'border-l-green-700';
+      case 'illegal':
+        return 'border-l-red-600';
+      case 'control':
+        return 'border-l-blue-600';
+      case 'ignore':
+      default:
+        return 'border-l-amber-700';
+    }
+  }
+
   return (
-    <main class="app-shell">
+    <main class="mx-auto flex max-w-3xl flex-col gap-4 p-4 sm:p-3">
       <h1>Chess-o-Matic</h1>
 
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
-      <div data-status={lastInputEvaluateStatus()} id="status">
-        <div class="status-meta">
+      <div
+        class={`flex flex-col gap-2 rounded-lg border border-slate-300 border-l-[0.75rem] bg-slate-50 px-4 py-3 ${renderStatusClasses()}`}
+        data-status={lastInputEvaluateStatus()}
+        id="status"
+      >
+        <div class="flex justify-between gap-4 text-sm text-slate-600">
           <span>Status</span>
           <span aria-label="Last Input Evaluate Status">{lastInputEvaluateStatus()}</span>
         </div>
-        <div class="status-primary" aria-label="Last Input SAN">
+        <div aria-label="Last Input SAN" class="text-2xl font-bold leading-tight">
           {renderLastMoveSan()}
         </div>
-        <div class="status-message" aria-label="Last Input Message">
+        <div aria-label="Last Input Message" class="text-base leading-6">
           {lastInputResultMessage()}
         </div>
-        <div class="status-secondary">
+        <div class="flex flex-col gap-1 text-sm text-slate-600">
           <span>Heard</span>
           <span aria-label="Last Input Sanitized">{renderLastInputSanitized()}</span>
         </div>
       </div>
 
-      <div class="button-row">
+      <div class="flex flex-wrap gap-3">
         <button disabled={isInitializing() || !!errorMessage()} onClick={() => void toggleListening()} type="button">
           {isListening() ? 'Disable Audio Input' : 'Enable Audio Input'}
         </button>
@@ -159,12 +177,12 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onReady={(controller) => void setBoardController(controller)}
       />
 
-      <label class="field">
+      <label class="flex flex-col gap-2">
         <span>PGN</span>
-        <textarea aria-label="PGN" readOnly value={pgn()} />
+        <textarea aria-label="PGN" class="min-h-32 w-full resize-y" readOnly value={pgn()} />
       </label>
 
-      <label class="field">
+      <label class="flex flex-col gap-2">
         <span>FEN</span>
         <div aria-label="FEN">{fen()}</div>
       </label>

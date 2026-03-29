@@ -153,14 +153,19 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
   });
 
   return (
-    <div class="board-frame">
-      <g-chess-board class="board" id="board" ref={boardEl} />
-      <div class="promotion-dialog" data-open="false" id="promotion-dialog" ref={promotionDialogEl}>
-        <div class="promotion-panel">
-          <button class="promo-choice" data-piece="q" title="Queen" type="button" />
-          <button class="promo-choice" data-piece="r" title="Rook" type="button" />
-          <button class="promo-choice" data-piece="b" title="Bishop" type="button" />
-          <button class="promo-choice" data-piece="n" title="Knight" type="button" />
+    <div class="relative">
+      <g-chess-board class="block aspect-square w-full max-w-[34rem]" id="board" ref={boardEl} />
+      <div
+        class="promotion-dialog absolute inset-0 hidden items-center justify-center bg-black/30 data-[open=true]:flex"
+        data-open="false"
+        id="promotion-dialog"
+        ref={promotionDialogEl}
+      >
+        <div class="grid w-full max-w-[14rem] grid-cols-2 gap-2 bg-white p-2">
+          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="q" title="Queen" type="button" />
+          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="r" title="Rook" type="button" />
+          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="b" title="Bishop" type="button" />
+          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="n" title="Knight" type="button" />
         </div>
       </div>
     </div>
