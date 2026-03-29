@@ -1,6 +1,6 @@
 import type { Chess } from 'chess.js';
 
-import type { GameMetadataData } from '../features/chess/components/GameMetadata/types';
+import type { GameMetadataData } from '../domain/game/metadata';
 
 const PGN_TAG_MAPPINGS = [
   ['Event', 'event'],
