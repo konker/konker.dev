@@ -37,11 +37,13 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = function Gchessboar
     rep.shadowRoot?.appendChild(style);
   });
 
-  rep.addEventListener('moveend', (e) => {
-    const coords: [Square, Square] = [e.detail.from, e.detail.to];
+  function handleMoveEnd(e: Event): void {
+    const customEvent = e as CustomEvent<{ from: Square; to: Square }>;
+    const coords: [Square, Square] = [customEvent.detail.from, customEvent.detail.to];
     if (!gameModelResources.isLegalMove(coords)) {
       rep.fen = gameModelResources.chess.fen();
-      return e.preventDefault();
+      e.preventDefault();
+      return;
     }
 
     const piece = gameModelResources.chess.get(coords[0]);
@@ -54,14 +56,18 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = function Gchessboar
       e.preventDefault();
       openPromotionDialog(gameModelResources, rep, elements.promotionDialogEl, coords, piece.color);
     }
-  });
+  }
 
-  rep.addEventListener('movefinished', async (e) => {
-    const coords: [Square, Square] = [e.detail.from, e.detail.to];
+  async function handleMoveFinished(e: Event): Promise<void> {
+    const customEvent = e as CustomEvent<{ from: Square; to: Square }>;
+    const coords: [Square, Square] = [customEvent.detail.from, customEvent.detail.to];
     if (gameModelResources.isLegalMove(coords)) {
       await moveComplete(gameModelResources, rep, coords, `${coords[0]}-${coords[1]}`);
     }
-  });
+  }
+
+  rep.addEventListener('moveend', handleMoveEnd);
+  rep.addEventListener('movefinished', handleMoveFinished);
 
   return {
     move(coords: [Square, Square], fen: string): void {
@@ -74,6 +80,11 @@ export const GchessboardBoardViewAdapter: BoardViewAdapter = function Gchessboar
     },
     orientation(): typeof BOARD_COLOR_LIGHT | typeof BOARD_COLOR_DARK {
       return rep.orientation == 'white' ? BOARD_COLOR_LIGHT : BOARD_COLOR_DARK;
+    },
+    dispose(): void {
+      rep.removeEventListener('moveend', handleMoveEnd);
+      rep.removeEventListener('movefinished', handleMoveFinished);
+      style.remove();
     },
   };
 };

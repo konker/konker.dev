@@ -14,8 +14,9 @@ import type { AudioOutputResources } from '../audio-output';
 import { exitAudioOutput, gameViewUpdateMovedSoundsOk, initAudioOutput } from '../audio-output';
 import type { GameModelResources } from '../game-model';
 import { exitGameModel, initGameModel } from '../game-model';
-import type { GameModelEvaluateStatus } from '../game-model/evaluate.js';
+import type { GameModelEvaluateResult, GameModelEvaluateStatus } from '../game-model/evaluate.js';
 import {
+  GAME_MODEL_CONTROL_ACTION_FLIP,
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
   GAME_MODEL_EVALUATE_STATUS_IGNORE,
   GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
@@ -103,6 +104,23 @@ export function createGameEngine(): GameEngine {
 
   function emitUiState(state: GameEngineUiState): void {
     onUiStateChange?.(state);
+  }
+
+  function getResultMessage(
+    result: GameModelEvaluateResult,
+    gameModelResources: GameModelResources
+  ): string {
+    switch (result.status) {
+      case GAME_MODEL_EVALUATE_STATUS_OK:
+        return gameModelResources.chess.history().at(-1) ?? 'Move accepted';
+      case GAME_MODEL_EVALUATE_STATUS_ILLEGAL:
+        return result.message;
+      case GAME_MODEL_EVALUATE_STATUS_CONTROL:
+        return result.action === GAME_MODEL_CONTROL_ACTION_FLIP ? 'Board flipped' : 'Control action applied';
+      case GAME_MODEL_EVALUATE_STATUS_IGNORE:
+      default:
+        return result.sanitized === '' ? 'No input' : 'Input ignored';
+    }
   }
 
   function requireInitialized(): {
@@ -399,18 +417,18 @@ export function createGameEngine(): GameEngine {
       }
     );
 
-    gameModelEventsAddListener(
-      nextGameModelResources,
-      GAME_MODEL_EVENT_TYPE_EVALUATED,
-      async (event: GameModelEventEvaluated) => {
-        emitUiState({
-          lastInputSanitized: event.result.sanitized,
-          lastMoveSan: nextGameModelResources.chess.history().at(-1) ?? '',
-          lastInputEvaluateStatus: event.result.status,
-          lastInputResultMessage: event.result.status,
-          fen: nextGameModelResources.chess.fen(),
-          pgn: nextGameModelResources.chess.pgn(),
-          scoresheet: [...(parsePgn(nextGameModelResources.chess.pgn())?.[0]?.moves?.mainline() ?? [])],
+      gameModelEventsAddListener(
+        nextGameModelResources,
+        GAME_MODEL_EVENT_TYPE_EVALUATED,
+        async (event: GameModelEventEvaluated) => {
+          emitUiState({
+            lastInputSanitized: event.result.sanitized,
+            lastMoveSan: nextGameModelResources.chess.history().at(-1) ?? '',
+            lastInputEvaluateStatus: event.result.status,
+            lastInputResultMessage: getResultMessage(event.result, nextGameModelResources),
+            fen: nextGameModelResources.chess.fen(),
+            pgn: nextGameModelResources.chess.pgn(),
+            scoresheet: [...(parsePgn(nextGameModelResources.chess.pgn())?.[0]?.moves?.mainline() ?? [])],
         });
       }
     );
