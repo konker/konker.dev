@@ -35,11 +35,8 @@ export async function initSpeechRecognizer(modelUrl: string): Promise<SpeechReco
 
 // --------------------------------------------------------------------------
 export async function exitSpeechRecognizer(speechRecognizerResources: SpeechRecognizerResources): Promise<void> {
-  await stopSpeechRecognizer(speechRecognizerResources);
-  if (speechRecognizerResources.status === SPEECH_RECOGNIZER_STATUS_ACTIVE) {
-    speechRecognizerResources.recognizer.remove();
-    speechRecognizerResources.model.terminate();
-  }
+  const stoppedSpeechRecognizerResources = await stopSpeechRecognizer(speechRecognizerResources);
+  stoppedSpeechRecognizerResources.model.terminate();
 }
 
 // --------------------------------------------------------------------------
@@ -70,6 +67,10 @@ export async function startSpeechRecognizer(
 export async function stopSpeechRecognizer(
   speechRecognizerResources: SpeechRecognizerResources
 ): Promise<SpeechRecognizerResourcesInactive> {
+  if (speechRecognizerResources.status === SPEECH_RECOGNIZER_STATUS_ACTIVE) {
+    speechRecognizerResources.recognizer.remove();
+  }
+
   return {
     status: SPEECH_RECOGNIZER_STATUS_INACTIVE,
     modelUrl: speechRecognizerResources.modelUrl,
