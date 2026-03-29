@@ -1,3 +1,4 @@
+import { Copy } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createSignal, For, Show } from 'solid-js';
 
@@ -71,8 +72,9 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
     <div class="flex flex-col gap-2">
       <div class="flex items-center gap-2">
         <span>PGN</span>
-        <button onClick={() => void copyPgn()} type="button">
-          Copy PGN
+        <button class="flex items-center gap-2" onClick={() => void copyPgn()} type="button">
+          <Copy class="h-4 w-4" />
+          <span>Copy PGN</span>
         </button>
       </div>
 

@@ -38,6 +38,7 @@
     "chess.js": "^1.4.0",
     "chessops": "^0.15.0",
     "gchessboard": "^1.4.0",
+    "lucide-solid": "^1.7.0",
     "solid-js": "^1.9.12",
     "vosk-browser": "^0.0.8"
   },

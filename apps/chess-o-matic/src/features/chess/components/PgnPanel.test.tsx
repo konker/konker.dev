@@ -34,9 +34,9 @@ describe('PgnPanel', () => {
     const copyButton = Array.from(root.querySelectorAll('button')).find(
       (button) => button.textContent === 'Copy PGN'
     ) as HTMLButtonElement | undefined;
-    const e4Button = Array.from(root.querySelectorAll('button')).find(
-      (button) => button.textContent === 'e4'
-    ) as HTMLButtonElement | undefined;
+    const e4Button = Array.from(root.querySelectorAll('button')).find((button) => button.textContent === 'e4') as
+      | HTMLButtonElement
+      | undefined;
     const activeMoveButton = Array.from(root.querySelectorAll('button')).find(
       (button) => button.textContent === 'e5'
     ) as HTMLButtonElement | undefined;
@@ -62,6 +62,6 @@ describe('PgnPanel', () => {
 
     rawTabButton?.click();
 
-    expect((root.querySelector('[aria-label=\"PGN\"]') as HTMLTextAreaElement | null)?.value).toBe('1. e4');
+    expect((root.querySelector('[aria-label="PGN"]') as HTMLTextAreaElement | null)?.value).toBe('1. e4');
   });
 });

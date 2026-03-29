@@ -3,6 +3,7 @@ import './gchessboard.css';
 
 import type { Square } from 'chess.js';
 import type { GChessBoardElement } from 'gchessboard';
+import { RotateCw } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { onCleanup, onMount } from 'solid-js';
 
@@ -170,8 +171,9 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
 
   return (
     <div class="flex flex-col gap-2">
-      <button onClick={toggleBoardOrientation} type="button">
-        Toggle Board Orientation
+      <button class="flex items-center gap-2" onClick={toggleBoardOrientation} type="button">
+        <RotateCw class="h-4 w-4" />
+        <span>Toggle Board Orientation</span>
       </button>
 
       <div class="relative">
