@@ -8,6 +8,7 @@ const PGN_TAG_MAPPINGS = [
   ['Date', 'date'],
   ['Round', 'round'],
   ['TimeControl', 'timeControl'],
+  ['Termination', 'termination'],
   ['White', 'white.name'],
   ['WhiteElo', 'white.elo'],
   ['Black', 'black.name'],
@@ -39,6 +40,8 @@ function resolveMetadataField(metadata: GameMetadataData, fieldPath: (typeof PGN
       return metadata.round;
     case 'timeControl':
       return metadata.timeControl;
+    case 'termination':
+      return metadata.termination;
     case 'white.name':
       return metadata.white.name;
     case 'white.elo':

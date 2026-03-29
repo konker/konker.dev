@@ -165,7 +165,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onStepForward={() => gameEngine.stepForward()}
       />
 
-      <CollapsibleSection icon={SlidersHorizontal} open title="Game Metadata">
+      <CollapsibleSection icon={SlidersHorizontal} open title="Info">
         <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
       </CollapsibleSection>
 
