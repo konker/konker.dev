@@ -10,8 +10,12 @@ import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
+import { ControlsPanel } from './ControlsPanel';
+import { FenPanel } from './FenPanel';
+import { PgnPanel } from './PgnPanel';
 import { ScoreSheet } from './ScoreSheet';
 import type { ScoreSheetData } from './ScoreSheet/types';
+import { StatusPanel } from './StatusPanel';
 import { SCORESHEET_EMPTY } from './ScoreSheet/types';
 
 type ChessOMaticAppProps = {
@@ -108,64 +112,26 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
     return <p>{message()}</p>;
   }
 
-  function renderLastMoveSan(): string {
-    return lastMoveSan() || 'No move yet';
-  }
-
-  function renderLastInputSanitized(): string {
-    return lastInputSanitized() || 'No input yet';
-  }
-
-  function renderStatusClasses(): string {
-    switch (lastInputEvaluateStatus()) {
-      case 'ok':
-        return 'border-l-green-700';
-      case 'illegal':
-        return 'border-l-red-600';
-      case 'control':
-        return 'border-l-blue-600';
-      case 'ignore':
-      default:
-        return 'border-l-amber-700';
-    }
-  }
-
   return (
     <main class="mx-auto flex max-w-3xl flex-col gap-4 p-4 sm:p-3">
       <h1>Chess-o-Matic</h1>
 
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
-      <div
-        class={`flex flex-col gap-2 rounded-lg border border-slate-300 border-l-[0.75rem] bg-slate-50 px-4 py-3 ${renderStatusClasses()}`}
-        data-status={lastInputEvaluateStatus()}
-        id="status"
-      >
-        <div class="flex justify-between gap-4 text-sm text-slate-600">
-          <span>Status</span>
-          <span aria-label="Last Input Evaluate Status">{lastInputEvaluateStatus()}</span>
-        </div>
-        <div aria-label="Last Input SAN" class="text-2xl font-bold leading-tight">
-          {renderLastMoveSan()}
-        </div>
-        <div aria-label="Last Input Message" class="text-base leading-6">
-          {lastInputResultMessage()}
-        </div>
-        <div class="flex flex-col gap-1 text-sm text-slate-600">
-          <span>Heard</span>
-          <span aria-label="Last Input Sanitized">{renderLastInputSanitized()}</span>
-        </div>
-      </div>
+      <StatusPanel
+        lastMoveSan={lastMoveSan()}
+        message={lastInputResultMessage()}
+        sanitizedInput={lastInputSanitized()}
+        status={lastInputEvaluateStatus()}
+      />
 
-      <div class="flex flex-wrap gap-3">
-        <button disabled={isInitializing() || !!errorMessage()} onClick={() => void toggleListening()} type="button">
-          {isListening() ? 'Disable Audio Input' : 'Enable Audio Input'}
-        </button>
-
-        <button disabled={isInitializing() || !!errorMessage()} onClick={() => void toggleSound()} type="button">
-          {isSoundEnabled() ? 'Disable Audio Output' : 'Enable Audio Output'}
-        </button>
-      </div>
+      <ControlsPanel
+        disabled={isInitializing() || !!errorMessage()}
+        isListening={isListening()}
+        isSoundEnabled={isSoundEnabled()}
+        onToggleListening={() => void toggleListening()}
+        onToggleSound={() => void toggleSound()}
+      />
 
       <ScoreSheet scoresheet={scoresheetData()} />
 
@@ -177,15 +143,9 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onReady={(controller) => void setBoardController(controller)}
       />
 
-      <label class="flex flex-col gap-2">
-        <span>PGN</span>
-        <textarea aria-label="PGN" class="min-h-32 w-full resize-y" readOnly value={pgn()} />
-      </label>
+      <PgnPanel pgn={pgn()} />
 
-      <label class="flex flex-col gap-2">
-        <span>FEN</span>
-        <div aria-label="FEN">{fen()}</div>
-      </label>
+      <FenPanel fen={fen()} />
     </main>
   );
 }
