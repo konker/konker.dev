@@ -26,7 +26,7 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
 
   return (
     <div
-      class={`flex flex-col gap-2 rounded-lg border border-slate-300 border-l-[0.75rem] bg-slate-50 px-4 py-3 ${renderStatusClasses()}`}
+      class={`flex flex-col gap-2 border border-slate-300 border-l-[0.75rem] bg-slate-50 px-4 py-3 ${renderStatusClasses()}`}
       data-status={props.status}
       id="status"
     >
