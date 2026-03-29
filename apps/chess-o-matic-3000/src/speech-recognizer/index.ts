@@ -22,9 +22,9 @@ export type SpeechRecognizerResources = SpeechRecognizerResourcesActive | Speech
 
 // --------------------------------------------------------------------------
 export async function initSpeechRecognizer(modelUrl: string): Promise<SpeechRecognizerResourcesInactive> {
-  console.log(`[chess-o-matic][speech-recognizer] Loading Vosk model at ${modelUrl}...`);
+  console.log(`[chess-o-matic-3000][speech-recognizer] Loading Vosk model at ${modelUrl}...`);
   const model = await createModel(modelUrl);
-  console.log('[chess-o-matic][speech-recognizer] Model loaded successfully');
+  console.log('[chess-o-matic-3000][speech-recognizer] Model loaded successfully');
 
   return {
     status: SPEECH_RECOGNIZER_STATUS_INACTIVE,
@@ -50,13 +50,13 @@ export async function startSpeechRecognizer(
 ): Promise<SpeechRecognizerResourcesActive> {
   if (speechRecognizerResources.status === SPEECH_RECOGNIZER_STATUS_ACTIVE) {
     console.warn(
-      '[chess-o-matic][speech-recognizer] WARNING: startSpeechRecognizer call with active speech recognizer resources: ignoring'
+      '[chess-o-matic-3000][speech-recognizer] WARNING: startSpeechRecognizer call with active speech recognizer resources: ignoring'
     );
     return speechRecognizerResources;
   }
 
   const recognizer = new speechRecognizerResources.model.KaldiRecognizer(sampleRate, JSON.stringify(grammar));
-  console.log(`[chess-o-matic][speech-recognizer] Recognizer created with grammar (${grammar.length} phrases)`);
+  console.log(`[chess-o-matic-3000][speech-recognizer] Recognizer created with grammar (${grammar.length} phrases)`);
 
   return {
     status: SPEECH_RECOGNIZER_STATUS_ACTIVE,
