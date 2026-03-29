@@ -1,5 +1,5 @@
-import type { JSX } from 'solid-js';
 import { Info } from 'lucide-solid';
+import type { JSX } from 'solid-js';
 
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 

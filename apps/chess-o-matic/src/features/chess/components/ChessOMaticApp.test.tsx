@@ -16,8 +16,8 @@ describe('ChessOMaticApp', () => {
     await Promise.resolve();
 
     expect(root.textContent).toContain('Chess-o-Matic');
-    expect(root.textContent).toContain('Enable Audio Input');
-    expect(root.textContent).toContain('Enable Audio Output');
+    expect(root.textContent).toContain('Speech');
+    expect(root.textContent).toContain('Sounds');
     expect(root.textContent).toContain('PGN');
     expect(root.textContent).toContain('Status');
     expect(root.textContent).toContain('Heard');

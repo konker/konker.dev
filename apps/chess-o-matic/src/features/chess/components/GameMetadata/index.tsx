@@ -1,5 +1,5 @@
-import type { JSX } from 'solid-js';
 import { Badge, Calendar, Clock3, Hash, MapPin, Trophy, User } from 'lucide-solid';
+import type { JSX } from 'solid-js';
 
 import type { GameMetadataData } from './types';
 
