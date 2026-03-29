@@ -21,6 +21,14 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
   let boardEl: GChessBoardElement | undefined;
   let promotionDialogEl: HTMLDivElement | undefined;
 
+  function toggleBoardOrientation(): void {
+    if (!boardEl) {
+      return;
+    }
+
+    boardEl.orientation = boardEl.orientation === 'white' ? 'black' : 'white';
+  }
+
   function moveHighlight(board: GChessBoardElement, coords: [Square, Square]): void {
     const [from, to] = coords;
 
@@ -153,7 +161,12 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
   });
 
   return (
-    <div class="relative">
+    <div class="flex flex-col gap-2">
+      <button onClick={toggleBoardOrientation} type="button">
+        Toggle Board Orientation
+      </button>
+
+      <div class="relative">
       <g-chess-board class="block aspect-square w-full max-w-[34rem]" id="board" ref={boardEl} />
       <div
         class="promotion-dialog absolute inset-0 hidden items-center justify-center bg-black/30 data-[open=true]:flex"
@@ -187,6 +200,7 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
             type="button"
           />
         </div>
+      </div>
       </div>
     </div>
   );
