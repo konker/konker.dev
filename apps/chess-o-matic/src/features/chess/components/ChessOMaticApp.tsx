@@ -8,8 +8,8 @@ import { createGameEngine } from '../../../game-engine';
 import { START_FEN } from '../../../game-model/consts';
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
-import type { ChessBoardController } from './ChessBoard/controller';
 import { ChessBoard } from './ChessBoard';
+import type { ChessBoardController } from './ChessBoard/controller';
 
 type ChessOMaticAppProps = {
   readonly autoloadEngine?: boolean;
@@ -149,6 +149,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
       <div id="scoresheet">{JSON.stringify(scoresheet())}</div>
 
       <ChessBoard
+        fen={fen()}
         getPromotionPieceColor={gameEngine.getPromotionPieceColor}
         isLegalMove={gameEngine.isLegalMove}
         onMove={gameEngine.handleBoardMove}

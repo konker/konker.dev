@@ -1,4 +1,3 @@
-import type { GameModelResources } from '../game-model';
 import type {
   GameModelEvaluateResultControl,
   GameModelEvaluateResultIgnore,
@@ -8,15 +7,17 @@ import type {
 } from '../game-model/evaluate';
 import type { ComSettings } from '../settings';
 import type { AudioOutputEvent } from './events';
-import { AUDIO_OUTPUT_EVENT_INVALID } from './events';
-import { AUDIO_OUTPUT_EVENT_MOVE_TOP } from './events';
-import { AUDIO_OUTPUT_EVENT_END_OTHER } from './events';
-import { AUDIO_OUTPUT_EVENT_PROMOTION } from './events';
-import { AUDIO_OUTPUT_EVENT_CAPTURE } from './events';
-import { AUDIO_OUTPUT_EVENT_CASTLE } from './events';
-import { AUDIO_OUTPUT_EVENT_CHECK } from './events';
-import { AUDIO_OUTPUT_EVENT_END_CHECKMATE } from './events';
-import { AUDIO_OUTPUT_EVENT_MOVE_BOTTOM } from './events';
+import {
+  AUDIO_OUTPUT_EVENT_CAPTURE,
+  AUDIO_OUTPUT_EVENT_CASTLE,
+  AUDIO_OUTPUT_EVENT_CHECK,
+  AUDIO_OUTPUT_EVENT_END_CHECKMATE,
+  AUDIO_OUTPUT_EVENT_END_OTHER,
+  AUDIO_OUTPUT_EVENT_INVALID,
+  AUDIO_OUTPUT_EVENT_MOVE_BOTTOM,
+  AUDIO_OUTPUT_EVENT_MOVE_TOP,
+  AUDIO_OUTPUT_EVENT_PROMOTION,
+} from './events';
 import type { AudioOutputEventSoundMap } from './sound-map';
 import { standardAudioOutputEventSoundMap } from './standard.sound-map';
 
