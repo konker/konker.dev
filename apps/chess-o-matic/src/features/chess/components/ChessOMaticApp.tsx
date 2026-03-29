@@ -12,11 +12,14 @@ import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
+import { GameMetadata } from './GameMetadata';
+import type { GameMetadataData } from './GameMetadata/types';
+import { GAME_METADATA_EMPTY } from './GameMetadata/types';
 import { PgnPanel } from './PgnPanel';
 import { ScoreSheet } from './ScoreSheet';
 import type { ScoreSheetData } from './ScoreSheet/types';
-import { StatusPanel } from './StatusPanel';
 import { SCORESHEET_EMPTY } from './ScoreSheet/types';
+import { StatusPanel } from './StatusPanel';
 
 type ChessOMaticAppProps = {
   readonly autoloadEngine?: boolean;
@@ -36,6 +39,7 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
   const [fen, setFen] = createSignal(START_FEN);
   const [pgn, setPgn] = createSignal('');
   const [scoresheetData, setScoresheetData] = createSignal<ScoreSheetData>(SCORESHEET_EMPTY);
+  const [gameMetadata, setGameMetadata] = createSignal<GameMetadataData>(GAME_METADATA_EMPTY);
 
   const gameEngine: GameEngine = createGameEngine();
 
@@ -112,6 +116,11 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
     return <p>{message()}</p>;
   }
 
+  function handleMetadataChange(metadata: GameMetadataData): void {
+    setGameMetadata(metadata);
+    gameEngine.setGameMetadata(metadata);
+  }
+
   return (
     <main class="mx-auto flex max-w-3xl flex-col gap-4 p-4 sm:p-3">
       <h1>Chess-o-Matic</h1>
@@ -132,6 +141,8 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onToggleListening={() => void toggleListening()}
         onToggleSound={() => void toggleSound()}
       />
+
+      <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
 
       <ScoreSheet scoresheet={scoresheetData()} />
 

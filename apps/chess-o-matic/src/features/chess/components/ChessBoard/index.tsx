@@ -162,10 +162,30 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
         ref={promotionDialogEl}
       >
         <div class="grid w-full max-w-[14rem] grid-cols-2 gap-2 bg-white p-2">
-          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="q" title="Queen" type="button" />
-          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="r" title="Rook" type="button" />
-          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="b" title="Bishop" type="button" />
-          <button class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat" data-piece="n" title="Knight" type="button" />
+          <button
+            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+            data-piece="q"
+            title="Queen"
+            type="button"
+          />
+          <button
+            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+            data-piece="r"
+            title="Rook"
+            type="button"
+          />
+          <button
+            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+            data-piece="b"
+            title="Bishop"
+            type="button"
+          />
+          <button
+            class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+            data-piece="n"
+            title="Knight"
+            type="button"
+          />
         </div>
       </div>
     </div>
