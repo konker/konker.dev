@@ -10,6 +10,7 @@ import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
+import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
 import { GameMetadata } from './GameMetadata';
@@ -142,21 +143,31 @@ export function ChessOMaticApp(props: ChessOMaticAppProps): JSX.Element {
         onToggleSound={() => void toggleSound()}
       />
 
-      <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
+      <CollapsibleSection open title="Game Metadata">
+        <GameMetadata metadata={gameMetadata()} onMetadataChange={handleMetadataChange} />
+      </CollapsibleSection>
 
-      <ScoreSheet scoresheet={scoresheetData()} />
+      <CollapsibleSection open title="Scoresheet">
+        <ScoreSheet scoresheet={scoresheetData()} />
+      </CollapsibleSection>
 
-      <ChessBoard
-        fen={fen()}
-        getPromotionPieceColor={gameEngine.getPromotionPieceColor}
-        isLegalMove={gameEngine.isLegalMove}
-        onMove={gameEngine.handleBoardMove}
-        onReady={(controller) => void setBoardController(controller)}
-      />
+      <CollapsibleSection open title="Board">
+        <ChessBoard
+          fen={fen()}
+          getPromotionPieceColor={gameEngine.getPromotionPieceColor}
+          isLegalMove={gameEngine.isLegalMove}
+          onMove={gameEngine.handleBoardMove}
+          onReady={(controller) => void setBoardController(controller)}
+        />
+      </CollapsibleSection>
 
-      <PgnPanel pgn={pgn()} />
+      <CollapsibleSection title="PGN">
+        <PgnPanel pgn={pgn()} />
+      </CollapsibleSection>
 
-      <FenPanel fen={fen()} />
+      <CollapsibleSection title="FEN">
+        <FenPanel fen={fen()} />
+      </CollapsibleSection>
     </main>
   );
 }
