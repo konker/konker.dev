@@ -26,6 +26,16 @@ export const AUDIO_INPUT_RESOURCES_NOT_LISTENING: AudioInputResourcesListeningOf
 } as const;
 
 // --------------------------------------------------------------------------
+export function audioInputIsSupported(): boolean {
+  return (
+    typeof navigator !== 'undefined' &&
+    typeof navigator.mediaDevices !== 'undefined' &&
+    typeof navigator.mediaDevices.getUserMedia === 'function' &&
+    typeof AudioContext !== 'undefined'
+  );
+}
+
+// --------------------------------------------------------------------------
 export async function initAudioInput(): Promise<AudioInputResourcesListeningOff> {
   return AUDIO_INPUT_RESOURCES_NOT_LISTENING;
 }

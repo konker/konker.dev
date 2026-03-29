@@ -34,10 +34,12 @@ type ChessOMaticAppProps = {
 
 export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const [errorMessage, setErrorMessage] = createSignal<string>();
-  const [lastInputResultMessage, setLastInputResultMessage] = createSignal('Loading local speech model…');
+  const [lastInputResultMessage, setLastInputResultMessage] = createSignal('Starting app…');
   const [isInitializing, setIsInitializing] = createSignal(true);
   const [isListening, setIsListening] = createSignal(false);
+  const [isListeningAvailable, setIsListeningAvailable] = createSignal(false);
   const [isSoundEnabled, setIsSoundEnabled] = createSignal(false);
+  const [isSoundAvailable, setIsSoundAvailable] = createSignal(false);
   const [lastInputEvaluateStatus, setLastInputEvaluateStatus] = createSignal<GameModelEvaluateStatus>(
     GAME_MODEL_EVALUATE_STATUS_IGNORE
   );
@@ -56,7 +58,9 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const gameEngine: GameEngine = createGameEngine();
 
   function syncAudioState(): void {
+    setIsListeningAvailable(gameEngine.canUseAudioInput());
     setIsListening(gameEngine.isAudioInputOn());
+    setIsSoundAvailable(gameEngine.canUseAudioOutput());
     setIsSoundEnabled(gameEngine.isAudioOutputOn());
   }
 
@@ -71,7 +75,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     try {
       await gameEngine.init({
         initialSettings: {
-          audioInputOn: true,
+          audioInputOn: false,
           audioOutputOn: false,
         },
         onUiStateChange: (state) => {
@@ -91,11 +95,10 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       });
 
       syncAudioState();
+      setLastInputResultMessage('No moves');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown initialization error';
-      setErrorMessage(
-        `Unable to initialize Chess-o-matic 3000. Add the local Vosk model to public/models/vosk-model-small-en-us-0.15.zip and retry. (${message})`
-      );
+      setErrorMessage(`Unable to initialize Chess-o-matic 3000. (${message})`);
       setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
       setLastInputResultMessage('Initialization failed');
     } finally {
@@ -108,15 +111,29 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   });
 
   async function toggleListening(): Promise<void> {
-    await gameEngine.audioInputToggle();
-    syncAudioState();
-    setLastInputResultMessage(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
+    try {
+      await gameEngine.audioInputToggle();
+      syncAudioState();
+      setLastInputResultMessage(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
+    } catch (error) {
+      syncAudioState();
+      const message = error instanceof Error ? error.message : 'Unknown speech input error';
+      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
+      setLastInputResultMessage(`Speech input unavailable. ${message}`);
+    }
   }
 
   async function toggleSound(): Promise<void> {
-    await gameEngine.audioOutputToggle();
-    syncAudioState();
-    setLastInputResultMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
+    try {
+      await gameEngine.audioOutputToggle();
+      syncAudioState();
+      setLastInputResultMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
+    } catch (error) {
+      syncAudioState();
+      const message = error instanceof Error ? error.message : 'Unknown audio output error';
+      setLastInputEvaluateStatus(GAME_MODEL_EVALUATE_STATUS_IGNORE);
+      setLastInputResultMessage(`Audio output unavailable. ${message}`);
+    }
   }
 
   async function setBoardController(controller: ChessBoardController | undefined): Promise<void> {
@@ -164,7 +181,9 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
 
         <ControlsPanel
           disabled={isInitializing() || !!errorMessage()}
+          isListeningAvailable={isListeningAvailable()}
           isListening={isListening()}
+          isSoundAvailable={isSoundAvailable()}
           isSoundEnabled={isSoundEnabled()}
           onToggleListening={() => void toggleListening()}
           onToggleSound={() => void toggleSound()}

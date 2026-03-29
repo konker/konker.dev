@@ -26,6 +26,11 @@ export type AudioOutputResources = {
 };
 
 // --------------------------------------------------------------------------
+export function audioOutputIsSupported(): boolean {
+  return typeof Audio !== 'undefined';
+}
+
+// --------------------------------------------------------------------------
 export async function initAudioOutput(): Promise<AudioOutputResources> {
   return {
     audioOutputEventSoundMap: standardAudioOutputEventSoundMap,
