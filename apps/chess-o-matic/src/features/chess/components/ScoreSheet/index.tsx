@@ -7,26 +7,32 @@ type ScoreSheetProps = {
   readonly scoresheet: ScoreSheetData;
 };
 
+const SCORESHEET_MIN_ROWS = 10;
+
 export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
   function renderBlackMove(item: ScoreSheetDataItem): string {
     return item[1] === '*' ? '' : item[1];
   }
 
+  function createDisplayRows(): Array<ScoreSheetDataItem | undefined> {
+    const rowCount = Math.max(SCORESHEET_MIN_ROWS, props.scoresheet.length);
+    return Array.from({ length: rowCount }, function mapRow(_value, index): ScoreSheetDataItem | undefined {
+      return props.scoresheet[index];
+    });
+  }
+
   return (
     <section aria-label="Scoresheet" class="flex flex-col gap-2">
-      <div class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-4 border-b border-slate-300 pb-2 text-sm font-semibold">
-        <span>#</span>
-        <span>White</span>
-        <span>Black</span>
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <For each={props.scoresheet}>
+      <div class="flex h-64 flex-col gap-1 overflow-y-auto pr-2">
+        <For each={createDisplayRows()}>
           {(item, index) => (
-            <div class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-4 text-sm leading-6">
+            <div
+              aria-label="Scoresheet Row"
+              class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-4 border-b border-black text-sm leading-6"
+            >
               <span class="tabular-nums">{index() + 1}.</span>
-              <span>{item[0]}</span>
-              <span>{renderBlackMove(item)}</span>
+              <span>{item ? item[0] : ''}</span>
+              <span>{item ? renderBlackMove(item) : ''}</span>
             </div>
           )}
         </For>

@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
-import { PgnPanel } from './PgnPanel';
+import { PgnPanel } from './index';
 
 describe('PgnPanel', () => {
   it('copies the PGN text and navigates when a move pill is clicked', async () => {

@@ -2,7 +2,7 @@ import { Copy, CopyCheck } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createEffect, createSignal, For, Show } from 'solid-js';
 
-import type { PgnMoveListData, PgnMoveListItem } from './PgnPanel/types';
+import type { PgnMoveListData, PgnMoveListItem } from './types';
 
 const PGN_PANEL_TAB_MOVES = 'moves';
 const PGN_PANEL_TAB_RAW = 'raw';
@@ -48,7 +48,7 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
 
   function renderMovesTab(): JSX.Element {
     return (
-      <div aria-label="PGN Moves" class="flex flex-wrap items-center gap-2">
+      <div aria-label="PGN Moves" class="flex h-64 flex-wrap content-start items-center gap-2 overflow-y-auto pr-2">
         <Show when={props.pgnMoveList.length > 0} fallback={<span>No moves yet</span>}>
           <For each={props.pgnMoveList}>
             {(item) => (
@@ -72,7 +72,7 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
   }
 
   function renderRawTab(): JSX.Element {
-    return <textarea aria-label="PGN" class="min-h-32 w-full resize-y" readOnly value={props.pgn} />;
+    return <textarea aria-label="PGN" class="h-64 w-full resize-y" readOnly value={props.pgn} />;
   }
 
   return (
