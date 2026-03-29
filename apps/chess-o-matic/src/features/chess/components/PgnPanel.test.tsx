@@ -1,3 +1,4 @@
+import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -31,8 +32,8 @@ describe('PgnPanel', () => {
       root
     );
 
-    const copyButton = Array.from(root.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Copy PGN'
+    const copyButton = Array.from(root.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Copy PGN')
     ) as HTMLButtonElement | undefined;
     const e4Button = Array.from(root.querySelectorAll('button')).find((button) => button.textContent === 'e4') as
       | HTMLButtonElement
@@ -48,6 +49,7 @@ describe('PgnPanel', () => {
     expect(writeText).toHaveBeenCalledWith('1. e4 e5 2. Nf3 Nc6');
     expect(onGoToPly).toHaveBeenCalledWith(1);
     expect(activeMoveButton?.className).toContain('bg-slate-200');
+    expect(copyButton?.textContent).toContain('Copied');
   });
 
   it('shows the raw PGN textarea behind the raw tab', () => {
@@ -63,5 +65,53 @@ describe('PgnPanel', () => {
     rawTabButton?.click();
 
     expect((root.querySelector('[aria-label="PGN"]') as HTMLTextAreaElement | null)?.value).toBe('1. e4');
+  });
+
+  it('resets the copied state when the PGN changes and still copies while already copied', async () => {
+    const root = document.createElement('div');
+    const writeText = vi.fn(async () => undefined);
+    document.body.append(root);
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    });
+
+    render(() => {
+      const [pgn, setPgn] = createSignal('1. e4');
+
+      function changePgn(): void {
+        setPgn('1. d4');
+      }
+
+      return (
+        <>
+          <PgnPanel currentPly={0} onGoToPly={vi.fn()} pgn={pgn()} pgnMoveList={[]} />
+          <button onClick={changePgn} type="button">
+            Change PGN
+          </button>
+        </>
+      );
+    }, root);
+
+    const copyButton = Array.from(root.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Copy PGN')
+    ) as HTMLButtonElement | undefined;
+    const changeButton = Array.from(root.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Change PGN'
+    ) as HTMLButtonElement | undefined;
+
+    copyButton?.click();
+    await Promise.resolve();
+    copyButton?.click();
+    await Promise.resolve();
+
+    expect(writeText).toHaveBeenNthCalledWith(1, '1. e4');
+    expect(writeText).toHaveBeenNthCalledWith(2, '1. e4');
+    expect(copyButton?.textContent).toContain('Copied');
+
+    changeButton?.click();
+    await Promise.resolve();
+
+    expect(copyButton?.textContent).toContain('Copy PGN');
   });
 });

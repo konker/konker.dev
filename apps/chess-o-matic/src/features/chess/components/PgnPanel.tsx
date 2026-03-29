@@ -1,6 +1,6 @@
-import { Copy } from 'lucide-solid';
+import { Copy, CopyCheck } from 'lucide-solid';
 import type { JSX } from 'solid-js';
-import { createSignal, For, Show } from 'solid-js';
+import { createEffect, createSignal, For, Show } from 'solid-js';
 
 import type { PgnMoveListData, PgnMoveListItem } from './PgnPanel/types';
 
@@ -18,9 +18,16 @@ type PgnPanelProps = {
 
 export function PgnPanel(props: PgnPanelProps): JSX.Element {
   const [activeTab, setActiveTab] = createSignal<PgnPanelTab>(PGN_PANEL_TAB_MOVES);
+  const [isCopied, setIsCopied] = createSignal(false);
+
+  createEffect(function resetCopiedState(): void {
+    props.pgn;
+    setIsCopied(false);
+  });
 
   async function copyPgn(): Promise<void> {
     await navigator.clipboard.writeText(props.pgn);
+    setIsCopied(true);
   }
 
   function showMoveNumber(item: PgnMoveListItem): boolean {
@@ -73,8 +80,10 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
       <div class="flex items-center gap-2">
         <span>PGN</span>
         <button class="flex items-center gap-2" onClick={() => void copyPgn()} type="button">
-          <Copy class="h-4 w-4" />
-          <span>Copy PGN</span>
+          <Show when={isCopied()} fallback={<Copy class="h-4 w-4" />}>
+            <CopyCheck class="h-4 w-4" />
+          </Show>
+          <span>{isCopied() ? 'Copied' : 'Copy PGN'}</span>
         </button>
       </div>
 
