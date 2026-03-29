@@ -1,5 +1,5 @@
-import { parsePgn } from 'chessops/pgn';
 import type { Square } from 'chess.js';
+import { parsePgn } from 'chessops/pgn';
 import type { RecognizerMessage } from 'vosk-browser/dist/interfaces';
 
 import type { AudioInputResources } from '../audio-input';
@@ -18,9 +18,6 @@ import type { GameModelResources } from '../game-model';
 import { exitGameModel, initGameModel } from '../game-model';
 import type {
   GameModelEvaluateResult,
-  GameModelEvaluateResultControl,
-  GameModelEvaluateResultIgnore,
-  GameModelEvaluateResultIllegal,
   GameModelEvaluateResultOk,
   GameModelEvaluateStatus,
 } from '../game-model/evaluate.js';
@@ -32,7 +29,7 @@ import {
   GAME_MODEL_EVALUATE_STATUS_OK,
   gameModelEvaluate,
 } from '../game-model/evaluate.js';
-import type { GameModelEventEvaluated, GameModelEventMovedInvalid, GameModelEventMovedOk } from '../game-model/events.js';
+import type { GameModelEventEvaluated } from '../game-model/events.js';
 import {
   GAME_MODEL_EVENT_TYPE_EVALUATED,
   GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
@@ -47,14 +44,14 @@ import {
 } from '../game-model/read.js';
 import type { ComSettings } from '../settings';
 import { initComSettings } from '../settings';
-import type { SpeechRecognizerResources } from '../speech-recognizer-model';
+import type { SpeechRecognizerResources } from '../speech-recognizer';
 import {
   exitSpeechRecognizer,
   initSpeechRecognizer,
   startSpeechRecognizer,
   stopSpeechRecognizer,
-} from '../speech-recognizer-model';
-import { chessGrammar } from '../speech-recognizer-model/grammar/chess-grammar-en.js';
+} from '../speech-recognizer';
+import { chessGrammar } from '../speech-recognizer/grammar/chess-grammar-en.js';
 
 const MODEL_URL = '/models/vosk-model-small-en-us-0.15.zip';
 
@@ -120,7 +117,13 @@ export function createGameEngine(): GameEngine {
     gameModelResources: GameModelResources;
     speechRecognizerResources: SpeechRecognizerResources;
   } {
-    if (!settings || !audioInputResources || !audioOutputResources || !gameModelResources || !speechRecognizerResources) {
+    if (
+      !settings ||
+      !audioInputResources ||
+      !audioOutputResources ||
+      !gameModelResources ||
+      !speechRecognizerResources
+    ) {
       throw new Error('Game engine is not initialized.');
     }
 
@@ -282,7 +285,13 @@ export function createGameEngine(): GameEngine {
   }
 
   async function exit(): Promise<void> {
-    if (!settings || !audioInputResources || !audioOutputResources || !gameModelResources || !speechRecognizerResources) {
+    if (
+      !settings ||
+      !audioInputResources ||
+      !audioOutputResources ||
+      !gameModelResources ||
+      !speechRecognizerResources
+    ) {
       return;
     }
 
@@ -372,18 +381,6 @@ export function createGameEngine(): GameEngine {
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
     speechRecognizerResources = await initSpeechRecognizer(MODEL_URL);
-
-    gameModelEventsAddListener(
-      gameModelResources,
-      GAME_MODEL_EVENT_TYPE_MOVED_OK,
-      async (_event: GameModelEventMovedOk): Promise<void> => {}
-    );
-
-    gameModelEventsAddListener(
-      gameModelResources,
-      GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
-      async (_event: GameModelEventMovedInvalid): Promise<void> => {}
-    );
 
     gameModelEventsAddListener(
       gameModelResources,

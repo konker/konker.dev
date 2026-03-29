@@ -10,6 +10,7 @@ import type { ChessBoardController } from './controller';
 import { BOARD_COLOR_DARK, BOARD_COLOR_LIGHT } from './controller';
 
 type ChessBoardProps = {
+  readonly fen: string;
   readonly isLegalMove: (coords: [Square, Square]) => boolean;
   readonly getPromotionPieceColor: (coords: [Square, Square]) => 'b' | 'w' | undefined;
   readonly onMove: (move: [Square, Square] | string) => Promise<void> | void;
@@ -83,8 +84,9 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     const dialog = promotionDialogEl;
 
     board.coordinates = 'outside';
-    board.turn = 'white';
     board.interactive = true;
+    board.fen = props.fen;
+    setBoardTurnFromFen(board, props.fen);
 
     const highlightStyle = document.createElement('style');
     highlightStyle.textContent = `

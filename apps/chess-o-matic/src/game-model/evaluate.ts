@@ -228,9 +228,9 @@ export function gameModelEvaluate(
         input: parserResult.input,
         sanitized: parserResult.sanitized,
         parsed: parserResult.parsed,
-            move: moveResult.move,
-            flags: gameModelResolveMoveFlags(gameModelResources, chessBoardController, moveResult),
-          };
+        move: moveResult.move,
+        flags: gameModelResolveMoveFlags(gameModelResources, chessBoardController, moveResult),
+      };
     }
   }
 }

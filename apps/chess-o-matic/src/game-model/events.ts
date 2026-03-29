@@ -92,7 +92,10 @@ export function gameModelEventsAddListener<E extends GameModelEvent>(
   eventListener: GameModelEventListener<E>
 ): void {
   const currentListeners = gameModelResources.listeners.get(type) ?? new Set<GameModelEventListener<GameModelEvent>>();
-  gameModelResources.listeners.set(type, new Set([...currentListeners, eventListener as GameModelEventListener<GameModelEvent>]));
+  gameModelResources.listeners.set(
+    type,
+    new Set([...currentListeners, eventListener as GameModelEventListener<GameModelEvent>])
+  );
 }
 
 export async function gameModelEventsNotifyListeners<E extends GameModelEvent>(
