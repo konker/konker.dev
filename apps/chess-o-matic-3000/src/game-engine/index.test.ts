@@ -11,13 +11,17 @@ import { createGameEngine } from './index';
 
 function createMemoryGameStorage(seedAppState = createDefaultAppState('2026-03-30T00:00:00.000Z')): GameStorage & {
   appState?: typeof seedAppState;
+  deletedGameIds: Array<string>;
 } {
   let appState = seedAppState;
   const games = new Map<string, typeof seedAppState.currentGame>();
+  const deletedGameIds: Array<string> = [];
 
   return {
     appState,
+    deletedGameIds,
     async deleteGame(gameId) {
+      deletedGameIds.push(gameId);
       games.delete(gameId);
     },
     async loadAppState() {
@@ -164,5 +168,37 @@ describe('createGameEngine persistence', () => {
 
     await expect(gameEngine.exportGamePgn('missing-game')).rejects.toThrow('Saved game not found: missing-game');
     await expect(gameEngine.openGameInLichess('missing-game')).rejects.toThrow('Saved game not found: missing-game');
+  });
+
+  it('discards the current game, removes saved data, and starts a fresh game', async () => {
+    const seedAppState: AppState = {
+      ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
+      currentGame: {
+        ...createDefaultAppState('2026-03-30T00:00:00.000Z').currentGame,
+        id: 'saved-game-1',
+        moveHistory: [
+          { from: 'e2', san: 'e4', to: 'e4' },
+          { from: 'e7', san: 'e5', to: 'e5' },
+        ],
+      },
+      savedGameIds: ['saved-game-1'],
+    };
+    const gameStorage = createMemoryGameStorage(seedAppState);
+    await gameStorage.saveGame(seedAppState.currentGame);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.discardGame();
+
+    expect(gameStorage.deletedGameIds).toEqual(['saved-game-1']);
+    expect(gameStorage.appState?.savedGameIds).toEqual([]);
+    expect(gameStorage.appState?.currentGame.id).not.toBe('saved-game-1');
+    expect(gameStorage.appState?.currentGame.moveHistory).toEqual([]);
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 0,
+      lastInputResultMessage: 'Game discarded',
+      pgn: expect.not.stringContaining('e4'),
+    });
   });
 });

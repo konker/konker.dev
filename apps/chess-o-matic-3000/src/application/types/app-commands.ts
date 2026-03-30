@@ -10,6 +10,10 @@ export type AppCommandResetGame = {
   readonly type: 'resetGame';
 };
 
+export type AppCommandDiscardGame = {
+  readonly type: 'discardGame';
+};
+
 export type AppCommandSaveGame = {
   readonly type: 'saveGame';
   readonly gameId?: GameId;
@@ -83,6 +87,7 @@ export type AppCommandSetAudioOutputEnabled = {
 export type AppCommand =
   | AppCommandNewGame
   | AppCommandResetGame
+  | AppCommandDiscardGame
   | AppCommandSaveGame
   | AppCommandLoadGame
   | AppCommandDeleteGame

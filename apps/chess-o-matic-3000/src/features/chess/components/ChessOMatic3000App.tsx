@@ -13,6 +13,7 @@ import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
+import { GameDataToolbar } from './GameDataToolbar';
 import { GameMetadata } from './GameMetadata';
 import { GameNavigationPanel } from './GameNavigationPanel';
 import { PgnPanel } from './PgnPanel';
@@ -142,6 +143,32 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     gameEngine.setGameMetadata(metadata);
   }
 
+  async function startNewGame(): Promise<void> {
+    try {
+      await gameEngine.newGame();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown new game error';
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: `Unable to start a new game. ${message}`,
+      }));
+    }
+  }
+
+  async function discardCurrentGame(): Promise<void> {
+    try {
+      await gameEngine.discardGame();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown discard game error';
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: `Unable to discard the current game. ${message}`,
+      }));
+    }
+  }
+
   return (
     <main class="mx-auto flex max-w-3xl flex-col gap-4 p-4 sm:p-3">
       <h1>Chess-o-matic 3000</h1>
@@ -164,6 +191,14 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           onGoToStart={() => gameEngine.goToStart()}
           onStepBackward={() => gameEngine.stepBackward()}
           onStepForward={() => gameEngine.stepForward()}
+        />
+      </div>
+
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <GameDataToolbar
+          disabled={isInitializing() || !!errorMessage()}
+          onDiscardGame={() => void discardCurrentGame()}
+          onNewGame={() => void startNewGame()}
         />
 
         <ControlsPanel

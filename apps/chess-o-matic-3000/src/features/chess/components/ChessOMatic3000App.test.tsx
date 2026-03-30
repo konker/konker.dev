@@ -16,6 +16,8 @@ describe('ChessOMatic3000App', () => {
     await Promise.resolve();
 
     expect(root.textContent).toContain('Chess-o-matic 3000');
+    expect(root.textContent).toContain('New game');
+    expect(root.textContent).toContain('Discard game');
     expect(root.textContent).toContain('Speech');
     expect(root.textContent).toContain('Sounds');
     expect(root.textContent).toContain('PGN');
