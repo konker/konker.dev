@@ -56,7 +56,10 @@ describe('game serialization', () => {
 
     expect(restored.currentGame.orientation).toBe('white');
     expect(restored.currentGame.updatedAt).toBe('2026-03-30T00:00:00.000Z');
-    expect(restored.currentGame.metadata).toEqual(GAME_METADATA_EMPTY);
+    expect(restored.currentGame.metadata).toEqual({
+      ...GAME_METADATA_EMPTY,
+      date: '2026-03-30',
+    });
     expect(restored.settings).toEqual({
       audioInputEnabled: false,
       audioOutputEnabled: false,

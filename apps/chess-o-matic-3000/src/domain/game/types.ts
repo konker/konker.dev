@@ -1,7 +1,7 @@
 import type { AppSettings } from '../settings/types';
 import { APP_SETTINGS_DEFAULT } from '../settings/types';
 import type { GameMetadataData } from './metadata';
-import { GAME_METADATA_EMPTY } from './metadata';
+import { createDefaultGameMetadata } from './metadata';
 import { APP_STATE_SCHEMA_VERSION, GAME_RECORD_SCHEMA_VERSION, SAVED_GAME_INDEX_SCHEMA_VERSION } from './version';
 
 export type GameId = string;
@@ -63,7 +63,7 @@ export function createEmptyGameRecord(now: string = new Date().toISOString(), id
     createdAt: now,
     currentPly: 0,
     id,
-    metadata: GAME_METADATA_EMPTY,
+    metadata: createDefaultGameMetadata(now),
     moveHistory: [],
     orientation: GAME_BOARD_ORIENTATION_WHITE,
     schemaVersion: GAME_RECORD_SCHEMA_VERSION,

@@ -5,7 +5,7 @@ import { applyGameMetadata } from './apply-game-metadata';
 
 export function gameRecordToPgn(game: GameRecord): string {
   const chess = new Chess();
-  applyGameMetadata(chess, game.metadata);
+  applyGameMetadata(chess, game.metadata, game.orientation);
 
   game.moveHistory.forEach((move) => {
     chess.move(move.san);

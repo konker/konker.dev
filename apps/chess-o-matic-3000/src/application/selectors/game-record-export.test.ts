@@ -26,6 +26,7 @@ describe('game record export selectors', () => {
       mimeType: 'application/x-chess-pgn',
       pgn: expect.stringContaining('[Event "Club Night"]'),
     });
+    expect(gameRecordToPgnExportDocument(game).pgn).toContain('[Orientation "white"]');
   });
 
   it('builds a text scoresheet export document from a game record', () => {
