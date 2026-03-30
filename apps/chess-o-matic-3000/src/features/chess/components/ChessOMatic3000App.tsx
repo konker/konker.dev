@@ -12,6 +12,7 @@ import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
+import { ExternalOpenToolbar } from './ExternalOpenToolbar';
 import { FenPanel } from './FenPanel';
 import { GameDataToolbar } from './GameDataToolbar';
 import { GameMetadata } from './GameMetadata';
@@ -169,6 +170,42 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     }
   }
 
+  async function openInLichess(): Promise<void> {
+    try {
+      await gameEngine.openGameInLichess();
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: 'Copied PGN and opened Lichess',
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown Lichess open error';
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: `Unable to open Lichess. ${message}`,
+      }));
+    }
+  }
+
+  async function openInChessDotCom(): Promise<void> {
+    try {
+      await gameEngine.openGameInChessDotCom();
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: 'Copied PGN and opened Chess.com',
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown Chess.com open error';
+      setUiState((state) => ({
+        ...state,
+        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+        lastInputResultMessage: `Unable to open Chess.com. ${message}`,
+      }));
+    }
+  }
+
   return (
     <main class="mx-auto flex max-w-3xl flex-col gap-4 p-4 sm:p-3">
       <h1>Chess-o-matic 3000</h1>
@@ -209,6 +246,14 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           isSoundEnabled={isSoundEnabled()}
           onToggleListening={() => void toggleListening()}
           onToggleSound={() => void toggleSound()}
+        />
+      </div>
+
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <ExternalOpenToolbar
+          disabled={isInitializing() || !!errorMessage()}
+          onOpenChessDotCom={() => void openInChessDotCom()}
+          onOpenLichess={() => void openInLichess()}
         />
       </div>
 
