@@ -5,7 +5,7 @@ import type { Square } from 'chess.js';
 import type { GChessBoardElement } from 'gchessboard';
 import { RotateCw } from 'lucide-solid';
 import type { JSX } from 'solid-js';
-import { createEffect, onCleanup, onMount } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 
 import type { GameBoardOrientation } from '../../../../domain/game/types';
 import type { ChessBoardController } from './controller';
@@ -20,10 +20,30 @@ type ChessBoardProps = {
   readonly orientation: GameBoardOrientation;
 };
 
+const BOARD_COLOR_SCHEME_GREEN = 'green' as const;
+const BOARD_COLOR_SCHEME_BROWN = 'brown' as const;
+type BoardColorScheme = typeof BOARD_COLOR_SCHEME_GREEN | typeof BOARD_COLOR_SCHEME_BROWN;
+
+const BOARD_COLOR_SCHEMES: Record<BoardColorScheme, { border: string; dark: string; label: string; light: string }> = {
+  brown: {
+    border: '#886649',
+    dark: '#B58863',
+    label: 'Brown/Beige',
+    light: '#F1DBCD',
+  },
+  green: {
+    border: '#668855',
+    dark: '#668855',
+    label: 'Green/White',
+    light: '#EFF1EE',
+  },
+} as const;
+
 export function ChessBoard(props: ChessBoardProps): JSX.Element {
   let boardEl: GChessBoardElement | undefined;
   let promotionDialogEl: HTMLDivElement | undefined;
   let lastHighlightedMove: [Square, Square] | undefined;
+  const [colorScheme, setColorScheme] = createSignal<BoardColorScheme>(BOARD_COLOR_SCHEME_GREEN);
 
   function clearMoveHighlight(board: GChessBoardElement): void {
     board.shadowRoot?.querySelectorAll('[last-move]')?.forEach((square) => square.removeAttribute('last-move'));
@@ -48,6 +68,15 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
 
   function setBoardTurnFromFen(board: GChessBoardElement, fen: string): void {
     board.turn = fen.split(' ')[1] === 'w' ? 'white' : 'black';
+  }
+
+  function applyBoardColorScheme(board: GChessBoardElement, scheme: BoardColorScheme): void {
+    const palette = BOARD_COLOR_SCHEMES[scheme];
+
+    board.style.setProperty('--board-border-color', palette.border);
+    board.style.setProperty('--board-square-light', palette.light);
+    board.style.setProperty('--board-square-dark', palette.dark);
+    board.style.setProperty('--inner-border-color', palette.border);
   }
 
   async function syncBoardMove(board: GChessBoardElement, move: [Square, Square] | string): Promise<void> {
@@ -95,10 +124,17 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     board.interactive = true;
     board.fen = props.fen;
     board.orientation = props.orientation;
+    applyBoardColorScheme(board, colorScheme());
     setBoardTurnFromFen(board, props.fen);
 
     const highlightStyle = document.createElement('style');
     highlightStyle.textContent = `
+      [data-square][data-square-color="light"] {
+        background-color: var(--board-square-light, #EFF1EE) !important;
+      }
+      [data-square][data-square-color="dark"] {
+        background-color: var(--board-square-dark, #668855) !important;
+      }
       [data-square][data-square-color="light"][last-move] {
         background-color: rgba(205, 210, 106, 0.8) !important;
       }
@@ -165,6 +201,14 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
       return;
     }
 
+    applyBoardColorScheme(boardEl, colorScheme());
+  });
+
+  createEffect(() => {
+    if (!boardEl) {
+      return;
+    }
+
     boardEl.orientation = props.orientation;
     if (lastHighlightedMove) {
       moveHighlight(boardEl, lastHighlightedMove);
@@ -176,13 +220,32 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
 
   return (
     <div class="flex flex-col gap-2">
-      <button class="flex items-center gap-2" onClick={props.onToggleOrientation} type="button">
-        <RotateCw class="h-4 w-4" />
-        <span>Toggle Board Orientation</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <button class="flex items-center gap-2" onClick={props.onToggleOrientation} type="button">
+          <RotateCw class="h-4 w-4" />
+          <span>Flip</span>
+        </button>
+
+        <button
+          aria-label="Toggle Board Color Scheme"
+          class="h-8 w-8 rounded border-2 border-[var(--board-border-color)]"
+          onClick={() =>
+            setColorScheme((current) =>
+              current === BOARD_COLOR_SCHEME_GREEN ? BOARD_COLOR_SCHEME_BROWN : BOARD_COLOR_SCHEME_GREEN
+            )
+          }
+          style={{ 'background-color': BOARD_COLOR_SCHEMES[colorScheme()].dark }}
+          title={`Board colors: ${BOARD_COLOR_SCHEMES[colorScheme()].label}`}
+          type="button"
+        />
+      </div>
 
       <div class="relative">
-        <g-chess-board class="block aspect-square w-full max-w-[34rem]" id="board" ref={boardEl} />
+        <g-chess-board
+          class="block aspect-square w-full max-w-[34rem] border-2 border-[var(--board-border-color)]"
+          id="board"
+          ref={boardEl}
+        />
         <div
           class="promotion-dialog absolute inset-0 hidden items-center justify-center bg-black/30 data-[open=true]:flex"
           data-open="false"

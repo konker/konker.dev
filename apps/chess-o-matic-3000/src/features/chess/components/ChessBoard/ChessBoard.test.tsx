@@ -43,17 +43,34 @@ describe('ChessBoard', () => {
     expect(onReady).toHaveBeenCalled();
 
     const controller = onReady.mock.calls[0]?.[0] as ChessBoardController | undefined;
-    const toggleButton = root.querySelector('button[type="button"]') as HTMLButtonElement | null;
+    const buttons = root.querySelectorAll('button[type="button"]');
+    const toggleButton = buttons.item(0) as HTMLButtonElement | null;
+    const colorSchemeToggle = root.querySelector(
+      'button[aria-label="Toggle Board Color Scheme"]'
+    ) as HTMLButtonElement | null;
     const board = root.querySelector('g-chess-board') as { orientation?: string } | null;
 
     expect(controller).toBeDefined();
-    expect(toggleButton?.textContent).toContain('Toggle Board Orientation');
+    expect(toggleButton?.textContent).toContain('Flip');
+    expect(colorSchemeToggle).not.toBeNull();
+    expect(colorSchemeToggle?.style.backgroundColor).toBe('rgb(102, 136, 85)');
     expect(board?.orientation).toBe('white');
+    expect((board as HTMLElement | null)?.style.getPropertyValue('--board-border-color')).toBe('#668855');
+    expect((board as HTMLElement | null)?.style.getPropertyValue('--board-square-light')).toBe('#EFF1EE');
+    expect((board as HTMLElement | null)?.style.getPropertyValue('--board-square-dark')).toBe('#668855');
 
     toggleButton?.click();
     await Promise.resolve();
 
     expect(board?.orientation).toBe('black');
+
+    colorSchemeToggle?.click();
+    await Promise.resolve();
+
+    expect(colorSchemeToggle?.style.backgroundColor).toBe('rgb(181, 136, 99)');
+    expect((board as HTMLElement | null)?.style.getPropertyValue('--board-border-color')).toBe('#886649');
+    expect((board as HTMLElement | null)?.style.getPropertyValue('--board-square-light')).toBe('#F1DBCD');
+    expect((board as HTMLElement | null)?.style.getPropertyValue('--board-square-dark')).toBe('#B58863');
 
     // eslint-disable-next-line fp/no-delete
     delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
