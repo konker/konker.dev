@@ -7,6 +7,7 @@ export type GameMetadataData = {
   readonly black: PlayerMetadata;
   readonly date: string;
   readonly event: string;
+  readonly result: string;
   readonly round: string;
   readonly site: string;
   readonly termination: string;
@@ -21,6 +22,7 @@ export const GAME_METADATA_EMPTY: GameMetadataData = {
   },
   date: '',
   event: '',
+  result: '',
   round: '',
   site: '',
   termination: '',
@@ -30,3 +32,10 @@ export const GAME_METADATA_EMPTY: GameMetadataData = {
     name: '',
   },
 } as const;
+
+export function createDefaultGameMetadata(now: string = new Date().toISOString()): GameMetadataData {
+  return {
+    ...GAME_METADATA_EMPTY,
+    date: now.slice(0, 10),
+  };
+}

@@ -36,6 +36,7 @@ function renderScoreSheetContent(game: GameRecord): string {
     ['WhiteElo', game.metadata.white.elo],
     ['Black', game.metadata.black.name],
     ['BlackElo', game.metadata.black.elo],
+    ['Result', game.metadata.result],
     ['TimeControl', game.metadata.timeControl],
     ['Termination', game.metadata.termination],
   ]

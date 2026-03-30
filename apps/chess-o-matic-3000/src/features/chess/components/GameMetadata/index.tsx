@@ -1,4 +1,4 @@
-import { Calendar, Clock3, Hash, MapPin, Trophy, User } from 'lucide-solid';
+import { Calendar, Clock3, Hash, MapPin, Medal, Trophy, User } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 
 import type { GameMetadataData } from './types';
@@ -144,6 +144,16 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
             />
           </div>
         </div>
+
+        <label class="flex flex-col gap-1">
+          {renderLabel(<Medal class="h-4 w-4" />, 'Result')}
+          <input
+            aria-label="Result"
+            onInput={(event) => updateField('result', event.currentTarget.value)}
+            type="text"
+            value={props.metadata.result}
+          />
+        </label>
       </div>
     </section>
   );

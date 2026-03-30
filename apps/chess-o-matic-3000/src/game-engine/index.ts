@@ -238,7 +238,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       currentPly: state.currentGame.currentPly,
       moveHistory: state.currentGame.moveHistory,
     });
-    applyGameMetadata(model.chess, state.currentGame.metadata);
+    applyGameMetadata(model.chess, state.currentGame.metadata, state.currentGame.orientation);
   }
 
   function syncAppStateFromGameModel(state: AppState, model: GameModelResources): void {
@@ -397,7 +397,11 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       if (result.action === GAME_MODEL_CONTROL_ACTION_UNDO) {
         gameModelStepBackward(state.gameModelResources);
         syncAppStateFromGameModel(state.appState, state.gameModelResources);
-        applyGameMetadata(state.gameModelResources.chess, requireAppState().currentGame.metadata);
+        applyGameMetadata(
+          state.gameModelResources.chess,
+          requireAppState().currentGame.metadata,
+          requireAppState().currentGame.orientation
+        );
         await persistAppState();
         syncBoardPosition();
       }
@@ -804,7 +808,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
         updatedAt: new Date().toISOString(),
       },
     };
-    applyGameMetadata(gameModelResources.chess, appState.currentGame.metadata);
+    applyGameMetadata(gameModelResources.chess, appState.currentGame.metadata, appState.currentGame.orientation);
     void persistAppState();
     emitCurrentUiState(
       appState,
@@ -846,7 +850,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     const model = state.gameModelResources;
     gameModelGoToStart(model);
     syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
     emitCurrentUiState(requireAppState(), model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game start', '', '');
@@ -857,7 +861,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     const model = state.gameModelResources;
     gameModelStepBackward(model);
     syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
     emitCurrentUiState(
@@ -875,7 +879,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     const model = state.gameModelResources;
     gameModelStepForward(model);
     syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
     emitCurrentUiState(
@@ -893,7 +897,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     const model = state.gameModelResources;
     gameModelGoToEnd(model);
     syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
     emitCurrentUiState(
@@ -911,7 +915,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     const model = state.gameModelResources;
     gameModelGoToPly(model, ply);
     syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata);
+    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
     emitCurrentUiState(

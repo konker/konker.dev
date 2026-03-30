@@ -1,6 +1,6 @@
 import type { AppSettings } from '../settings/types';
 import { APP_SETTINGS_DEFAULT } from '../settings/types';
-import { GAME_METADATA_EMPTY } from './metadata';
+import { createDefaultGameMetadata } from './metadata';
 import type {
   AppState,
   GameBoardOrientation,
@@ -65,21 +65,23 @@ function readMoveRecord(value: unknown, index: number): GameMoveRecord {
   };
 }
 
-function readGameMetadata(value: unknown): GameRecord['metadata'] {
+function readGameMetadata(value: unknown, createdAt: string): GameRecord['metadata'] {
   if (!isRecord(value)) {
-    return GAME_METADATA_EMPTY;
+    return createDefaultGameMetadata(createdAt);
   }
 
   const white = isRecord(value.white) ? value.white : {};
   const black = isRecord(value.black) ? value.black : {};
+  const defaults = createDefaultGameMetadata(createdAt);
 
   return {
     black: {
       elo: typeof black.elo === 'string' ? black.elo : '',
       name: typeof black.name === 'string' ? black.name : '',
     },
-    date: typeof value.date === 'string' ? value.date : '',
+    date: typeof value.date === 'string' ? value.date : defaults.date,
     event: typeof value.event === 'string' ? value.event : '',
+    result: typeof value.result === 'string' ? value.result : '',
     round: typeof value.round === 'string' ? value.round : '',
     site: typeof value.site === 'string' ? value.site : '',
     termination: typeof value.termination === 'string' ? value.termination : '',
@@ -127,7 +129,7 @@ function readGameRecord(value: unknown): GameRecord {
         ? Math.min(value.currentPly, moveHistory.length)
         : moveHistory.length,
     id: readString(value.id, 'currentGame.id'),
-    metadata: readGameMetadata(value.metadata),
+    metadata: readGameMetadata(value.metadata, createdAt),
     moveHistory,
     orientation: readOrientation(value.orientation),
     schemaVersion: GAME_RECORD_SCHEMA_VERSION,
