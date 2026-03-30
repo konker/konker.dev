@@ -140,6 +140,7 @@ export type GameEngine = {
   readonly exit: () => Promise<void>;
   readonly attachBoardController: (controller: ChessBoardController | undefined) => Promise<void>;
   readonly newGame: () => Promise<void>;
+  readonly discardGame: () => Promise<void>;
   readonly resetGame: () => Promise<void>;
   readonly saveCurrentGame: () => Promise<void>;
   readonly loadSavedGame: (gameId: GameId) => Promise<void>;
@@ -678,6 +679,30 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'New game', '', '');
   }
 
+  async function discardGame(): Promise<void> {
+    const state = requireInitialized();
+    const discardedGameId = state.appState.currentGame.id;
+    const nextAppState: AppState = {
+      ...state.appState,
+      currentGame: createEmptyGameRecord(new Date().toISOString(), createGameId()),
+      savedGameIds: state.appState.savedGameIds.filter((savedGameId) => savedGameId !== discardedGameId),
+    };
+
+    await gameStorage.deleteGame(discardedGameId);
+    appState = nextAppState;
+    syncGameModelFromAppState(nextAppState, state.gameModelResources);
+    syncBoardPosition();
+    await persistAppState();
+    emitCurrentUiState(
+      nextAppState,
+      state.gameModelResources,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      'Game discarded',
+      '',
+      ''
+    );
+  }
+
   async function resetGame(): Promise<void> {
     const state = requireInitialized();
     const nextAppState: AppState = {
@@ -934,6 +959,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     exit,
     attachBoardController,
     newGame,
+    discardGame,
     resetGame,
     saveCurrentGame,
     loadSavedGame,
