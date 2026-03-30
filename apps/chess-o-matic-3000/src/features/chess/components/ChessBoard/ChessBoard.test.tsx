@@ -58,4 +58,98 @@ describe('ChessBoard', () => {
     // eslint-disable-next-line fp/no-delete
     delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
   });
+
+  it('reapplies the highlighted move when the board orientation changes', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    const getAnimationsSpy = vi.fn(() => []);
+    Object.defineProperty(Element.prototype, 'getAnimations', {
+      configurable: true,
+      value: getAnimationsSpy,
+    });
+
+    const [orientation, setOrientation] = createSignal<GameBoardOrientation>(GAME_BOARD_ORIENTATION_WHITE);
+    const onReady = vi.fn();
+
+    render(
+      () => (
+        <ChessBoard
+          fen={START_FEN}
+          getPromotionPieceColor={() => undefined}
+          isLegalMove={() => true}
+          onMove={async () => Promise.resolve()}
+          onReady={onReady}
+          onToggleOrientation={() => setOrientation((current) => (current === 'white' ? 'black' : 'white'))}
+          orientation={orientation()}
+        />
+      ),
+      root
+    );
+
+    await Promise.resolve();
+
+    const controller = onReady.mock.calls[0]?.[0] as ChessBoardController | undefined;
+    const board = root.querySelector('g-chess-board') as HTMLElement | null;
+
+    if (!controller || !board) {
+      throw new Error('Expected board controller and element to be available.');
+    }
+
+    const fromSquare = document.createElement('div');
+    fromSquare.setAttribute('data-square', 'e2');
+    const toSquare = document.createElement('div');
+    toSquare.setAttribute('data-square', 'e4');
+    const shadowRoot = board.shadowRoot ?? board.attachShadow({ mode: 'open' });
+
+    const querySelector = (selector: string): Element | null => {
+      if (selector === '[data-square="e2"]') {
+        return fromSquare;
+      }
+
+      if (selector === '[data-square="e4"]') {
+        return toSquare;
+      }
+
+      return null;
+    };
+    const querySelectorAll = (): NodeListOf<Element> => {
+      const matchingSquares = [fromSquare, toSquare].filter((square) => square.hasAttribute('last-move'));
+
+      return {
+        entries: () => matchingSquares.entries(),
+        forEach: matchingSquares.forEach.bind(matchingSquares),
+        item: (index: number) => matchingSquares[index] ?? null,
+        keys: () => matchingSquares.keys(),
+        length: matchingSquares.length,
+        values: () => matchingSquares.values(),
+        [Symbol.iterator]: matchingSquares[Symbol.iterator].bind(matchingSquares),
+      } as unknown as NodeListOf<Element>;
+    };
+
+    Object.defineProperty(shadowRoot, 'querySelector', {
+      configurable: true,
+      value: querySelector,
+    });
+    Object.defineProperty(shadowRoot, 'querySelectorAll', {
+      configurable: true,
+      value: querySelectorAll,
+    });
+
+    controller.renderPosition(START_FEN, ['e2', 'e4']);
+    expect(fromSquare.hasAttribute('last-move')).toBe(true);
+    expect(toSquare.hasAttribute('last-move')).toBe(true);
+
+    fromSquare.removeAttribute('last-move');
+    toSquare.removeAttribute('last-move');
+
+    setOrientation('black');
+    await Promise.resolve();
+
+    expect(fromSquare.hasAttribute('last-move')).toBe(true);
+    expect(toSquare.hasAttribute('last-move')).toBe(true);
+
+    // eslint-disable-next-line fp/no-delete
+    delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
+  });
 });

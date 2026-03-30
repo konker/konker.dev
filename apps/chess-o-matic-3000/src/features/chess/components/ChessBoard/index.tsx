@@ -23,6 +23,7 @@ type ChessBoardProps = {
 export function ChessBoard(props: ChessBoardProps): JSX.Element {
   let boardEl: GChessBoardElement | undefined;
   let promotionDialogEl: HTMLDivElement | undefined;
+  let lastHighlightedMove: [Square, Square] | undefined;
 
   function clearMoveHighlight(board: GChessBoardElement): void {
     board.shadowRoot?.querySelectorAll('[last-move]')?.forEach((square) => square.removeAttribute('last-move'));
@@ -141,6 +142,7 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     props.onReady({
       renderPosition(fen: string, lastMove?: [Square, Square]): void {
         board.fen = fen;
+        lastHighlightedMove = lastMove;
         if (lastMove) {
           moveHighlight(board, lastMove);
         } else {
@@ -164,6 +166,12 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     }
 
     boardEl.orientation = props.orientation;
+    if (lastHighlightedMove) {
+      moveHighlight(boardEl, lastHighlightedMove);
+      return;
+    }
+
+    clearMoveHighlight(boardEl);
   });
 
   return (
