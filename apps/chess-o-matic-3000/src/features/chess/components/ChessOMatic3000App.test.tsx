@@ -18,6 +18,8 @@ describe('ChessOMatic3000App', () => {
     expect(root.textContent).toContain('Chess-o-matic 3000');
     expect(root.textContent).toContain('New game');
     expect(root.textContent).toContain('Discard game');
+    expect(root.textContent).toContain('Open in Lichess');
+    expect(root.textContent).toContain('Open in Chess.com');
     expect(root.textContent).toContain('Speech');
     expect(root.textContent).toContain('Sounds');
     expect(root.textContent).toContain('PGN');
