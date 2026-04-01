@@ -85,6 +85,34 @@ describe('createGameEngine persistence', () => {
     });
   });
 
+  it('restores a past position as neutral when current ply is behind the last move', async () => {
+    const storedAppState: AppState = {
+      ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
+      currentGame: {
+        ...createDefaultAppState('2026-03-30T00:00:00.000Z').currentGame,
+        currentPly: 1,
+        id: 'restored-past-position',
+        moveHistory: [
+          { from: 'e2', san: 'e4', to: 'e4' },
+          { from: 'e7', san: 'e5', to: 'e5' },
+        ],
+      },
+    };
+    const gameStorage = createMemoryGameStorage(storedAppState);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+
+    expect(onUiStateChange).toHaveBeenCalled();
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 1,
+      lastInputEvaluateStatus: 'ignore',
+      lastInputResultMessage: 'Viewing past move',
+      lastMoveSan: 'e4',
+    });
+  });
+
   it('persists app state after moves and metadata changes', async () => {
     const gameStorage = createMemoryGameStorage(undefined);
     const gameEngine = createGameEngine({ gameStorage });
@@ -98,6 +126,48 @@ describe('createGameEngine persistence', () => {
 
     expect(gameStorage.appState?.currentGame.moveHistory).toEqual([{ from: 'e2', san: 'e4', to: 'e4' }]);
     expect(gameStorage.appState?.currentGame.metadata.event).toBe('Saved Locally');
+  });
+
+  it('uses consistent status snapshots when navigating through history', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('e4');
+    await gameEngine.handleBoardMove('e5');
+
+    gameEngine.stepBackward();
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 1,
+      lastInputEvaluateStatus: 'ignore',
+      lastInputResultMessage: 'VIEWING PAST MOVE',
+      lastMoveSan: 'e4',
+    });
+
+    gameEngine.goToStart();
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 0,
+      lastInputEvaluateStatus: 'ignore',
+      lastInputResultMessage: 'VIEWING PAST MOVE',
+      lastMoveSan: '',
+    });
+
+    gameEngine.stepForward();
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 1,
+      lastInputEvaluateStatus: 'ignore',
+      lastInputResultMessage: 'VIEWING PAST MOVE',
+      lastMoveSan: 'e4',
+    });
+
+    gameEngine.goToEnd();
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 2,
+      lastInputEvaluateStatus: 'ok',
+      lastInputResultMessage: 'OK',
+      lastMoveSan: 'e5',
+    });
   });
 
   it('exports and opens the selected saved game through injected adapters', async () => {

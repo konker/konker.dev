@@ -1,11 +1,9 @@
-import { Info } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 
 type StatusPanelProps = {
   readonly controls?: JSX.Element;
-  readonly currentPly: number;
   readonly status: GameModelEvaluateStatus;
   readonly lastMoveSan: string;
   readonly message: string;
@@ -29,12 +27,22 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
     }
   }
 
-  function renderMoveNumber(): number {
-    return Math.max(1, Math.ceil(props.currentPly / 2));
+  function renderDisplayMessage(): string {
+    return props.message === props.lastMoveSan ? '' : props.message;
   }
 
-  function renderCurrentMoveColor(): 'White' | 'Black' {
-    return props.currentPly % 2 === 0 ? 'White' : 'Black';
+  function renderChipMessage(): string {
+    const displayMessage = renderDisplayMessage();
+
+    if (displayMessage !== '') {
+      return displayMessage;
+    }
+
+    if (props.status === 'ok') {
+      return 'OK';
+    }
+
+    return props.lastMoveSan || 'No move yet';
   }
 
   function scrollPanelToTop(): void {
@@ -43,31 +51,18 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
 
   return (
     <section class="status-surface" data-status={props.status} id="status" ref={panelEl}>
-      <div class="status-header">
-        <span class="status-label">
-          <Info class="h-4 w-4" />
-          <span>Status</span>
-        </span>
-        <span aria-label="Last Input Evaluate Status" class="status-chip">
-          {renderStatusText()}
-        </span>
-      </div>
+      <span aria-label="Last Input Evaluate Status" class="status-chip status-floating-chip">
+        {renderChipMessage()}
+      </span>
       <button
         aria-label="Last Input SAN"
-        class="status-san cursor-pointer text-left"
+        class="status-san cursor-pointer pr-28 text-left"
         onClick={scrollPanelToTop}
         type="button"
       >
-        {props.lastMoveSan || 'No move yet'}
+        {props.lastMoveSan || '-'}
       </button>
-      <div aria-label="Last Input Message" class="status-message">
-        {props.message}
-      </div>
-      <div class="flex flex-wrap gap-2 text-sm">
-        <span class="status-chip">Move {renderMoveNumber()}</span>
-        <span class="status-chip">{renderCurrentMoveColor()} to move</span>
-      </div>
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-wrap items-baseline gap-3">
         <span class="status-heard-label">Heard</span>
         <span aria-label="Last Input Sanitized" class="status-heard-value">
           {props.sanitizedInput || 'No input yet'}

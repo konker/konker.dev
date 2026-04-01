@@ -333,14 +333,26 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     readonly sanitizedInput: string;
     readonly status: GameModelEvaluateStatus;
   } {
-    const lastMoveSan = state.currentGame.moveHistory.at(-1)?.san ?? '';
+    const currentMoveSan =
+      state.currentGame.currentPly > 0 ? state.currentGame.moveHistory[state.currentGame.currentPly - 1]?.san ?? '' : '';
+    const isAtLatestMove =
+      state.currentGame.currentPly > 0 && state.currentGame.currentPly === state.currentGame.moveHistory.length;
 
-    if (lastMoveSan !== '') {
+    if (isAtLatestMove && currentMoveSan !== '') {
       return {
-        lastMoveSan,
-        message: lastMoveSan,
+        lastMoveSan: currentMoveSan,
+        message: currentMoveSan,
         sanitizedInput: '',
         status: GAME_MODEL_EVALUATE_STATUS_OK,
+      };
+    }
+
+    if (currentMoveSan !== '') {
+      return {
+        lastMoveSan: currentMoveSan,
+        message: 'Viewing past move',
+        sanitizedInput: '',
+        status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
       };
     }
 
@@ -348,6 +360,29 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       lastMoveSan: '',
       message: 'No moves',
       sanitizedInput: '',
+      status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+    };
+  }
+
+  function createNavigationStatusSnapshot(model: GameModelResources): {
+    readonly lastMoveSan: string;
+    readonly message: string;
+    readonly status: GameModelEvaluateStatus;
+  } {
+    const lastMoveSan = model.chess.history().at(-1) ?? '';
+    const isAtLatestMove = model.currentPly > 0 && model.currentPly === model.moveHistory.length;
+
+    if (isAtLatestMove) {
+      return {
+        lastMoveSan,
+        message: 'OK',
+        status: GAME_MODEL_EVALUATE_STATUS_OK,
+      };
+    }
+
+    return {
+      lastMoveSan,
+      message: 'VIEWING PAST MOVE',
       status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
     };
   }
@@ -878,7 +913,8 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
-    emitCurrentUiState(requireAppState(), model, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'At game start', '', '');
+    const snapshot = createNavigationStatusSnapshot(model);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateStepBackward(): void {
@@ -889,14 +925,8 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
-    emitCurrentUiState(
-      requireAppState(),
-      model,
-      GAME_MODEL_EVALUATE_STATUS_IGNORE,
-      'Moved back one ply',
-      '',
-      model.chess.history().at(-1) ?? ''
-    );
+    const snapshot = createNavigationStatusSnapshot(model);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateStepForward(): void {
@@ -907,14 +937,8 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
-    emitCurrentUiState(
-      requireAppState(),
-      model,
-      GAME_MODEL_EVALUATE_STATUS_IGNORE,
-      'Moved forward one ply',
-      '',
-      model.chess.history().at(-1) ?? ''
-    );
+    const snapshot = createNavigationStatusSnapshot(model);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateToEnd(): void {
@@ -925,14 +949,8 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
-    emitCurrentUiState(
-      requireAppState(),
-      model,
-      GAME_MODEL_EVALUATE_STATUS_IGNORE,
-      'At game end',
-      '',
-      model.chess.history().at(-1) ?? ''
-    );
+    const snapshot = createNavigationStatusSnapshot(model);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateToPly(ply: number): void {
@@ -943,14 +961,8 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void persistAppState();
-    emitCurrentUiState(
-      requireAppState(),
-      model,
-      GAME_MODEL_EVALUATE_STATUS_IGNORE,
-      'Moved to selected ply',
-      '',
-      model.chess.history().at(-1) ?? ''
-    );
+    const snapshot = createNavigationStatusSnapshot(model);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
