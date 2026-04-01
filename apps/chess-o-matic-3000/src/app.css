@@ -507,12 +507,20 @@
     @apply flex flex-col gap-3;
   }
 
+  .board-section-layout {
+    @apply flex flex-col gap-3;
+  }
+
   .board-toolbar {
     @apply flex flex-wrap items-center gap-2;
   }
 
+  .board-navigation-row {
+    @apply w-full;
+  }
+
   .board-frame {
-    @apply mx-auto border p-2;
+    @apply border p-2;
     border-color: var(--color-border-strong);
     background-color: color-mix(in srgb, var(--color-bg-panel-muted) 78%, white);
   }

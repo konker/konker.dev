@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, SkipBack, SkipForward } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 
-type GameNavigationPanelProps = {
+type GameNavigationToolbarProps = {
   readonly canGoBackward: boolean;
   readonly canGoForward: boolean;
   readonly disabled: boolean;
@@ -11,7 +11,7 @@ type GameNavigationPanelProps = {
   readonly onStepForward: () => void;
 };
 
-export function GameNavigationPanel(props: GameNavigationPanelProps): JSX.Element {
+export function GameNavigationToolbar(props: GameNavigationToolbarProps): JSX.Element {
   return (
     <div class="toolbar-group" role="group" aria-label="Game navigation">
       <button
