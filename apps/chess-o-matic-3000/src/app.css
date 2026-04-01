@@ -238,7 +238,7 @@
   }
 
   .status-surface {
-    @apply flex flex-col gap-3 border px-4 py-4 sm:px-5 sm:py-5;
+    @apply relative flex flex-col gap-3 border px-4 py-4 sm:px-5 sm:py-5;
     border-width: 2px 2px 2px 0.85rem;
   }
 
@@ -274,19 +274,41 @@
     @apply flex items-center gap-2 text-xs uppercase tracking-[0.22em];
   }
 
+  .status-inline-message {
+    @apply text-sm font-medium leading-6 sm:text-base;
+  }
+
   .status-chip {
     @apply border px-2 py-1 text-[0.7rem] font-medium uppercase tracking-[0.18em];
     border-color: currentColor;
     background-color: color-mix(in srgb, currentColor 9%, white);
   }
 
-  .status-san {
-    @apply text-4xl font-semibold leading-none sm:text-5xl;
+  .status-floating-chip {
+    @apply absolute right-4 top-4 sm:right-5 sm:top-5;
+  }
+
+  .status-move-chip {
+    @apply inline-flex min-w-10 justify-center;
     font-family: var(--font-data);
   }
 
-  .status-message {
-    @apply text-base font-medium leading-6 sm:text-lg;
+  .status-color-chip {
+    @apply inline-block h-7 w-7 border;
+    border-color: currentColor;
+  }
+
+  .status-color-chip-white {
+    background-color: white;
+  }
+
+  .status-color-chip-black {
+    background-color: #1b1c1b;
+  }
+
+  .status-san {
+    @apply text-4xl font-semibold leading-none sm:text-5xl;
+    font-family: var(--font-data);
   }
 
   .status-heard-label {
@@ -490,7 +512,7 @@
   }
 
   .board-frame {
-    @apply border p-2;
+    @apply mx-auto border p-2;
     border-color: var(--color-border-strong);
     background-color: color-mix(in srgb, var(--color-bg-panel-muted) 78%, white);
   }

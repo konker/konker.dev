@@ -89,19 +89,11 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     try {
       await gameEngine.audioInputToggle();
       syncAudioState();
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused',
-      }));
+      updateStatusMessage(gameEngine.isAudioInputOn() ? 'Listening for moves' : 'Voice input paused');
     } catch (error) {
       syncAudioState();
       const message = error instanceof Error ? error.message : 'Unknown speech input error';
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: `Speech input unavailable. ${message}`,
-      }));
+      updateStatusMessage(`Speech input unavailable. ${message}`);
     }
   }
 
@@ -109,19 +101,11 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     try {
       await gameEngine.audioOutputToggle();
       syncAudioState();
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted',
-      }));
+      updateStatusMessage(gameEngine.isAudioOutputOn() ? 'Move sounds enabled' : 'Move sounds muted');
     } catch (error) {
       syncAudioState();
       const message = error instanceof Error ? error.message : 'Unknown audio output error';
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: `Audio output unavailable. ${message}`,
-      }));
+      updateStatusMessage(`Audio output unavailable. ${message}`);
     }
   }
 
@@ -143,16 +127,27 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     gameEngine.setGameMetadata(metadata);
   }
 
+  function updateStatusMessage(message: string): void {
+    setUiState((state) => ({
+      ...state,
+      lastInputResultMessage: message,
+    }));
+  }
+
+  function renderCurrentMoveNumber(): number {
+    return Math.max(1, Math.ceil(uiState().currentPly / 2));
+  }
+
+  function renderCurrentMoveColor(): 'white' | 'black' {
+    return uiState().currentPly % 2 === 0 ? 'white' : 'black';
+  }
+
   async function startNewGame(): Promise<void> {
     try {
       await gameEngine.newGame();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown new game error';
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: `Unable to start a new game. ${message}`,
-      }));
+      updateStatusMessage(`Unable to start a new game. ${message}`);
     }
   }
 
@@ -161,47 +156,27 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       await gameEngine.discardGame();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown discard game error';
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: `Unable to discard the current game. ${message}`,
-      }));
+      updateStatusMessage(`Unable to discard the current game. ${message}`);
     }
   }
 
   async function openInLichess(): Promise<void> {
     try {
       await gameEngine.openGameInLichess();
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: 'Copied PGN and opened Lichess',
-      }));
+      updateStatusMessage('Copied PGN and opened Lichess');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown Lichess open error';
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: `Unable to open Lichess. ${message}`,
-      }));
+      updateStatusMessage(`Unable to open Lichess. ${message}`);
     }
   }
 
   async function openInChessDotCom(): Promise<void> {
     try {
       await gameEngine.openGameInChessDotCom();
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: 'Copied PGN and opened Chess.com',
-      }));
+      updateStatusMessage('Copied PGN and opened Chess.com');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown Chess.com open error';
-      setUiState((state) => ({
-        ...state,
-        lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
-        lastInputResultMessage: `Unable to open Chess.com. ${message}`,
-      }));
+      updateStatusMessage(`Unable to open Chess.com. ${message}`);
     }
   }
 
@@ -235,14 +210,27 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             onToggleSound={() => void toggleSound()}
           />
         }
-        currentPly={uiState().currentPly}
         lastMoveSan={uiState().lastMoveSan}
         message={uiState().lastInputResultMessage}
         sanitizedInput={uiState().lastInputSanitized}
         status={uiState().lastInputEvaluateStatus}
       />
 
-      <CollapsibleSection icon={Grid3x3} open storageKey="board" title="Board">
+      <CollapsibleSection
+        headerAside={
+          <>
+            <span class="status-chip status-move-chip">{renderCurrentMoveNumber()}</span>
+            <span
+              aria-label={`${renderCurrentMoveColor()} to move`}
+              class={`status-color-chip status-color-chip-${renderCurrentMoveColor()}`}
+            />
+          </>
+        }
+        icon={Grid3x3}
+        open
+        storageKey="board"
+        title="Board"
+      >
         <ChessBoard
           fen={uiState().fen}
           getPromotionPieceColor={gameEngine.getPromotionPieceColor}

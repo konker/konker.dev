@@ -5,6 +5,7 @@ import { createSignal, onMount } from 'solid-js';
 
 type CollapsibleSectionProps = {
   readonly children: JSX.Element;
+  readonly headerAside?: JSX.Element;
   readonly icon?: Component<{ class?: string }>;
   readonly open?: boolean;
   readonly storageKey?: string;
@@ -67,6 +68,7 @@ export function CollapsibleSection(props: CollapsibleSectionProps): JSX.Element 
             <span class="section-summary-title">{props.title}</span>
           </span>
         </span>
+        {props.headerAside ? <span class="flex items-center gap-2">{props.headerAside}</span> : null}
       </summary>
       <div class="section-body">{props.children}</div>
     </details>
