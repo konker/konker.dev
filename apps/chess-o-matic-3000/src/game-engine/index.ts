@@ -101,6 +101,7 @@ export type GameEngineUiState = {
   readonly pgn: string;
   readonly pgnMoveList: PgnMoveListData;
   readonly fen: string;
+  readonly currentGameId: GameId;
   readonly gameMetadata: GameMetadataData;
   readonly lastMoveSan: string;
   readonly lastInputSanitized: string;
@@ -114,6 +115,7 @@ export const GAME_ENGINE_UI_STATE_EMPTY: GameEngineUiState = {
   canGoBackward: false,
   canGoForward: false,
   currentPly: 0,
+  currentGameId: 'current-game',
   fen: START_FEN,
   gameMetadata: GAME_METADATA_EMPTY,
   lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
@@ -308,6 +310,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       canGoBackward: gameModelCanGoBackward(model),
       canGoForward: gameModelCanGoForward(model),
       currentPly: model.currentPly,
+      currentGameId: state.currentGame.id,
       boardOrientation: state.currentGame.orientation,
       lastInputSanitized: sanitizedInput,
       lastMoveSan,

@@ -15,7 +15,7 @@ import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
 import { GameMetadata } from './GameMetadata';
-import { GameNavigationPanel } from './GameNavigationPanel';
+import { GameNavigationToolbar } from './GameNavigationToolbar';
 import { PgnPanel } from './PgnPanel';
 import { ScoreSheet } from './ScoreSheet';
 import { StatusPanel } from './StatusPanel';
@@ -248,33 +248,37 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         storageKey="board"
         title="Board"
       >
-        <ChessBoard
-          fen={uiState().fen}
-          getPromotionPieceColor={gameEngine.getPromotionPieceColor}
-          isLegalMove={gameEngine.isLegalMove}
-          onMove={gameEngine.handleBoardMove}
-          onReady={(controller) => void setBoardController(controller)}
-          onToggleOrientation={() => gameEngine.toggleBoardOrientation()}
-          orientation={uiState().boardOrientation}
-        />
+        <div class="board-section-layout">
+          <ChessBoard
+            fen={uiState().fen}
+            getPromotionPieceColor={gameEngine.getPromotionPieceColor}
+            isLegalMove={gameEngine.isLegalMove}
+            onMove={gameEngine.handleBoardMove}
+            onReady={(controller) => void setBoardController(controller)}
+            onToggleOrientation={() => gameEngine.toggleBoardOrientation()}
+            orientation={uiState().boardOrientation}
+          />
+
+          <div class="board-navigation-row">
+            <GameNavigationToolbar
+              canGoBackward={uiState().canGoBackward}
+              canGoForward={uiState().canGoForward}
+              disabled={isInitializing() || !!errorMessage()}
+              onGoToEnd={() => gameEngine.goToEnd()}
+              onGoToStart={() => gameEngine.goToStart()}
+              onStepBackward={() => gameEngine.stepBackward()}
+              onStepForward={() => gameEngine.stepForward()}
+            />
+          </div>
+        </div>
       </CollapsibleSection>
 
-      <section aria-label="Navigation" class="app-control-zone">
-        <div class="app-control-row">
-          <GameNavigationPanel
-            canGoBackward={uiState().canGoBackward}
-            canGoForward={uiState().canGoForward}
-            disabled={isInitializing() || !!errorMessage()}
-            onGoToEnd={() => gameEngine.goToEnd()}
-            onGoToStart={() => gameEngine.goToStart()}
-            onStepBackward={() => gameEngine.stepBackward()}
-            onStepForward={() => gameEngine.stepForward()}
-          />
-        </div>
-      </section>
-
       <CollapsibleSection icon={SlidersHorizontal} open storageKey="info" title="Info">
-        <GameMetadata metadata={uiState().gameMetadata} onMetadataChange={handleMetadataChange} />
+        <GameMetadata
+          gameId={() => uiState().currentGameId}
+          metadata={() => uiState().gameMetadata}
+          onMetadataChange={handleMetadataChange}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection icon={NotebookPen} open storageKey="scoresheet" title="Scoresheet">

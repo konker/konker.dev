@@ -6,7 +6,7 @@ import { GameMetadata } from './index';
 import { GAME_METADATA_EMPTY } from './types';
 
 describe('GameMetadata', () => {
-  it('emits updated metadata when form fields change', () => {
+  it('emits updated metadata when fields are committed', () => {
     const root = document.createElement('div');
     const onMetadataChange = vi.fn();
     document.body.append(root);
@@ -19,7 +19,7 @@ describe('GameMetadata', () => {
         onMetadataChange(nextMetadata);
       }
 
-      return <GameMetadata metadata={metadata()} onMetadataChange={handleMetadataChange} />;
+      return <GameMetadata gameId={() => 'game-1'} metadata={metadata} onMetadataChange={handleMetadataChange} />;
     }, root);
 
     function getRequiredInput(selector: string): HTMLInputElement {
@@ -33,18 +33,24 @@ describe('GameMetadata', () => {
     const eventInput = getRequiredInput('input[type="text"]');
     eventInput.value = 'Club Championship';
     eventInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    expect(eventInput.value).toBe('Club Championship');
+    expect(onMetadataChange).not.toHaveBeenCalled();
+    eventInput.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
 
-    const dateInput = getRequiredInput('input[type="date"]');
-    dateInput.value = '2026-03-29';
+    const dateInput = getRequiredInput('input[aria-label="Date"]');
+    dateInput.value = '29/03/2026';
     dateInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    dateInput.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
 
     const resultInput = getRequiredInput('input[aria-label="Result"]');
     resultInput.value = '1-0';
     resultInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    resultInput.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
 
     const whiteNameInput = getRequiredInput('input[aria-label="White Name"]');
     whiteNameInput.value = 'Alice';
     whiteNameInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    whiteNameInput.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
 
     expect(onMetadataChange).toHaveBeenCalledTimes(4);
     expect(onMetadataChange).toHaveBeenLastCalledWith({
