@@ -263,6 +263,39 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     await gameStorage.saveAppState(appState);
   }
 
+  function shouldPersistGameToHistory(game: AppState['currentGame']): boolean {
+    return game.moveHistory.length > 0;
+  }
+
+  function syncAppStateSavedGameIds(gameId: GameId, shouldPersist: boolean): void {
+    if (!appState) {
+      return;
+    }
+
+    appState = {
+      ...appState,
+      savedGameIds: shouldPersist
+        ? [gameId, ...appState.savedGameIds.filter((savedGameId) => savedGameId !== gameId)]
+        : appState.savedGameIds.filter((savedGameId) => savedGameId !== gameId),
+    };
+  }
+
+  async function syncPersistedCurrentGame(game: AppState['currentGame']): Promise<void> {
+    if (shouldPersistGameToHistory(game)) {
+      await gameStorage.saveGame(game);
+      syncAppStateSavedGameIds(game.id, true);
+      return;
+    }
+
+    if (!appState?.savedGameIds.includes(game.id)) {
+      syncAppStateSavedGameIds(game.id, false);
+      return;
+    }
+
+    await gameStorage.deleteGame(game.id);
+    syncAppStateSavedGameIds(game.id, false);
+  }
+
   function emitCurrentUiState(
     state: AppState,
     model: GameModelResources,
@@ -432,6 +465,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     if (result.status === GAME_MODEL_EVALUATE_STATUS_OK) {
       syncAppStateFromGameModel(state.appState, state.gameModelResources);
       const nextState = requireAppState();
+      await syncPersistedCurrentGame(nextState.currentGame);
       await persistAppState();
       const flags = resolveGameMoveFlags(state.gameModelResources.chess, nextState.currentGame.orientation);
       syncBoardPosition();
@@ -731,6 +765,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
 
   async function newGame(): Promise<void> {
     const state = requireInitialized();
+    await syncPersistedCurrentGame(state.appState.currentGame);
     const nextAppState: AppState = {
       ...state.appState,
       currentGame: createEmptyGameRecord(new Date().toISOString(), createGameId()),
@@ -739,6 +774,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     appState = nextAppState;
     syncGameModelFromAppState(nextAppState, state.gameModelResources);
     syncBoardPosition();
+    await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
     emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'New game', '', '');
   }
@@ -756,6 +792,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     appState = nextAppState;
     syncGameModelFromAppState(nextAppState, state.gameModelResources);
     syncBoardPosition();
+    await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
     emitCurrentUiState(
       nextAppState,
@@ -769,6 +806,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
 
   async function resetGame(): Promise<void> {
     const state = requireInitialized();
+    await gameStorage.deleteGame(state.appState.currentGame.id);
     const nextAppState: AppState = {
       ...state.appState,
       currentGame: createEmptyGameRecord(new Date().toISOString(), state.appState.currentGame.id),
@@ -777,21 +815,14 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     appState = nextAppState;
     syncGameModelFromAppState(nextAppState, state.gameModelResources);
     syncBoardPosition();
+    await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
     emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'Game reset', '', '');
   }
 
   async function saveCurrentGame(): Promise<void> {
     const state = requireInitialized();
-    await gameStorage.saveGame(state.appState.currentGame);
-
-    appState = {
-      ...state.appState,
-      savedGameIds: [
-        state.appState.currentGame.id,
-        ...state.appState.savedGameIds.filter((savedGameId) => savedGameId !== state.appState.currentGame.id),
-      ],
-    };
+    await syncPersistedCurrentGame(state.appState.currentGame);
 
     await persistAppState();
   }
@@ -806,22 +837,19 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
 
     const nextAppState: AppState = {
       ...state.appState,
-      currentGame: savedGame,
+      currentGame: {
+        ...savedGame,
+        currentPly: savedGame.moveHistory.length,
+      },
       savedGameIds: [gameId, ...state.appState.savedGameIds.filter((savedGameId) => savedGameId !== gameId)],
     };
 
     appState = nextAppState;
     syncGameModelFromAppState(nextAppState, state.gameModelResources);
     syncBoardPosition();
+    await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
-    emitCurrentUiState(
-      nextAppState,
-      state.gameModelResources,
-      GAME_MODEL_EVALUATE_STATUS_IGNORE,
-      'Saved game loaded',
-      '',
-      ''
-    );
+    emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_OK, 'OK', '', savedGame.moveHistory.at(-1)?.san ?? '');
   }
 
   async function listSavedGames(): Promise<PersistedSavedGameIndex> {
@@ -869,6 +897,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       },
     };
     applyGameMetadata(gameModelResources.chess, appState.currentGame.metadata, appState.currentGame.orientation);
+    void syncPersistedCurrentGame(appState.currentGame);
     void persistAppState();
     emitCurrentUiState(
       appState,
@@ -894,6 +923,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       },
     };
 
+    void syncPersistedCurrentGame(appState.currentGame);
     void persistAppState();
     emitCurrentUiState(
       appState,
@@ -912,6 +942,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
+    void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
     emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
@@ -924,6 +955,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
+    void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
     emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
@@ -936,6 +968,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
+    void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
     emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
@@ -948,6 +981,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
+    void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
     emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
@@ -960,6 +994,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
+    void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
     emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
@@ -977,6 +1012,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
     syncGameModelFromAppState(appState, gameModelResources);
+    await syncPersistedCurrentGame(appState.currentGame);
 
     gameModelEventsAddListener(
       gameModelResources,

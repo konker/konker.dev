@@ -16,17 +16,16 @@ describe('ChessOMatic3000App', () => {
     await Promise.resolve();
 
     expect(root.textContent).toContain('Chess-o-matic 3000');
-    expect(root.textContent).toContain('New game');
+    expect(root.querySelector('button[aria-label="Open menu"]')).not.toBeNull();
     expect(root.textContent).toContain('Discard game');
     expect(root.textContent).toContain('Open in Lichess');
     expect(root.textContent).toContain('Open in Chess.com');
     expect(root.textContent).toContain('Speech');
     expect(root.textContent).toContain('Sounds');
     expect(root.textContent).toContain('PGN');
-    expect(root.textContent).toContain('Status');
     expect(root.textContent).toContain('Heard');
     expect(root.querySelector('[data-testid="mock-chess-board"]')).not.toBeNull();
-    expect((root.querySelector('[aria-label="Last Input Message"]') as HTMLElement | null)?.textContent).toContain(
+    expect((root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent).toContain(
       'Component test mode'
     );
   });

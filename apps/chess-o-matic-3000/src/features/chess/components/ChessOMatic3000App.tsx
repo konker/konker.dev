@@ -8,12 +8,12 @@ import type { GameMetadataData } from '../../../domain/game/metadata';
 import type { GameEngine, GameEngineUiState } from '../../../game-engine';
 import { createGameEngine, GAME_ENGINE_UI_STATE_EMPTY } from '../../../game-engine';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
+import { AppMenu } from './AppMenu';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ControlsPanel } from './ControlsPanel';
 import { FenPanel } from './FenPanel';
-import { GameDataToolbar } from './GameDataToolbar';
 import { GameMetadata } from './GameMetadata';
 import { GameNavigationPanel } from './GameNavigationPanel';
 import { PgnPanel } from './PgnPanel';
@@ -22,6 +22,10 @@ import { StatusPanel } from './StatusPanel';
 
 type ChessOMaticAppProps = {
   readonly autoloadEngine?: boolean;
+  readonly onConsumeRouteAction?: () => void;
+  readonly onGoToHistory?: () => void;
+  readonly requestedGameId?: string;
+  readonly requestNewGame?: boolean;
 };
 
 export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
@@ -66,6 +70,14 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           setUiState(state);
         },
       });
+
+      if (props.requestedGameId) {
+        await gameEngine.loadSavedGame(props.requestedGameId);
+        props.onConsumeRouteAction?.();
+      } else if (props.requestNewGame) {
+        await gameEngine.newGame();
+        props.onConsumeRouteAction?.();
+      }
 
       syncAudioState();
     } catch (error) {
@@ -187,11 +199,16 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           <div class="flex flex-col gap-2">
             <span class="app-eyebrow">Voice-first chess recorder</span>
             <h1 class="app-title flex items-center gap-1">
-              <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.black.svg" />
+              <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
               <span>Chess-o-matic 3000</span>
             </h1>
           </div>
-          <div aria-hidden="true" class="app-header-furniture" />
+          <AppMenu
+            onGoToHistory={() => props.onGoToHistory?.()}
+            onNewGame={() => {
+              void startNewGame();
+            }}
+          />
         </div>
         <p class="app-subtitle"></p>
       </header>
@@ -252,16 +269,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             onGoToStart={() => gameEngine.goToStart()}
             onStepBackward={() => gameEngine.stepBackward()}
             onStepForward={() => gameEngine.stepForward()}
-          />
-        </div>
-      </section>
-
-      <section aria-label="Controls" class="app-control-zone">
-        <div class="app-control-row">
-          <GameDataToolbar
-            disabled={isInitializing() || !!errorMessage()}
-            onDiscardGame={() => void discardCurrentGame()}
-            onNewGame={() => void startNewGame()}
           />
         </div>
       </section>

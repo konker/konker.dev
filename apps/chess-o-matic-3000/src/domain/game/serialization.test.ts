@@ -127,6 +127,7 @@ describe('game serialization', () => {
         {
           black: 'Bob',
           createdAt: '2026-03-30T00:00:00.000Z',
+          date: '2026-03-30',
           event: 'League Match',
           id: 'game-1',
           moveCount: 42,

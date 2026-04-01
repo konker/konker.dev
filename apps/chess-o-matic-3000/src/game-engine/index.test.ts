@@ -6,7 +6,7 @@ import type { FileExport } from '../application/ports/FileExport';
 import type { GameStorage } from '../application/ports/GameStorage';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
 import type { AppState } from '../domain/game/types';
-import { createDefaultAppState, EMPTY_PERSISTED_SAVED_GAME_INDEX } from '../domain/game/types';
+import { createDefaultAppState } from '../domain/game/types';
 import { createGameEngine } from './index';
 
 function createMemoryGameStorage(seedAppState = createDefaultAppState('2026-03-30T00:00:00.000Z')): GameStorage & {
@@ -31,7 +31,19 @@ function createMemoryGameStorage(seedAppState = createDefaultAppState('2026-03-3
       return games.get(gameId);
     },
     async loadSavedGameIndex() {
-      return EMPTY_PERSISTED_SAVED_GAME_INDEX;
+      return {
+        savedGames: Array.from(games.values()).map((game) => ({
+          black: game.metadata.black.name,
+          createdAt: game.createdAt,
+          date: game.metadata.date,
+          event: game.metadata.event,
+          id: game.id,
+          moveCount: game.moveHistory.length,
+          updatedAt: game.updatedAt,
+          white: game.metadata.white.name,
+        })),
+        schemaVersion: 1,
+      };
     },
     async saveAppState(nextAppState) {
       appState = nextAppState;
@@ -126,6 +138,29 @@ describe('createGameEngine persistence', () => {
 
     expect(gameStorage.appState?.currentGame.moveHistory).toEqual([{ from: 'e2', san: 'e4', to: 'e4' }]);
     expect(gameStorage.appState?.currentGame.metadata.event).toBe('Saved Locally');
+    await expect(gameStorage.loadSavedGameIndex()).resolves.toMatchObject({
+      savedGames: [
+        expect.objectContaining({
+          id: gameStorage.appState?.currentGame.id,
+          moveCount: 1,
+        }),
+      ],
+    });
+  });
+
+  it('drops zero-move games from history when starting a new game', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({});
+    const emptyGameId = gameStorage.appState?.currentGame.id;
+    await gameEngine.newGame();
+
+    await expect(gameStorage.loadSavedGameIndex()).resolves.toEqual({
+      savedGames: [],
+      schemaVersion: 1,
+    });
+    expect(gameStorage.deletedGameIds).not.toContain(emptyGameId);
   });
 
   it('uses consistent status snapshots when navigating through history', async () => {
@@ -181,6 +216,7 @@ describe('createGameEngine persistence', () => {
       openChessDotCom: vi.fn(async () => undefined),
       openLichess: vi.fn(async () => undefined),
     };
+    const onUiStateChange = vi.fn();
     const savedGame = {
       ...seedAppState.currentGame,
       id: 'saved-game-1',
@@ -210,11 +246,12 @@ describe('createGameEngine persistence', () => {
       gameStorage,
     });
 
-    await gameEngine.init({});
+    await gameEngine.init({ onUiStateChange });
     await gameEngine.exportGamePgn('saved-game-1');
     await gameEngine.exportGameScoreSheet('saved-game-1');
     await gameEngine.openGameInLichess('saved-game-1');
     await gameEngine.openGameInChessDotCom('saved-game-1');
+    await gameEngine.loadSavedGame('saved-game-1');
 
     expect(fileExport.exportPgn).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -233,6 +270,13 @@ describe('createGameEngine persistence', () => {
     });
     expect(externalOpen.openChessDotCom).toHaveBeenCalledWith({
       pgn: expect.stringContaining('1. e4 e5'),
+    });
+    expect(gameStorage.appState?.currentGame.currentPly).toBe(2);
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 2,
+      lastInputEvaluateStatus: 'ok',
+      lastInputResultMessage: 'OK',
+      lastMoveSan: 'e5',
     });
   });
 
