@@ -22,24 +22,27 @@ describe('GameMetadata', () => {
       return <GameMetadata metadata={metadata()} onMetadataChange={handleMetadataChange} />;
     }, root);
 
-    const eventInput = root.querySelector('input[type="text"]') as HTMLInputElement | null;
-    const dateInput = root.querySelector('input[type="date"]') as HTMLInputElement | null;
-    const resultInput = root.querySelector('input[aria-label="Result"]') as HTMLInputElement | null;
-    const whiteNameInput = root.querySelectorAll('input[placeholder="Name"]').item(0) as HTMLInputElement | null;
-
-    if (!eventInput || !dateInput || !resultInput || !whiteNameInput) {
-      throw new Error('Expected GameMetadata inputs to render.');
+    function getRequiredInput(selector: string): HTMLInputElement {
+      const input = root.querySelector(selector) as HTMLInputElement | null;
+      if (!input) {
+        throw new Error(`Expected GameMetadata input to render for selector: ${selector}`);
+      }
+      return input;
     }
 
+    const eventInput = getRequiredInput('input[type="text"]');
     eventInput.value = 'Club Championship';
     eventInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
 
+    const dateInput = getRequiredInput('input[type="date"]');
     dateInput.value = '2026-03-29';
     dateInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
 
+    const resultInput = getRequiredInput('input[aria-label="Result"]');
     resultInput.value = '1-0';
     resultInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
 
+    const whiteNameInput = getRequiredInput('input[aria-label="White Name"]');
     whiteNameInput.value = 'Alice';
     whiteNameInput.dispatchEvent(new InputEvent('input', { bubbles: true }));
 

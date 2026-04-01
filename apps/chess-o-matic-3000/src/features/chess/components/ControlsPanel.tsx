@@ -13,9 +13,9 @@ type ControlsPanelProps = {
 
 export function ControlsPanel(props: ControlsPanelProps): JSX.Element {
   return (
-    <div class="flex flex-wrap gap-3">
+    <div class="toolbar-group">
       <button
-        class="flex items-center gap-2"
+        class={`toolbar-button ${props.isListening ? 'toolbar-button-active' : ''}`}
         disabled={props.disabled || !props.isListeningAvailable}
         onClick={props.onToggleListening}
         type="button"
@@ -25,7 +25,7 @@ export function ControlsPanel(props: ControlsPanelProps): JSX.Element {
       </button>
 
       <button
-        class="flex items-center gap-2"
+        class={`toolbar-button ${props.isSoundEnabled ? 'toolbar-button-active' : ''}`}
         disabled={props.disabled || !props.isSoundAvailable}
         onClick={props.onToggleSound}
         type="button"

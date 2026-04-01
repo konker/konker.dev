@@ -327,6 +327,31 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     };
   }
 
+  function createInitialStatusSnapshot(state: AppState): {
+    readonly lastMoveSan: string;
+    readonly message: string;
+    readonly sanitizedInput: string;
+    readonly status: GameModelEvaluateStatus;
+  } {
+    const lastMoveSan = state.currentGame.moveHistory.at(-1)?.san ?? '';
+
+    if (lastMoveSan !== '') {
+      return {
+        lastMoveSan,
+        message: lastMoveSan,
+        sanitizedInput: '',
+        status: GAME_MODEL_EVALUATE_STATUS_OK,
+      };
+    }
+
+    return {
+      lastMoveSan: '',
+      message: 'No moves',
+      sanitizedInput: '',
+      status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+    };
+  }
+
   function requireInitialized(): {
     appState: AppState;
     audioInputResources: AudioInputResources;
@@ -949,7 +974,15 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       }
     );
 
-    emitCurrentUiState(appState, gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'No moves', '', '');
+    const initialStatusSnapshot = createInitialStatusSnapshot(appState);
+    emitCurrentUiState(
+      appState,
+      gameModelResources,
+      initialStatusSnapshot.status,
+      initialStatusSnapshot.message,
+      initialStatusSnapshot.sanitizedInput,
+      initialStatusSnapshot.lastMoveSan
+    );
     syncBoardPosition();
     await persistAppState();
 

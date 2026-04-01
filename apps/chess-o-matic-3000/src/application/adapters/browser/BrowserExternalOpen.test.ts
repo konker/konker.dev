@@ -14,7 +14,7 @@ describe('createBrowserExternalOpen', () => {
     await externalOpen.openLichess({ pgn: '1. e4 e5' });
 
     expect(writeClipboardText).toHaveBeenCalledWith('1. e4 e5');
-    expect(openWindow).toHaveBeenCalledWith('https://lichess.org/paste');
+    expect(openWindow).toHaveBeenCalledWith('https://lichess.org/paste?pgn=1.+e4+e5');
   });
 
   it('still opens the target page when clipboard writing is unavailable', async () => {
@@ -26,6 +26,6 @@ describe('createBrowserExternalOpen', () => {
 
     await externalOpen.openChessDotCom({ pgn: '1. d4 d5' });
 
-    expect(openWindow).toHaveBeenCalledWith('https://www.chess.com/analysis');
+    expect(openWindow).toHaveBeenCalledWith('https://www.chess.com/analysis?pgn=1.+d4+d5&tab=analysis');
   });
 });

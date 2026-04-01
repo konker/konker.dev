@@ -20,16 +20,16 @@ export function FenPanel(props: FenPanelProps): JSX.Element {
   }
 
   return (
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <button class="flex items-center gap-2" onClick={() => void copyFen()} type="button">
+    <div class="utility-panel">
+      <div class="utility-toolbar">
+        <button class="toolbar-button" onClick={() => void copyFen()} type="button">
           <Show when={isCopied()} fallback={<Copy class="h-4 w-4" />}>
             <CopyCheck class="h-4 w-4" />
           </Show>
           <span>{isCopied() ? 'Copied' : 'Copy FEN'}</span>
         </button>
       </div>
-      <div aria-label="FEN" class="h-32 overflow-auto break-all">
+      <div aria-label="FEN" class="utility-code-block">
         {props.fen}
       </div>
     </div>

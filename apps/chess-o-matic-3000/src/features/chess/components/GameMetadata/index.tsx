@@ -36,123 +36,148 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
 
   function renderLabel(icon: JSX.Element, text: string): JSX.Element {
     return (
-      <span class="flex items-center gap-2">
+      <span class="paper-field-label">
         {icon}
         <span>{text}</span>
       </span>
     );
   }
 
+  function renderTextInput(
+    value: string,
+    onInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>,
+    type = 'text',
+    placeholder?: string,
+    ariaLabel?: string
+  ): JSX.Element {
+    return (
+      <span class="paper-field-frame">
+        <input
+          aria-label={ariaLabel}
+          class="paper-field-control"
+          onInput={onInput}
+          placeholder={placeholder}
+          type={type}
+          value={value}
+        />
+      </span>
+    );
+  }
+
+  function renderSelect(
+    value: string,
+    onInput: JSX.EventHandlerUnion<HTMLSelectElement, InputEvent>,
+    options: readonly string[]
+  ): JSX.Element {
+    return (
+      <span class="paper-field-frame">
+        <select class="paper-field-control" onInput={onInput} value={value}>
+          <option value=""></option>
+          {options.map(function renderOption(option): JSX.Element {
+            return <option value={option}>{option}</option>;
+          })}
+        </select>
+      </span>
+    );
+  }
+
   return (
-    <section aria-label="Game Metadata" class="flex flex-col gap-3">
-      <div class="grid gap-3 sm:grid-cols-2">
-        <label class="flex flex-col gap-1">
+    <section aria-label="Game Metadata" class="panel-muted flex flex-col gap-4">
+      <div class="metadata-grid">
+        <label class="paper-field">
           {renderLabel(<Trophy class="h-4 w-4" />, 'Event')}
-          <input
-            onInput={(event) => updateField('event', event.currentTarget.value)}
-            type="text"
-            value={props.metadata.event}
-          />
+          {renderTextInput(props.metadata.event, (event) => updateField('event', event.currentTarget.value))}
         </label>
-        <label class="flex flex-col gap-1">
+        <label class="paper-field">
           {renderLabel(<MapPin class="h-4 w-4" />, 'Site')}
-          <input
-            onInput={(event) => updateField('site', event.currentTarget.value)}
-            type="text"
-            value={props.metadata.site}
-          />
+          {renderTextInput(props.metadata.site, (event) => updateField('site', event.currentTarget.value))}
         </label>
-        <label class="flex flex-col gap-1">
+        <label class="paper-field">
           {renderLabel(<Calendar class="h-4 w-4" />, 'Date')}
-          <input
-            onInput={(event) => updateField('date', event.currentTarget.value)}
-            type="date"
-            value={props.metadata.date}
-          />
+          {renderTextInput(props.metadata.date, (event) => updateField('date', event.currentTarget.value), 'date')}
         </label>
-        <label class="flex flex-col gap-1">
+        <label class="paper-field">
           {renderLabel(<Hash class="h-4 w-4" />, 'Round')}
-          <input
-            onInput={(event) => updateField('round', event.currentTarget.value)}
-            type="text"
-            value={props.metadata.round}
-          />
+          {renderTextInput(props.metadata.round, (event) => updateField('round', event.currentTarget.value))}
         </label>
-        <div class="grid gap-3 sm:col-span-2 sm:grid-cols-2">
-          <label class="flex flex-col gap-1">
+        <div class="grid gap-4 sm:col-span-2 sm:grid-cols-2">
+          <label class="paper-field">
             {renderLabel(<Clock3 class="h-4 w-4" />, 'Time Control')}
-            <input
-              onInput={(event) => updateField('timeControl', event.currentTarget.value)}
-              type="text"
-              value={props.metadata.timeControl}
-            />
+            {renderTextInput(props.metadata.timeControl, (event) => updateField('timeControl', event.currentTarget.value))}
           </label>
-          <label class="flex flex-col gap-1">
-            <span>Termination</span>
-            <select
-              onInput={(event) => updateField('termination', event.currentTarget.value)}
-              value={props.metadata.termination}
-            >
-              <option value=""></option>
-              {TERMINATION_OPTIONS.map(function renderOption(option): JSX.Element {
-                return <option value={option}>{option}</option>;
-              })}
-            </select>
+          <label class="paper-field">
+            <span class="paper-field-label">Termination</span>
+            {renderSelect(
+              props.metadata.termination,
+              (event) => updateField('termination', event.currentTarget.value),
+              TERMINATION_OPTIONS
+            )}
           </label>
         </div>
       </div>
 
-      <div class="grid gap-3 sm:grid-cols-2">
-        <div class="flex flex-col gap-3">
-          <h2 class="flex items-center gap-2 text-base font-semibold">
+      <div class="metadata-player-grid">
+        <div class="metadata-player-panel">
+          <h2 class="metadata-player-title">
             <User class="h-4 w-4" />
             <span>White</span>
           </h2>
-          <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
-            <input
-              onInput={(event) => updatePlayerField('white', 'name', event.currentTarget.value)}
-              placeholder="Name"
-              type="text"
-              value={props.metadata.white.name}
-            />
-            <input
-              onInput={(event) => updatePlayerField('white', 'elo', event.currentTarget.value)}
-              placeholder="Elo"
-              type="text"
-              value={props.metadata.white.elo}
-            />
+          <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
+            <label class="paper-field">
+              <span class="paper-field-label">Name</span>
+          {renderTextInput(
+            props.metadata.white.name,
+            (event) => updatePlayerField('white', 'name', event.currentTarget.value),
+            'text',
+            'Name',
+            'White Name'
+          )}
+            </label>
+            <label class="paper-field">
+              <span class="paper-field-label">Elo</span>
+          {renderTextInput(
+            props.metadata.white.elo,
+            (event) => updatePlayerField('white', 'elo', event.currentTarget.value),
+            'text',
+            'Elo',
+            'White Elo'
+          )}
+            </label>
           </div>
         </div>
 
-        <div class="flex flex-col gap-3">
-          <h2 class="flex items-center gap-2 text-base font-semibold">
+        <div class="metadata-player-panel">
+          <h2 class="metadata-player-title">
             <User class="h-4 w-4" />
             <span>Black</span>
           </h2>
-          <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
-            <input
-              onInput={(event) => updatePlayerField('black', 'name', event.currentTarget.value)}
-              placeholder="Name"
-              type="text"
-              value={props.metadata.black.name}
-            />
-            <input
-              onInput={(event) => updatePlayerField('black', 'elo', event.currentTarget.value)}
-              placeholder="Elo"
-              type="text"
-              value={props.metadata.black.elo}
-            />
+          <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
+            <label class="paper-field">
+              <span class="paper-field-label">Name</span>
+          {renderTextInput(
+            props.metadata.black.name,
+            (event) => updatePlayerField('black', 'name', event.currentTarget.value),
+            'text',
+            'Name',
+            'Black Name'
+          )}
+            </label>
+            <label class="paper-field">
+              <span class="paper-field-label">Elo</span>
+          {renderTextInput(
+            props.metadata.black.elo,
+            (event) => updatePlayerField('black', 'elo', event.currentTarget.value),
+            'text',
+            'Elo',
+            'Black Elo'
+          )}
+            </label>
           </div>
         </div>
 
-        <label class="flex flex-col gap-1">
+        <label class="paper-field sm:col-span-2">
           {renderLabel(<Medal class="h-4 w-4" />, 'Result')}
-          <input
-            aria-label="Result"
-            onInput={(event) => updateField('result', event.currentTarget.value)}
-            type="text"
-            value={props.metadata.result}
-          />
+          {renderTextInput(props.metadata.result, (event) => updateField('result', event.currentTarget.value), 'text', undefined, 'Result')}
         </label>
       </div>
     </section>

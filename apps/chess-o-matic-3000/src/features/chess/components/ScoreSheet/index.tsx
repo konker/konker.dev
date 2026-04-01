@@ -18,11 +18,11 @@ export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
 
   function renderMoveClasses(ply: number): string {
     if (props.currentPly === ply) {
-      return 'font-semibold underline';
+      return 'scoresheet-move-button-current font-semibold underline';
     }
 
     if (props.currentPly < ply) {
-      return 'text-slate-400';
+      return 'scoresheet-move-button-future';
     }
 
     return '';
@@ -36,19 +36,19 @@ export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
   }
 
   return (
-    <section aria-label="Scoresheet" class="flex flex-col gap-2">
-      <div class="flex h-64 flex-col gap-1 overflow-y-auto pr-2">
+    <section aria-label="Scoresheet" class="scoresheet-shell">
+      <div class="scoresheet-scroll">
         <For each={createDisplayRows()}>
           {(item, index) => (
             <div
               aria-label="Scoresheet Row"
-              class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] gap-x-6 border-b border-black text-sm leading-6"
+              class={`scoresheet-row ${item && (props.currentPly === index() * 2 + 1 || props.currentPly === index() * 2 + 2) ? 'scoresheet-row-active' : ''}`}
             >
-              <span class="tabular-nums">{index() + 1}.</span>
-              <span>
+              <span class="scoresheet-index">{index() + 1}.</span>
+              <span class="scoresheet-move-cell">
                 {item ? (
                   <button
-                    class={`block w-full text-left text-sm ${renderMoveClasses(index() * 2 + 1)}`}
+                    class={`scoresheet-move-button ${renderMoveClasses(index() * 2 + 1)}`}
                     onClick={() => props.onGoToPly(index() * 2 + 1)}
                     type="button"
                   >
@@ -58,10 +58,10 @@ export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
                   ''
                 )}
               </span>
-              <span>
+              <span class="scoresheet-move-cell">
                 {item && item[1] !== '*' ? (
                   <button
-                    class={`block w-full text-left text-sm ${renderMoveClasses(index() * 2 + 2)}`}
+                    class={`scoresheet-move-button ${renderMoveClasses(index() * 2 + 2)}`}
                     onClick={() => props.onGoToPly(index() * 2 + 2)}
                     type="button"
                   >

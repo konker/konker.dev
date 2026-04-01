@@ -23,13 +23,15 @@ type ChessBoardProps = {
 const BOARD_COLOR_SCHEME_GREEN = 'green' as const;
 const BOARD_COLOR_SCHEME_BROWN = 'brown' as const;
 type BoardColorScheme = typeof BOARD_COLOR_SCHEME_GREEN | typeof BOARD_COLOR_SCHEME_BROWN;
+const BOARD_COLOR_SCHEME_STORAGE_KEY = 'chess-o-matic-3000/ui/board-color-scheme';
+const BOARD_COORDINATES_STORAGE_KEY = 'chess-o-matic-3000/ui/board-coordinates-visible';
 
 const BOARD_COLOR_SCHEMES: Record<BoardColorScheme, { border: string; dark: string; label: string; light: string }> = {
   brown: {
     border: '#886649',
     dark: '#B58863',
     label: 'Brown/Beige',
-    light: '#F1DBCD',
+    light: '#FFFFDD',
   },
   green: {
     border: '#668855',
@@ -43,7 +45,27 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
   let boardEl: GChessBoardElement | undefined;
   let promotionDialogEl: HTMLDivElement | undefined;
   let lastHighlightedMove: [Square, Square] | undefined;
-  const [colorScheme, setColorScheme] = createSignal<BoardColorScheme>(BOARD_COLOR_SCHEME_GREEN);
+
+  function loadStoredBoardColorScheme(): BoardColorScheme {
+    if (typeof localStorage === 'undefined') {
+      return BOARD_COLOR_SCHEME_GREEN;
+    }
+
+    const storedValue = localStorage.getItem(BOARD_COLOR_SCHEME_STORAGE_KEY);
+    return storedValue === BOARD_COLOR_SCHEME_BROWN ? BOARD_COLOR_SCHEME_BROWN : BOARD_COLOR_SCHEME_GREEN;
+  }
+
+  function loadStoredBoardCoordinatesVisible(): boolean {
+    if (typeof localStorage === 'undefined') {
+      return true;
+    }
+
+    const storedValue = localStorage.getItem(BOARD_COORDINATES_STORAGE_KEY);
+    return storedValue === null ? true : storedValue === 'true';
+  }
+
+  const [colorScheme, setColorScheme] = createSignal<BoardColorScheme>(loadStoredBoardColorScheme());
+  const [showCoordinates, setShowCoordinates] = createSignal(loadStoredBoardCoordinatesVisible());
 
   function clearMoveHighlight(board: GChessBoardElement): void {
     board.shadowRoot?.querySelectorAll('[last-move]')?.forEach((square) => square.removeAttribute('last-move'));
@@ -77,6 +99,10 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     board.style.setProperty('--board-square-light', palette.light);
     board.style.setProperty('--board-square-dark', palette.dark);
     board.style.setProperty('--inner-border-color', palette.border);
+  }
+
+  function applyBoardCoordinates(board: GChessBoardElement, visible: boolean): void {
+    board.coordinates = visible ? 'outside' : 'hidden';
   }
 
   async function syncBoardMove(board: GChessBoardElement, move: [Square, Square] | string): Promise<void> {
@@ -120,7 +146,7 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     const board = boardEl;
     const dialog = promotionDialogEl;
 
-    board.coordinates = 'outside';
+    applyBoardCoordinates(board, showCoordinates());
     board.interactive = true;
     board.fen = props.fen;
     board.orientation = props.orientation;
@@ -197,11 +223,27 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
   });
 
   createEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(BOARD_COLOR_SCHEME_STORAGE_KEY, colorScheme());
+    }
+
     if (!boardEl) {
       return;
     }
 
     applyBoardColorScheme(boardEl, colorScheme());
+  });
+
+  createEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(BOARD_COORDINATES_STORAGE_KEY, JSON.stringify(showCoordinates()));
+    }
+
+    if (!boardEl) {
+      return;
+    }
+
+    applyBoardCoordinates(boardEl, showCoordinates());
   });
 
   createEffect(() => {
@@ -219,28 +261,42 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
   });
 
   return (
-    <div class="flex flex-col gap-2">
-      <div class="flex flex-wrap items-center gap-3">
-        <button class="flex items-center gap-2" onClick={props.onToggleOrientation} type="button">
+    <div class="board-panel">
+      <div class="board-toolbar">
+        <button class="toolbar-button" onClick={props.onToggleOrientation} type="button">
           <RotateCw class="h-4 w-4" />
           <span>Flip</span>
         </button>
 
         <button
+          aria-label="Toggle Board Coordinates"
+          class="toolbar-button"
+          onClick={() => setShowCoordinates((current) => !current)}
+          type="button"
+        >
+          <span class={showCoordinates() ? '[font-family:var(--font-data)]' : '[font-family:var(--font-data)] line-through'}>
+            a1
+          </span>
+        </button>
+
+        <button
           aria-label="Toggle Board Color Scheme"
-          class="h-8 w-8 rounded border-2 border-[var(--board-border-color)]"
+          class="board-swatch-button"
           onClick={() =>
             setColorScheme((current) =>
               current === BOARD_COLOR_SCHEME_GREEN ? BOARD_COLOR_SCHEME_BROWN : BOARD_COLOR_SCHEME_GREEN
             )
           }
-          style={{ 'background-color': BOARD_COLOR_SCHEMES[colorScheme()].dark }}
+          style={{
+            'background-color': BOARD_COLOR_SCHEMES[colorScheme()].dark,
+            'border-color': 'var(--board-border-color)',
+          }}
           title={`Board colors: ${BOARD_COLOR_SCHEMES[colorScheme()].label}`}
           type="button"
         />
       </div>
 
-      <div class="relative">
+      <div class="board-frame relative">
         <g-chess-board
           class="block aspect-square w-full max-w-[34rem] border-2 border-[var(--board-border-color)]"
           id="board"
@@ -252,27 +308,27 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
           id="promotion-dialog"
           ref={promotionDialogEl}
         >
-          <div class="grid w-full max-w-[14rem] grid-cols-2 gap-2 bg-white p-2">
+          <div class="promotion-surface">
             <button
-              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              class="promo-choice promotion-choice"
               data-piece="q"
               title="Queen"
               type="button"
             />
             <button
-              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              class="promo-choice promotion-choice"
               data-piece="r"
               title="Rook"
               type="button"
             />
             <button
-              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              class="promo-choice promotion-choice"
               data-piece="b"
               title="Bishop"
               type="button"
             />
             <button
-              class="promo-choice aspect-square w-full cursor-pointer border border-black bg-white bg-center bg-no-repeat"
+              class="promo-choice promotion-choice"
               data-piece="n"
               title="Knight"
               type="button"

@@ -75,6 +75,9 @@ describe('createGameEngine persistence', () => {
       gameMetadata: {
         event: 'Restored Event',
       },
+      lastInputEvaluateStatus: 'ok',
+      lastInputResultMessage: 'e5',
+      lastMoveSan: 'e5',
       pgn: expect.stringContaining('[Orientation "black"]'),
     });
     expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({

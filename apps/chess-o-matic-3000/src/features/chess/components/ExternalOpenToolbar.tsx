@@ -9,13 +9,13 @@ type ExternalOpenToolbarProps = {
 
 export function ExternalOpenToolbar(props: ExternalOpenToolbarProps): JSX.Element {
   return (
-    <div class="flex flex-wrap gap-3">
-      <button class="flex items-center gap-2" disabled={props.disabled} onClick={props.onOpenLichess} type="button">
+    <div class="toolbar-group">
+      <button class="toolbar-button" disabled={props.disabled} onClick={props.onOpenLichess} type="button">
         <ExternalLink class="h-4 w-4" />
         <span>Open in Lichess</span>
       </button>
 
-      <button class="flex items-center gap-2" disabled={props.disabled} onClick={props.onOpenChessDotCom} type="button">
+      <button class="toolbar-button" disabled={props.disabled} onClick={props.onOpenChessDotCom} type="button">
         <ExternalLink class="h-4 w-4" />
         <span>Open in Chess.com</span>
       </button>
