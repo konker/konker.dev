@@ -146,6 +146,7 @@ function readSavedGameSummary(value: unknown, index: number): SavedGameSummary {
   return {
     black: readString(value.black, `savedGames[${index}].black`),
     createdAt: readString(value.createdAt, `savedGames[${index}].createdAt`),
+    date: typeof value.date === 'string' ? value.date : '',
     event: readString(value.event, `savedGames[${index}].event`),
     id: readString(value.id, `savedGames[${index}].id`),
     moveCount: typeof value.moveCount === 'number' && value.moveCount >= 0 ? value.moveCount : 0,

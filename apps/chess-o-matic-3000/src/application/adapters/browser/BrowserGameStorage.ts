@@ -34,6 +34,7 @@ function summarizeGame(game: GameRecord): PersistedSavedGameIndex['savedGames'][
   return {
     black: game.metadata.black.name,
     createdAt: game.createdAt,
+    date: game.metadata.date,
     event: game.metadata.event,
     id: game.id,
     moveCount: game.moveHistory.length,

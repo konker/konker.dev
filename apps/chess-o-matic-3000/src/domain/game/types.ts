@@ -45,6 +45,7 @@ export type PersistedAppState = AppState;
 
 export type SavedGameSummary = {
   readonly createdAt: string;
+  readonly date: string;
   readonly id: GameId;
   readonly moveCount: number;
   readonly updatedAt: string;

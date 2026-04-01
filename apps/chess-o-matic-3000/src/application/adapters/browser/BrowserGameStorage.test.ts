@@ -59,6 +59,7 @@ describe('BrowserGameStorage', () => {
         {
           black: 'Bob',
           createdAt: game.createdAt,
+          date: game.metadata.date,
           event: 'League Match',
           id: game.id,
           moveCount: 2,
@@ -114,6 +115,7 @@ describe('BrowserGameStorage', () => {
         {
           black: 'Bob',
           createdAt: baseGame.createdAt,
+          date: baseGame.metadata.date,
           event: 'Updated Event',
           id: baseGame.id,
           moveCount: 1,
