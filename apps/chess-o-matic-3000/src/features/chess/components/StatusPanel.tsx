@@ -4,6 +4,8 @@ import type { JSX } from 'solid-js';
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 
 type StatusPanelProps = {
+  readonly controls?: JSX.Element;
+  readonly currentPly: number;
   readonly status: GameModelEvaluateStatus;
   readonly lastMoveSan: string;
   readonly message: string;
@@ -11,43 +13,68 @@ type StatusPanelProps = {
 };
 
 export function StatusPanel(props: StatusPanelProps): JSX.Element {
-  function renderStatusClasses(): string {
+  let panelEl: HTMLElement | undefined;
+
+  function renderStatusText(): string {
     switch (props.status) {
       case 'ok':
-        return 'border-l-green-700';
+        return 'Move accepted';
       case 'illegal':
-        return 'border-l-red-600';
+        return 'Illegal move';
       case 'control':
-        return 'border-l-blue-600';
+        return 'Command received';
       case 'ignore':
       default:
-        return 'border-l-slate-400';
+        return 'Waiting';
     }
   }
 
+  function renderMoveNumber(): number {
+    return Math.max(1, Math.ceil(props.currentPly / 2));
+  }
+
+  function renderCurrentMoveColor(): 'White' | 'Black' {
+    return props.currentPly % 2 === 0 ? 'White' : 'Black';
+  }
+
+  function scrollPanelToTop(): void {
+    panelEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   return (
-    <div
-      class={`flex flex-col gap-2 border border-slate-300 border-l-[0.75rem] bg-slate-50 px-4 py-3 ${renderStatusClasses()}`}
-      data-status={props.status}
-      id="status"
-    >
-      <div class="flex justify-between gap-4 text-sm text-slate-600">
-        <span class="flex items-center gap-2">
+    <section class="status-surface" data-status={props.status} id="status" ref={panelEl}>
+      <div class="status-header">
+        <span class="status-label">
           <Info class="h-4 w-4" />
           <span>Status</span>
         </span>
-        <span aria-label="Last Input Evaluate Status">{props.status}</span>
+        <span aria-label="Last Input Evaluate Status" class="status-chip">
+          {renderStatusText()}
+        </span>
       </div>
-      <div aria-label="Last Input SAN" class="text-2xl font-bold leading-tight">
+      <button
+        aria-label="Last Input SAN"
+        class="status-san cursor-pointer text-left"
+        onClick={scrollPanelToTop}
+        type="button"
+      >
         {props.lastMoveSan || 'No move yet'}
-      </div>
-      <div aria-label="Last Input Message" class="text-base leading-6">
+      </button>
+      <div aria-label="Last Input Message" class="status-message">
         {props.message}
       </div>
-      <div class="flex flex-col gap-1 text-sm text-slate-600">
-        <span>Heard</span>
-        <span aria-label="Last Input Sanitized">{props.sanitizedInput || 'No input yet'}</span>
+      <div class="flex flex-wrap gap-2 text-sm">
+        <span class="status-chip">Move {renderMoveNumber()}</span>
+        <span class="status-chip">{renderCurrentMoveColor()} to move</span>
       </div>
-    </div>
+      <div class="flex flex-col gap-1">
+        <span class="status-heard-label">Heard</span>
+        <span aria-label="Last Input Sanitized" class="status-heard-value">
+          {props.sanitizedInput || 'No input yet'}
+        </span>
+      </div>
+
+      {props.controls ? <div class="toolbar-group border-t pt-3">{props.controls}</div> : null}
+    </section>
   );
 }

@@ -13,10 +13,10 @@ type GameNavigationPanelProps = {
 
 export function GameNavigationPanel(props: GameNavigationPanelProps): JSX.Element {
   return (
-    <div class="flex flex-wrap gap-3">
+    <div class="toolbar-group" role="group" aria-label="Game navigation">
       <button
         aria-label="Jump to first move"
-        class="flex items-center justify-center"
+        class="toolbar-icon-button"
         disabled={props.disabled || !props.canGoBackward}
         onClick={props.onGoToStart}
         title="Jump to first move"
@@ -27,7 +27,7 @@ export function GameNavigationPanel(props: GameNavigationPanelProps): JSX.Elemen
 
       <button
         aria-label="Back one move"
-        class="flex items-center justify-center"
+        class="toolbar-icon-button"
         disabled={props.disabled || !props.canGoBackward}
         onClick={props.onStepBackward}
         title="Back one move"
@@ -38,7 +38,7 @@ export function GameNavigationPanel(props: GameNavigationPanelProps): JSX.Elemen
 
       <button
         aria-label="Forward one move"
-        class="flex items-center justify-center"
+        class="toolbar-icon-button"
         disabled={props.disabled || !props.canGoForward}
         onClick={props.onStepForward}
         title="Forward one move"
@@ -49,7 +49,7 @@ export function GameNavigationPanel(props: GameNavigationPanelProps): JSX.Elemen
 
       <button
         aria-label="Jump to last move"
-        class="flex items-center justify-center"
+        class="toolbar-icon-button"
         disabled={props.disabled || !props.canGoForward}
         onClick={props.onGoToEnd}
         title="Jump to last move"

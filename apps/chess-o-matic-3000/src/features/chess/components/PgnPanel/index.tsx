@@ -1,23 +1,20 @@
-import { Copy, CopyCheck } from 'lucide-solid';
+import { Copy, CopyCheck, ExternalLink } from 'lucide-solid';
 import type { JSX } from 'solid-js';
-import { createEffect, createSignal, For, Show } from 'solid-js';
+import { createEffect, createSignal, Show } from 'solid-js';
 
-import type { PgnMoveListData, PgnMoveListItem } from './types';
-
-const PGN_PANEL_TAB_MOVES = 'moves';
-const PGN_PANEL_TAB_RAW = 'raw';
-
-type PgnPanelTab = typeof PGN_PANEL_TAB_MOVES | typeof PGN_PANEL_TAB_RAW;
+import type { PgnMoveListData } from './types';
 
 type PgnPanelProps = {
   readonly currentPly: number;
+  readonly disabled?: boolean;
+  readonly onOpenChessDotCom?: () => void;
+  readonly onOpenLichess?: () => void;
   readonly onGoToPly: (ply: number) => void;
   readonly pgn: string;
   readonly pgnMoveList: PgnMoveListData;
 };
 
 export function PgnPanel(props: PgnPanelProps): JSX.Element {
-  const [activeTab, setActiveTab] = createSignal<PgnPanelTab>(PGN_PANEL_TAB_MOVES);
   const [isCopied, setIsCopied] = createSignal(false);
 
   createEffect(function resetCopiedState(): void {
@@ -30,92 +27,31 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
     setIsCopied(true);
   }
 
-  function showMoveNumber(item: PgnMoveListItem): boolean {
-    return item.side === 'white';
-  }
-
-  function renderMoveClasses(item: PgnMoveListItem): string {
-    if (props.currentPly === item.ply) {
-      return 'border-black bg-slate-200 font-semibold';
-    }
-
-    if (props.currentPly < item.ply) {
-      return 'border-slate-300 bg-white text-slate-400';
-    }
-
-    return 'border-slate-300 bg-white';
-  }
-
-  function switchToMovesTab(): void {
-    setActiveTab(PGN_PANEL_TAB_MOVES);
-  }
-
-  function switchToRawTab(): void {
-    setActiveTab(PGN_PANEL_TAB_RAW);
-  }
-
-  function renderMovesTab(): JSX.Element {
-    return (
-      <div aria-label="PGN Moves" class="flex h-64 flex-wrap content-start items-center gap-2 overflow-y-auto pr-2">
-        <Show when={props.pgnMoveList.length > 0} fallback={<span>No moves yet</span>}>
-          <For each={props.pgnMoveList}>
-            {(item) => (
-              <>
-                <Show when={showMoveNumber(item)}>
-                  <span class="tabular-nums text-sm">{item.moveNumber}.</span>
-                </Show>
-                <button
-                  class={`rounded-full border px-3 py-1 text-sm ${renderMoveClasses(item)}`}
-                  onClick={() => props.onGoToPly(item.ply)}
-                  type="button"
-                >
-                  {item.san}
-                </button>
-              </>
-            )}
-          </For>
-        </Show>
-      </div>
-    );
-  }
-
-  function renderRawTab(): JSX.Element {
-    return <textarea aria-label="PGN" class="h-64 w-full resize-y" readOnly value={props.pgn} />;
-  }
-
   return (
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <button class="flex items-center gap-2" onClick={() => void copyPgn()} type="button">
+    <div class="utility-panel">
+      <div class="utility-toolbar">
+        <button class="toolbar-button" disabled={props.disabled} onClick={() => void copyPgn()} type="button">
           <Show when={isCopied()} fallback={<Copy class="h-4 w-4" />}>
             <CopyCheck class="h-4 w-4" />
           </Show>
           <span>{isCopied() ? 'Copied' : 'Copy PGN'}</span>
         </button>
-      </div>
 
-      <div class="flex items-center gap-2">
-        <button
-          aria-pressed={activeTab() === PGN_PANEL_TAB_MOVES}
-          class="border border-slate-300 px-2 py-1"
-          onClick={switchToMovesTab}
-          type="button"
-        >
-          Moves
-        </button>
-        <button
-          aria-pressed={activeTab() === PGN_PANEL_TAB_RAW}
-          class="border border-slate-300 px-2 py-1"
-          onClick={switchToRawTab}
-          type="button"
-        >
-          Raw PGN
-        </button>
-      </div>
+        <Show when={props.onOpenLichess}>
+          <button class="toolbar-button" disabled={props.disabled} onClick={props.onOpenLichess} type="button">
+            <ExternalLink class="h-4 w-4" />
+            <span>Open in Lichess</span>
+          </button>
+        </Show>
 
-      <Show when={activeTab() === PGN_PANEL_TAB_MOVES} fallback={renderRawTab()}>
-        {renderMovesTab()}
-      </Show>
+        <Show when={props.onOpenChessDotCom}>
+          <button class="toolbar-button" disabled={props.disabled} onClick={props.onOpenChessDotCom} type="button">
+            <ExternalLink class="h-4 w-4" />
+            <span>Open in Chess.com</span>
+          </button>
+        </Show>
+      </div>
+      <textarea aria-label="PGN" class="utility-textarea" readOnly value={props.pgn} />
     </div>
   );
 }

@@ -22,16 +22,30 @@ export function createBrowserExternalOpen(deps: BrowserExternalOpenDeps = {}): E
     });
 
   async function openLichess(request: ExternalOpenRequest): Promise<void> {
-    await openWithPgn(LICHESS_PASTE_URL, request);
+    await writeClipboardText(request.pgn);
+    openWindow(createLichessPasteUrl(request.pgn));
   }
 
   async function openChessDotCom(request: ExternalOpenRequest): Promise<void> {
-    await openWithPgn(CHESS_DOT_COM_ANALYSIS_URL, request);
+    await writeClipboardText(request.pgn);
+    openWindow(createChessDotComAnalysisUrl(request.pgn));
   }
 
-  async function openWithPgn(url: string, request: ExternalOpenRequest): Promise<void> {
-    await writeClipboardText(request.pgn);
-    openWindow(url);
+  function createLichessPasteUrl(pgn: string): string {
+    const searchParams = new URLSearchParams({
+      pgn,
+    });
+
+    return `${LICHESS_PASTE_URL}?${searchParams.toString()}`;
+  }
+
+  function createChessDotComAnalysisUrl(pgn: string): string {
+    const searchParams = new URLSearchParams({
+      pgn,
+      tab: 'analysis',
+    });
+
+    return `${CHESS_DOT_COM_ANALYSIS_URL}?${searchParams.toString()}`;
   }
 
   return {
