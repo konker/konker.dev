@@ -205,6 +205,37 @@ describe('createGameEngine persistence', () => {
     });
   });
 
+  it('reports ambiguous SAN input separately from other invalid moves', async () => {
+    const storedAppState: AppState = {
+      ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
+      currentGame: {
+        ...createDefaultAppState('2026-03-30T00:00:00.000Z').currentGame,
+        currentPly: 5,
+        moveHistory: [
+          { from: 'a2', san: 'a3', to: 'a3' },
+          { from: 'b8', san: 'Nc6', to: 'c6' },
+          { from: 'a3', san: 'a4', to: 'a4' },
+          { from: 'e7', san: 'e6', to: 'e6' },
+          { from: 'a4', san: 'a5', to: 'a5' },
+        ],
+      },
+    };
+    const gameStorage = createMemoryGameStorage(storedAppState);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('Ne7');
+
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 5,
+      lastInputEvaluateStatus: 'illegal',
+      lastInputResultMessage: 'Ambiguous move',
+      lastInputSanitized: 'Ne7',
+      lastMoveSan: 'a5',
+    });
+  });
+
   it('exports and opens the selected saved game through injected adapters', async () => {
     const seedAppState = createDefaultAppState('2026-03-30T00:00:00.000Z');
     const gameStorage = createMemoryGameStorage(seedAppState);
