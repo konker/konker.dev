@@ -1,8 +1,8 @@
 import '../chess-o-matic.css';
 
-import { Binary, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
+import { Binary, Copy, CopyCheck, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 import type { JSX } from 'solid-js';
-import { createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 
 import type { GameMetadataData } from '../../../domain/game/metadata';
 import type { GameEngine, GameEngineUiState } from '../../../game-engine';
@@ -33,6 +33,8 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const [isInitializing, setIsInitializing] = createSignal(true);
   const [isListening, setIsListening] = createSignal(false);
   const [isListeningAvailable, setIsListeningAvailable] = createSignal(false);
+  const [isFenCopied, setIsFenCopied] = createSignal(false);
+  const [isPgnCopied, setIsPgnCopied] = createSignal(false);
   const [isSoundEnabled, setIsSoundEnabled] = createSignal(false);
   const [isSoundAvailable, setIsSoundAvailable] = createSignal(false);
   const [uiState, setUiState] = createSignal<GameEngineUiState>({
@@ -41,6 +43,16 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   });
 
   const gameEngine: GameEngine = createGameEngine();
+
+  createEffect(() => {
+    uiState().fen;
+    setIsFenCopied(false);
+  });
+
+  createEffect(() => {
+    uiState().pgn;
+    setIsPgnCopied(false);
+  });
 
   function syncAudioState(): void {
     setIsListeningAvailable(gameEngine.canUseAudioInput());
@@ -192,15 +204,25 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     }
   }
 
+  async function copyPgn(): Promise<void> {
+    await navigator.clipboard.writeText(uiState().pgn);
+    setIsPgnCopied(true);
+  }
+
+  async function copyFen(): Promise<void> {
+    await navigator.clipboard.writeText(uiState().fen);
+    setIsFenCopied(true);
+  }
+
   return (
     <main class="app-shell">
       <header class="app-header">
         <div class="app-header-top">
           <div class="flex flex-col gap-2">
-            <span class="app-eyebrow">Voice-first chess recorder</span>
+            <span class="app-eyebrow">Chess game recorder</span>
             <h1 class="app-title flex items-center gap-1">
               <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
-              <span>Chess-o-matic 3000</span>
+              <span class="pt-1.5">Chess-o-matic 3000</span>
             </h1>
           </div>
           <AppMenu
@@ -289,7 +311,25 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection icon={FileText} storageKey="pgn" title="PGN">
+      <CollapsibleSection
+        headerAside={
+          <button
+            aria-label="Copy PGN"
+            class="toolbar-button"
+            disabled={isInitializing() || !!errorMessage()}
+            onClick={() => void copyPgn()}
+            type="button"
+          >
+            <Show when={isPgnCopied()} fallback={<Copy class="h-4 w-4" />}>
+              <CopyCheck class="h-4 w-4" />
+            </Show>
+            <span>{isPgnCopied() ? 'Copied' : 'Copy PGN'}</span>
+          </button>
+        }
+        icon={FileText}
+        storageKey="pgn"
+        title="PGN"
+      >
         <PgnPanel
           currentPly={uiState().currentPly}
           disabled={isInitializing() || !!errorMessage()}
@@ -301,7 +341,25 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection icon={Binary} storageKey="fen" title="FEN">
+      <CollapsibleSection
+        headerAside={
+          <button
+            aria-label="Copy FEN"
+            class="toolbar-button"
+            disabled={isInitializing() || !!errorMessage()}
+            onClick={() => void copyFen()}
+            type="button"
+          >
+            <Show when={isFenCopied()} fallback={<Copy class="h-4 w-4" />}>
+              <CopyCheck class="h-4 w-4" />
+            </Show>
+            <span>{isFenCopied() ? 'Copied' : 'Copy FEN'}</span>
+          </button>
+        }
+        icon={Binary}
+        storageKey="fen"
+        title="FEN"
+      >
         <FenPanel fen={uiState().fen} />
       </CollapsibleSection>
 

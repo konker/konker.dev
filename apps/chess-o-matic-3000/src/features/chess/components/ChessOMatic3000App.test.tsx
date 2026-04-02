@@ -17,7 +17,8 @@ describe('ChessOMatic3000App', () => {
 
     expect(root.textContent).toContain('Chess-o-matic 3000');
     expect(root.querySelector('button[aria-label="Open menu"]')).not.toBeNull();
-    expect(root.textContent).toContain('Discard game');
+    expect(root.textContent).toContain('Copy PGN');
+    expect(root.textContent).toContain('Copy FEN');
     expect(root.textContent).toContain('Open in Lichess');
     expect(root.textContent).toContain('Open in Chess.com');
     expect(root.textContent).toContain('Speech');
