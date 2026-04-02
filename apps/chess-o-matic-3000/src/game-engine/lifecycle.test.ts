@@ -4,6 +4,8 @@ import type { GameStorage } from '../application/ports/GameStorage';
 import { createDefaultAppState, EMPTY_PERSISTED_SAVED_GAME_INDEX } from '../domain/game/types';
 
 const {
+  boardAdapterUpdateMovedSoundsInvalidMock,
+  boardAdapterUpdateMovedSoundsOkMock,
   exitAudioInputMock,
   exitSpeechRecognizerMock,
   initAudioInputMock,
@@ -13,6 +15,8 @@ const {
   stopAudioInputMock,
   stopSpeechRecognizerMock,
 } = vi.hoisted(() => ({
+  boardAdapterUpdateMovedSoundsInvalidMock: vi.fn(),
+  boardAdapterUpdateMovedSoundsOkMock: vi.fn(),
   exitAudioInputMock: vi.fn(),
   exitSpeechRecognizerMock: vi.fn(),
   initAudioInputMock: vi.fn(),
@@ -35,7 +39,8 @@ vi.mock('../audio-input', () => ({
 
 vi.mock('../audio-output', () => ({
   audioOutputIsSupported: () => true,
-  boardAdapterUpdateMovedSoundsOk: vi.fn(),
+  boardAdapterUpdateMovedSoundsInvalid: boardAdapterUpdateMovedSoundsInvalidMock,
+  boardAdapterUpdateMovedSoundsOk: boardAdapterUpdateMovedSoundsOkMock,
   exitAudioOutput: vi.fn(),
   initAudioOutput: vi.fn(async () => ({
     audioOutputEventSoundMap: {} as Record<string, HTMLAudioElement>,
@@ -82,6 +87,8 @@ describe('game engine lifecycle', () => {
     startAudioInputMock.mockReset();
     stopAudioInputMock.mockReset();
     exitAudioInputMock.mockReset();
+    boardAdapterUpdateMovedSoundsInvalidMock.mockReset();
+    boardAdapterUpdateMovedSoundsOkMock.mockReset();
     initSpeechRecognizerMock.mockReset();
     startSpeechRecognizerMock.mockReset();
     stopSpeechRecognizerMock.mockReset();
@@ -157,5 +164,15 @@ describe('game engine lifecycle', () => {
     expect(startAudioInputMock).toHaveBeenCalledTimes(2);
     expect(stopAudioInputMock).toHaveBeenCalledTimes(2);
     expect(exitSpeechRecognizerMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays the invalid move sound when a board move is illegal', async () => {
+    const gameEngine = createGameEngine({ gameStorage: createMemoryGameStorage() });
+
+    await gameEngine.init({});
+    await gameEngine.handleBoardMove('e5');
+
+    expect(boardAdapterUpdateMovedSoundsInvalidMock).toHaveBeenCalledTimes(1);
+    expect(boardAdapterUpdateMovedSoundsOkMock).not.toHaveBeenCalled();
   });
 });

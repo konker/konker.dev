@@ -41,6 +41,7 @@ export type GameModelEvaluateResultIllegal = {
   readonly sanitized: string;
   readonly parsed: string | undefined;
   readonly message: string;
+  readonly reason: 'ambiguous' | 'invalid';
 };
 
 export type GameModelEvaluateResultControl = {
@@ -116,6 +117,7 @@ export function gameModelEvaluate(
               sanitized: parserResult.sanitized,
               parsed: parserResult.parsed,
               message: moveResult.message,
+              reason: moveResult.reason,
             };
           }
 
@@ -148,6 +150,7 @@ export function gameModelEvaluate(
           sanitized: parserResult.sanitized,
           parsed: parserResult.parsed,
           message: moveResult.message,
+          reason: moveResult.reason,
         };
       }
 

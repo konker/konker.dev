@@ -36,6 +36,7 @@ import {
 import type { AudioOutputResources } from '../audio-output';
 import {
   audioOutputIsSupported,
+  boardAdapterUpdateMovedSoundsInvalid,
   boardAdapterUpdateMovedSoundsOk,
   exitAudioOutput,
   initAudioOutput,
@@ -71,6 +72,7 @@ import {
   gameModelEvaluate,
 } from '../game-model/evaluate.js';
 import type { GameModelEventEvaluated } from '../game-model/events.js';
+import type { GameModelEventMovedInvalid } from '../game-model/events.js';
 import {
   GAME_MODEL_EVENT_TYPE_EVALUATED,
   GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
@@ -339,7 +341,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       case GAME_MODEL_EVALUATE_STATUS_OK:
         return model.chess.history().at(-1) ?? 'Move accepted';
       case GAME_MODEL_EVALUATE_STATUS_ILLEGAL:
-        return result.message;
+        return result.reason === 'ambiguous' ? 'Ambiguous move' : result.message;
       case GAME_MODEL_EVALUATE_STATUS_CONTROL:
         if (result.action === GAME_MODEL_CONTROL_ACTION_FLIP) {
           return 'Board flipped';
@@ -1016,6 +1018,18 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     gameModelResources = await initGameModel();
     syncGameModelFromAppState(appState, gameModelResources);
     await syncPersistedCurrentGame(appState.currentGame);
+
+    gameModelEventsAddListener(
+      gameModelResources,
+      GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
+      async (event: GameModelEventMovedInvalid): Promise<void> => {
+        await boardAdapterUpdateMovedSoundsInvalid(
+          currentComSettings(requireAppState()),
+          requireInitialized().audioOutputResources,
+          event.result
+        );
+      }
+    );
 
     gameModelEventsAddListener(
       gameModelResources,
