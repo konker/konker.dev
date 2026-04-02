@@ -8,6 +8,7 @@ export default defineConfig({
     mode: 'json',
   },
   server: {
+    https: true,
     prerender: {
       routes: ['/'],
     },
