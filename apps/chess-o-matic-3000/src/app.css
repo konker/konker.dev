@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 @import 'tailwindcss';
 
 @theme {
+  --color-title: #640933;
   --color-bg-app: #eff1ee;
   --color-bg-panel: #fbfcfa;
   --color-bg-panel-muted: #f4f6f3;
@@ -99,7 +101,11 @@
   }
 
   .app-title {
-    @apply text-3xl font-semibold tracking-[-0.03em] sm:text-4xl;
+    @apply text-3xl sm:text-4xl;
+    color: var(--color-title);
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
   .app-subtitle {
@@ -154,7 +160,7 @@
   }
 
   .section-summary {
-    @apply flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 sm:px-5;
+    @apply flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 sm:px-5;
     background-color: color-mix(in srgb, var(--color-bg-panel-muted) 80%, white);
   }
 

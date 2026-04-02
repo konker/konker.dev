@@ -1,24 +1,22 @@
-import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PgnPanel } from './index';
 
 describe('PgnPanel', () => {
-  it('copies the PGN text and shows the raw PGN textarea', async () => {
+  it('shows the raw PGN textarea and external open actions', () => {
     const root = document.createElement('div');
-    const writeText = vi.fn(async () => undefined);
+    const onOpenLichess = vi.fn();
+    const onOpenChessDotCom = vi.fn();
     document.body.append(root);
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText },
-    });
 
     render(
       () => (
         <PgnPanel
           currentPly={2}
           onGoToPly={vi.fn()}
+          onOpenChessDotCom={onOpenChessDotCom}
+          onOpenLichess={onOpenLichess}
           pgn={'1. e4 e5 2. Nf3 Nc6'}
           pgnMoveList={[
             { moveNumber: 1, ply: 1, san: 'e4', side: 'white' },
@@ -31,65 +29,22 @@ describe('PgnPanel', () => {
       root
     );
 
-    const copyButton = Array.from(root.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Copy PGN')
-    ) as HTMLButtonElement | undefined;
+    const buttons = Array.from(root.querySelectorAll('button'));
+    const lichessButton = buttons.find((button) => button.textContent?.includes('Open in Lichess')) as
+      | HTMLButtonElement
+      | undefined;
+    const chessDotComButton = buttons.find((button) => button.textContent?.includes('Open in Chess.com')) as
+      | HTMLButtonElement
+      | undefined;
 
-    copyButton?.click();
-    await Promise.resolve();
+    lichessButton?.click();
+    chessDotComButton?.click();
 
-    expect(writeText).toHaveBeenCalledWith('1. e4 e5 2. Nf3 Nc6');
-    expect(copyButton?.textContent).toContain('Copied');
+    expect(onOpenLichess).toHaveBeenCalledTimes(1);
+    expect(onOpenChessDotCom).toHaveBeenCalledTimes(1);
     expect((root.querySelector('[aria-label="PGN"]') as HTMLTextAreaElement | null)?.value).toBe(
       '1. e4 e5 2. Nf3 Nc6'
     );
-  });
-
-  it('resets the copied state when the PGN changes and still copies while already copied', async () => {
-    const root = document.createElement('div');
-    const writeText = vi.fn(async () => undefined);
-    document.body.append(root);
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText },
-    });
-
-    render(() => {
-      const [pgn, setPgn] = createSignal('1. e4');
-
-      function changePgn(): void {
-        setPgn('1. d4');
-      }
-
-      return (
-        <>
-          <PgnPanel currentPly={0} onGoToPly={vi.fn()} pgn={pgn()} pgnMoveList={[]} />
-          <button onClick={changePgn} type="button">
-            Change PGN
-          </button>
-        </>
-      );
-    }, root);
-
-    const copyButton = Array.from(root.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Copy PGN')
-    ) as HTMLButtonElement | undefined;
-    const changeButton = Array.from(root.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Change PGN'
-    ) as HTMLButtonElement | undefined;
-
-    copyButton?.click();
-    await Promise.resolve();
-    copyButton?.click();
-    await Promise.resolve();
-
-    expect(writeText).toHaveBeenNthCalledWith(1, '1. e4');
-    expect(writeText).toHaveBeenNthCalledWith(2, '1. e4');
-    expect(copyButton?.textContent).toContain('Copied');
-
-    changeButton?.click();
-    await Promise.resolve();
-
-    expect(copyButton?.textContent).toContain('Copy PGN');
+    expect(root.textContent).not.toContain('Copy PGN');
   });
 });

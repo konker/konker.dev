@@ -68,7 +68,17 @@ export function CollapsibleSection(props: CollapsibleSectionProps): JSX.Element 
             <span class="section-summary-title">{props.title}</span>
           </span>
         </span>
-        {props.headerAside ? <span class="flex items-center gap-2">{props.headerAside}</span> : null}
+        {props.headerAside ? (
+          <span
+            class="flex items-center gap-2"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
+          >
+            {props.headerAside}
+          </span>
+        ) : null}
       </summary>
       <div class="section-body">{props.children}</div>
     </details>
