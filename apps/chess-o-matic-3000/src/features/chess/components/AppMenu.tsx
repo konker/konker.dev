@@ -1,6 +1,7 @@
+import { Dialog } from '@kobalte/core';
 import { History, Home, Menu, PlusSquare } from 'lucide-solid';
 import type { JSX } from 'solid-js';
-import { createSignal, Show } from 'solid-js';
+import { createSignal } from 'solid-js';
 
 type AppMenuProps = {
   readonly onGoHome: () => void;
@@ -17,42 +18,42 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
   }
 
   return (
-    <div class="relative">
-      <button
-        aria-expanded={isOpen()}
-        aria-haspopup="menu"
+    <Dialog.Root modal onOpenChange={setIsOpen} open={isOpen()}>
+      <Dialog.Trigger
         aria-label="Open menu"
         class="toolbar-icon-button"
-        onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
         <Menu class="h-5 w-5" />
-      </button>
-
-      <Show when={isOpen()}>
-        <div
-          class="absolute right-0 top-12 z-20 flex min-w-44 flex-col border bg-[var(--color-bg-panel)] p-2 shadow-sm"
-          role="menu"
-        >
-          <button class="toolbar-button justify-start border-0" onClick={() => handleMenuAction(props.onGoHome)} role="menuitem" type="button">
-            <Home class="h-4 w-4" />
-            <span>Home</span>
-          </button>
-          <button class="toolbar-button justify-start border-0" onClick={() => handleMenuAction(props.onNewGame)} role="menuitem" type="button">
-            <PlusSquare class="h-4 w-4" />
-            <span>New Game</span>
-          </button>
-          <button
-            class="toolbar-button justify-start border-0"
-            onClick={() => handleMenuAction(props.onGoToHistory)}
-            role="menuitem"
-            type="button"
-          >
-            <History class="h-4 w-4" />
-            <span>History</span>
-          </button>
-        </div>
-      </Show>
-    </div>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay class="app-drawer-overlay" />
+        <Dialog.Content class="app-drawer-content">
+          <div class="app-drawer-header">
+            <Dialog.Title class="app-drawer-title">Menu</Dialog.Title>
+            <Dialog.CloseButton aria-label="Close menu" class="toolbar-icon-button" type="button">
+              <span class="sr-only">Close</span>
+              <span aria-hidden="true" class="text-lg leading-none">
+                ×
+              </span>
+            </Dialog.CloseButton>
+          </div>
+          <nav class="app-drawer-nav" role="menu">
+            <button class="toolbar-button justify-start" onClick={() => handleMenuAction(props.onGoHome)} role="menuitem" type="button">
+              <Home class="h-4 w-4" />
+              <span>Home</span>
+            </button>
+            <button class="toolbar-button justify-start" onClick={() => handleMenuAction(props.onNewGame)} role="menuitem" type="button">
+              <PlusSquare class="h-4 w-4" />
+              <span>New Game</span>
+            </button>
+            <button class="toolbar-button justify-start" onClick={() => handleMenuAction(props.onGoToHistory)} role="menuitem" type="button">
+              <History class="h-4 w-4" />
+              <span>History</span>
+            </button>
+          </nav>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

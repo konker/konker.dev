@@ -259,6 +259,46 @@
     opacity: 0.45;
   }
 
+  .app-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background-color: color-mix(in srgb, var(--color-text-primary) 26%, transparent);
+    backdrop-filter: blur(2px);
+  }
+
+  .app-drawer-content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    display: flex;
+    width: min(24rem, calc(100vw - 1.5rem));
+    flex-direction: column;
+    gap: 1rem;
+    border-left: 1px solid var(--color-border-subtle);
+    background-color: var(--color-bg-panel);
+    padding: 1rem;
+    box-shadow: -16px 0 40px color-mix(in srgb, var(--color-text-primary) 16%, transparent);
+  }
+
+  .app-drawer-header {
+    @apply flex items-center justify-between gap-3 border-b pb-3;
+    border-color: var(--color-border-subtle);
+  }
+
+  .app-drawer-title {
+    @apply text-lg;
+    color: var(--color-title);
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .app-drawer-nav {
+    @apply flex flex-col gap-2;
+  }
+
   .status-surface {
     @apply relative flex flex-col gap-3 border px-4 py-4 sm:px-5 sm:py-5;
     border-width: 2px 2px 2px 0.85rem;
