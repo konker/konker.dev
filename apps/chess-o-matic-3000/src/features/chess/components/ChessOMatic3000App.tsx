@@ -267,7 +267,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           </>
         }
         icon={Grid3x3}
-        open
         storageKey="board"
         title="Board"
       >
@@ -296,7 +295,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection icon={SlidersHorizontal} open storageKey="info" title="Info">
+      <CollapsibleSection icon={SlidersHorizontal} storageKey="info" title="Info">
         <GameMetadata
           gameId={() => uiState().currentGameId}
           metadata={() => uiState().gameMetadata}
@@ -304,7 +303,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection icon={NotebookPen} open storageKey="scoresheet" title="Scoresheet">
+      <CollapsibleSection icon={NotebookPen} storageKey="scoresheet" title="Scoresheet">
         <ScoreSheet
           currentPly={uiState().currentPly}
           onGoToPly={gameEngine.goToPly}
