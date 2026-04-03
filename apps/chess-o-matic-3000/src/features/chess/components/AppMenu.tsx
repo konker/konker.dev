@@ -21,7 +21,7 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
     <Dialog.Root modal onOpenChange={setIsOpen} open={isOpen()}>
       <Dialog.Trigger
         aria-label="Open menu"
-        class="toolbar-icon-button"
+        class="toolbar-icon-button app-menu-trigger"
         type="button"
       >
         <Menu class="h-5 w-5" />

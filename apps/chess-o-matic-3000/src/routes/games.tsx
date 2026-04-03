@@ -202,8 +202,14 @@ export default function GamesPage(): JSX.Element {
           <div class="app-header-top">
             <div class="flex flex-col gap-2">
               <span class="app-eyebrow">Chess game recorder</span>
-              <button aria-label="Go to home" class="app-title text-left" onClick={() => void navigate('/')} type="button">
-                Chess-o-matic 3000
+              <button
+                aria-label="Go to home"
+                class="app-title flex items-center gap-1 text-left"
+                onClick={() => void navigate('/')}
+                type="button"
+              >
+                <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
+                <span class="pt-1.5">Chess-o-matic 3000</span>
               </button>
             </div>
             <AppMenu onGoHome={() => void navigate('/')} onGoToHistory={() => undefined} onNewGame={() => void navigate('/?newGame=1')} />

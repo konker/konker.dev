@@ -87,8 +87,9 @@ describe('ChessBoard', () => {
     expect(onReady).toHaveBeenCalled();
 
     const controller = onReady.mock.calls[0]?.[0] as ChessBoardController | undefined;
-    const buttons = root.querySelectorAll('button[type="button"]');
-    const toggleButton = buttons.item(0) as HTMLButtonElement | null;
+    const toggleButton = Array.from(root.querySelectorAll('button[type="button"]')).find((button) =>
+      button.textContent?.includes('Flip')
+    ) as HTMLButtonElement | null;
     const coordinatesToggle = root.querySelector(
       'button[aria-label="Toggle Board Coordinates"]'
     ) as HTMLButtonElement | null;
