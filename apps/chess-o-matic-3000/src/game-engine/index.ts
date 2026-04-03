@@ -108,6 +108,7 @@ export type GameEngineUiState = {
   readonly lastMoveSan: string;
   readonly lastInputSanitized: string;
   readonly lastInputEvaluateStatus: GameModelEvaluateStatus;
+  readonly lastInputIllegalReason: 'ambiguous' | 'invalid' | undefined;
   readonly lastInputResultMessage: string;
   readonly scoresheetData: ScoreSheetData;
 };
@@ -121,6 +122,7 @@ export const GAME_ENGINE_UI_STATE_EMPTY: GameEngineUiState = {
   fen: START_FEN,
   gameMetadata: GAME_METADATA_EMPTY,
   lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
+  lastInputIllegalReason: undefined,
   lastInputResultMessage: 'No moves',
   lastInputSanitized: '',
   lastMoveSan: '',
@@ -304,6 +306,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     state: AppState,
     model: GameModelResources,
     status: GameModelEvaluateStatus,
+    illegalReason: GameEngineUiState['lastInputIllegalReason'],
     message: string,
     sanitizedInput: string,
     lastMoveSan: string
@@ -317,6 +320,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
       lastInputEvaluateStatus: status,
+      lastInputIllegalReason: illegalReason,
       lastInputResultMessage: message,
       fen: model.chess.fen(),
       gameMetadata: state.currentGame.metadata,
@@ -458,6 +462,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       state.appState,
       model,
       result.status,
+      result.status === GAME_MODEL_EVALUATE_STATUS_ILLEGAL ? result.reason : undefined,
       getResultMessage(result, model),
       result.sanitized,
       model.chess.history().at(-1) ?? ''
@@ -781,7 +786,15 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncBoardPosition();
     await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
-    emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'New game', '', '');
+    emitCurrentUiState(
+      nextAppState,
+      state.gameModelResources,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      undefined,
+      'New game',
+      '',
+      ''
+    );
   }
 
   async function discardGame(): Promise<void> {
@@ -803,6 +816,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       nextAppState,
       state.gameModelResources,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      undefined,
       'Game discarded',
       '',
       ''
@@ -822,7 +836,15 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncBoardPosition();
     await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
-    emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_IGNORE, 'Game reset', '', '');
+    emitCurrentUiState(
+      nextAppState,
+      state.gameModelResources,
+      GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      undefined,
+      'Game reset',
+      '',
+      ''
+    );
   }
 
   async function saveCurrentGame(): Promise<void> {
@@ -854,7 +876,15 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     syncBoardPosition();
     await syncPersistedCurrentGame(nextAppState.currentGame);
     await persistAppState();
-    emitCurrentUiState(nextAppState, state.gameModelResources, GAME_MODEL_EVALUATE_STATUS_OK, 'OK', '', savedGame.moveHistory.at(-1)?.san ?? '');
+    emitCurrentUiState(
+      nextAppState,
+      state.gameModelResources,
+      GAME_MODEL_EVALUATE_STATUS_OK,
+      undefined,
+      'OK',
+      '',
+      savedGame.moveHistory.at(-1)?.san ?? ''
+    );
   }
 
   async function listSavedGames(): Promise<PersistedSavedGameIndex> {
@@ -908,6 +938,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       appState,
       gameModelResources,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      undefined,
       'Game metadata updated',
       '',
       gameModelResources.chess.history().at(-1) ?? ''
@@ -934,6 +965,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       appState,
       gameModelResources,
       GAME_MODEL_EVALUATE_STATUS_IGNORE,
+      undefined,
       'Board orientation updated',
       '',
       gameModelResources.chess.history().at(-1) ?? ''
@@ -950,7 +982,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateStepBackward(): void {
@@ -963,7 +995,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateStepForward(): void {
@@ -976,7 +1008,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateToEnd(): void {
@@ -989,7 +1021,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   function navigateToPly(ply: number): void {
@@ -1002,7 +1034,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, snapshot.message, '', snapshot.lastMoveSan);
+    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
   }
 
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
@@ -1044,6 +1076,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       appState,
       gameModelResources,
       initialStatusSnapshot.status,
+      undefined,
       initialStatusSnapshot.message,
       initialStatusSnapshot.sanitizedInput,
       initialStatusSnapshot.lastMoveSan

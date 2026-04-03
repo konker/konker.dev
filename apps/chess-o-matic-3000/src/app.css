@@ -27,14 +27,17 @@
   --color-status-error-bg: #fdeced;
   --color-status-error-border: #c62828;
   --color-status-error-text: #7f1d1d;
+  --color-status-warning-bg: color-mix(in srgb, var(--color-accent-warm) 15%, white);
+  --color-status-warning-border: color-mix(in srgb, var(--color-accent-warm) 78%, #5c472e);
+  --color-status-warning-text: #5c472e;
   --color-status-info-bg: #eaf2fd;
   --color-status-info-border: #1565c0;
   --color-status-info-text: #0b3d91;
   --color-status-neutral-bg: #f0f2ef;
   --color-status-neutral-border: #6b7280;
   --color-status-neutral-text: #374151;
-  --font-body: 'Atkinson Hyperlegible Next', 'IBM Plex Sans', 'Aptos', 'Segoe UI', sans-serif;
-  --font-data: 'Atkinson Hyperlegible Next', 'IBM Plex Mono', 'Consolas', 'SFMono-Regular', monospace;
+  --font-body: 'Atkinson Hyperlegible Next', sans-serif;
+  --font-data: 'Atkinson Hyperlegible Next', monospace;
 }
 
 @layer base {
@@ -261,6 +264,12 @@
     border-color: var(--color-status-error-border);
     background-color: var(--color-status-error-bg);
     color: var(--color-status-error-text);
+  }
+
+  .status-surface[data-status='illegal'][data-illegal-reason='ambiguous'] {
+    border-color: var(--color-status-warning-border);
+    background-color: var(--color-status-warning-bg);
+    color: var(--color-status-warning-text);
   }
 
   .status-surface[data-status='control'] {

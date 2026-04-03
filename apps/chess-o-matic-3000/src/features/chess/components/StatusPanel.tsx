@@ -5,6 +5,7 @@ import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 type StatusPanelProps = {
   readonly controls?: JSX.Element;
   readonly status: GameModelEvaluateStatus;
+  readonly illegalReason?: 'ambiguous' | 'invalid';
   readonly lastMoveSan: string;
   readonly message: string;
   readonly sanitizedInput: string;
@@ -50,7 +51,13 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
   }
 
   return (
-    <section class="status-surface" data-status={props.status} id="status" ref={panelEl}>
+    <section
+      class="status-surface"
+      data-illegal-reason={props.status === 'illegal' ? props.illegalReason : undefined}
+      data-status={props.status}
+      id="status"
+      ref={panelEl}
+    >
       <span aria-label="Last Input Evaluate Status" class="status-chip status-floating-chip">
         {renderChipMessage()}
       </span>
