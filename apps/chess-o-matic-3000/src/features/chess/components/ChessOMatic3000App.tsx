@@ -1,7 +1,7 @@
 import '../chess-o-matic.css';
 
-import { Binary, Copy, CopyCheck, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 import { useNavigate } from '@solidjs/router';
+import { Binary, Copy, CopyCheck, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 
@@ -9,8 +9,8 @@ import type { GameMetadataData } from '../../../domain/game/metadata';
 import type { GameEngine, GameEngineUiState } from '../../../game-engine';
 import { createGameEngine, GAME_ENGINE_UI_STATE_EMPTY } from '../../../game-engine';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
-import { AppMenu } from './AppMenu';
 import { AppFooter } from './AppFooter';
+import { AppMenu } from './AppMenu';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -225,7 +225,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             <span class="app-eyebrow">Chess game recorder</span>
             <button
               aria-label="Go to home"
-              class="app-title flex items-center gap-1 text-left"
+              class="app-title flex items-center gap-0.5 text-left"
               onClick={() => void navigate('/')}
               type="button"
             >
