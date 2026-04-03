@@ -249,6 +249,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             onToggleSound={() => void toggleSound()}
           />
         }
+        illegalReason={uiState().lastInputIllegalReason}
         lastMoveSan={uiState().lastMoveSan}
         message={uiState().lastInputResultMessage}
         sanitizedInput={uiState().lastInputSanitized}

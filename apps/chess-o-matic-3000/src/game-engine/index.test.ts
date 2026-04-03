@@ -230,6 +230,7 @@ describe('createGameEngine persistence', () => {
     expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
       currentPly: 5,
       lastInputEvaluateStatus: 'illegal',
+      lastInputIllegalReason: 'ambiguous',
       lastInputResultMessage: 'Ambiguous move',
       lastInputSanitized: 'Ne7',
       lastMoveSan: 'a5',
