@@ -114,6 +114,7 @@
     font-weight: 600;
     font-style: normal;
     letter-spacing: 0.01em;
+    margin-left: -0.2rem;
   }
 
   .app-subtitle {
@@ -127,6 +128,7 @@
     font-family: var(--font-sans);
     font-weight: 400;
     letter-spacing: 0.01em;
+    padding-left: 0.35rem;
   }
 
   .app-header-furniture {
@@ -160,7 +162,7 @@
   .panel-muted {
     @apply border p-3 sm:p-4;
     border-color: var(--color-border-subtle);
-    background-color: var(--color-bg-panel-muted);
+    background-color: var(--color-sheet-bg);
   }
 
   .panel-utility {
@@ -341,6 +343,29 @@
     @apply flex flex-col gap-2;
   }
 
+  .app-drawer-item {
+    @apply flex min-h-11 items-center gap-3 px-3 py-2 text-left text-sm;
+    border: 0;
+    border-left: 0.35rem solid transparent;
+    background-color: transparent;
+    color: var(--color-text-primary);
+  }
+
+  .app-drawer-item:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-title) 6%, white);
+  }
+
+  .app-drawer-item-active {
+    border-left-color: var(--color-title);
+    background-color: color-mix(in srgb, var(--color-title) 6%, white);
+    color: var(--color-title);
+  }
+
+  .app-drawer-actions {
+    @apply mt-2 border-t pt-3;
+    border-color: var(--color-border-subtle);
+  }
+
   .status-surface {
     @apply relative flex flex-col gap-3 border py-4 pr-4 pl-[1.35rem] sm:py-5 sm:pr-5 sm:pl-[1.6rem];
     border-width: 2px 2px 2px 0.85rem;
@@ -454,7 +479,7 @@
   .metadata-player-panel {
     @apply flex flex-col gap-3 border p-4;
     border-color: var(--color-border-subtle);
-    background-color: color-mix(in srgb, var(--color-bg-panel-muted) 70%, white);
+    background-color: white;
   }
 
   .metadata-player-title {
@@ -659,7 +684,7 @@
     border-color: var(--color-border-subtle);
     background-color: color-mix(in srgb, var(--color-bg-panel-muted) 70%, white);
     color: var(--color-text-primary);
-    font-family: var(--font-data);
+    font-family: var(--font-mono);
   }
 
   .utility-code-block {
@@ -667,7 +692,7 @@
     border-color: var(--color-border-subtle);
     background-color: color-mix(in srgb, var(--color-bg-panel-muted) 70%, white);
     color: var(--color-text-primary);
-    font-family: var(--font-data);
+    font-family: var(--font-mono);
   }
 
   .board-panel {
@@ -683,8 +708,18 @@
   }
 
   .board-navigation-row {
-    @apply flex w-full justify-end;
+    @apply flex w-full items-center justify-between gap-3;
     touch-action: manipulation;
+  }
+
+  .board-navigation-row > :first-child {
+    margin-right: auto;
+    padding-left: 0.35rem;
+  }
+
+  .board-navigation-row > :last-child {
+    margin-left: auto;
+    padding-right: 0.35rem;
   }
 
   .board-navigation-row .toolbar-icon-button {

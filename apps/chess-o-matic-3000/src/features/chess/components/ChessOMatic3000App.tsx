@@ -234,9 +234,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             </button>
           </div>
           <AppMenu
-            onGoHome={() => {
-              void navigate('/');
-            }}
             onGoToHistory={() => props.onGoToHistory?.()}
             onNewGame={() => {
               void startNewGame();
@@ -249,17 +246,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
       <StatusPanel
-        controls={
-          <ControlsPanel
-            disabled={isInitializing() || !!errorMessage()}
-            isListeningAvailable={isListeningAvailable()}
-            isListening={isListening()}
-            isSoundAvailable={isSoundAvailable()}
-            isSoundEnabled={isSoundEnabled()}
-            onToggleListening={() => void toggleListening()}
-            onToggleSound={() => void toggleSound()}
-          />
-        }
         illegalReason={uiState().lastInputIllegalReason}
         lastMoveSan={uiState().lastMoveSan}
         message={uiState().lastInputResultMessage}
@@ -276,6 +262,15 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           onGoToStart={() => gameEngine.goToStart()}
           onStepBackward={() => gameEngine.stepBackward()}
           onStepForward={() => gameEngine.stepForward()}
+        />
+        <ControlsPanel
+          disabled={isInitializing() || !!errorMessage()}
+          isListeningAvailable={isListeningAvailable()}
+          isListening={isListening()}
+          isSoundAvailable={isSoundAvailable()}
+          isSoundEnabled={isSoundEnabled()}
+          onToggleListening={() => void toggleListening()}
+          onToggleSound={() => void toggleSound()}
         />
       </div>
 

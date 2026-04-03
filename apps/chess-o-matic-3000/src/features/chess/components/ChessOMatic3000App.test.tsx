@@ -3,6 +3,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@solidjs/router', () => ({
   useNavigate: () => vi.fn(),
+  useLocation: () => ({
+    pathname: '/',
+  }),
 }));
 
 vi.mock('@kobalte/core', () => {
@@ -47,8 +50,8 @@ describe('ChessOMatic3000App', () => {
     expect(root.querySelector('button[aria-label="Copy FEN"]')).not.toBeNull();
     expect(root.textContent).toContain('Open in Lichess');
     expect(root.textContent).toContain('Open in Chess.com');
-    expect(root.textContent).toContain('Speech');
-    expect(root.textContent).toContain('Sounds');
+    expect(root.querySelector('button[aria-label="Speech"]')).not.toBeNull();
+    expect(root.querySelector('button[aria-label="Sounds"]')).not.toBeNull();
     expect(root.textContent).toContain('PGN');
     expect(root.textContent).toContain('Heard');
     expect(root.querySelector('[data-testid="mock-chess-board"]')).not.toBeNull();
