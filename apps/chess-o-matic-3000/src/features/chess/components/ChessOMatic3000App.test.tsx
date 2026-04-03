@@ -5,6 +5,28 @@ vi.mock('@solidjs/router', () => ({
   useNavigate: () => vi.fn(),
 }));
 
+vi.mock('@kobalte/core', () => {
+  const DialogRoot = (props: { children: unknown }) => <>{props.children}</>;
+  const DialogTrigger = (props: Record<string, unknown>) => <button {...props}>{props.children as never}</button>;
+  const DialogPortal = (props: { children: unknown }) => <>{props.children}</>;
+  const DialogOverlay = (props: Record<string, unknown>) => <div {...props} />;
+  const DialogContent = (props: Record<string, unknown>) => <div {...props}>{props.children as never}</div>;
+  const DialogTitle = (props: Record<string, unknown>) => <div {...props}>{props.children as never}</div>;
+  const DialogCloseButton = (props: Record<string, unknown>) => <button {...props}>{props.children as never}</button>;
+
+  return {
+    Dialog: {
+      Root: DialogRoot,
+      Trigger: DialogTrigger,
+      Portal: DialogPortal,
+      Overlay: DialogOverlay,
+      Content: DialogContent,
+      Title: DialogTitle,
+      CloseButton: DialogCloseButton,
+    },
+  };
+});
+
 vi.mock('./ChessBoard', () => ({
   ChessBoard: () => <div data-testid="mock-chess-board">Mock ChessBoard</div>,
 }));
