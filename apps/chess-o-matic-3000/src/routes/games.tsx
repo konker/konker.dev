@@ -212,7 +212,7 @@ export default function GamesPage(): JSX.Element {
                 <span class="pt-1.5">Chess-o-matic 3000</span>
               </button>
             </div>
-            <AppMenu onGoHome={() => void navigate('/')} onGoToHistory={() => undefined} onNewGame={() => void navigate('/?newGame=1')} />
+            <AppMenu onGoToHistory={() => undefined} onNewGame={() => void navigate('/?newGame=1')} />
           </div>
         </header>
 

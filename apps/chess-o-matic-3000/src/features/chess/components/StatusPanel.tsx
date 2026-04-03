@@ -12,8 +12,6 @@ type StatusPanelProps = {
 };
 
 export function StatusPanel(props: StatusPanelProps): JSX.Element {
-  let panelEl: HTMLElement | undefined;
-
   function renderStatusText(): string {
     switch (props.status) {
       case 'ok':
@@ -47,7 +45,14 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
   }
 
   function scrollPanelToTop(): void {
-    panelEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const headerEl = document.querySelector('.app-header');
+    if (headerEl instanceof HTMLElement) {
+      const targetTop = window.scrollY + headerEl.getBoundingClientRect().bottom;
+      window.scrollTo({
+        behavior: 'smooth',
+        top: targetTop,
+      });
+    }
   }
 
   return (
@@ -56,7 +61,6 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
       data-illegal-reason={props.status === 'illegal' ? props.illegalReason : undefined}
       data-status={props.status}
       id="status"
-      ref={panelEl}
     >
       <span aria-label="Last Input Evaluate Status" class="status-chip status-floating-chip">
         {renderChipMessage()}

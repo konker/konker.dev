@@ -23,24 +23,28 @@ vi.mock('@kobalte/core', () => {
   };
 });
 
+vi.mock('@solidjs/router', () => ({
+  useLocation: () => ({
+    pathname: '/',
+  }),
+}));
+
 import { AppMenu } from './AppMenu';
 
 describe('AppMenu', () => {
   it('opens a drawer and dispatches menu actions', async () => {
     const root = document.createElement('div');
-    const onGoHome = vi.fn();
     const onGoToHistory = vi.fn();
     const onNewGame = vi.fn();
     document.body.append(root);
 
-    render(() => <AppMenu onGoHome={onGoHome} onGoToHistory={onGoToHistory} onNewGame={onNewGame} />, root);
+    render(() => <AppMenu onGoToHistory={onGoToHistory} onNewGame={onNewGame} />, root);
     await Promise.resolve();
 
     const trigger = root.querySelector('button[aria-label="Open menu"]') as HTMLButtonElement | null;
     trigger?.click();
     await Promise.resolve();
 
-    expect(document.body.textContent).toContain('Home');
     expect(document.body.textContent).toContain('New Game');
     expect(document.body.textContent).toContain('History');
 
