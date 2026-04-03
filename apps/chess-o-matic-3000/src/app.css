@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@200..800&family=Atkinson+Hyperlegible+Mono:wght@200..800&display=swap');
 /*@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');*/
 @import 'tailwindcss';
 
@@ -36,8 +36,10 @@
   --color-status-neutral-bg: #f0f2ef;
   --color-status-neutral-border: #6b7280;
   --color-status-neutral-text: #374151;
-  --font-body: 'Atkinson Hyperlegible Next', sans-serif;
+  --font-sans: 'Atkinson Hyperlegible Next', sans-serif;
+  --font-body: var(--font-sans);
   --font-data: 'Atkinson Hyperlegible Next', monospace;
+  --font-mono: 'Atkinson Hyperlegible Mono', monospace;
 }
 
 @layer base {
@@ -107,9 +109,9 @@
   .app-title {
     @apply text-2xl sm:text-3xl;
     color: var(--color-title);
-    font-family: 'Atkinson Hyperlegible Next', sans-serif;
+    font-family: var(--font-sans);
     font-optical-sizing: auto;
-    font-weight: 400;
+    font-weight: 500;
     font-style: normal;
     letter-spacing: 0.01em;
   }
@@ -326,7 +328,7 @@
 
   .status-san {
     @apply text-4xl font-semibold leading-none sm:text-5xl;
-    font-family: var(--font-data);
+    font-family: var(--font-mono);
   }
 
   .status-heard-label {
@@ -438,7 +440,7 @@
 
   .scoresheet-index {
     @apply py-2 tabular-nums;
-    font-family: var(--font-data);
+    font-family: var(--font-mono);
     color: color-mix(in srgb, var(--color-sheet-ink) 68%, white);
   }
 
@@ -456,7 +458,7 @@
 
   .scoresheet-move-button {
     @apply block w-full py-2 text-left text-sm;
-    font-family: var(--font-data);
+    font-family: var(--font-mono);
   }
 
   .scoresheet-move-button-current {
