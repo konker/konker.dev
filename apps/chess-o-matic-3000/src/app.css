@@ -233,6 +233,12 @@
     background-color: color-mix(in srgb, var(--color-accent-primary) 10%, white);
   }
 
+  .toolbar-button-cobalt {
+    border-color: color-mix(in srgb, var(--color-title) 34%, var(--color-border-subtle));
+    background-color: transparent;
+    color: var(--color-title);
+  }
+
   .toolbar-button-danger {
     border-color: color-mix(in srgb, #c62828 32%, var(--color-border-subtle));
     background-color: color-mix(in srgb, #c62828 7%, white);
@@ -257,6 +263,16 @@
   .toolbar-icon-button:disabled {
     cursor: not-allowed;
     opacity: 0.45;
+  }
+
+  .toolbar-icon-button-cobalt {
+    border-color: color-mix(in srgb, var(--color-title) 34%, var(--color-border-subtle));
+    background-color: transparent;
+    color: var(--color-title);
+  }
+
+  .app-menu-trigger {
+    color: var(--color-title);
   }
 
   .app-drawer-overlay {
@@ -300,8 +316,19 @@
   }
 
   .status-surface {
-    @apply relative flex flex-col gap-3 border px-4 py-4 sm:px-5 sm:py-5;
+    @apply relative flex flex-col gap-3 border py-4 pr-4 pl-[1.35rem] sm:py-5 sm:pr-5 sm:pl-[1.6rem];
     border-width: 2px 2px 2px 0.85rem;
+  }
+
+  .status-surface::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0.35rem;
+    background-color: color-mix(in srgb, currentColor 28%, transparent);
+    pointer-events: none;
   }
 
   .status-surface[data-status='ok'] {
@@ -623,16 +650,20 @@
   }
 
   .board-toolbar {
-    @apply flex flex-wrap items-center gap-2;
+    @apply flex flex-wrap items-center gap-2 pl-3;
   }
 
   .board-navigation-row {
-    @apply w-full;
+    @apply flex w-full justify-end;
+    touch-action: manipulation;
+  }
+
+  .board-navigation-row .toolbar-icon-button {
+    touch-action: manipulation;
   }
 
   .board-frame {
-    @apply border p-2;
-    border-color: var(--color-border-strong);
+    @apply p-2;
     background-color: color-mix(in srgb, var(--color-bg-panel-muted) 78%, white);
   }
 

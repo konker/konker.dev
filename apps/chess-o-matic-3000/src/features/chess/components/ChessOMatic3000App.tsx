@@ -267,15 +267,29 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         status={uiState().lastInputEvaluateStatus}
       />
 
+      <div class="board-navigation-row">
+        <GameNavigationToolbar
+          canGoBackward={uiState().canGoBackward}
+          canGoForward={uiState().canGoForward}
+          disabled={isInitializing() || !!errorMessage()}
+          onGoToEnd={() => gameEngine.goToEnd()}
+          onGoToStart={() => gameEngine.goToStart()}
+          onStepBackward={() => gameEngine.stepBackward()}
+          onStepForward={() => gameEngine.stepForward()}
+        />
+      </div>
+
       <CollapsibleSection
         headerAside={
-          <>
-            <span class="status-chip status-move-chip">{renderCurrentMoveNumber()}</span>
-            <span
-              aria-label={`${renderCurrentMoveColor()} to move`}
-              class={`status-color-chip status-color-chip-${renderCurrentMoveColor()}`}
-            />
-          </>
+          <span class="flex items-center gap-2">
+            <span class="flex items-center gap-2">
+              <span class="status-chip status-move-chip">{renderCurrentMoveNumber()}</span>
+              <span
+                aria-label={`${renderCurrentMoveColor()} to move`}
+                class={`status-color-chip status-color-chip-${renderCurrentMoveColor()}`}
+              />
+            </span>
+          </span>
         }
         icon={Grid3x3}
         storageKey="board"
@@ -291,18 +305,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             onToggleOrientation={() => gameEngine.toggleBoardOrientation()}
             orientation={uiState().boardOrientation}
           />
-
-          <div class="board-navigation-row">
-            <GameNavigationToolbar
-              canGoBackward={uiState().canGoBackward}
-              canGoForward={uiState().canGoForward}
-              disabled={isInitializing() || !!errorMessage()}
-              onGoToEnd={() => gameEngine.goToEnd()}
-              onGoToStart={() => gameEngine.goToStart()}
-              onStepBackward={() => gameEngine.stepBackward()}
-              onStepForward={() => gameEngine.stepForward()}
-            />
-          </div>
         </div>
       </CollapsibleSection>
 
@@ -326,7 +328,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         headerAside={
           <button
             aria-label="Copy PGN"
-            class="toolbar-button"
+            class="toolbar-button toolbar-button-cobalt"
             disabled={isInitializing() || !!errorMessage()}
             onClick={() => void copyPgn()}
             type="button"
@@ -334,7 +336,9 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             <Show when={isPgnCopied()} fallback={<Copy class="h-4 w-4" />}>
               <CopyCheck class="h-4 w-4" />
             </Show>
-            <span>{isPgnCopied() ? 'Copied' : 'Copy PGN'}</span>
+            <Show when={isPgnCopied()}>
+              <span>Copied</span>
+            </Show>
           </button>
         }
         icon={FileText}
@@ -356,7 +360,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         headerAside={
           <button
             aria-label="Copy FEN"
-            class="toolbar-button"
+            class="toolbar-button toolbar-button-cobalt"
             disabled={isInitializing() || !!errorMessage()}
             onClick={() => void copyFen()}
             type="button"
@@ -364,7 +368,9 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
             <Show when={isFenCopied()} fallback={<Copy class="h-4 w-4" />}>
               <CopyCheck class="h-4 w-4" />
             </Show>
-            <span>{isFenCopied() ? 'Copied' : 'Copy FEN'}</span>
+            <Show when={isFenCopied()}>
+              <span>Copied</span>
+            </Show>
           </button>
         }
         icon={Binary}

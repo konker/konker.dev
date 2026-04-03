@@ -16,7 +16,7 @@ export function GameNavigationToolbar(props: GameNavigationToolbarProps): JSX.El
     <div class="toolbar-group" role="group" aria-label="Game navigation">
       <button
         aria-label="Jump to first move"
-        class="toolbar-icon-button"
+        class="toolbar-icon-button toolbar-icon-button-cobalt"
         disabled={props.disabled || !props.canGoBackward}
         onClick={props.onGoToStart}
         title="Jump to first move"
@@ -27,7 +27,7 @@ export function GameNavigationToolbar(props: GameNavigationToolbarProps): JSX.El
 
       <button
         aria-label="Back one move"
-        class="toolbar-icon-button"
+        class="toolbar-icon-button toolbar-icon-button-cobalt"
         disabled={props.disabled || !props.canGoBackward}
         onClick={props.onStepBackward}
         title="Back one move"
@@ -38,7 +38,7 @@ export function GameNavigationToolbar(props: GameNavigationToolbarProps): JSX.El
 
       <button
         aria-label="Forward one move"
-        class="toolbar-icon-button"
+        class="toolbar-icon-button toolbar-icon-button-cobalt"
         disabled={props.disabled || !props.canGoForward}
         onClick={props.onStepForward}
         title="Forward one move"
@@ -49,7 +49,7 @@ export function GameNavigationToolbar(props: GameNavigationToolbarProps): JSX.El
 
       <button
         aria-label="Jump to last move"
-        class="toolbar-icon-button"
+        class="toolbar-icon-button toolbar-icon-button-cobalt"
         disabled={props.disabled || !props.canGoForward}
         onClick={props.onGoToEnd}
         title="Jump to last move"

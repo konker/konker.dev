@@ -262,40 +262,6 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
 
   return (
     <div class="board-panel">
-      <div class="board-toolbar">
-        <button class="toolbar-button" onClick={props.onToggleOrientation} type="button">
-          <RotateCw class="h-4 w-4" />
-          <span>Flip</span>
-        </button>
-
-        <button
-          aria-label="Toggle Board Coordinates"
-          class="toolbar-button"
-          onClick={() => setShowCoordinates((current) => !current)}
-          type="button"
-        >
-          <span class={showCoordinates() ? '[font-family:var(--font-data)]' : '[font-family:var(--font-data)] line-through'}>
-            a1
-          </span>
-        </button>
-
-        <button
-          aria-label="Toggle Board Color Scheme"
-          class="board-swatch-button"
-          onClick={() =>
-            setColorScheme((current) =>
-              current === BOARD_COLOR_SCHEME_GREEN ? BOARD_COLOR_SCHEME_BROWN : BOARD_COLOR_SCHEME_GREEN
-            )
-          }
-          style={{
-            'background-color': BOARD_COLOR_SCHEMES[colorScheme()].dark,
-            'border-color': 'var(--board-border-color)',
-          }}
-          title={`Board colors: ${BOARD_COLOR_SCHEMES[colorScheme()].label}`}
-          type="button"
-        />
-      </div>
-
       <div class="board-frame relative">
         <g-chess-board
           class="block aspect-square w-full max-w-[34rem] border-2 border-[var(--board-border-color)]"
@@ -335,6 +301,40 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
             />
           </div>
         </div>
+      </div>
+
+      <div class="board-toolbar">
+        <button class="toolbar-button toolbar-button-cobalt" onClick={props.onToggleOrientation} type="button">
+          <RotateCw class="h-4 w-4" />
+          <span>Flip</span>
+        </button>
+
+        <button
+          aria-label="Toggle Board Coordinates"
+          class="toolbar-button toolbar-button-cobalt"
+          onClick={() => setShowCoordinates((current) => !current)}
+          type="button"
+        >
+          <span class={showCoordinates() ? '[font-family:var(--font-data)]' : '[font-family:var(--font-data)] line-through'}>
+            a1
+          </span>
+        </button>
+
+        <button
+          aria-label="Toggle Board Color Scheme"
+          class="board-swatch-button toolbar-icon-button-cobalt"
+          onClick={() =>
+            setColorScheme((current) =>
+              current === BOARD_COLOR_SCHEME_GREEN ? BOARD_COLOR_SCHEME_BROWN : BOARD_COLOR_SCHEME_GREEN
+            )
+          }
+          style={{
+            'background-color': BOARD_COLOR_SCHEMES[colorScheme()].dark,
+            'border-color': 'var(--board-border-color)',
+          }}
+          title={`Board colors: ${BOARD_COLOR_SCHEMES[colorScheme()].label}`}
+          type="button"
+        />
       </div>
     </div>
   );
