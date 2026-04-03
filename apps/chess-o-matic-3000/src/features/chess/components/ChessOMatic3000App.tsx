@@ -1,6 +1,7 @@
 import '../chess-o-matic.css';
 
 import { Binary, Copy, CopyCheck, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
+import { useNavigate } from '@solidjs/router';
 import type { JSX } from 'solid-js';
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 
@@ -9,6 +10,7 @@ import type { GameEngine, GameEngineUiState } from '../../../game-engine';
 import { createGameEngine, GAME_ENGINE_UI_STATE_EMPTY } from '../../../game-engine';
 import { GAME_MODEL_EVALUATE_STATUS_IGNORE } from '../../../game-model/evaluate';
 import { AppMenu } from './AppMenu';
+import { AppFooter } from './AppFooter';
 import { ChessBoard } from './ChessBoard';
 import type { ChessBoardController } from './ChessBoard/controller';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -29,6 +31,7 @@ type ChessOMaticAppProps = {
 };
 
 export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = createSignal<string>();
   const [isInitializing, setIsInitializing] = createSignal(true);
   const [isListening, setIsListening] = createSignal(false);
@@ -220,12 +223,20 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         <div class="app-header-top">
           <div class="flex flex-col gap-2">
             <span class="app-eyebrow">Chess game recorder</span>
-            <h1 class="app-title flex items-center gap-1">
+            <button
+              aria-label="Go to home"
+              class="app-title flex items-center gap-1 text-left"
+              onClick={() => void navigate('/')}
+              type="button"
+            >
               <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
               <span class="pt-1.5">Chess-o-matic 3000</span>
-            </h1>
+            </button>
           </div>
           <AppMenu
+            onGoHome={() => {
+              void navigate('/');
+            }}
             onGoToHistory={() => props.onGoToHistory?.()}
             onNewGame={() => {
               void startNewGame();
@@ -363,10 +374,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         <FenPanel fen={uiState().fen} />
       </CollapsibleSection>
 
-      <footer class="app-footer">
-        <span>Chess-o-matic 3000</span>
-        <span>Design system in progress</span>
-      </footer>
+      <AppFooter />
     </main>
   );
 }

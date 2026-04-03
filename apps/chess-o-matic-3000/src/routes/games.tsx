@@ -1,12 +1,13 @@
 import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
-import { FolderOpen, ScrollText, Trash2 } from 'lucide-solid';
+import { ArrowLeft, FolderOpen, ScrollText, Trash2 } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createSignal, For, onMount, Show } from 'solid-js';
 
 import { createBrowserGameStorage } from '../application/adapters/browser/BrowserGameStorage';
 import type { GameRecord } from '../domain/game/types';
 import type { SavedGameSummary } from '../domain/game/types';
+import { AppFooter } from '../features/chess/components/AppFooter';
 import { AppMenu } from '../features/chess/components/AppMenu';
 
 function deriveHistoryTitle(game: SavedGameSummary): string {
@@ -200,16 +201,21 @@ export default function GamesPage(): JSX.Element {
         <header class="app-header">
           <div class="app-header-top">
             <div class="flex flex-col gap-2">
-              <span class="app-eyebrow">Saved games</span>
-              <h1 class="app-title">History</h1>
+              <span class="app-eyebrow">Chess game recorder</span>
+              <button aria-label="Go to home" class="app-title text-left" onClick={() => void navigate('/')} type="button">
+                Chess-o-matic 3000
+              </button>
             </div>
-            <AppMenu onGoToHistory={() => undefined} onNewGame={() => void navigate('/?newGame=1')} />
+            <AppMenu onGoHome={() => void navigate('/')} onGoToHistory={() => undefined} onNewGame={() => void navigate('/?newGame=1')} />
           </div>
-          <div class="app-control-row">
-            <button class="toolbar-button" onClick={() => void navigate('/')} type="button">
-              Back to game
-            </button>
-          </div>
+        </header>
+
+        <header class="flex items-center justify-between gap-3">
+          <p class="history-page-subtitle">History</p>
+          <button class="toolbar-button" onClick={() => void navigate('/')} type="button">
+            <ArrowLeft class="h-4 w-4" />
+            <span>Back to game</span>
+          </button>
         </header>
 
         <section class="panel flex flex-col gap-3">
@@ -221,6 +227,8 @@ export default function GamesPage(): JSX.Element {
             </For>
           </Show>
         </section>
+
+        <AppFooter />
       </main>
     </>
   );

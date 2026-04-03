@@ -1,6 +1,10 @@
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@solidjs/router', () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 vi.mock('./ChessBoard', () => ({
   ChessBoard: () => <div data-testid="mock-chess-board">Mock ChessBoard</div>,
 }));
