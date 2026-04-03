@@ -1,8 +1,9 @@
-import { Menu } from 'lucide-solid';
+import { History, Home, Menu, PlusSquare } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createSignal, Show } from 'solid-js';
 
 type AppMenuProps = {
+  readonly onGoHome: () => void;
   readonly onGoToHistory: () => void;
   readonly onNewGame: () => void;
 };
@@ -33,8 +34,13 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
           class="absolute right-0 top-12 z-20 flex min-w-44 flex-col border bg-[var(--color-bg-panel)] p-2 shadow-sm"
           role="menu"
         >
+          <button class="toolbar-button justify-start border-0" onClick={() => handleMenuAction(props.onGoHome)} role="menuitem" type="button">
+            <Home class="h-4 w-4" />
+            <span>Home</span>
+          </button>
           <button class="toolbar-button justify-start border-0" onClick={() => handleMenuAction(props.onNewGame)} role="menuitem" type="button">
-            New Game
+            <PlusSquare class="h-4 w-4" />
+            <span>New Game</span>
           </button>
           <button
             class="toolbar-button justify-start border-0"
@@ -42,7 +48,8 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
             role="menuitem"
             type="button"
           >
-            History
+            <History class="h-4 w-4" />
+            <span>History</span>
           </button>
         </div>
       </Show>

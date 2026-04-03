@@ -111,7 +111,7 @@
     color: var(--color-title);
     font-family: var(--font-sans);
     font-optical-sizing: auto;
-    font-weight: 500;
+    font-weight: 600;
     font-style: normal;
     letter-spacing: 0.01em;
   }
@@ -119,6 +119,14 @@
   .app-subtitle {
     @apply max-w-2xl text-sm leading-6;
     color: var(--color-text-secondary);
+  }
+
+  .history-page-subtitle {
+    @apply text-2xl leading-tight sm:text-3xl;
+    color: var(--color-title);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
   .app-header-furniture {
