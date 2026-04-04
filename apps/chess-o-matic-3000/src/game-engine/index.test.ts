@@ -7,6 +7,21 @@ import type { GameStorage } from '../application/ports/GameStorage';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
 import type { AppState } from '../domain/game/types';
 import { createDefaultAppState } from '../domain/game/types';
+
+vi.mock('../audio-output', () => ({
+  audioOutputIsSupported: () => true,
+  boardAdapterUpdateMovedSoundsInvalid: vi.fn(),
+  boardAdapterUpdateMovedSoundsOk: vi.fn(),
+  exitAudioOutput: vi.fn(),
+  initAudioOutput: vi.fn(async () => ({
+    audioBufferMap: {},
+    audioContext: {},
+    audioOutputEventSoundMap: {},
+    isUnlocked: false,
+  })),
+  unlockAudioOutput: vi.fn(async () => undefined),
+}));
+
 import { createGameEngine } from './index';
 
 function createMemoryGameStorage(seedAppState = createDefaultAppState('2026-03-30T00:00:00.000Z')): GameStorage & {
