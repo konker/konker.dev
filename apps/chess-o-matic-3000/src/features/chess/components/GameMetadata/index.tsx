@@ -215,7 +215,7 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
             () => commitForm()
           )}
         </label>
-        <label class="paper-field">
+        <label class="paper-field metadata-key-field">
           {renderLabel(<Calendar class="h-4 w-4" />, 'Date')}
           {renderTextInput(
             props.metadata().date,

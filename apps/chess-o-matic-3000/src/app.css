@@ -287,6 +287,7 @@
     border-radius: 0.3rem;
     border-color: color-mix(in srgb, var(--color-title) 34%, var(--color-border-subtle));
     color: var(--color-title);
+    margin-top: 0.35rem;
   }
 
   .app-menu-trigger:hover:not(:disabled) {
@@ -478,6 +479,12 @@
 
   .metadata-player-panel {
     @apply flex flex-col gap-3 border p-4;
+    border-color: var(--color-border-subtle);
+    background-color: white;
+  }
+
+  .metadata-key-field {
+    @apply border p-3;
     border-color: var(--color-border-subtle);
     background-color: white;
   }

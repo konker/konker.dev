@@ -303,19 +303,19 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection icon={SlidersHorizontal} storageKey="info" title="Info">
-        <GameMetadata
-          gameId={() => uiState().currentGameId}
-          metadata={() => uiState().gameMetadata}
-          onMetadataChange={handleMetadataChange}
-        />
-      </CollapsibleSection>
-
       <CollapsibleSection icon={NotebookPen} storageKey="scoresheet" title="Scoresheet">
         <ScoreSheet
           currentPly={uiState().currentPly}
           onGoToPly={gameEngine.goToPly}
           scoresheet={uiState().scoresheetData}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection icon={SlidersHorizontal} storageKey="info" title="Info">
+        <GameMetadata
+          gameId={() => uiState().currentGameId}
+          metadata={() => uiState().gameMetadata}
+          onMetadataChange={handleMetadataChange}
         />
       </CollapsibleSection>
 
