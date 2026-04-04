@@ -20,55 +20,100 @@ import {
 import type { AudioOutputEventSoundMap } from './sound-map';
 import { standardAudioOutputEventSoundMap } from './standard.sound-map';
 
-// --------------------------------------------------------------------------
+type AudioContextLike = AudioContext;
+type AudioContextCtor = new () => AudioContextLike;
+
 export type AudioOutputResources = {
-  readonly audioOutputEventSoundMap: AudioOutputEventSoundMap;
+  audioBufferMap: Partial<Record<AudioOutputEvent, AudioBuffer>>;
+  audioContext: AudioContextLike;
+  audioOutputEventSoundMap: AudioOutputEventSoundMap;
+  isUnlocked: boolean;
 };
 
-// --------------------------------------------------------------------------
-export function audioOutputIsSupported(): boolean {
-  return typeof Audio !== 'undefined';
-}
-
-// --------------------------------------------------------------------------
-export async function initAudioOutput(): Promise<AudioOutputResources> {
-  return {
-    audioOutputEventSoundMap: standardAudioOutputEventSoundMap,
+function resolveAudioContextCtor(): AudioContextCtor | undefined {
+  const scope = globalThis as typeof globalThis & {
+    webkitAudioContext?: AudioContextCtor;
   };
+
+  return scope.AudioContext ?? scope.webkitAudioContext;
 }
 
-// --------------------------------------------------------------------------
-export async function exitAudioOutput(_audioOutputResources: AudioOutputResources): Promise<void> {
-  return;
+async function decodeAudioBuffer(audioContext: AudioContextLike, src: string): Promise<AudioBuffer> {
+  const response = await fetch(src);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load audio asset: ${src}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  return audioContext.decodeAudioData(arrayBuffer);
 }
 
-// --------------------------------------------------------------------------
-export async function unlockAudioOutput(audioOutputResources: AudioOutputResources): Promise<void> {
-  const audioElements = Object.values(audioOutputResources.audioOutputEventSoundMap);
-
-  for (const audio of audioElements) {
-    if (!audio) {
-      continue;
-    }
-
-    const originalMuted = audio.muted;
-    const originalVolume = audio.volume;
-
-    try {
-      audio.currentTime = 0;
-      audio.muted = true;
-      audio.volume = 0;
-      await audio.play();
-      audio.pause();
-      audio.currentTime = 0;
-    } finally {
-      audio.muted = originalMuted;
-      audio.volume = originalVolume;
-    }
+async function ensureAudioContextReady(audioOutputResources: AudioOutputResources): Promise<void> {
+  if (audioOutputResources.audioContext.state === 'suspended') {
+    await audioOutputResources.audioContext.resume();
   }
 }
 
-// --------------------------------------------------------------------------
+function createSilentBuffer(audioContext: AudioContextLike): AudioBuffer {
+  return audioContext.createBuffer(1, 1, audioContext.sampleRate);
+}
+
+function playAudioBuffer(
+  audioContext: AudioContextLike,
+  audioBuffer: AudioBuffer,
+  destination: AudioNode = audioContext.destination
+): AudioBufferSourceNode {
+  const source = audioContext.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(destination);
+  source.start(0);
+  return source;
+}
+
+export function audioOutputIsSupported(): boolean {
+  return typeof fetch === 'function' && typeof resolveAudioContextCtor() !== 'undefined';
+}
+
+export async function initAudioOutput(): Promise<AudioOutputResources> {
+  const AudioContextCtor = resolveAudioContextCtor();
+
+  if (!AudioContextCtor) {
+    throw new Error('Audio output is not supported in this browser.');
+  }
+
+  const audioContext = new AudioContextCtor();
+  const audioOutputEventSoundMap = standardAudioOutputEventSoundMap;
+  const audioBufferEntries = await Promise.all(
+    Object.entries(audioOutputEventSoundMap).map(async ([event, src]) => {
+      const audioBuffer = await decodeAudioBuffer(audioContext, src);
+      return [event, audioBuffer] as const;
+    })
+  );
+
+  return {
+    audioBufferMap: Object.fromEntries(audioBufferEntries) as Partial<Record<AudioOutputEvent, AudioBuffer>>,
+    audioContext,
+    audioOutputEventSoundMap,
+    isUnlocked: false,
+  };
+}
+
+export async function exitAudioOutput(audioOutputResources: AudioOutputResources): Promise<void> {
+  if (audioOutputResources.audioContext.state !== 'closed') {
+    await audioOutputResources.audioContext.close();
+  }
+}
+
+export async function unlockAudioOutput(audioOutputResources: AudioOutputResources): Promise<void> {
+  await ensureAudioContextReady(audioOutputResources);
+
+  const silentBuffer = createSilentBuffer(audioOutputResources.audioContext);
+  const source = playAudioBuffer(audioOutputResources.audioContext, silentBuffer);
+  source.stop();
+  audioOutputResources.isUnlocked = true;
+}
+
 export function resolveAudioOutputSoundEvent(gameMoveFlags: GameMoveFlags): AudioOutputEvent {
   if (gameMoveFlags.isCheckmate) {
     return AUDIO_OUTPUT_EVENT_END_CHECKMATE;
@@ -94,22 +139,25 @@ export function resolveAudioOutputSoundEvent(gameMoveFlags: GameMoveFlags): Audi
   return AUDIO_OUTPUT_EVENT_MOVE_TOP;
 }
 
-// --------------------------------------------------------------------------
 export async function playAudioOutputEventSound(
   settings: ComSettings,
-  AudioOutputResources: AudioOutputResources,
+  audioOutputResources: AudioOutputResources,
   event: AudioOutputEvent
 ): Promise<void> {
-  if (settings.audioOutputOn) {
-    const audio = AudioOutputResources.audioOutputEventSoundMap[event];
-    if (audio) {
-      audio.currentTime = 0;
-      await audio.play();
-    }
+  if (!settings.audioOutputOn) {
+    return;
   }
+
+  await ensureAudioContextReady(audioOutputResources);
+  const audioBuffer = audioOutputResources.audioBufferMap[event];
+
+  if (!audioBuffer) {
+    throw new Error(`Missing audio buffer for event: ${event}`);
+  }
+
+  playAudioBuffer(audioOutputResources.audioContext, audioBuffer);
 }
 
-// --------------------------------------------------------------------------
 export async function boardAdapterUpdateMovedSoundsOk(
   settings: ComSettings,
   audioOutputResources: AudioOutputResources,
@@ -119,7 +167,6 @@ export async function boardAdapterUpdateMovedSoundsOk(
   await playAudioOutputEventSound(settings, audioOutputResources, soundEvent);
 }
 
-// --------------------------------------------------------------------------
 export async function boardAdapterUpdateMovedSoundsInvalid(
   settings: ComSettings,
   audioOutputResources: AudioOutputResources,
@@ -128,7 +175,6 @@ export async function boardAdapterUpdateMovedSoundsInvalid(
   await playAudioOutputEventSound(settings, audioOutputResources, AUDIO_OUTPUT_EVENT_INVALID);
 }
 
-// --------------------------------------------------------------------------
 export async function boardAdapterUpdateControlSounds(
   _settings: ComSettings,
   _audioOutputResources: AudioOutputResources,

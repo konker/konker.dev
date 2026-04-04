@@ -20,20 +20,14 @@ import moveTopSound from './sounds/move-opponent.mp3';
 import moveBottomSound from './sounds/move-self.mp3';
 import promotionSound from './sounds/promote.mp3';
 
-function createAudioElement(src: string): HTMLAudioElement {
-  const audio = new Audio(src);
-  audio.preload = 'auto';
-  return audio;
-}
-
 export const standardAudioOutputEventSoundMap: AudioOutputEventSoundMap = {
-  [AUDIO_OUTPUT_EVENT_CAPTURE]: createAudioElement(captureSound),
-  [AUDIO_OUTPUT_EVENT_CHECK]: createAudioElement(checkSound),
-  [AUDIO_OUTPUT_EVENT_CASTLE]: createAudioElement(castleSound),
-  [AUDIO_OUTPUT_EVENT_PROMOTION]: createAudioElement(promotionSound),
-  [AUDIO_OUTPUT_EVENT_END_CHECKMATE]: createAudioElement(endCheckmateSound),
-  [AUDIO_OUTPUT_EVENT_END_OTHER]: createAudioElement(endOtherSound),
-  [AUDIO_OUTPUT_EVENT_MOVE_TOP]: createAudioElement(moveTopSound),
-  [AUDIO_OUTPUT_EVENT_MOVE_BOTTOM]: createAudioElement(moveBottomSound),
-  [AUDIO_OUTPUT_EVENT_INVALID]: createAudioElement(invalidSound),
+  [AUDIO_OUTPUT_EVENT_CAPTURE]: captureSound,
+  [AUDIO_OUTPUT_EVENT_CHECK]: checkSound,
+  [AUDIO_OUTPUT_EVENT_CASTLE]: castleSound,
+  [AUDIO_OUTPUT_EVENT_PROMOTION]: promotionSound,
+  [AUDIO_OUTPUT_EVENT_END_CHECKMATE]: endCheckmateSound,
+  [AUDIO_OUTPUT_EVENT_END_OTHER]: endOtherSound,
+  [AUDIO_OUTPUT_EVENT_MOVE_TOP]: moveTopSound,
+  [AUDIO_OUTPUT_EVENT_MOVE_BOTTOM]: moveBottomSound,
+  [AUDIO_OUTPUT_EVENT_INVALID]: invalidSound,
 };
