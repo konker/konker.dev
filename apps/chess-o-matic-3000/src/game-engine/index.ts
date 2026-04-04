@@ -40,6 +40,7 @@ import {
   boardAdapterUpdateMovedSoundsOk,
   exitAudioOutput,
   initAudioOutput,
+  unlockAudioOutput,
 } from '../audio-output';
 import type { GameMetadataData } from '../domain/game/metadata';
 import { GAME_METADATA_EMPTY } from '../domain/game/metadata';
@@ -207,6 +208,21 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     };
   }
 
+  function applySessionInitialSettings(
+    state: AppState,
+    initialSettings: GameEngineInitialSettings = {}
+  ): AppState {
+    return {
+      ...state,
+      settings: {
+        ...state.settings,
+        audioInputEnabled: initialSettings.audioInputOn ?? state.settings.audioInputEnabled,
+        // Audio output requires an explicit user gesture each session on iOS.
+        audioOutputEnabled: false,
+      },
+    };
+  }
+
   function createGameId(): GameId {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
       return crypto.randomUUID();
@@ -369,6 +385,14 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     };
   }
 
+  async function runNonFatalAudioSideEffect(effect: () => Promise<void>, context: string): Promise<void> {
+    try {
+      await effect();
+    } catch (error) {
+      console.warn(`[chess-o-matic-3000][game-engine] Non-fatal audio side effect failed during ${context}.`, error);
+    }
+  }
+
   function createInitialStatusSnapshot(state: AppState): {
     readonly lastMoveSan: string;
     readonly message: string;
@@ -479,7 +503,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       await persistAppState();
       const flags = resolveGameMoveFlags(state.gameModelResources.chess, nextState.currentGame.orientation);
       syncBoardPosition();
-      await boardAdapterUpdateMovedSoundsOk(currentComSettings(nextState), state.audioOutputResources, flags);
+      await runNonFatalAudioSideEffect(
+        () => boardAdapterUpdateMovedSoundsOk(currentComSettings(nextState), state.audioOutputResources, flags),
+        'successful move playback'
+      );
       await gameModelEventsNotifyListeners(state.gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
         type: GAME_MODEL_EVENT_TYPE_MOVED_OK,
         result,
@@ -729,11 +756,17 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     }
 
     const state = requireInitialized();
+    const nextAudioOutputEnabled = !state.appState.settings.audioOutputEnabled;
+
+    if (nextAudioOutputEnabled) {
+      await unlockAudioOutput(state.audioOutputResources);
+    }
+
     appState = {
       ...state.appState,
       settings: {
         ...state.appState.settings,
-        audioOutputEnabled: !state.appState.settings.audioOutputEnabled,
+        audioOutputEnabled: nextAudioOutputEnabled,
       },
     };
     await persistAppState();
@@ -1044,7 +1077,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
 
     onUiStateChange = onStateChange;
 
-    appState = (await gameStorage.loadAppState()) ?? createInitialAppState(initialSettings);
+    appState = applySessionInitialSettings(
+      (await gameStorage.loadAppState()) ?? createInitialAppState(initialSettings),
+      initialSettings
+    );
     audioInputResources = await initAudioInput();
     audioOutputResources = await initAudioOutput();
     gameModelResources = await initGameModel();
@@ -1055,10 +1091,14 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       gameModelResources,
       GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
       async (event: GameModelEventMovedInvalid): Promise<void> => {
-        await boardAdapterUpdateMovedSoundsInvalid(
-          currentComSettings(requireAppState()),
-          requireInitialized().audioOutputResources,
-          event.result
+        await runNonFatalAudioSideEffect(
+          () =>
+            boardAdapterUpdateMovedSoundsInvalid(
+              currentComSettings(requireAppState()),
+              requireInitialized().audioOutputResources,
+              event.result
+            ),
+          'invalid move playback'
         );
       }
     );
