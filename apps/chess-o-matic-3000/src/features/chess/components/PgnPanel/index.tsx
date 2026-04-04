@@ -21,14 +21,14 @@ export function PgnPanel(props: PgnPanelProps): JSX.Element {
         <Show when={props.onOpenLichess}>
           <button class="toolbar-button toolbar-button-cobalt" disabled={props.disabled} onClick={props.onOpenLichess} type="button">
             <ExternalLink class="h-4 w-4" />
-            <span>Open in Lichess</span>
+            <span>Lichess</span>
           </button>
         </Show>
 
         <Show when={props.onOpenChessDotCom}>
           <button class="toolbar-button toolbar-button-cobalt" disabled={props.disabled} onClick={props.onOpenChessDotCom} type="button">
             <ExternalLink class="h-4 w-4" />
-            <span>Open in Chess.com</span>
+            <span>Chess.com</span>
           </button>
         </Show>
       </div>
