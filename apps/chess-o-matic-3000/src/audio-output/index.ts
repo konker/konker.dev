@@ -43,6 +43,32 @@ export async function exitAudioOutput(_audioOutputResources: AudioOutputResource
 }
 
 // --------------------------------------------------------------------------
+export async function unlockAudioOutput(audioOutputResources: AudioOutputResources): Promise<void> {
+  const audioElements = Object.values(audioOutputResources.audioOutputEventSoundMap);
+
+  for (const audio of audioElements) {
+    if (!audio) {
+      continue;
+    }
+
+    const originalMuted = audio.muted;
+    const originalVolume = audio.volume;
+
+    try {
+      audio.currentTime = 0;
+      audio.muted = true;
+      audio.volume = 0;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+    } finally {
+      audio.muted = originalMuted;
+      audio.volume = originalVolume;
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
 export function resolveAudioOutputSoundEvent(gameMoveFlags: GameMoveFlags): AudioOutputEvent {
   if (gameMoveFlags.isCheckmate) {
     return AUDIO_OUTPUT_EVENT_END_CHECKMATE;

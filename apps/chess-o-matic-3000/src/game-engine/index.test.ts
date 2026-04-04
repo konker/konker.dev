@@ -97,6 +97,23 @@ describe('createGameEngine persistence', () => {
     });
   });
 
+  it('always starts with audio output off even when persisted state had it enabled', async () => {
+    const storedAppState: AppState = {
+      ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
+      settings: {
+        audioInputEnabled: false,
+        audioOutputEnabled: true,
+      },
+    };
+    const gameStorage = createMemoryGameStorage(storedAppState);
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({});
+
+    expect(gameEngine.isAudioOutputOn()).toBe(false);
+    expect(gameStorage.appState?.settings.audioOutputEnabled).toBe(false);
+  });
+
   it('restores a past position as neutral when current ply is behind the last move', async () => {
     const storedAppState: AppState = {
       ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
@@ -146,6 +163,28 @@ describe('createGameEngine persistence', () => {
         }),
       ],
     });
+  });
+
+  it('treats persistence failures during move handling as hard errors', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    let saveAppStateShouldFail = false;
+    const gameEngine = createGameEngine({
+      gameStorage: {
+        ...gameStorage,
+        async saveAppState(nextAppState) {
+          if (saveAppStateShouldFail) {
+            throw new Error('Persist failed');
+          }
+
+          await gameStorage.saveAppState(nextAppState);
+        },
+      },
+    });
+
+    await gameEngine.init({});
+    saveAppStateShouldFail = true;
+
+    await expect(gameEngine.handleBoardMove('e4')).rejects.toThrow('Persist failed');
   });
 
   it('drops zero-move games from history when starting a new game', async () => {

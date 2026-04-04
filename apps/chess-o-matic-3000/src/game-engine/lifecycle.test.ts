@@ -9,6 +9,7 @@ const {
   exitAudioInputMock,
   exitSpeechRecognizerMock,
   initAudioInputMock,
+  unlockAudioOutputMock,
   initSpeechRecognizerMock,
   startAudioInputMock,
   startSpeechRecognizerMock,
@@ -20,6 +21,7 @@ const {
   exitAudioInputMock: vi.fn(),
   exitSpeechRecognizerMock: vi.fn(),
   initAudioInputMock: vi.fn(),
+  unlockAudioOutputMock: vi.fn(),
   initSpeechRecognizerMock: vi.fn(),
   startAudioInputMock: vi.fn(),
   startSpeechRecognizerMock: vi.fn(),
@@ -45,6 +47,7 @@ vi.mock('../audio-output', () => ({
   initAudioOutput: vi.fn(async () => ({
     audioOutputEventSoundMap: {} as Record<string, HTMLAudioElement>,
   })),
+  unlockAudioOutput: unlockAudioOutputMock,
 }));
 
 vi.mock('../speech-recognizer', () => ({
@@ -90,6 +93,7 @@ describe('game engine lifecycle', () => {
     boardAdapterUpdateMovedSoundsInvalidMock.mockReset();
     boardAdapterUpdateMovedSoundsOkMock.mockReset();
     initSpeechRecognizerMock.mockReset();
+    unlockAudioOutputMock.mockReset();
     startSpeechRecognizerMock.mockReset();
     stopSpeechRecognizerMock.mockReset();
     exitSpeechRecognizerMock.mockReset();
@@ -143,6 +147,7 @@ describe('game engine lifecycle', () => {
     });
 
     exitSpeechRecognizerMock.mockResolvedValue(undefined);
+    unlockAudioOutputMock.mockResolvedValue(undefined);
   });
 
   it('reuses the loaded speech model across repeated toggles and disposes on exit', async () => {
@@ -174,5 +179,34 @@ describe('game engine lifecycle', () => {
 
     expect(boardAdapterUpdateMovedSoundsInvalidMock).toHaveBeenCalledTimes(1);
     expect(boardAdapterUpdateMovedSoundsOkMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps emitting evaluated UI state when move audio playback fails', async () => {
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage: createMemoryGameStorage() });
+    boardAdapterUpdateMovedSoundsOkMock.mockRejectedValueOnce(new Error('Audio play() rejected'));
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('e4');
+
+    expect(boardAdapterUpdateMovedSoundsOkMock).toHaveBeenCalledTimes(1);
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 1,
+      lastInputEvaluateStatus: 'ok',
+      lastInputResultMessage: 'e4',
+      lastMoveSan: 'e4',
+      pgn: expect.stringContaining('1. e4'),
+      scoresheetData: [['e4', '*']],
+    });
+  });
+
+  it('unlocks audio output when sounds are enabled', async () => {
+    const gameEngine = createGameEngine({ gameStorage: createMemoryGameStorage() });
+
+    await gameEngine.init({});
+    await gameEngine.audioOutputToggle();
+    await gameEngine.audioOutputToggle();
+
+    expect(unlockAudioOutputMock).toHaveBeenCalledTimes(1);
   });
 });
