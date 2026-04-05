@@ -18,7 +18,7 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
     action();
   }
 
-  function isCurrentNavigationItem(item: 'history'): boolean {
+  function isCurrentNavigationItem(_item: 'history'): boolean {
     const pathname = location.pathname;
 
     return pathname === '/games';
@@ -26,16 +26,12 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
 
   return (
     <Dialog.Root modal onOpenChange={setIsOpen} open={isOpen()}>
-      <Dialog.Trigger
-        aria-label="Open menu"
-        class="toolbar-icon-button app-menu-trigger"
-        type="button"
-      >
+      <Dialog.Trigger aria-label="Open menu" class="toolbar-icon-button app-menu-trigger" type="button">
         <Menu class="h-5 w-5" />
       </Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Overlay class="app-drawer-overlay" />
-          <Dialog.Content class="app-drawer-content">
+      <Dialog.Portal>
+        <Dialog.Overlay class="app-drawer-overlay" />
+        <Dialog.Content class="app-drawer-content">
           <div class="app-drawer-header">
             <Dialog.Title class="sr-only">Menu</Dialog.Title>
             <Dialog.CloseButton aria-label="Close menu" class="toolbar-icon-button ml-auto" type="button">
@@ -54,7 +50,12 @@ export function AppMenu(props: AppMenuProps): JSX.Element {
               <span>History</span>
             </button>
             <div class="app-drawer-actions">
-              <button class="toolbar-button toolbar-button-cobalt justify-start" onClick={() => handleMenuAction(props.onNewGame)} role="menuitem" type="button">
+              <button
+                class="toolbar-button toolbar-button-cobalt justify-start"
+                onClick={() => handleMenuAction(props.onNewGame)}
+                role="menuitem"
+                type="button"
+              >
                 <PlusSquare class="h-4 w-4" />
                 <span>New Game</span>
               </button>

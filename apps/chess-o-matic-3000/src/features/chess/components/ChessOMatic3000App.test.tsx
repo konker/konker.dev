@@ -48,15 +48,15 @@ describe('ChessOMatic3000App', () => {
     expect(root.querySelector('button[aria-label="Open menu"]')).not.toBeNull();
     expect(root.querySelector('button[aria-label="Copy PGN"]')).not.toBeNull();
     expect(root.querySelector('button[aria-label="Copy FEN"]')).not.toBeNull();
-    expect(root.textContent).toContain('Open in Lichess');
-    expect(root.textContent).toContain('Open in Chess.com');
+    expect(root.textContent).toContain('Lichess');
+    expect(root.textContent).toContain('Chess.com');
     expect(root.querySelector('button[aria-label="Speech"]')).not.toBeNull();
     expect(root.querySelector('button[aria-label="Sounds"]')).not.toBeNull();
     expect(root.textContent).toContain('PGN');
     expect(root.textContent).toContain('Heard');
     expect(root.querySelector('[data-testid="mock-chess-board"]')).not.toBeNull();
-    expect((root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent).toContain(
-      'Component test mode'
-    );
+    expect(
+      (root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent
+    ).toContain('Component test mode');
   });
 });

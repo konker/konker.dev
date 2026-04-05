@@ -12,20 +12,6 @@ type StatusPanelProps = {
 };
 
 export function StatusPanel(props: StatusPanelProps): JSX.Element {
-  function renderStatusText(): string {
-    switch (props.status) {
-      case 'ok':
-        return 'Move accepted';
-      case 'illegal':
-        return 'Illegal move';
-      case 'control':
-        return 'Command received';
-      case 'ignore':
-      default:
-        return 'Waiting';
-    }
-  }
-
   function renderDisplayMessage(): string {
     return props.message === props.lastMoveSan ? '' : props.message;
   }

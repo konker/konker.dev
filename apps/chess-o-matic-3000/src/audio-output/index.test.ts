@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { AUDIO_OUTPUT_EVENT_INVALID, AUDIO_OUTPUT_EVENT_MOVE_TOP } from './events';
 
 const { standardAudioOutputEventSoundMapMock } = vi.hoisted(() => ({
@@ -19,12 +20,7 @@ vi.mock('./standard.sound-map', () => ({
   standardAudioOutputEventSoundMap: standardAudioOutputEventSoundMapMock,
 }));
 
-import {
-  type AudioOutputResources,
-  initAudioOutput,
-  playAudioOutputEventSound,
-  unlockAudioOutput,
-} from './index';
+import { type AudioOutputResources, initAudioOutput, playAudioOutputEventSound, unlockAudioOutput } from './index';
 
 type FakeSourceNode = {
   buffer: unknown;
@@ -49,6 +45,7 @@ class FakeAudioContext {
   decodeAudioData = vi.fn(async (buffer: ArrayBuffer) => ({ byteLength: buffer.byteLength }));
   destination = { id: 'destination' } as unknown as AudioDestinationNode;
   resume = vi.fn(async () => {
+    // eslint-disable-next-line fp/no-this
     this.state = 'running';
   });
   sampleRate = 44_100;

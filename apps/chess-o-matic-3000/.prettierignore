@@ -4,3 +4,4 @@ src/database/drizzle
 .output
 .vinxi
 assets/**/*
+.claude

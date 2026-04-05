@@ -65,6 +65,7 @@ import { START_FEN } from '../game-model/consts';
 import type { GameModelEvaluateResult, GameModelEvaluateStatus } from '../game-model/evaluate.js';
 import {
   GAME_MODEL_CONTROL_ACTION_FLIP,
+  GAME_MODEL_CONTROL_ACTION_RESIGN,
   GAME_MODEL_CONTROL_ACTION_UNDO,
   GAME_MODEL_EVALUATE_STATUS_CONTROL,
   GAME_MODEL_EVALUATE_STATUS_IGNORE,
@@ -208,10 +209,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     };
   }
 
-  function applySessionInitialSettings(
-    state: AppState,
-    initialSettings: GameEngineInitialSettings = {}
-  ): AppState {
+  function applySessionInitialSettings(state: AppState, initialSettings: GameEngineInitialSettings = {}): AppState {
     return {
       ...state,
       settings: {
@@ -371,6 +369,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
           return 'Moved back one ply';
         }
 
+        if (result.action === GAME_MODEL_CONTROL_ACTION_RESIGN) {
+          return 'Game resigned';
+        }
+
         return 'Control action applied';
       case GAME_MODEL_EVALUATE_STATUS_IGNORE:
       default:
@@ -400,7 +402,9 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     readonly status: GameModelEvaluateStatus;
   } {
     const currentMoveSan =
-      state.currentGame.currentPly > 0 ? state.currentGame.moveHistory[state.currentGame.currentPly - 1]?.san ?? '' : '';
+      state.currentGame.currentPly > 0
+        ? (state.currentGame.moveHistory[state.currentGame.currentPly - 1]?.san ?? '')
+        : '';
     const isAtLatestMove =
       state.currentGame.currentPly > 0 && state.currentGame.currentPly === state.currentGame.moveHistory.length;
 
@@ -504,7 +508,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       const flags = resolveGameMoveFlags(state.gameModelResources.chess, nextState.currentGame.orientation);
       syncBoardPosition();
       await runNonFatalAudioSideEffect(
-        () => boardAdapterUpdateMovedSoundsOk(currentComSettings(nextState), state.audioOutputResources, flags),
+        async () => boardAdapterUpdateMovedSoundsOk(currentComSettings(nextState), state.audioOutputResources, flags),
         'successful move playback'
       );
       await gameModelEventsNotifyListeners(state.gameModelResources, GAME_MODEL_EVENT_TYPE_MOVED_OK, {
@@ -535,6 +539,28 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
         );
         await persistAppState();
         syncBoardPosition();
+      }
+
+      if (result.action === GAME_MODEL_CONTROL_ACTION_RESIGN) {
+        const resignResult = state.gameModelResources.chess.turn() === 'w' ? '0-1' : '1-0';
+        appState = {
+          ...requireAppState(),
+          currentGame: {
+            ...requireAppState().currentGame,
+            metadata: {
+              ...requireAppState().currentGame.metadata,
+              result: resignResult,
+            },
+            updatedAt: new Date().toISOString(),
+          },
+        };
+        applyGameMetadata(
+          state.gameModelResources.chess,
+          requireAppState().currentGame.metadata,
+          requireAppState().currentGame.orientation
+        );
+        await syncPersistedCurrentGame(requireAppState().currentGame);
+        await persistAppState();
       }
     }
 
@@ -1005,69 +1031,45 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     );
   }
 
-  function navigateToStart(): void {
+  function navigateWith(modelAction: (model: GameModelResources) => void): void {
     const state = requireInitialized();
     const model = state.gameModelResources;
-    gameModelGoToStart(model);
+    modelAction(model);
     syncAppStateFromGameModel(state.appState, model);
     applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
     syncBoardPosition();
     void syncPersistedCurrentGame(requireAppState().currentGame);
     void persistAppState();
     const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
+    emitCurrentUiState(
+      requireAppState(),
+      model,
+      snapshot.status,
+      undefined,
+      snapshot.message,
+      '',
+      snapshot.lastMoveSan
+    );
+  }
+
+  function navigateToStart(): void {
+    navigateWith(gameModelGoToStart);
   }
 
   function navigateStepBackward(): void {
-    const state = requireInitialized();
-    const model = state.gameModelResources;
-    gameModelStepBackward(model);
-    syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
-    syncBoardPosition();
-    void syncPersistedCurrentGame(requireAppState().currentGame);
-    void persistAppState();
-    const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
+    navigateWith(gameModelStepBackward);
   }
 
   function navigateStepForward(): void {
-    const state = requireInitialized();
-    const model = state.gameModelResources;
-    gameModelStepForward(model);
-    syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
-    syncBoardPosition();
-    void syncPersistedCurrentGame(requireAppState().currentGame);
-    void persistAppState();
-    const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
+    navigateWith(gameModelStepForward);
   }
 
   function navigateToEnd(): void {
-    const state = requireInitialized();
-    const model = state.gameModelResources;
-    gameModelGoToEnd(model);
-    syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
-    syncBoardPosition();
-    void syncPersistedCurrentGame(requireAppState().currentGame);
-    void persistAppState();
-    const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
+    navigateWith(gameModelGoToEnd);
   }
 
   function navigateToPly(ply: number): void {
-    const state = requireInitialized();
-    const model = state.gameModelResources;
-    gameModelGoToPly(model, ply);
-    syncAppStateFromGameModel(state.appState, model);
-    applyGameMetadata(model.chess, requireAppState().currentGame.metadata, requireAppState().currentGame.orientation);
-    syncBoardPosition();
-    void syncPersistedCurrentGame(requireAppState().currentGame);
-    void persistAppState();
-    const snapshot = createNavigationStatusSnapshot(model);
-    emitCurrentUiState(requireAppState(), model, snapshot.status, undefined, snapshot.message, '', snapshot.lastMoveSan);
+    navigateWith((model) => gameModelGoToPly(model, ply));
   }
 
   async function init({ initialSettings, onUiStateChange: onStateChange }: GameEngineInitOptions): Promise<void> {
@@ -1092,7 +1094,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       GAME_MODEL_EVENT_TYPE_MOVED_INVALID,
       async (event: GameModelEventMovedInvalid): Promise<void> => {
         await runNonFatalAudioSideEffect(
-          () =>
+          async () =>
             boardAdapterUpdateMovedSoundsInvalid(
               currentComSettings(requireAppState()),
               requireInitialized().audioOutputResources,

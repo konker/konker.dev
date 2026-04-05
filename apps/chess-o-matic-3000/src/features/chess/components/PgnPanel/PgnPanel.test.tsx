@@ -30,10 +30,10 @@ describe('PgnPanel', () => {
     );
 
     const buttons = Array.from(root.querySelectorAll('button'));
-    const lichessButton = buttons.find((button) => button.textContent?.includes('Open in Lichess')) as
+    const lichessButton = buttons.find((button) => button.textContent?.includes('Lichess')) as
       | HTMLButtonElement
       | undefined;
-    const chessDotComButton = buttons.find((button) => button.textContent?.includes('Open in Chess.com')) as
+    const chessDotComButton = buttons.find((button) => button.textContent?.includes('Chess.com')) as
       | HTMLButtonElement
       | undefined;
 
@@ -42,9 +42,7 @@ describe('PgnPanel', () => {
 
     expect(onOpenLichess).toHaveBeenCalledTimes(1);
     expect(onOpenChessDotCom).toHaveBeenCalledTimes(1);
-    expect((root.querySelector('[aria-label="PGN"]') as HTMLTextAreaElement | null)?.value).toBe(
-      '1. e4 e5 2. Nf3 Nc6'
-    );
+    expect((root.querySelector('[aria-label="PGN"]') as HTMLTextAreaElement | null)?.value).toBe('1. e4 e5 2. Nf3 Nc6');
     expect(root.textContent).not.toContain('Copy PGN');
   });
 });

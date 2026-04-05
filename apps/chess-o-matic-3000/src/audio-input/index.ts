@@ -69,7 +69,6 @@ export async function startAudioInput(): Promise<AudioInputResourcesListeningOn>
   source.connect(workletNode);
   workletNode.connect(audioContext.destination);
 
-  console.log('Started listening');
   return {
     status: AUDIO_INPUT_LISTENING_ON,
     workletNode,
@@ -101,6 +100,5 @@ export async function stopAudioInput(
     audioInputResources.mediaStream.getTracks().forEach((track) => track.stop());
   }
 
-  console.log('Stopped listening');
   return AUDIO_INPUT_RESOURCES_NOT_LISTENING;
 }
