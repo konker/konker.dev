@@ -11,9 +11,7 @@ export const GAME_MOVE_STATUS_ILLEGAL = 'illegal';
 export const GAME_MOVE_ILLEGAL_REASON_AMBIGUOUS = 'ambiguous';
 export const GAME_MOVE_ILLEGAL_REASON_INVALID = 'invalid';
 
-export type GameMoveIllegalReason =
-  | typeof GAME_MOVE_ILLEGAL_REASON_AMBIGUOUS
-  | typeof GAME_MOVE_ILLEGAL_REASON_INVALID;
+export type GameMoveIllegalReason = typeof GAME_MOVE_ILLEGAL_REASON_AMBIGUOUS | typeof GAME_MOVE_ILLEGAL_REASON_INVALID;
 
 export type GameMoveResultOk = {
   readonly status: typeof GAME_MOVE_STATUS_OK;

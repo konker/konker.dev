@@ -13,7 +13,11 @@ import {
 // --------------------------------------------------------------------------
 export const GAME_MODEL_CONTROL_ACTION_FLIP = '_flip';
 export const GAME_MODEL_CONTROL_ACTION_UNDO = '_undo';
-export type GameModelControlAction = typeof GAME_MODEL_CONTROL_ACTION_FLIP | typeof GAME_MODEL_CONTROL_ACTION_UNDO;
+export const GAME_MODEL_CONTROL_ACTION_RESIGN = '_resign';
+export type GameModelControlAction =
+  | typeof GAME_MODEL_CONTROL_ACTION_FLIP
+  | typeof GAME_MODEL_CONTROL_ACTION_UNDO
+  | typeof GAME_MODEL_CONTROL_ACTION_RESIGN;
 
 // --------------------------------------------------------------------------
 export const GAME_MODEL_EVALUATE_STATUS_OK = 'ok';
@@ -100,33 +104,12 @@ export function gameModelEvaluate(
           };
         }
         case 'resign': {
-          // FIXME: this doesn't work
-          const san = gameModelResources.chess.turn() === 'w' ? '0-1' : '1-0';
-          const moveResult = playMove(gameModelResources, {
-            status: GAME_INPUT_PARSE_STATUS_OK_SAN,
-            input: san,
-            sanitized: san,
-            parsed: san,
-            san: { candidates: [san] },
-          });
-
-          if (moveResult.status === GAME_MOVE_STATUS_ILLEGAL) {
-            return {
-              status: GAME_MODEL_EVALUATE_STATUS_ILLEGAL,
-              input: parserResult.input,
-              sanitized: parserResult.sanitized,
-              parsed: parserResult.parsed,
-              message: moveResult.message,
-              reason: moveResult.reason,
-            };
-          }
-
           return {
-            status: GAME_MODEL_EVALUATE_STATUS_OK,
+            status: GAME_MODEL_EVALUATE_STATUS_CONTROL,
             input: parserResult.input,
             sanitized: parserResult.sanitized,
             parsed: parserResult.parsed,
-            move: moveResult.move,
+            action: GAME_MODEL_CONTROL_ACTION_RESIGN,
           };
         }
       }

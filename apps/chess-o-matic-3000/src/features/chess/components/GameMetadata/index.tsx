@@ -94,12 +94,9 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
   }
 
   createEffect(
-    on(
-      props.gameId,
-      () => {
-        syncFormFromMetadata(props.metadata());
-      }
-    )
+    on(props.gameId, () => {
+      syncFormFromMetadata(props.metadata());
+    })
   );
 
   function readFormMetadata(): GameMetadataData {
@@ -149,9 +146,7 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
 
   function renderTextInput(
     value: string,
-    ref:
-      | ((element: HTMLInputElement) => void)
-      | undefined,
+    ref: ((element: HTMLInputElement) => void) | undefined,
     onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>,
     type = 'text',
     placeholder?: string,
@@ -174,11 +169,9 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
 
   function renderSelect(
     value: string,
-    ref:
-      | ((element: HTMLSelectElement) => void)
-      | undefined,
+    ref: ((element: HTMLSelectElement) => void) | undefined,
     onChange: JSX.EventHandlerUnion<HTMLSelectElement, Event>,
-    options: readonly string[]
+    options: ReadonlyArray<string>
   ): JSX.Element {
     return (
       <span class="paper-field-frame">

@@ -124,7 +124,11 @@ function HistoryGameCard(props: HistoryGameCardProps): JSX.Element {
             <FolderOpen class="h-4 w-4" />
             <span>Open</span>
           </button>
-          <button class="toolbar-button toolbar-button-danger" onClick={() => void props.onDiscard(props.game.id)} type="button">
+          <button
+            class="toolbar-button toolbar-button-danger"
+            onClick={() => void props.onDiscard(props.game.id)}
+            type="button"
+          >
             <Trash2 class="h-4 w-4" />
             <span>Discard</span>
           </button>
@@ -132,7 +136,9 @@ function HistoryGameCard(props: HistoryGameCardProps): JSX.Element {
       </div>
       <div class="history-meta">
         <span>{props.game.date || 'Undated game'}</span>
-        <span>{props.game.white || 'White'} vs {props.game.black || 'Black'}</span>
+        <span>
+          {props.game.white || 'White'} vs {props.game.black || 'Black'}
+        </span>
         <span>{props.game.moveCount} moves</span>
       </div>
     </article>
@@ -208,7 +214,12 @@ export default function GamesPage(): JSX.Element {
                 onClick={() => void navigate('/')}
                 type="button"
               >
-                <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  class="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
+                  src="/images/rook.cobalt.svg"
+                />
                 <span class="pt-1.5">Chess-o-matic 3000</span>
               </button>
             </div>
@@ -225,7 +236,10 @@ export default function GamesPage(): JSX.Element {
         </header>
 
         <section class="panel flex flex-col gap-3">
-          <Show when={games().length > 0} fallback={<p class="text-sm text-[var(--color-text-secondary)]">No saved games yet.</p>}>
+          <Show
+            when={games().length > 0}
+            fallback={<p class="text-sm text-[var(--color-text-secondary)]">No saved games yet.</p>}
+          >
             <For each={games()}>
               {(game) => (
                 <HistoryGameCard game={game} onDiscard={discardGame} onOpen={openGame} onRename={renameGameTitle} />

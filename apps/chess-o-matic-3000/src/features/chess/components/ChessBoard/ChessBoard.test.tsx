@@ -41,7 +41,9 @@ describe('ChessBoard', () => {
     const colorSchemeToggle = root.querySelector(
       'button[aria-label="Toggle Board Color Scheme"]'
     ) as HTMLButtonElement | null;
-    const coordinatesText = root.querySelector('button[aria-label="Toggle Board Coordinates"] span') as HTMLElement | null;
+    const coordinatesText = root.querySelector(
+      'button[aria-label="Toggle Board Coordinates"] span'
+    ) as HTMLElement | null;
 
     expect(board?.coordinates).toBe('hidden');
     expect(colorSchemeToggle?.style.backgroundColor).toBe('rgb(181, 136, 99)');

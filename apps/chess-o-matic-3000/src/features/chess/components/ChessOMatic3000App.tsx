@@ -178,7 +178,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     }
   }
 
-  async function discardCurrentGame(): Promise<void> {
+  async function _discardCurrentGame(): Promise<void> {
     try {
       await gameEngine.discardGame();
     } catch (error) {

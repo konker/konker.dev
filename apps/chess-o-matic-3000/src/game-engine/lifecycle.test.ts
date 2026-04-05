@@ -9,12 +9,12 @@ const {
   exitAudioInputMock,
   exitSpeechRecognizerMock,
   initAudioInputMock,
-  unlockAudioOutputMock,
   initSpeechRecognizerMock,
   startAudioInputMock,
   startSpeechRecognizerMock,
   stopAudioInputMock,
   stopSpeechRecognizerMock,
+  unlockAudioOutputMock,
 } = vi.hoisted(() => ({
   boardAdapterUpdateMovedSoundsInvalidMock: vi.fn(),
   boardAdapterUpdateMovedSoundsOkMock: vi.fn(),
@@ -208,5 +208,41 @@ describe('game engine lifecycle', () => {
     await gameEngine.audioOutputToggle();
 
     expect(unlockAudioOutputMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('sets game result to 0-1 when White resigns via speech recognition', async () => {
+    const onUiStateChange = vi.fn();
+
+    // Override startSpeechRecognizerMock for this test to capture the recognizer callbacks
+    const recognizerOnMock = vi.fn();
+    startSpeechRecognizerMock.mockResolvedValueOnce({
+      model: {},
+      modelUrl: '/models/vosk-model-small-en-us-0.15.zip',
+      recognizer: {
+        acceptWaveformFloat: vi.fn(),
+        on: recognizerOnMock,
+      },
+      status: 'active',
+    });
+
+    const gameEngine = createGameEngine({ gameStorage: createMemoryGameStorage() });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.attachBoardController({ renderPosition: () => undefined });
+
+    // Toggle audio input on — registers 'result' and 'error' callbacks on the recognizer
+    await gameEngine.audioInputToggle();
+
+    const resultCallArgs = recognizerOnMock.mock.calls.find(([event]) => event === 'result');
+    const resultCallback = resultCallArgs?.[1] as ((msg: unknown) => Promise<void>) | undefined;
+    if (!resultCallback) throw new Error('Expected result callback to be registered');
+
+    // Simulate a 'resign' speech recognition result (White to move at start → result is '0-1')
+    await resultCallback({ result: { text: 'resign' } });
+
+    const lastUiState = onUiStateChange.mock.calls.at(-1)?.[0];
+    expect(lastUiState?.lastInputEvaluateStatus).toBe('control');
+    expect(lastUiState?.lastInputResultMessage).toBe('Game resigned');
+    expect(lastUiState?.gameMetadata?.result).toBe('0-1');
   });
 });

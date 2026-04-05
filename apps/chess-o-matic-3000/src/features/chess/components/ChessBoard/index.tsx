@@ -275,30 +275,10 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
           ref={promotionDialogEl}
         >
           <div class="promotion-surface">
-            <button
-              class="promo-choice promotion-choice"
-              data-piece="q"
-              title="Queen"
-              type="button"
-            />
-            <button
-              class="promo-choice promotion-choice"
-              data-piece="r"
-              title="Rook"
-              type="button"
-            />
-            <button
-              class="promo-choice promotion-choice"
-              data-piece="b"
-              title="Bishop"
-              type="button"
-            />
-            <button
-              class="promo-choice promotion-choice"
-              data-piece="n"
-              title="Knight"
-              type="button"
-            />
+            <button class="promo-choice promotion-choice" data-piece="q" title="Queen" type="button" />
+            <button class="promo-choice promotion-choice" data-piece="r" title="Rook" type="button" />
+            <button class="promo-choice promotion-choice" data-piece="b" title="Bishop" type="button" />
+            <button class="promo-choice promotion-choice" data-piece="n" title="Knight" type="button" />
           </div>
         </div>
       </div>
@@ -315,7 +295,9 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
           onClick={() => setShowCoordinates((current) => !current)}
           type="button"
         >
-          <span class={showCoordinates() ? '[font-family:var(--font-data)]' : '[font-family:var(--font-data)] line-through'}>
+          <span
+            class={showCoordinates() ? '[font-family:var(--font-data)]' : '[font-family:var(--font-data)] line-through'}
+          >
             a1
           </span>
         </button>
