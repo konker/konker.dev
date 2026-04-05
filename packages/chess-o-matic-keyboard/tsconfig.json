@@ -1,9 +1,11 @@
 {
   "extends": "../common-config/configs/tsconfig-base.json",
-  "include": ["./src"],
+  "include": ["./src/**/*"],
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
+    "composite": false,
+    "declarationMap": false,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],

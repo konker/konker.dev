@@ -120,15 +120,15 @@ Suggested shapes:
 ```ts
 export type KeyboardContext = {
   readonly fen?: string;
-  readonly orientation?: "white" | "black";
+  readonly orientation?: 'white' | 'black';
   readonly legalMovesSan?: readonly string[];
   readonly legalMovesUci?: readonly string[];
   readonly inCheck?: boolean;
-  readonly turn?: "w" | "b";
+  readonly turn?: 'w' | 'b';
 };
 
 export type KeyboardState = {
-  readonly mode: "notation-only" | "board-aware";
+  readonly mode: 'notation-only' | 'board-aware';
   readonly rawInput: string;
   readonly normalizedInput: string;
   readonly tokens: readonly string[];
@@ -136,7 +136,7 @@ export type KeyboardState = {
   readonly enabledKeys: ReadonlySet<string>;
   readonly pendingPromotion: boolean;
   readonly canSubmit: boolean;
-  readonly status: "idle" | "building" | "complete" | "invalid";
+  readonly status: 'idle' | 'building' | 'complete' | 'invalid';
 };
 
 export type KeyboardController = {
@@ -172,11 +172,7 @@ Instead, it should work against normalized data such as:
 
 This keeps the package decoupled from one engine and easier to reuse.
 
-Because the current app already uses `chess.js`, the package can provide optional adapters later, for example:
-
-- `adapters/chessjs.ts`
-
-That adapter can translate a `Chess` instance into `KeyboardContext`.
+Because the current app already uses `chess.js`, the parent app can translate engine state into `legalMovesSan` directly.
 
 ## Solid UI Responsibilities
 
@@ -202,37 +198,37 @@ Suggested exports:
 
 - `ChessKeyboard`
 - `CandidateBar`
-- `NotationPreview`
+- `SanReadout`
 - `createChessKeyboardController`
 - `useChessKeyboard`
 
 Suggested usage direction:
 
 ```tsx
-const keyboard = createChessKeyboardController({
-  context: initialContext,
-});
-
 <ChessKeyboard
-  controller={keyboard}
-  onSubmit={(result) => {
-    // forward accepted move into app flow
+  legalMovesSan={legalMovesSan}
+  onChange={(input) => {
+    // track permissive user input
   }}
-/>;
+  onSubmit={(input, meta) => {
+    // parent app decides whether and how to apply the move
+  }}
+/>
 ```
 
-This keeps the app in control while still allowing a high-level default component.
+The direct component props are now the primary integration path. `createChessKeyboardController` remains useful for lower-level integrations, but it is no longer the center of the component API.
 
 ## State Ownership
 
 The package should support two integration styles:
 
-1. Internal controller ownership
-   - Package creates and owns the controller.
-   - Good for simple usage.
+1. Internal state ownership
+   - `ChessKeyboard` manages input and settings internally.
+   - Good for simple usage and demo flows.
 
-2. External controller ownership
-   - Consumer app creates the controller and passes it into components.
+2. External value/settings ownership
+   - Consumer app controls `value` and/or `settings`.
+   - Good when keyboard state needs to be synchronized with surrounding application state.
    - Better for synchronization with board state, game state, persistence, analytics, or custom flows.
 
 For the chess app, external ownership is likely the better long-term default.
@@ -271,22 +267,17 @@ packages/chess-o-matic-keyboard/
       types.ts
       controller.ts
       state.ts
-      actions.ts
-      tokenizer.ts
       normalizer.ts
       candidates.ts
-      enabled-keys.ts
-      promotion.ts
       context.ts
     solid/
       index.ts
       ChessKeyboard.tsx
       CandidateBar.tsx
-      NotationPreview.tsx
-      create-controller.ts
-      hooks.ts
-    adapters/
-      chessjs.ts
+      SanReadout.tsx
+      KeyGrid.tsx
+      SettingsPanel.tsx
+      createChessKeyboardController.ts
     test/
       setup.ts
 ```
@@ -300,7 +291,6 @@ Recommended export groups:
 - `@konker.dev/chess-o-matic-keyboard`
 - `@konker.dev/chess-o-matic-keyboard/core`
 - `@konker.dev/chess-o-matic-keyboard/solid`
-- `@konker.dev/chess-o-matic-keyboard/adapters/chessjs`
 
 This allows consumers to depend only on what they need.
 
@@ -368,7 +358,7 @@ Recommended implementation order:
 3. Add board-aware context support.
 4. Build Solid keyboard UI against the controller.
 5. Tune layout and interaction model for mobile and tablet usage.
-6. Add optional adapters such as `chess.js`.
+6. Keep engine integration at the parent-app boundary unless a concrete adapter earns its maintenance cost.
 7. Reassess whether a web component is justified by actual consumers.
 
 If a non-Solid consumer appears later, a web component can be built on top of the same core without undoing this design.

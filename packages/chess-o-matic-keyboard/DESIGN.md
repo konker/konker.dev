@@ -76,8 +76,8 @@ Choose fonts that are **distinctive and characterful**, emphasizing precision an
   --color-text: #f8fafc;
   --color-muted: #334155;
   --color-accent: #39ff14;
-  --font-primary: "Space Grotesk", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-primary: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
   --radius: 4px;
   --spacing-xs: 4px;
   --spacing-sm: 8px;

@@ -15,4 +15,3 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md).
 - `@konker.dev/chess-o-matic-keyboard`
 - `@konker.dev/chess-o-matic-keyboard/core`
 - `@konker.dev/chess-o-matic-keyboard/solid`
-- `@konker.dev/chess-o-matic-keyboard/adapters/chessjs`

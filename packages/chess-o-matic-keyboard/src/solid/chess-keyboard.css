@@ -1,0 +1,392 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@200..800&family=Atkinson+Hyperlegible+Mono:wght@200..800&display=swap');
+
+.chess-keyboard-root {
+  --chesskbd-font-ui: 'Atkinson Hyperlegible Next', sans-serif;
+  --chesskbd-font-mono: 'Atkinson Hyperlegible Mono', monospace;
+  --chesskbd-font-size: 1.0rem;
+  --chesskbd-font-size-title: 1.25rem;
+  --chesskbd-font-weight-title: 400;
+  --chesskbd-gap: 0.75rem;
+  --chesskbd-row-gap: 0.75rem;
+  --chesskbd-button-padding: 0.75rem 1rem;
+  --chesskbd-panel-padding: 0.75rem;
+  --chesskbd-readout-padding: 0.75rem 1rem;
+  --chesskbd-readout-border: #333;
+  --chesskbd-candidates-bg: #fde2e9;
+  --chesskbd-candidates-padding: 0.75rem 1rem;
+
+  --chesskbd-button-color-bg: #eff1ee;
+  --chesskbd-button-color-fg: #000;
+  --chesskbd-button-color-border: #eff1ee;
+
+  --chesskbd-button-color-bg-hover: #eff1ee;
+  --chesskbd-button-color-fg-hover: #000;
+  --chesskbd-button-color-border-hover: #eff1ee;
+
+  --chesskbd-button-color-bg-candidate: #dd2277;
+  --chesskbd-button-color-fg-candidate: #fff;
+  --chesskbd-button-color-border-candidate: #dd2277;
+
+  --chesskbd-button-color-bg-candidate-hover: #dd2277;
+  --chesskbd-button-color-fg-candidate-hover: #fff;
+  --chesskbd-button-color-border-candidate-hover: #dd2277;
+
+  --chesskbd-button-color-bg-highlight: #dd2277;
+  --chesskbd-button-color-fg-highlight: #fff;
+  --chesskbd-button-color-border-highlight: #dd2277;
+
+  --chesskbd-button-color-bg-highlight-hover: #dd2277;
+  --chesskbd-button-color-fg-highlight-hover: #fff;
+  --chesskbd-button-color-border-highlight-hover: #dd2277;
+
+  --chesskbd-button-color-bg-piece: #95ccfd;
+  --chesskbd-button-color-fg-piece: #000;
+  --chesskbd-button-color-border-piece: #95ccfd;
+
+  --chesskbd-button-color-bg-piece-hover: #95ccfd;
+  --chesskbd-button-color-fg-piece-hover: #000;
+  --chesskbd-button-color-border-piece-hover: #95ccfd;
+
+  --chesskbd-button-color-bg-file: #95ccfd;
+  --chesskbd-button-color-fg-file: #000;
+  --chesskbd-button-color-border-file: #95ccfd;
+
+  --chesskbd-button-color-bg-file-hover: #95ccfd;
+  --chesskbd-button-color-fg-file-hover: #000;
+  --chesskbd-button-color-border-file-hover: #95ccfd;
+
+  --chesskbd-button-color-bg-rank: #123462;
+  --chesskbd-button-color-fg-rank: #fff;
+  --chesskbd-button-color-border-rank: #123462;
+
+  --chesskbd-button-color-bg-rank-hover: #123462;
+  --chesskbd-button-color-fg-rank-hover: #fff;
+  --chesskbd-button-color-border-rank-hover: #123462;
+
+  --chesskbd-button-color-bg-takes: #123462;
+  --chesskbd-button-color-fg-takes: #fff;
+  --chesskbd-button-color-border-takes: #123462;
+
+  --chesskbd-button-color-bg-takes-hover: #123462;
+  --chesskbd-button-color-fg-takes-hover: #fff;
+  --chesskbd-button-color-border-takes-hover: #123462;
+
+  --chesskbd-button-color-bg-secondary: #95ccfd;
+  --chesskbd-button-color-fg-secondary: #000;
+  --chesskbd-button-color-border-secondary: #95ccfd;
+
+  --chesskbd-button-color-bg-secondary-hover: #95ccfd;
+  --chesskbd-button-color-fg-secondary-hover: #000;
+  --chesskbd-button-color-border-secondary-hover: #95ccfd;
+
+  --chesskbd-settings-panel-bg: #eff1ee;
+  --chesskbd-settings-panel-border: #eff1ee;
+  --chesskbd-settings-panel-fg: #1f2933;
+  --chesskbd-settings-label-fg: #3b4552;
+  --chesskbd-settings-control-accent: #3378d4;
+
+  display: grid;
+  gap: var(--chesskbd-gap);
+  font-family: var(--chesskbd-font-ui);
+}
+
+.chess-keyboard-root *,
+.chess-keyboard-root *::before,
+.chess-keyboard-root *::after {
+  box-sizing: border-box;
+}
+
+.chess-keyboard-readout {
+  align-items: center;
+  display: flex;
+  font-family: var(--chesskbd-font-mono);
+  font-weight: 600;
+  line-height: 1.25;
+  min-height: 3.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--chesskbd-readout-padding);
+  white-space: nowrap;
+  background-color: #ffffdd;
+  border: 3px solid var(--chesskbd-readout-border);
+}
+
+.chess-keyboard-grid {
+  display: grid;
+  gap: var(--chesskbd-gap);
+}
+
+.chess-keyboard-row {
+  display: grid;
+  gap: var(--chesskbd-row-gap);
+}
+
+.chess-keyboard-row[data-row='row-1'] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.chess-keyboard-row[data-row='row-2'] {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.chess-keyboard-row[data-row='row-3'],
+.chess-keyboard-row[data-row='row-6'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.chess-keyboard-row[data-row='row-4'],
+.chess-keyboard-row[data-row='row-5'] {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.chess-keyboard-secondary-row[data-row='secondary-row-1'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.chess-keyboard-secondary-row[data-row='secondary-row-2'] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.chess-keyboard-secondary-row[data-row='secondary-row-3'] {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button {
+  font: inherit;
+  outline:none;
+  font-family: var(--chesskbd-font-ui);
+  padding: var(--chesskbd-button-padding);
+  white-space: nowrap;
+  color: var(--chesskbd-button-color-fg);
+  background-color: var(--chesskbd-button-color-bg);
+  border: 1px solid var(--chesskbd-button-color-border);
+  border-radius: 0.25rem;
+}
+
+.chess-keyboard-button:hover {
+  color: var(--chesskbd-button-color-fg-hover);
+  background-color: var(--chesskbd-button-color-bg-hover);
+  border: 1px solid var(--chesskbd-button-color-border-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-candidate-button {
+  appearance: none;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+  padding: var(--chesskbd-button-padding);
+  white-space: nowrap;
+  color: var(--chesskbd-button-color-fg-candidate);
+  background-color: var(--chesskbd-button-color-bg-candidate);
+  border: 1px solid var(--chesskbd-button-color-border-candidate);
+  border-radius: 0.25rem;
+}
+
+.chess-keyboard-candidate-button:hover {
+  box-shadow: none;
+  color: var(--chesskbd-button-color-fg-candidate-hover);
+  background-color: var(--chesskbd-button-color-bg-candidate-hover);
+  border: 1px solid var(--chesskbd-button-color-border-candidate-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-settings-button,
+.chess-keyboard-settings-close {
+  font: inherit;
+  padding: var(--chesskbd-button-padding);
+  white-space: nowrap;
+  color: var(--chesskbd-button-color-fg);
+  background-color: var(--chesskbd-button-color-bg);
+  border-color: var(--chesskbd-button-color-border);
+}
+
+.chess-keyboard-settings-button:hover,
+.chess-keyboard-settings-close:hover {
+  color: var(--chesskbd-button-color-fg-hover);
+  background-color: var(--chesskbd-button-color-bg-hover);
+  border-color: var(--chesskbd-button-color-border-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button[data-button-kind='piece'] {
+  font-family: var(--chesskbd-font-mono);
+  font-weight: 600;
+  color: var(--chesskbd-button-color-fg-piece);
+  background-color: var(--chesskbd-button-color-bg-piece);
+  border-color: var(--chesskbd-button-color-border-piece);
+}
+
+.chess-keyboard-button[data-button-kind='piece']:hover {
+  color: var(--chesskbd-button-color-fg-piece-hover);
+  background-color: var(--chesskbd-button-color-bg-piece-hover);
+  border-color: var(--chesskbd-button-color-border-piece-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button[data-button-kind='rank'] {
+  font-family: var(--chesskbd-font-mono);
+  font-weight: 600;
+  color: var(--chesskbd-button-color-fg-rank);
+  background-color: var(--chesskbd-button-color-bg-rank);
+  border-color: var(--chesskbd-button-color-border-rank);
+}
+
+.chess-keyboard-button[data-button-kind='rank']:hover {
+  color: var(--chesskbd-button-color-fg-rank-hover);
+  background-color: var(--chesskbd-button-color-bg-rank-hover);
+  border-color: var(--chesskbd-button-color-border-rank-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button[data-button-kind='file'] {
+  font-family: var(--chesskbd-font-mono);
+  font-weight: 600;
+  color: var(--chesskbd-button-color-fg-file);
+  background-color: var(--chesskbd-button-color-bg-file);
+  border-color: var(--chesskbd-button-color-border-file);
+}
+
+.chess-keyboard-button[data-button-kind='file']:hover {
+  color: var(--chesskbd-button-color-fg-file-hover);
+  background-color: var(--chesskbd-button-color-bg-file-hover);
+  border-color: var(--chesskbd-button-color-border-file-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button[data-button-kind='takes'] {
+  font-family: var(--chesskbd-font-mono);
+  font-weight: 600;
+  color: var(--chesskbd-button-color-fg-takes);
+  background-color: var(--chesskbd-button-color-bg-takes);
+  border-color: var(--chesskbd-button-color-border-takes);
+}
+
+.chess-keyboard-button[data-button-kind='takes']:hover {
+  color: var(--chesskbd-button-color-fg-takes-hover);
+  background-color: var(--chesskbd-button-color-bg-takes-hover);
+  border-color: var(--chesskbd-button-color-border-takes-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button[data-button-kind='secondary'] {
+  font-family: var(--chesskbd-font-mono);
+  font-weight: 600;
+  color: var(--chesskbd-button-color-fg-secondary);
+  background-color: var(--chesskbd-button-color-bg-secondary);
+  border-color: var(--chesskbd-button-color-border-secondary);
+}
+
+.chess-keyboard-button[data-button-kind='secondary']:hover {
+  color: var(--chesskbd-button-color-fg-secondary-hover);
+  background-color: var(--chesskbd-button-color-bg-secondary-hover);
+  border-color: var(--chesskbd-button-color-border-secondary-hover);
+}
+
+/* ----------------------------------------------------------------------- */
+.chess-keyboard-button[data-highlighted='true'] {
+  color: var(--chesskbd-button-color-fg-highlight);
+  background-color: var(--chesskbd-button-color-bg-highlight);
+  border-color: var(--chesskbd-button-color-border-highlight);
+}
+
+.chess-keyboard-button[data-highlighted='true']:hover {
+  color: var(--chesskbd-button-color-fg-highlight-hover);
+  background-color: var(--chesskbd-button-color-bg-highlight-hover);
+  border-color: var(--chesskbd-button-color-border-highlight-hover);
+}
+
+.chess-keyboard-candidates {
+  min-height: 3.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-color: var(--chesskbd-candidates-bg);
+  padding: var(--chesskbd-candidates-padding);
+  border-radius: 0.25rem;
+}
+
+.chess-keyboard-candidates-title,
+.chess-keyboard-settings-title {
+  margin: 0;
+  font-family: var(--chesskbd-font-ui);
+  font-size: var(--chesskbd-font-size-title);
+  font-weight: var(--chesskbd-font-weight-title);
+}
+
+.chess-keyboard-candidates-list {
+  display: flex;
+  gap: var(--chesskbd-gap);
+  min-width: max-content;
+  padding: 0;
+}
+
+.chess-keyboard-button[data-icon-only='true'] {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.chess-keyboard-button-icon {
+  display: block;
+  height: 1.125rem;
+  width: 1.125rem;
+}
+
+.chess-keyboard-settings {
+  background-color: var(--chesskbd-settings-panel-bg);
+  border: 1px solid var(--chesskbd-settings-panel-border);
+  color: var(--chesskbd-settings-panel-fg);
+  display: grid;
+  gap: var(--chesskbd-gap);
+  padding: var(--chesskbd-panel-padding);
+  border-radius: 0.25rem;
+}
+
+.chess-keyboard-secondary-panel {
+  display: grid;
+  gap: var(--chesskbd-gap);
+}
+
+.chess-keyboard-secondary-row {
+  width: 100%;
+}
+
+.chess-keyboard-secondary-row .chess-keyboard-button {
+  min-width: 0;
+  padding-inline: 0.5rem;
+}
+
+.chess-keyboard-settings-group {
+  display: grid;
+  gap: var(--chesskbd-gap);
+}
+
+.chess-keyboard-settings-field {
+  align-items: center;
+  display: grid;
+  gap: var(--chesskbd-gap);
+  grid-template-columns: 1fr auto;
+}
+
+.chess-keyboard-settings-label {
+  color: var(--chesskbd-settings-label-fg);
+  margin: 0;
+}
+
+.chess-keyboard-settings-control {
+  accent-color: var(--chesskbd-settings-control-accent);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .chess-keyboard-row[data-row='row-4'],
+  .chess-keyboard-row[data-row='row-5'] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .chess-keyboard-secondary-row[data-row='secondary-row-3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

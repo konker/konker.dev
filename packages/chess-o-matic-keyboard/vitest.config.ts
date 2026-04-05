@@ -1,15 +1,17 @@
-import { baseConfig } from "@konker.dev/common-config/configs/vitest.config-base";
-import { defineConfig } from "vitest/config";
+import solid from 'vite-plugin-solid';
+import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
-  ...baseConfig,
-  test: {
-    ...baseConfig.test,
-    environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
-    coverage: {
-      ...baseConfig.test.coverage,
-      exclude: [...baseConfig.test.coverage.exclude, "src/test/setup.ts"],
+  plugins: [solid()],
+  resolve: {
+    alias: {
+      'lucide-solid': fileURLToPath(
+        new URL('./node_modules/lucide-solid/dist/esm/lucide-solid.js', import.meta.url)
+      ),
     },
+  },
+  test: {
+    environment: 'jsdom',
   },
 });
