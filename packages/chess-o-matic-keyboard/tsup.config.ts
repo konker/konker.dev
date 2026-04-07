@@ -1,0 +1,30 @@
+import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: [
+    'src/index.ts',
+    'src/core/candidates.ts',
+    'src/core/context.ts',
+    'src/core/controller.ts',
+    'src/core/index.ts',
+    'src/core/normalizer.ts',
+    'src/core/state.ts',
+    'src/core/types.ts',
+    'src/solid/CandidateBar.tsx',
+    'src/solid/ChessKeyboard.tsx',
+    'src/solid/createChessKeyboardController.ts',
+    'src/solid/index.ts',
+    'src/solid/KeyGrid.tsx',
+    'src/solid/SanReadout.tsx',
+    'src/solid/SecondaryPanel.tsx',
+    'src/solid/SettingsPanel.tsx',
+  ],
+  format: ['esm'],
+  target: 'es2023',
+  outDir: 'dist',
+  clean: true,
+  sourcemap: true,
+  splitting: false,
+  bundle: false,
+  dts: true,
+});

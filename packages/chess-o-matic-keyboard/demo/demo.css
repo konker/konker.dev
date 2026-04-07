@@ -1,0 +1,46 @@
+:root {
+  color: inherit;
+  font: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+.demo-shell {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 24px;
+}
+
+.demo-layout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+
+.demo-panel,
+.demo-card {
+  padding: 20px;
+}
+
+.scenario-list,
+.demo-panel,
+.demo-card,
+.demo-actions,
+.demo-log {
+  display: grid;
+  gap: 12px;
+}
+
+.keyboard-frame {
+  padding: 12px;
+}
