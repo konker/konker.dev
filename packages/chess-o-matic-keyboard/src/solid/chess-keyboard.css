@@ -3,7 +3,7 @@
 .chess-keyboard-root {
   --chesskbd-font-ui: 'Atkinson Hyperlegible Next', sans-serif;
   --chesskbd-font-mono: 'Atkinson Hyperlegible Mono', monospace;
-  --chesskbd-font-size: 1.0rem;
+  --chesskbd-font-size: 1rem;
   --chesskbd-font-size-title: 1.25rem;
   --chesskbd-font-weight-title: 400;
   --chesskbd-gap: 0.75rem;
@@ -154,7 +154,7 @@
 /* ----------------------------------------------------------------------- */
 .chess-keyboard-button {
   font: inherit;
-  outline:none;
+  outline: none;
   font-family: var(--chesskbd-font-ui);
   padding: var(--chesskbd-button-padding);
   white-space: nowrap;

@@ -6,4 +6,5 @@ export * from './solid/ChessKeyboard';
 export * from './solid/createChessKeyboardController';
 export * from './solid/KeyGrid';
 export * from './solid/SanReadout';
+export * from './solid/SecondaryPanel';
 export * from './solid/SettingsPanel';

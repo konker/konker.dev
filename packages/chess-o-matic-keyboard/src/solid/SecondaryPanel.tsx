@@ -45,15 +45,21 @@ export function SecondaryPanel(props: SecondaryPanelProps): JSX.Element {
     return [
       {
         id: 'secondary-row-1',
-        buttons: SECONDARY_ROW_1.map((keyId) => secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)),
+        buttons: SECONDARY_ROW_1.map((keyId) =>
+          secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)
+        ),
       },
       {
         id: 'secondary-row-2',
-        buttons: SECONDARY_ROW_2.map((keyId) => secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)),
+        buttons: SECONDARY_ROW_2.map((keyId) =>
+          secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)
+        ),
       },
       {
         id: 'secondary-row-3',
-        buttons: SECONDARY_ROW_3.map((keyId) => secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)),
+        buttons: SECONDARY_ROW_3.map((keyId) =>
+          secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)
+        ),
       },
     ];
   });
