@@ -5,3 +5,4 @@ src/database/drizzle
 .vinxi
 assets/**/*
 .claude
+coverage/
