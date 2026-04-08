@@ -34,6 +34,11 @@ vi.mock('./ChessBoard', () => ({
   ChessBoard: () => <div data-testid="mock-chess-board">Mock ChessBoard</div>,
 }));
 
+vi.mock('@konker.dev/chess-o-matic-keyboard/solid/chess-keyboard.css', () => ({}));
+vi.mock('@konker.dev/chess-o-matic-keyboard/solid', () => ({
+  ChessKeyboard: () => <div class="chess-keyboard-root">Mock ChessKeyboard</div>,
+}));
+
 import { ChessOMatic3000App } from './ChessOMatic3000App';
 
 describe('ChessOMatic3000App', () => {
@@ -53,8 +58,10 @@ describe('ChessOMatic3000App', () => {
     expect(root.querySelector('button[aria-label="Speech"]')).not.toBeNull();
     expect(root.querySelector('button[aria-label="Sounds"]')).not.toBeNull();
     expect(root.textContent).toContain('PGN');
+    expect(root.textContent).toContain('Keyboard');
     expect(root.textContent).toContain('Heard');
     expect(root.querySelector('[data-testid="mock-chess-board"]')).not.toBeNull();
+    expect(root.querySelector('.chess-keyboard-root')).not.toBeNull();
     expect(
       (root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent
     ).toContain('Component test mode');

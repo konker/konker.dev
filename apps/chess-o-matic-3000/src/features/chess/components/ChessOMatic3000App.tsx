@@ -1,7 +1,9 @@
 import '../chess-o-matic.css';
+import '@konker.dev/chess-o-matic-keyboard/solid/chess-keyboard.css';
 
+import { ChessKeyboard } from '@konker.dev/chess-o-matic-keyboard/solid';
 import { useNavigate } from '@solidjs/router';
-import { Binary, Copy, CopyCheck, FileText, Grid3x3, NotebookPen, SlidersHorizontal } from 'lucide-solid';
+import { Binary, Copy, CopyCheck, FileText, Grid3x3, Keyboard, NotebookPen, SlidersHorizontal } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 
@@ -273,6 +275,10 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           onToggleSound={() => void toggleSound()}
         />
       </div>
+
+      <CollapsibleSection icon={Keyboard} storageKey="keyboard" title="Keyboard">
+        <ChessKeyboard />
+      </CollapsibleSection>
 
       <CollapsibleSection
         headerAside={
