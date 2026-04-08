@@ -1,8 +1,8 @@
+/* eslint-disable fp/no-nil,fp/no-unused-expression */
 import { createSignal, For, type JSX } from 'solid-js';
 
-import { ChessKeyboard } from '../src/solid/index.js';
-
 import type { KeyboardContext } from '../src/core/types.js';
+import { ChessKeyboard } from '../src/solid/index.js';
 
 type Scenario = {
   readonly description: string;
@@ -11,7 +11,7 @@ type Scenario = {
   readonly context?: KeyboardContext;
 };
 
-const scenarios: readonly Scenario[] = [
+const scenarios: ReadonlyArray<Scenario> = [
   {
     id: 'notation-only',
     name: 'Notation Only',
@@ -74,10 +74,11 @@ const scenarios: readonly Scenario[] = [
 
 export function DemoPage(): JSX.Element {
   const [selectedScenarioId, setSelectedScenarioId] = createSignal<Scenario['id']>('notation-only');
-  const [submittedMoves, setSubmittedMoves] = createSignal<readonly string[]>([]);
+  const [submittedMoves, setSubmittedMoves] = createSignal<ReadonlyArray<string>>([]);
   const [resetNonce, setResetNonce] = createSignal(0);
 
-  const selectedScenario = () => scenarios.find((scenario) => scenario.id === selectedScenarioId()) ?? scenarios[0];
+  const selectedScenario = (): Scenario =>
+    scenarios.find((scenario) => scenario.id === selectedScenarioId()) ?? scenarios[0]!;
 
   function handleScenarioSelect(nextScenarioId: Scenario['id']): void {
     setSelectedScenarioId(nextScenarioId);
@@ -90,6 +91,8 @@ export function DemoPage(): JSX.Element {
     setResetNonce((value) => value + 1);
   }
 
+  const currentScenario = () => selectedScenario();
+
   return (
     <main class="demo-shell">
       <section class="demo-hero">
@@ -100,18 +103,22 @@ export function DemoPage(): JSX.Element {
       <section class="demo-layout">
         <section class="demo-stage">
           <div class="demo-card">
-            <h2>{selectedScenario().name}</h2>
-            <p>{selectedScenario().description}</p>
+            <h2>{currentScenario().name}</h2>
+            <p>{currentScenario().description}</p>
             <div class="keyboard-frame" data-reset-nonce={resetNonce()}>
               <For each={[resetNonce()]}>
-                {() => (
-                  <ChessKeyboard
-                    legalMovesSan={selectedScenario().context?.legalMovesSan}
-                    onSubmit={(input) => {
-                      setSubmittedMoves((currentMoves) => [input, ...currentMoves]);
-                    }}
-                  />
-                )}
+                {() => {
+                  const scenario = currentScenario();
+
+                  return (
+                    <ChessKeyboard
+                      {...(scenario.context === undefined ? {} : { legalMovesSan: scenario.context.legalMovesSan })}
+                      onSubmit={(input) => {
+                        setSubmittedMoves((currentMoves) => [input, ...currentMoves]);
+                      }}
+                    />
+                  );
+                }}
               </For>
             </div>
           </div>
