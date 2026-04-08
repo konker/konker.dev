@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/chess-o-matic-keyboard",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -94,7 +94,7 @@
     "demo:build": "vite build --config vite.demo.config.ts",
     "clean": "rm -rf dist && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
-    "build": "pnpm run clean && tsup && cp src/solid/chess-keyboard.css dist/chess-keyboard.css",
+    "build": "pnpm run clean && vite build --config vite.lib.config.ts && tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap false && cp src/solid/chess-keyboard.css dist/chess-keyboard.css",
     "type-coverage-check": "type-coverage --detail --at-least 95 --ignore-files src/index.ts --ignore-files src/solid/index.ts",
     "circular-check": "madge --extensions ts,tsx --circular --no-color --no-spinner --warning --ts-config ./tsconfig.json src",
     "eslint-check": "eslint --max-warnings=0 'src/**/*.{ts,tsx,js,json}'",

@@ -27,4 +27,8 @@ export default defineConfig({
   splitting: false,
   bundle: false,
   dts: true,
+  esbuildOptions(options) {
+    options.jsx = 'automatic';
+    options.jsxImportSource = 'solid-js';
+  },
 });
