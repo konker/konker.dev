@@ -171,6 +171,18 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     return uiState().currentPly % 2 === 0 ? 'white' : 'black';
   }
 
+  function renderCurrentMoveIndicator(): JSX.Element {
+    return (
+      <span class="flex items-center gap-2">
+        <span class="status-chip status-move-chip">{renderCurrentMoveNumber()}</span>
+        <span
+          aria-label={`${renderCurrentMoveColor()} to move`}
+          class={`status-color-chip status-color-chip-${renderCurrentMoveColor()}`}
+        />
+      </span>
+    );
+  }
+
   async function startNewGame(): Promise<void> {
     try {
       await gameEngine.newGame();
@@ -276,22 +288,21 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         />
       </div>
 
-      <CollapsibleSection icon={Keyboard} storageKey="keyboard" title="Keyboard">
-        <ChessKeyboard />
+      <CollapsibleSection
+        headerAside={renderCurrentMoveIndicator()}
+        icon={Keyboard}
+        storageKey="keyboard"
+        title="Keyboard"
+      >
+        <ChessKeyboard
+          legalMovesSan={uiState().legalMovesSan}
+          onSubmit={(input) => void gameEngine.handleTextInput(input)}
+          orientation={uiState().boardOrientation}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection
-        headerAside={
-          <span class="flex items-center gap-2">
-            <span class="flex items-center gap-2">
-              <span class="status-chip status-move-chip">{renderCurrentMoveNumber()}</span>
-              <span
-                aria-label={`${renderCurrentMoveColor()} to move`}
-                class={`status-color-chip status-color-chip-${renderCurrentMoveColor()}`}
-              />
-            </span>
-          </span>
-        }
+        headerAside={renderCurrentMoveIndicator()}
         icon={Grid3x3}
         storageKey="board"
         title="Board"

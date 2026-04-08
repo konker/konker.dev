@@ -715,7 +715,7 @@
   }
 
   .board-navigation-row {
-    @apply flex w-full items-center justify-between gap-3;
+    @apply flex w-full flex-nowrap items-center justify-between gap-3;
     touch-action: manipulation;
   }
 

@@ -102,6 +102,7 @@ describe('createGameEngine persistence', () => {
       gameMetadata: {
         event: 'Restored Event',
       },
+      legalMovesSan: expect.arrayContaining(['Nf3', 'Nc3', 'Bb5', 'Bc4', 'd4']),
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'e5',
       lastMoveSan: 'e5',
@@ -177,6 +178,25 @@ describe('createGameEngine persistence', () => {
           moveCount: 1,
         }),
       ],
+    });
+  });
+
+  it('routes text input through the same evaluation path as speech input', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleTextInput('e4');
+
+    expect(gameStorage.appState?.currentGame.moveHistory).toEqual([{ from: 'e2', san: 'e4', to: 'e4' }]);
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      currentPly: 1,
+      lastInputEvaluateStatus: 'ok',
+      lastInputResultMessage: 'e4',
+      lastInputSanitized: 'e4',
+      lastMoveSan: 'e4',
+      legalMovesSan: expect.arrayContaining(['Nc6', 'Nf6', 'e5', 'c5']),
     });
   });
 
@@ -374,6 +394,21 @@ describe('createGameEngine persistence', () => {
 
     await expect(gameEngine.exportGamePgn('missing-game')).rejects.toThrow('Saved game not found: missing-game');
     await expect(gameEngine.openGameInLichess('missing-game')).rejects.toThrow('Saved game not found: missing-game');
+  });
+
+  it('emits board orientation changes in UI state', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    gameEngine.toggleBoardOrientation();
+
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      boardOrientation: 'black',
+      lastInputEvaluateStatus: 'ignore',
+      lastInputResultMessage: 'Board orientation updated',
+    });
   });
 
   it('discards the current game, removes saved data, and starts a fresh game', async () => {

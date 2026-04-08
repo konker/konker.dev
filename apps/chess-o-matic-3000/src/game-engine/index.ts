@@ -83,6 +83,7 @@ import {
   gameModelEventsNotifyListeners,
 } from '../game-model/events.js';
 import {
+  GAME_INPUT_PARSE_STATUS_IGNORE,
   GAME_INPUT_PARSE_STATUS_OK_COORDS,
   GAME_INPUT_PARSE_STATUS_OK_SAN,
   gameModelRead,
@@ -105,6 +106,7 @@ export type GameEngineUiState = {
   readonly pgn: string;
   readonly pgnMoveList: PgnMoveListData;
   readonly fen: string;
+  readonly legalMovesSan: ReadonlyArray<string>;
   readonly currentGameId: GameId;
   readonly gameMetadata: GameMetadataData;
   readonly lastMoveSan: string;
@@ -123,6 +125,7 @@ export const GAME_ENGINE_UI_STATE_EMPTY: GameEngineUiState = {
   currentGameId: 'current-game',
   fen: START_FEN,
   gameMetadata: GAME_METADATA_EMPTY,
+  legalMovesSan: [],
   lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
   lastInputIllegalReason: undefined,
   lastInputResultMessage: 'No moves',
@@ -166,6 +169,7 @@ export type GameEngine = {
   readonly goToEnd: () => void;
   readonly isLegalMove: (coords: [Square, Square]) => boolean;
   readonly getPromotionPieceColor: (coords: [Square, Square]) => 'b' | 'w' | undefined;
+  readonly handleTextInput: (input: string) => Promise<void>;
   readonly handleBoardMove: (move: [Square, Square] | string) => Promise<void>;
   readonly audioInputToggle: () => Promise<void>;
   readonly audioOutputToggle: () => Promise<void>;
@@ -331,6 +335,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       currentPly: model.currentPly,
       currentGameId: state.currentGame.id,
       boardOrientation: state.currentGame.orientation,
+      legalMovesSan: model.chess.moves(),
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
       lastInputEvaluateStatus: status,
@@ -832,6 +837,19 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     await evaluateBoardMove(move);
   }
 
+  async function handleTextInput(input: string): Promise<void> {
+    const readResult = gameModelRead(input);
+
+    if (readResult.status === GAME_INPUT_PARSE_STATUS_IGNORE && input.trim() !== '') {
+      await evaluateBoardMove(input.trim());
+      return;
+    }
+
+    const state = requireInitialized();
+    const evaluateResult = gameModelEvaluate(state.gameModelResources, readResult);
+    await handleMoveResult(evaluateResult);
+  }
+
   async function newGame(): Promise<void> {
     const state = requireInitialized();
     await syncPersistedCurrentGame(state.appState.currentGame);
@@ -1154,6 +1172,7 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     goToEnd: navigateToEnd,
     isLegalMove,
     getPromotionPieceColor,
+    handleTextInput,
     handleBoardMove,
     audioInputToggle,
     audioOutputToggle,

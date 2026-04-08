@@ -1,6 +1,16 @@
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
+const chessKeyboardMock = vi.fn((props: Record<string, unknown>) => (
+  <div
+    class="chess-keyboard-root"
+    data-legal-moves={(props.legalMovesSan as ReadonlyArray<string> | undefined)?.join(',') ?? ''}
+    data-orientation={(props.orientation as string | undefined) ?? ''}
+  >
+    Mock ChessKeyboard
+  </div>
+));
+
 vi.mock('@solidjs/router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({
@@ -36,13 +46,14 @@ vi.mock('./ChessBoard', () => ({
 
 vi.mock('@konker.dev/chess-o-matic-keyboard/solid/chess-keyboard.css', () => ({}));
 vi.mock('@konker.dev/chess-o-matic-keyboard/solid', () => ({
-  ChessKeyboard: () => <div class="chess-keyboard-root">Mock ChessKeyboard</div>,
+  ChessKeyboard: (props: Record<string, unknown>) => chessKeyboardMock(props),
 }));
 
 import { ChessOMatic3000App } from './ChessOMatic3000App';
 
 describe('ChessOMatic3000App', () => {
   it('renders the SolidStart app shell without booting the chess engine in tests', async () => {
+    chessKeyboardMock.mockClear();
     const root = document.createElement('div');
     document.body.append(root);
 
@@ -62,6 +73,9 @@ describe('ChessOMatic3000App', () => {
     expect(root.textContent).toContain('Heard');
     expect(root.querySelector('[data-testid="mock-chess-board"]')).not.toBeNull();
     expect(root.querySelector('.chess-keyboard-root')).not.toBeNull();
+    expect(chessKeyboardMock).toHaveBeenCalled();
+    expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-legal-moves')).toBe('');
+    expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-orientation')).toBe('white');
     expect(
       (root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent
     ).toContain('Component test mode');
