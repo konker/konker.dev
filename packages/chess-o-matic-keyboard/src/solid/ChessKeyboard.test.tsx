@@ -307,6 +307,71 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
+  it('should render all settings controls by default', () => {
+    const view = mount({});
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+
+    expect(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' })).toBeTruthy();
+    expect(getByRole(view.root, 'checkbox', { name: 'Key Highlights' })).toBeTruthy();
+    expect(getByRole(view.root, 'checkbox', { name: 'Auto Submit' })).toBeTruthy();
+    expect(getByRole(view.root, 'checkbox', { name: 'Show Readout' })).toBeTruthy();
+    expect(getByRole(view.root, 'radio', { name: 'White' })).toBeTruthy();
+    expect(getByRole(view.root, 'radio', { name: 'Black' })).toBeTruthy();
+
+    view.cleanup();
+  });
+
+  it('should hide an individual setting control when configured in visibleSettings', () => {
+    const view = mount({
+      visibleSettings: {
+        candidateBar: false,
+      },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+
+    expect(queryByRole(view.root, 'checkbox', { name: 'Candidate Bar' })).toBeNull();
+    expect(getByRole(view.root, 'checkbox', { name: 'Key Highlights' })).toBeTruthy();
+
+    view.cleanup();
+  });
+
+  it('should hide the orientation setting group when configured in visibleSettings', () => {
+    const view = mount({
+      visibleSettings: {
+        orientation: false,
+      },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+
+    expect(queryByRole(view.root, 'radio', { name: 'White' })).toBeNull();
+    expect(queryByRole(view.root, 'radio', { name: 'Black' })).toBeNull();
+
+    view.cleanup();
+  });
+
+  it('should keep visible settings interactive when visibleSettings hides other controls', () => {
+    const view = mount({
+      legalMovesSan: ['Nf3', 'Nc3'],
+      visibleSettings: {
+        autoSubmit: false,
+        candidateBar: true,
+      },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    expect(getByRole(view.root, 'button', { name: 'Nf3' })).toBeTruthy();
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' }));
+
+    expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
+
+    view.cleanup();
+  });
+
   it('should keep the readout visible while the settings panel is open', () => {
     const view = mount({});
 

@@ -9,6 +9,9 @@ import { KeyGrid } from './KeyGrid.js';
 import { SanReadout } from './SanReadout.js';
 import { SecondaryPanel } from './SecondaryPanel.js';
 import { SettingsPanel } from './SettingsPanel.js';
+import type { ChessKeyboardVisibleSettings } from './types.js';
+
+export type { ChessKeyboardVisibleSettings } from './types.js';
 
 export type ChessKeyboardProps = {
   readonly autoSubmit?: boolean;
@@ -25,6 +28,7 @@ export type ChessKeyboardProps = {
   readonly settings?: Partial<KeyboardBehaviorSettings>;
   readonly showReadout?: boolean;
   readonly value?: string;
+  readonly visibleSettings?: ChessKeyboardVisibleSettings;
 };
 
 export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
@@ -268,6 +272,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
             toggleBehaviorSetting('showReadout');
           }}
           settings={resolvedSettings()}
+          {...(props.visibleSettings === undefined ? {} : { visibleSettings: props.visibleSettings })}
         />
       </Show>
     </section>
