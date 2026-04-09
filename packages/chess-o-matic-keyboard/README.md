@@ -55,6 +55,20 @@ Flat behavior props:
 
 You can also pass `settings?: Partial<KeyboardBehaviorSettings>`, but the flat props take precedence when both are provided.
 
+You can also pass `visibleSettings?: Partial<Record<keyof KeyboardBehaviorSettings, boolean>>` to control which settings are shown in the settings panel. Omitted keys default to visible.
+
+```tsx
+<ChessKeyboard
+  visibleSettings={{
+    autoSubmit: false,
+    candidateBar: true,
+    keyHighlights: true,
+    orientation: false,
+    showReadout: true,
+  }}
+/>
+```
+
 ## Public Exports
 
 - `@konker.dev/chess-o-matic-keyboard`
