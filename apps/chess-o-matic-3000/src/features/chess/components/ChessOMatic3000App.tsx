@@ -298,15 +298,12 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           legalMovesSan={uiState().legalMovesSan}
           onSubmit={(input) => void gameEngine.handleTextInput(input)}
           orientation={uiState().boardOrientation}
+          showReadout={false}
+          visibleSettings={{ showReadout: false, orientation: false }}
         />
       </CollapsibleSection>
 
-      <CollapsibleSection
-        headerAside={renderCurrentMoveIndicator()}
-        icon={Grid3x3}
-        storageKey="board"
-        title="Board"
-      >
+      <CollapsibleSection headerAside={renderCurrentMoveIndicator()} icon={Grid3x3} storageKey="board" title="Board">
         <div class="board-section-layout">
           <ChessBoard
             fen={uiState().fen}
