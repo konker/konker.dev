@@ -52,6 +52,6 @@ describe('core/controller', () => {
 
     expect(state.settings.autoSubmit).toBe(false);
     expect(state.settings.candidateBar).toBe(false);
-    expect(state.settings.keyHighlightsMode).toBe('always');
+    expect(state.settings.keyHighlightsMode).toBe('after-input');
   });
 });

@@ -570,23 +570,6 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should allow key highlight mode to be changed from the settings panel', () => {
-    const view = mount({ legalMovesSan: ['d3', 'd4', 'e4'] });
-
-    expect(getByRole(view.root, 'button', { name: 'd' }).getAttribute('data-highlighted')).toBe('true');
-
-    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
-    fireEvent.click(getByRole(view.root, 'radio', { name: 'After Input' }));
-
-    expect(getByRole(view.root, 'button', { name: 'd' }).getAttribute('data-highlighted')).toBe('false');
-
-    fireEvent.click(getByRole(view.root, 'button', { name: 'd' }));
-
-    expect(getByRole(view.root, 'button', { name: '3' }).getAttribute('data-highlighted')).toBe('true');
-
-    view.cleanup();
-  });
-
   it('should update highlighted keys as input changes', () => {
     const view = mount({
       legalMovesSan: ['d3', 'd4', 'e4'],

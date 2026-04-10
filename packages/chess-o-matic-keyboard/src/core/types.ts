@@ -169,7 +169,7 @@ export type KeyboardBehaviorSettings = {
 export const DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS: KeyboardBehaviorSettings = {
   autoSubmit: true,
   candidateBar: true,
-  keyHighlightsMode: 'always',
+  keyHighlightsMode: 'after-input',
   orientation: 'white',
   showReadout: true,
 };
