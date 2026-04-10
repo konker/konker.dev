@@ -1,7 +1,12 @@
 /* eslint-disable fp/no-nil */
 import { createEffect, createMemo, createSignal, type JSX, Show, untrack } from 'solid-js';
 
-import type { KeyboardBehaviorSettings, KeyboardKeyDefinition, KeyboardSubmitEvent } from '../core/types.js';
+import type {
+  KeyboardBehaviorSettings,
+  KeyboardHighlightsMode,
+  KeyboardKeyDefinition,
+  KeyboardSubmitEvent,
+} from '../core/types.js';
 import { DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS, KEYBOARD_KEYS } from '../core/types.js';
 import { CandidateBar } from './CandidateBar.js';
 import { areSettingsEqual, areStringListsEqual } from './ChessKeyboard.helpers.js';
@@ -21,7 +26,7 @@ export type ChessKeyboardProps = {
   readonly class?: string;
   readonly defaultValue?: string;
   readonly defaultSettings?: Partial<KeyboardBehaviorSettings>;
-  readonly keyHighlights?: boolean;
+  readonly keyHighlightsMode?: KeyboardHighlightsMode;
   readonly legalMovesSan?: ReadonlyArray<string>;
   readonly onChange?: (input: string) => void;
   readonly onSettingsChange?: (settings: KeyboardBehaviorSettings) => void;
@@ -33,7 +38,7 @@ export type ChessKeyboardProps = {
   readonly visibleSettings?: ChessKeyboardVisibleSettings;
 };
 
-const SETTING_PROP_KEYS = ['autoSubmit', 'candidateBar', 'keyHighlights', 'orientation', 'showReadout'] as const;
+const SETTING_PROP_KEYS = ['autoSubmit', 'candidateBar', 'keyHighlightsMode', 'orientation', 'showReadout'] as const;
 
 export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const keyboard = createChessKeyboardController();
@@ -214,13 +219,20 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
     setSettingsOpen((open) => !open);
   };
 
-  const toggleBehaviorSetting = (setting: 'autoSubmit' | 'candidateBar' | 'keyHighlights' | 'showReadout') => {
+  const toggleBehaviorSetting = (setting: 'autoSubmit' | 'candidateBar' | 'showReadout') => {
     const nextSettings = {
       ...resolvedSettings(),
       [setting]: !resolvedSettings()[setting],
     };
 
     applySettingsChange(nextSettings);
+  };
+
+  const setKeyHighlightsMode = (keyHighlightsMode: KeyboardHighlightsMode) => {
+    applySettingsChange({
+      ...resolvedSettings(),
+      keyHighlightsMode,
+    });
   };
 
   const toggleOrientation = () => {
@@ -275,8 +287,8 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
           onToggleCandidateBar={() => {
             toggleBehaviorSetting('candidateBar');
           }}
-          onToggleKeyHighlights={() => {
-            toggleBehaviorSetting('keyHighlights');
+          onSetKeyHighlightsMode={(keyHighlightsMode) => {
+            setKeyHighlightsMode(keyHighlightsMode);
           }}
           onToggleOrientation={() => {
             toggleOrientation();

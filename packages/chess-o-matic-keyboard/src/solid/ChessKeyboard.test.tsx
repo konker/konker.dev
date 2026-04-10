@@ -30,7 +30,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   readonly setSettings: (nextSettings: {
     readonly autoSubmit: boolean;
     readonly candidateBar: boolean;
-    readonly keyHighlights: boolean;
+    readonly keyHighlightsMode: 'after-input' | 'always' | 'off';
     readonly orientation: 'black' | 'white';
     readonly showReadout: boolean;
   }) => void;
@@ -41,7 +41,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   let setSettings!: (nextSettings: {
     readonly autoSubmit: boolean;
     readonly candidateBar: boolean;
-    readonly keyHighlights: boolean;
+    readonly keyHighlightsMode: 'after-input' | 'always' | 'off';
     readonly orientation: 'black' | 'white';
     readonly showReadout: boolean;
   }) => void;
@@ -52,7 +52,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
     const [settings, updateSettings] = createSignal({
       autoSubmit: true,
       candidateBar: true,
-      keyHighlights: true,
+      keyHighlightsMode: 'always' as const,
       orientation: 'white' as const,
       showReadout: true,
     });
@@ -297,7 +297,7 @@ describe('solid/ChessKeyboard', () => {
     view.setSettings({
       autoSubmit: true,
       candidateBar: true,
-      keyHighlights: false,
+      keyHighlightsMode: 'off',
       orientation: 'white',
       showReadout: true,
     });
@@ -313,7 +313,9 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
     expect(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' })).toBeTruthy();
-    expect(getByRole(view.root, 'checkbox', { name: 'Key Highlights' })).toBeTruthy();
+    expect(getByRole(view.root, 'radio', { name: 'Off' })).toBeTruthy();
+    expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
+    expect(getByRole(view.root, 'radio', { name: 'Always' })).toBeTruthy();
     expect(getByRole(view.root, 'checkbox', { name: 'Auto Submit' })).toBeTruthy();
     expect(getByRole(view.root, 'checkbox', { name: 'Show Readout' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'White' })).toBeTruthy();
@@ -332,7 +334,7 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
     expect(queryByRole(view.root, 'checkbox', { name: 'Candidate Bar' })).toBeNull();
-    expect(getByRole(view.root, 'checkbox', { name: 'Key Highlights' })).toBeTruthy();
+    expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
 
     view.cleanup();
   });
@@ -540,13 +542,47 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should remove key highlights when keyHighlights is disabled', () => {
-    const view = mount({ legalMovesSan: ['Nf3', 'Nc3'], settings: { keyHighlights: false } });
+  it('should remove key highlights when keyHighlightsMode is off', () => {
+    const view = mount({ legalMovesSan: ['Nf3', 'Nc3'], settings: { keyHighlightsMode: 'off' } });
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
 
     expect(getByRole(view.root, 'button', { name: 'f' }).getAttribute('data-highlighted')).toBe('false');
     expect(getByRole(view.root, 'button', { name: 'c' }).getAttribute('data-highlighted')).toBe('false');
+
+    view.cleanup();
+  });
+
+  it('should defer key highlights until input exists when keyHighlightsMode is after-input', () => {
+    const view = mount({
+      keyHighlightsMode: 'after-input',
+      legalMovesSan: ['d3', 'd4', 'e4'],
+    });
+
+    expect(getByRole(view.root, 'button', { name: '3' }).getAttribute('data-highlighted')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: '4' }).getAttribute('data-highlighted')).toBe('false');
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'd' }));
+
+    expect(getByRole(view.root, 'button', { name: '3' }).getAttribute('data-highlighted')).toBe('true');
+    expect(getByRole(view.root, 'button', { name: '4' }).getAttribute('data-highlighted')).toBe('true');
+
+    view.cleanup();
+  });
+
+  it('should allow key highlight mode to be changed from the settings panel', () => {
+    const view = mount({ legalMovesSan: ['d3', 'd4', 'e4'] });
+
+    expect(getByRole(view.root, 'button', { name: 'd' }).getAttribute('data-highlighted')).toBe('true');
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+    fireEvent.click(getByRole(view.root, 'radio', { name: 'After Input' }));
+
+    expect(getByRole(view.root, 'button', { name: 'd' }).getAttribute('data-highlighted')).toBe('false');
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'd' }));
+
+    expect(getByRole(view.root, 'button', { name: '3' }).getAttribute('data-highlighted')).toBe('true');
 
     view.cleanup();
   });

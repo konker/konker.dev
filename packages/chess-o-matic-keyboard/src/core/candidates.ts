@@ -46,7 +46,11 @@ export function deriveHighlightedKeyIds(
   layer: KeyboardLayer,
   settings: KeyboardBehaviorSettings
 ): ReadonlySet<KeyboardKeyId> {
-  if (!settings.keyHighlights || legalMovesSan.length === 0) {
+  if (
+    settings.keyHighlightsMode === 'off' ||
+    legalMovesSan.length === 0 ||
+    (settings.keyHighlightsMode === 'after-input' && input.length === 0)
+  ) {
     return new Set<KeyboardKeyId>();
   }
 
