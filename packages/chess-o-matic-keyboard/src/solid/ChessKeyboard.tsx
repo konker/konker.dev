@@ -4,6 +4,7 @@ import { createEffect, createMemo, createSignal, type JSX, Show, untrack } from 
 import type { KeyboardBehaviorSettings, KeyboardKeyDefinition, KeyboardSubmitEvent } from '../core/types.js';
 import { DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS, KEYBOARD_KEYS } from '../core/types.js';
 import { CandidateBar } from './CandidateBar.js';
+import { areSettingsEqual, areStringListsEqual } from './ChessKeyboard.helpers.js';
 import { createChessKeyboardController } from './createChessKeyboardController.js';
 import { KeyGrid } from './KeyGrid.js';
 import { SanReadout } from './SanReadout.js';
@@ -32,6 +33,8 @@ export type ChessKeyboardProps = {
   readonly visibleSettings?: ChessKeyboardVisibleSettings;
 };
 
+const SETTING_PROP_KEYS = ['autoSubmit', 'candidateBar', 'keyHighlights', 'orientation', 'showReadout'] as const;
+
 export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const keyboard = createChessKeyboardController();
   const [initializedDefaultValue, setInitializedDefaultValue] = createSignal(false);
@@ -41,15 +44,25 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   });
   const [lastAutoSubmitKey, setLastAutoSubmitKey] = createSignal<string | undefined>(undefined);
   const [settingsOpen, setSettingsOpen] = createSignal(false);
-  const hasControlledSettingsProps = createMemo(
-    () =>
-      props.settings !== undefined ||
-      props.autoSubmit !== undefined ||
-      props.candidateBar !== undefined ||
-      props.keyHighlights !== undefined ||
-      props.orientation !== undefined ||
-      props.showReadout !== undefined
-  );
+  const controlledSettings = createMemo<Partial<KeyboardBehaviorSettings>>(() => {
+    const nextSettings = SETTING_PROP_KEYS.reduce<Partial<KeyboardBehaviorSettings>>(
+      (acc, key) => {
+        const value = props[key];
+
+        return value === undefined
+          ? acc
+          : {
+              ...acc,
+              [key]: value,
+            };
+      },
+      {
+        ...props.settings,
+      }
+    );
+
+    return nextSettings;
+  });
 
   createEffect(() => {
     const currentLegalMoves = untrack(() => keyboard.getModel().context?.legalMovesSan);
@@ -128,12 +141,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   );
   const resolvedSettings = createMemo<KeyboardBehaviorSettings>(() => ({
     ...internalSettings(),
-    ...props.settings,
-    ...(props.autoSubmit === undefined ? {} : { autoSubmit: props.autoSubmit }),
-    ...(props.candidateBar === undefined ? {} : { candidateBar: props.candidateBar }),
-    ...(props.keyHighlights === undefined ? {} : { keyHighlights: props.keyHighlights }),
-    ...(props.orientation === undefined ? {} : { orientation: props.orientation }),
-    ...(props.showReadout === undefined ? {} : { showReadout: props.showReadout }),
+    ...controlledSettings(),
   }));
 
   const applyInputChange = (nextInput: string) => {
@@ -141,9 +149,22 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   };
 
   const applySettingsChange = (nextSettings: KeyboardBehaviorSettings) => {
-    if (!hasControlledSettingsProps()) {
-      setInternalSettings(nextSettings);
-    }
+    setInternalSettings((currentSettings) => {
+      const controlled = controlledSettings();
+      const uncontrolledSettings = SETTING_PROP_KEYS.reduce<KeyboardBehaviorSettings>(
+        (acc, key) => {
+          return controlled[key] === undefined
+            ? {
+                ...acc,
+                [key]: nextSettings[key],
+              }
+            : acc;
+        },
+        { ...currentSettings }
+      );
+
+      return uncontrolledSettings;
+    });
 
     props.onSettingsChange?.(nextSettings);
   };
@@ -274,29 +295,4 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
       />
     </section>
   );
-}
-
-function areSettingsEqual(left: KeyboardBehaviorSettings, right: KeyboardBehaviorSettings): boolean {
-  return (
-    left.autoSubmit === right.autoSubmit &&
-    left.candidateBar === right.candidateBar &&
-    left.keyHighlights === right.keyHighlights &&
-    left.orientation === right.orientation &&
-    left.showReadout === right.showReadout
-  );
-}
-
-function areStringListsEqual(
-  left: ReadonlyArray<string> | undefined,
-  right: ReadonlyArray<string> | undefined
-): boolean {
-  if (left === right) {
-    return true;
-  }
-
-  if (left === undefined || left.length !== right?.length) {
-    return false;
-  }
-
-  return left.every((value, index) => value === right[index]);
 }
