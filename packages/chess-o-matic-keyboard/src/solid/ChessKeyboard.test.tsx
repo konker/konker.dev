@@ -410,21 +410,39 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should render the settings panel after the candidate bar', () => {
+  it('should render the settings panel after the top action row', () => {
     const view = mount({ legalMovesSan: ['Nf3', 'Nc3'] });
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
-    const candidates = view.root.querySelector('[data-slot="candidates"]');
+    const topActionRow = view.root.querySelector('[data-slot="top-action-row"]');
     const settingsPanel = view.root.querySelector('[data-slot="settings-panel"]');
 
-    expect(candidates).toBeTruthy();
+    expect(topActionRow).toBeTruthy();
     expect(settingsPanel).toBeTruthy();
-    const candidatesNode = candidates as Node;
+    const topActionRowNode = topActionRow as Node;
     const settingsPanelNode = settingsPanel as Node;
 
-    expect(candidatesNode.compareDocumentPosition(settingsPanelNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(topActionRowNode.compareDocumentPosition(settingsPanelNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    view.cleanup();
+  });
+
+  it('should render the settings panel before the key grid', () => {
+    const view = mount({});
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+
+    const settingsPanel = view.root.querySelector('[data-slot="settings-panel"]');
+    const keyGrid = view.root.querySelector('[data-slot="grid"]');
+
+    expect(settingsPanel).toBeTruthy();
+    expect(keyGrid).toBeTruthy();
+    const settingsPanelNode = settingsPanel as Node;
+    const keyGridNode = keyGrid as Node;
+
+    expect(settingsPanelNode.compareDocumentPosition(keyGridNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     view.cleanup();
   });

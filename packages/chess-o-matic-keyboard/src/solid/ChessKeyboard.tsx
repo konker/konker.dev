@@ -9,6 +9,7 @@ import { KeyGrid } from './KeyGrid.js';
 import { SanReadout } from './SanReadout.js';
 import { SecondaryPanel } from './SecondaryPanel.js';
 import { SettingsPanel } from './SettingsPanel.js';
+import { TopActionRow } from './TopActionRow.js';
 import type { ChessKeyboardVisibleSettings } from './types.js';
 
 export type { ChessKeyboardVisibleSettings } from './types.js';
@@ -147,11 +148,6 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
     props.onSettingsChange?.(nextSettings);
   };
 
-  const backspace = () => {
-    const nextState = keyboard.backspace();
-    applyInputChange(nextState.input);
-  };
-
   const clear = () => {
     const nextState = keyboard.clear();
     applyInputChange(nextState.input);
@@ -230,29 +226,12 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
       <Show when={resolvedSettings().showReadout}>
         <SanReadout value={keyboard.state().input} />
       </Show>
-      <KeyGrid
-        highlightedKeyIds={keyboard.state().highlightedKeyIds}
-        keys={visibleKeys()}
-        onBackspace={backspace}
+      <TopActionRow
         onClear={clear}
-        onPressKey={pressKey}
         onSubmit={handleSubmit}
         onToggleSecondary={toggleSecondary}
         onToggleSettings={toggleSettings}
-        orientation={resolvedSettings().orientation}
         secondaryActive={effectiveLayer() === 'secondary'}
-      />
-      <CandidateBar
-        candidates={keyboard.state().matchingMoves}
-        enabled={resolvedSettings().candidateBar}
-        onSelectCandidate={selectCandidate}
-        selectedCandidate={keyboard.state().selectedCandidateId}
-      />
-      <SecondaryPanel
-        highlightedKeyIds={keyboard.state().highlightedKeyIds}
-        keys={secondaryKeys()}
-        onPressKey={pressKey}
-        visible={effectiveLayer() === 'secondary'}
       />
       <Show when={settingsOpen()}>
         <SettingsPanel
@@ -275,6 +254,24 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
           {...(props.visibleSettings === undefined ? {} : { visibleSettings: props.visibleSettings })}
         />
       </Show>
+      <KeyGrid
+        highlightedKeyIds={keyboard.state().highlightedKeyIds}
+        keys={visibleKeys()}
+        onPressKey={pressKey}
+        orientation={resolvedSettings().orientation}
+      />
+      <CandidateBar
+        candidates={keyboard.state().matchingMoves}
+        enabled={resolvedSettings().candidateBar}
+        onSelectCandidate={selectCandidate}
+        selectedCandidate={keyboard.state().selectedCandidateId}
+      />
+      <SecondaryPanel
+        highlightedKeyIds={keyboard.state().highlightedKeyIds}
+        keys={secondaryKeys()}
+        onPressKey={pressKey}
+        visible={effectiveLayer() === 'secondary'}
+      />
     </section>
   );
 }
