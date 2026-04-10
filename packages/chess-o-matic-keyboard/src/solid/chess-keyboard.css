@@ -19,9 +19,9 @@
   --chesskbd-button-color-fg: #000;
   --chesskbd-button-color-border: #eff1ee;
 
-  --chesskbd-button-color-bg-hover: #eff1ee;
+  --chesskbd-button-color-bg-hover: #fffeff;
   --chesskbd-button-color-fg-hover: #000;
-  --chesskbd-button-color-border-hover: #eff1ee;
+  --chesskbd-button-color-border-hover: #fffeff;
 
   --chesskbd-button-color-bg-candidate: #dd2277;
   --chesskbd-button-color-fg-candidate: #fff;
@@ -39,51 +39,53 @@
   --chesskbd-button-color-fg-highlight-hover: #fff;
   --chesskbd-button-color-border-highlight-hover: #dd2277;
 
-  --chesskbd-button-color-bg-piece: #95ccfd;
-  --chesskbd-button-color-fg-piece: #000;
-  --chesskbd-button-color-border-piece: #95ccfd;
+  --chesskbd-button-color-bg-piece: #265ea8;
+  --chesskbd-button-color-fg-piece: #fff;
+  --chesskbd-button-color-border-piece: #265ea8;
 
-  --chesskbd-button-color-bg-piece-hover: #95ccfd;
-  --chesskbd-button-color-fg-piece-hover: #000;
-  --chesskbd-button-color-border-piece-hover: #95ccfd;
+  --chesskbd-button-color-bg-piece-hover: #3378d4;
+  --chesskbd-button-color-fg-piece-hover: #fff;
+  --chesskbd-button-color-border-piece-hover: #3378d4;
 
-  --chesskbd-button-color-bg-file: #95ccfd;
-  --chesskbd-button-color-fg-file: #000;
-  --chesskbd-button-color-border-file: #95ccfd;
+  --chesskbd-button-color-bg-file: #265ea8;
+  --chesskbd-button-color-fg-file: #fff;
+  --chesskbd-button-color-border-file: #265ea8;
 
-  --chesskbd-button-color-bg-file-hover: #95ccfd;
-  --chesskbd-button-color-fg-file-hover: #000;
-  --chesskbd-button-color-border-file-hover: #95ccfd;
+  --chesskbd-button-color-bg-file-hover: #3378d4;
+  --chesskbd-button-color-fg-file-hover: #fff;
+  --chesskbd-button-color-border-file-hover: #3378d4;
 
-  --chesskbd-button-color-bg-rank: #123462;
+  --chesskbd-button-color-bg-rank: #265ea8;
   --chesskbd-button-color-fg-rank: #fff;
-  --chesskbd-button-color-border-rank: #123462;
+  --chesskbd-button-color-border-rank: #265ea8;
 
-  --chesskbd-button-color-bg-rank-hover: #123462;
+  --chesskbd-button-color-bg-rank-hover: #3378d4;
   --chesskbd-button-color-fg-rank-hover: #fff;
-  --chesskbd-button-color-border-rank-hover: #123462;
+  --chesskbd-button-color-border-rank-hover: #3378d4;
 
-  --chesskbd-button-color-bg-takes: #123462;
+  --chesskbd-button-color-bg-takes: #265ea8;
   --chesskbd-button-color-fg-takes: #fff;
-  --chesskbd-button-color-border-takes: #123462;
+  --chesskbd-button-color-border-takes: #265ea8;
 
-  --chesskbd-button-color-bg-takes-hover: #123462;
+  --chesskbd-button-color-bg-takes-hover: #3378d4;
   --chesskbd-button-color-fg-takes-hover: #fff;
-  --chesskbd-button-color-border-takes-hover: #123462;
+  --chesskbd-button-color-border-takes-hover: #3378d4;
 
-  --chesskbd-button-color-bg-secondary: #95ccfd;
-  --chesskbd-button-color-fg-secondary: #000;
-  --chesskbd-button-color-border-secondary: #95ccfd;
+  --chesskbd-button-color-bg-secondary: #265ea8;
+  --chesskbd-button-color-fg-secondary: #fff;
+  --chesskbd-button-color-border-secondary: #265ea8;
 
-  --chesskbd-button-color-bg-secondary-hover: #95ccfd;
-  --chesskbd-button-color-fg-secondary-hover: #000;
-  --chesskbd-button-color-border-secondary-hover: #95ccfd;
+  --chesskbd-button-color-bg-secondary-hover: #3378d4;
+  --chesskbd-button-color-fg-secondary-hover: #fff;
+  --chesskbd-button-color-border-secondary-hover: #3378d4;
 
   --chesskbd-settings-panel-bg: #eff1ee;
   --chesskbd-settings-panel-border: #eff1ee;
   --chesskbd-settings-panel-fg: #1f2933;
   --chesskbd-settings-label-fg: #3b4552;
-  --chesskbd-settings-control-accent: #3378d4;
+  --chesskbd-settings-control-accent: #265ea8;
+  --chesskbd-rank-separator-color: color-mix(in srgb, #333 50%, transparent);
+  --chesskbd-rank-separator-thickness: 2px;
 
   display: grid;
   gap: var(--chesskbd-gap);
@@ -137,6 +139,11 @@
 .chess-keyboard-row[data-row='row-4'],
 .chess-keyboard-row[data-row='row-5'] {
   grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.chess-keyboard-row[data-row='row-5'] {
+  border-top: var(--chesskbd-rank-separator-thickness) solid var(--chesskbd-rank-separator-color);
+  padding-top: calc(var(--chesskbd-row-gap) * 1.5);
 }
 
 .chess-keyboard-secondary-row[data-row='secondary-row-1'] {
