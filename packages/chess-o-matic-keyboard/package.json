@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/chess-o-matic-keyboard",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",

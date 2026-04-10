@@ -24,7 +24,7 @@ export function Example() {
     <ChessKeyboard
       legalMovesSan={['e4', 'd4', 'Nf3', 'Nc3']}
       candidateBar
-      keyHighlights
+      keyHighlightsMode="always"
       autoSubmit
       orientation="white"
       showReadout
@@ -49,7 +49,7 @@ Flat behavior props:
 
 - `autoSubmit?: boolean`
 - `candidateBar?: boolean`
-- `keyHighlights?: boolean`
+- `keyHighlightsMode?: 'off' | 'after-input' | 'always'`
 - `orientation?: 'white' | 'black'`
 - `showReadout?: boolean`
 
@@ -62,7 +62,7 @@ You can also pass `visibleSettings?: false | Partial<Record<keyof KeyboardBehavi
   visibleSettings={{
     autoSubmit: false,
     candidateBar: true,
-    keyHighlights: true,
+    keyHighlightsMode: true,
     orientation: false,
     showReadout: true,
   }}

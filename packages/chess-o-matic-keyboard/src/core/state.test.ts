@@ -38,6 +38,24 @@ describe('core/state', () => {
     expect(state.highlightedKeyIds).toStrictEqual(new Set(['file-f', 'file-c']));
   });
 
+  it('should not highlight keys before input when keyHighlightsMode is after-input', () => {
+    const state = deriveKeyboardState('', { legalMovesSan: ['Nf3', 'Nc3', 'e4'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      keyHighlightsMode: 'after-input',
+    });
+
+    expect(state.highlightedKeyIds).toStrictEqual(new Set());
+  });
+
+  it('should highlight keys after input when keyHighlightsMode is after-input', () => {
+    const state = deriveKeyboardState('N', { legalMovesSan: ['Nf3', 'Nc3', 'e4'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      keyHighlightsMode: 'after-input',
+    });
+
+    expect(state.highlightedKeyIds).toStrictEqual(new Set(['file-f', 'file-c']));
+  });
+
   it('should support reducer-style controlled input updates and settings toggles', () => {
     const model = reduceKeyboardModel(
       reduceKeyboardModel(createInitialKeyboardModel({ legalMovesSan: ['e4'] }), {
@@ -45,14 +63,14 @@ describe('core/state', () => {
         type: 'set-input',
       }),
       {
-        settings: { autoSubmit: false, keyHighlights: false },
+        settings: { autoSubmit: false, keyHighlightsMode: 'off' },
         type: 'set-settings',
       }
     );
 
     expect(model.state.input).toBe('e');
     expect(model.state.settings.autoSubmit).toBe(false);
-    expect(model.state.settings.keyHighlights).toBe(false);
+    expect(model.state.settings.keyHighlightsMode).toBe('off');
     expect(model.state.highlightedKeyIds).toStrictEqual(new Set());
   });
 

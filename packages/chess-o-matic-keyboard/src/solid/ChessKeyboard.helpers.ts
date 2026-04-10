@@ -4,7 +4,7 @@ export function areSettingsEqual(left: KeyboardBehaviorSettings, right: Keyboard
   return (
     left.autoSubmit === right.autoSubmit &&
     left.candidateBar === right.candidateBar &&
-    left.keyHighlights === right.keyHighlights &&
+    left.keyHighlightsMode === right.keyHighlightsMode &&
     left.orientation === right.orientation &&
     left.showReadout === right.showReadout
   );
