@@ -2,7 +2,7 @@
 import { Show, type JSX } from 'solid-js';
 
 import type { KeyboardBehaviorSettings } from '../core/types.js';
-import type { ChessKeyboardVisibleSettings } from './types.js';
+import type { ChessKeyboardVisibleSettingsMap } from './types.js';
 
 type SettingsPanelProps = {
   readonly onToggleAutoSubmit: () => void;
@@ -11,7 +11,7 @@ type SettingsPanelProps = {
   readonly onToggleOrientation: () => void;
   readonly onToggleShowReadout: () => void;
   readonly settings: KeyboardBehaviorSettings;
-  readonly visibleSettings?: ChessKeyboardVisibleSettings;
+  readonly visibleSettings?: ChessKeyboardVisibleSettingsMap | undefined;
 };
 
 export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
