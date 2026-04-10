@@ -4,6 +4,7 @@ import { createEffect, createMemo, createSignal, type JSX, Show, untrack } from 
 import type { KeyboardBehaviorSettings, KeyboardKeyDefinition, KeyboardSubmitEvent } from '../core/types.js';
 import { DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS, KEYBOARD_KEYS } from '../core/types.js';
 import { CandidateBar } from './CandidateBar.js';
+import { areSettingsEqual, areStringListsEqual } from './ChessKeyboard.helpers.js';
 import { createChessKeyboardController } from './createChessKeyboardController.js';
 import { KeyGrid } from './KeyGrid.js';
 import { SanReadout } from './SanReadout.js';
@@ -44,17 +45,21 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const [lastAutoSubmitKey, setLastAutoSubmitKey] = createSignal<string | undefined>(undefined);
   const [settingsOpen, setSettingsOpen] = createSignal(false);
   const controlledSettings = createMemo<Partial<KeyboardBehaviorSettings>>(() => {
-    const nextSettings: Partial<KeyboardBehaviorSettings> = {
-      ...props.settings,
-    };
+    const nextSettings = SETTING_PROP_KEYS.reduce<Partial<KeyboardBehaviorSettings>>(
+      (acc, key) => {
+        const value = props[key];
 
-    for (const key of SETTING_PROP_KEYS) {
-      const value = props[key];
-
-      if (value !== undefined) {
-        nextSettings[key] = value;
+        return value === undefined
+          ? acc
+          : {
+              ...acc,
+              [key]: value,
+            };
+      },
+      {
+        ...props.settings,
       }
-    }
+    );
 
     return nextSettings;
   });
@@ -146,13 +151,17 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const applySettingsChange = (nextSettings: KeyboardBehaviorSettings) => {
     setInternalSettings((currentSettings) => {
       const controlled = controlledSettings();
-      const uncontrolledSettings = { ...currentSettings };
-
-      for (const key of SETTING_PROP_KEYS) {
-        if (controlled[key] === undefined) {
-          uncontrolledSettings[key] = nextSettings[key];
-        }
-      }
+      const uncontrolledSettings = SETTING_PROP_KEYS.reduce<KeyboardBehaviorSettings>(
+        (acc, key) => {
+          return controlled[key] === undefined
+            ? {
+                ...acc,
+                [key]: nextSettings[key],
+              }
+            : acc;
+        },
+        { ...currentSettings }
+      );
 
       return uncontrolledSettings;
     });
@@ -286,29 +295,4 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
       />
     </section>
   );
-}
-
-function areSettingsEqual(left: KeyboardBehaviorSettings, right: KeyboardBehaviorSettings): boolean {
-  return (
-    left.autoSubmit === right.autoSubmit &&
-    left.candidateBar === right.candidateBar &&
-    left.keyHighlights === right.keyHighlights &&
-    left.orientation === right.orientation &&
-    left.showReadout === right.showReadout
-  );
-}
-
-function areStringListsEqual(
-  left: ReadonlyArray<string> | undefined,
-  right: ReadonlyArray<string> | undefined
-): boolean {
-  if (left === right) {
-    return true;
-  }
-
-  if (left === undefined || left.length !== right?.length) {
-    return false;
-  }
-
-  return left.every((value, index) => value === right[index]);
 }
