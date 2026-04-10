@@ -352,6 +352,26 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
+  it('should hide the settings button when visibleSettings is false', () => {
+    const view = mount({
+      visibleSettings: false,
+    });
+
+    expect(queryByRole(view.root, 'button', { name: 'Settings' })).toBeNull();
+
+    view.cleanup();
+  });
+
+  it('should omit the settings panel when visibleSettings is false', () => {
+    const view = mount({
+      visibleSettings: false,
+    });
+
+    expect(view.root.querySelector('[data-slot="settings-panel"]')).toBeNull();
+
+    view.cleanup();
+  });
+
   it('should keep visible settings interactive when visibleSettings hides other controls', () => {
     const view = mount({
       legalMovesSan: ['Nf3', 'Nc3'],
@@ -632,6 +652,21 @@ describe('solid/ChessKeyboard', () => {
     expect(row1After).toStrictEqual(['Hide Secondary Keys', 'Settings', 'Clear', 'Submit']);
     expect(row6Before).toStrictEqual([]);
     expect(row6After).toStrictEqual([]);
+
+    view.cleanup();
+  });
+
+  it('should expand the remaining top action buttons when visibleSettings is false', () => {
+    const view = mount({
+      visibleSettings: false,
+    });
+
+    const row1 = Array.from(view.root.querySelectorAll('[data-row="row-1"] button')).map(
+      (button) => button.getAttribute('aria-label') ?? button.textContent
+    );
+
+    expect(row1).toStrictEqual(['Show Secondary Keys', 'Clear', 'Submit']);
+    expect(view.root.querySelector('[data-row="row-1"]')?.getAttribute('data-settings-visible')).toBe('false');
 
     view.cleanup();
   });

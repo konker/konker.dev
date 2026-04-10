@@ -11,7 +11,7 @@ import { SanReadout } from './SanReadout.js';
 import { SecondaryPanel } from './SecondaryPanel.js';
 import { SettingsPanel } from './SettingsPanel.js';
 import { TopActionRow } from './TopActionRow.js';
-import type { ChessKeyboardVisibleSettings } from './types.js';
+import type { ChessKeyboardVisibleSettings, ChessKeyboardVisibleSettingsMap } from './types.js';
 
 export type { ChessKeyboardVisibleSettings } from './types.js';
 
@@ -139,10 +139,22 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const secondaryKeys = createMemo<ReadonlyArray<KeyboardKeyDefinition>>(() =>
     KEYBOARD_KEYS.filter((key) => key.kind === 'notation' && key.layers.some((layer) => layer === 'secondary'))
   );
+  const settingsVisible = createMemo(() => props.visibleSettings !== false);
+  const settingsPanelVisibility = createMemo<ChessKeyboardVisibleSettingsMap | undefined>(() =>
+    props.visibleSettings === false ? undefined : props.visibleSettings
+  );
   const resolvedSettings = createMemo<KeyboardBehaviorSettings>(() => ({
     ...internalSettings(),
     ...controlledSettings(),
   }));
+
+  createEffect(() => {
+    if (settingsVisible()) {
+      return;
+    }
+
+    setSettingsOpen(false);
+  });
 
   const applyInputChange = (nextInput: string) => {
     props.onChange?.(nextInput);
@@ -252,9 +264,10 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
         onSubmit={handleSubmit}
         onToggleSecondary={toggleSecondary}
         onToggleSettings={toggleSettings}
+        settingsVisible={settingsVisible()}
         secondaryActive={effectiveLayer() === 'secondary'}
       />
-      <Show when={settingsOpen()}>
+      <Show when={settingsVisible() && settingsOpen()}>
         <SettingsPanel
           onToggleAutoSubmit={() => {
             toggleBehaviorSetting('autoSubmit');
@@ -272,7 +285,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
             toggleBehaviorSetting('showReadout');
           }}
           settings={resolvedSettings()}
-          {...(props.visibleSettings === undefined ? {} : { visibleSettings: props.visibleSettings })}
+          {...(settingsPanelVisibility() === undefined ? {} : { visibleSettings: settingsPanelVisibility() })}
         />
       </Show>
       <KeyGrid

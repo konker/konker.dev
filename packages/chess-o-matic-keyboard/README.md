@@ -55,7 +55,7 @@ Flat behavior props:
 
 You can also pass `settings?: Partial<KeyboardBehaviorSettings>`, but the flat props take precedence when both are provided.
 
-You can also pass `visibleSettings?: Partial<Record<keyof KeyboardBehaviorSettings, boolean>>` to control which settings are shown in the settings panel. Omitted keys default to visible.
+You can also pass `visibleSettings?: false | Partial<Record<keyof KeyboardBehaviorSettings, boolean>>` to control which settings are shown in the settings panel. Omitted keys default to visible. Pass `false` to hide the settings button entirely and let the remaining top-row action buttons expand to fill the row.
 
 ```tsx
 <ChessKeyboard
