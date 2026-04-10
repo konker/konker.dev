@@ -204,7 +204,7 @@ describe('solid/ChessKeyboard', () => {
     expect(getByRole(view.root, 'button', { name: 'Nf3' })).toBeTruthy();
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
-    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' }));
 
     expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
 
@@ -289,7 +289,7 @@ describe('solid/ChessKeyboard', () => {
     const view = mountControlled();
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
-    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' }));
     fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
 
     expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
@@ -312,7 +312,7 @@ describe('solid/ChessKeyboard', () => {
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
-    expect(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' })).toBeTruthy();
+    expect(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'Off' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'Always' })).toBeTruthy();
@@ -333,7 +333,7 @@ describe('solid/ChessKeyboard', () => {
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
-    expect(queryByRole(view.root, 'checkbox', { name: 'Candidate Bar' })).toBeNull();
+    expect(queryByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' })).toBeNull();
     expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
 
     view.cleanup();
@@ -387,7 +387,7 @@ describe('solid/ChessKeyboard', () => {
     expect(getByRole(view.root, 'button', { name: 'Nf3' })).toBeTruthy();
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
-    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' }));
 
     expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
 
@@ -411,7 +411,7 @@ describe('solid/ChessKeyboard', () => {
     expect(getByRole(view.root, 'button', { name: 'Nf3' })).toBeTruthy();
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
-    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' }));
 
     expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
     expect(queryByRole(view.root, 'radio', { name: 'White' })).toBeNull();

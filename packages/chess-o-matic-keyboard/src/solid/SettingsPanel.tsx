@@ -18,10 +18,42 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
   return (
     <section class="chess-keyboard-settings" data-slot="settings-panel">
       <div class="chess-keyboard-settings-group" data-slot="settings-group">
+        <Show when={props.visibleSettings?.autoSubmit !== false}>
+          <label class="chess-keyboard-settings-field" data-slot="settings-field">
+            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+              Auto Submit
+            </span>
+            <input
+              checked={props.settings.autoSubmit}
+              class="chess-keyboard-settings-control"
+              data-slot="settings-control"
+              onChange={() => {
+                props.onToggleAutoSubmit();
+              }}
+              type="checkbox"
+            />
+          </label>
+        </Show>
+        <Show when={props.visibleSettings?.showReadout !== false}>
+          <label class="chess-keyboard-settings-field" data-slot="settings-field">
+            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+              Show Readout
+            </span>
+            <input
+              checked={props.settings.showReadout}
+              class="chess-keyboard-settings-control"
+              data-slot="settings-control"
+              onChange={() => {
+                props.onToggleShowReadout();
+              }}
+              type="checkbox"
+            />
+          </label>
+        </Show>
         <Show when={props.visibleSettings?.candidateBar !== false}>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
             <span class="chess-keyboard-settings-label" data-slot="settings-label">
-              Candidate Bar
+              Show Candidate Bar
             </span>
             <input
               checked={props.settings.candidateBar}
@@ -91,38 +123,6 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
               />
             </label>
           </fieldset>
-        </Show>
-        <Show when={props.visibleSettings?.autoSubmit !== false}>
-          <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
-              Auto Submit
-            </span>
-            <input
-              checked={props.settings.autoSubmit}
-              class="chess-keyboard-settings-control"
-              data-slot="settings-control"
-              onChange={() => {
-                props.onToggleAutoSubmit();
-              }}
-              type="checkbox"
-            />
-          </label>
-        </Show>
-        <Show when={props.visibleSettings?.showReadout !== false}>
-          <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
-              Show Readout
-            </span>
-            <input
-              checked={props.settings.showReadout}
-              class="chess-keyboard-settings-control"
-              data-slot="settings-control"
-              onChange={() => {
-                props.onToggleShowReadout();
-              }}
-              type="checkbox"
-            />
-          </label>
         </Show>
       </div>
       <Show when={props.visibleSettings?.orientation !== false}>
