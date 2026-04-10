@@ -32,6 +32,8 @@ export type ChessKeyboardProps = {
   readonly visibleSettings?: ChessKeyboardVisibleSettings;
 };
 
+const SETTING_PROP_KEYS = ['autoSubmit', 'candidateBar', 'keyHighlights', 'orientation', 'showReadout'] as const;
+
 export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const keyboard = createChessKeyboardController();
   const [initializedDefaultValue, setInitializedDefaultValue] = createSignal(false);
@@ -41,15 +43,21 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   });
   const [lastAutoSubmitKey, setLastAutoSubmitKey] = createSignal<string | undefined>(undefined);
   const [settingsOpen, setSettingsOpen] = createSignal(false);
-  const hasControlledSettingsProps = createMemo(
-    () =>
-      props.settings !== undefined ||
-      props.autoSubmit !== undefined ||
-      props.candidateBar !== undefined ||
-      props.keyHighlights !== undefined ||
-      props.orientation !== undefined ||
-      props.showReadout !== undefined
-  );
+  const controlledSettings = createMemo<Partial<KeyboardBehaviorSettings>>(() => {
+    const nextSettings: Partial<KeyboardBehaviorSettings> = {
+      ...props.settings,
+    };
+
+    for (const key of SETTING_PROP_KEYS) {
+      const value = props[key];
+
+      if (value !== undefined) {
+        nextSettings[key] = value;
+      }
+    }
+
+    return nextSettings;
+  });
 
   createEffect(() => {
     const currentLegalMoves = untrack(() => keyboard.getModel().context?.legalMovesSan);
@@ -128,12 +136,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   );
   const resolvedSettings = createMemo<KeyboardBehaviorSettings>(() => ({
     ...internalSettings(),
-    ...props.settings,
-    ...(props.autoSubmit === undefined ? {} : { autoSubmit: props.autoSubmit }),
-    ...(props.candidateBar === undefined ? {} : { candidateBar: props.candidateBar }),
-    ...(props.keyHighlights === undefined ? {} : { keyHighlights: props.keyHighlights }),
-    ...(props.orientation === undefined ? {} : { orientation: props.orientation }),
-    ...(props.showReadout === undefined ? {} : { showReadout: props.showReadout }),
+    ...controlledSettings(),
   }));
 
   const applyInputChange = (nextInput: string) => {
@@ -141,9 +144,18 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   };
 
   const applySettingsChange = (nextSettings: KeyboardBehaviorSettings) => {
-    if (!hasControlledSettingsProps()) {
-      setInternalSettings(nextSettings);
-    }
+    setInternalSettings((currentSettings) => {
+      const controlled = controlledSettings();
+      const uncontrolledSettings = { ...currentSettings };
+
+      for (const key of SETTING_PROP_KEYS) {
+        if (controlled[key] === undefined) {
+          uncontrolledSettings[key] = nextSettings[key];
+        }
+      }
+
+      return uncontrolledSettings;
+    });
 
     props.onSettingsChange?.(nextSettings);
   };

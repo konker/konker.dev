@@ -372,6 +372,32 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
+  it('should keep uncontrolled settings interactive when other settings are fixed by flat props', () => {
+    const view = mount({
+      legalMovesSan: ['Nf3', 'Nc3'],
+      orientation: 'black',
+      showReadout: false,
+      visibleSettings: {
+        orientation: false,
+        showReadout: false,
+      },
+    });
+
+    expect(view.root.querySelector('output')).toBeNull();
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    expect(getByRole(view.root, 'button', { name: 'Nf3' })).toBeTruthy();
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Candidate Bar' }));
+
+    expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
+    expect(queryByRole(view.root, 'radio', { name: 'White' })).toBeNull();
+    expect(queryByRole(view.root, 'checkbox', { name: 'Show Readout' })).toBeNull();
+
+    view.cleanup();
+  });
+
   it('should keep the readout visible while the settings panel is open', () => {
     const view = mount({});
 
