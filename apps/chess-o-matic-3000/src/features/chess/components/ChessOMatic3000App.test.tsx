@@ -71,6 +71,14 @@ describe('ChessOMatic3000App', () => {
     expect(root.textContent).toContain('PGN');
     expect(root.textContent).toContain('Keyboard');
     expect(root.textContent).toContain('Heard');
+    const navigationRow = root.querySelector('.board-navigation-row');
+    const statusPanel = root.querySelector('#status');
+    const keyboardSection = root.querySelector('.chess-keyboard-root')?.closest('details');
+    expect(navigationRow).not.toBeNull();
+    expect(statusPanel).not.toBeNull();
+    expect(keyboardSection).not.toBeNull();
+    expect(navigationRow?.compareDocumentPosition(statusPanel as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(statusPanel?.compareDocumentPosition(keyboardSection as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(root.querySelector('[data-testid="mock-chess-board"]')).not.toBeNull();
     expect(root.querySelector('.chess-keyboard-root')).not.toBeNull();
     expect(chessKeyboardMock).toHaveBeenCalled();

@@ -3,7 +3,6 @@ import type { JSX } from 'solid-js';
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 
 type StatusPanelProps = {
-  readonly controls?: JSX.Element;
   readonly status: GameModelEvaluateStatus;
   readonly illegalReason?: 'ambiguous' | 'invalid';
   readonly lastMoveSan: string;
@@ -65,8 +64,6 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
           {props.sanitizedInput || 'No input yet'}
         </span>
       </div>
-
-      {props.controls ? <div class="toolbar-group border-t pt-3">{props.controls}</div> : null}
     </section>
   );
 }

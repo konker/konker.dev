@@ -259,14 +259,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
 
       <Show when={errorMessage()}>{renderErrorMessage}</Show>
 
-      <StatusPanel
-        illegalReason={uiState().lastInputIllegalReason}
-        lastMoveSan={uiState().lastMoveSan}
-        message={uiState().lastInputResultMessage}
-        sanitizedInput={uiState().lastInputSanitized}
-        status={uiState().lastInputEvaluateStatus}
-      />
-
       <div class="board-navigation-row">
         <GameNavigationToolbar
           canGoBackward={uiState().canGoBackward}
@@ -287,6 +279,14 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           onToggleSound={() => void toggleSound()}
         />
       </div>
+
+      <StatusPanel
+        illegalReason={uiState().lastInputIllegalReason}
+        lastMoveSan={uiState().lastMoveSan}
+        message={uiState().lastInputResultMessage}
+        sanitizedInput={uiState().lastInputSanitized}
+        status={uiState().lastInputEvaluateStatus}
+      />
 
       <CollapsibleSection
         headerAside={renderCurrentMoveIndicator()}
