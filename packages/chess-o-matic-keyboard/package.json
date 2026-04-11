@@ -93,7 +93,7 @@
     "demo": "vite --config vite.demo.config.ts",
     "demo:build": "vite build --config vite.demo.config.ts",
     "demo:typecheck": "tsc --project demo/tsconfig.json --noEmit",
-    "clean": "rm -rf dist && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
+    "clean": "rm -rf dist && rm -rf dist-demo && rm -rf coverage && rm -f tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run clean && vite build && tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap false && cp src/solid/chess-keyboard.css dist/chess-keyboard.css",
     "type-coverage-check": "type-coverage --detail --at-least 95 --ignore-files src/index.ts --ignore-files src/solid/index.ts",
@@ -109,7 +109,7 @@
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/chess-o-matic-keyboard'",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run demo:typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run demo:typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run demo:build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
   },
   "dependencies": {
