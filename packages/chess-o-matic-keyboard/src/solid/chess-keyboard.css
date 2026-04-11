@@ -39,51 +39,51 @@
   --chesskbd-button-color-fg-highlight-hover: #fff;
   --chesskbd-button-color-border-highlight-hover: #dd2277;
 
-  --chesskbd-button-color-bg-piece: #265ea8;
+  --chesskbd-button-color-bg-piece: #49623c;
   --chesskbd-button-color-fg-piece: #fff;
-  --chesskbd-button-color-border-piece: #265ea8;
+  --chesskbd-button-color-border-piece: #49623c;
 
-  --chesskbd-button-color-bg-piece-hover: #3378d4;
+  --chesskbd-button-color-bg-piece-hover: #668855;
   --chesskbd-button-color-fg-piece-hover: #fff;
-  --chesskbd-button-color-border-piece-hover: #3378d4;
+  --chesskbd-button-color-border-piece-hover: #668855;
 
-  --chesskbd-button-color-bg-file: #265ea8;
+  --chesskbd-button-color-bg-file: #49623c;
   --chesskbd-button-color-fg-file: #fff;
-  --chesskbd-button-color-border-file: #265ea8;
+  --chesskbd-button-color-border-file: #49623c;
 
-  --chesskbd-button-color-bg-file-hover: #3378d4;
+  --chesskbd-button-color-bg-file-hover: #668855;
   --chesskbd-button-color-fg-file-hover: #fff;
-  --chesskbd-button-color-border-file-hover: #3378d4;
+  --chesskbd-button-color-border-file-hover: #668855;
 
-  --chesskbd-button-color-bg-rank: #265ea8;
+  --chesskbd-button-color-bg-rank: #49623c;
   --chesskbd-button-color-fg-rank: #fff;
-  --chesskbd-button-color-border-rank: #265ea8;
+  --chesskbd-button-color-border-rank: #49623c;
 
-  --chesskbd-button-color-bg-rank-hover: #3378d4;
+  --chesskbd-button-color-bg-rank-hover: #668855;
   --chesskbd-button-color-fg-rank-hover: #fff;
-  --chesskbd-button-color-border-rank-hover: #3378d4;
+  --chesskbd-button-color-border-rank-hover: #668855;
 
-  --chesskbd-button-color-bg-takes: #265ea8;
+  --chesskbd-button-color-bg-takes: #49623c;
   --chesskbd-button-color-fg-takes: #fff;
-  --chesskbd-button-color-border-takes: #265ea8;
+  --chesskbd-button-color-border-takes: #49623c;
 
-  --chesskbd-button-color-bg-takes-hover: #3378d4;
+  --chesskbd-button-color-bg-takes-hover: #668855;
   --chesskbd-button-color-fg-takes-hover: #fff;
-  --chesskbd-button-color-border-takes-hover: #3378d4;
+  --chesskbd-button-color-border-takes-hover: #668855;
 
-  --chesskbd-button-color-bg-secondary: #265ea8;
+  --chesskbd-button-color-bg-secondary: #49623c;
   --chesskbd-button-color-fg-secondary: #fff;
-  --chesskbd-button-color-border-secondary: #265ea8;
+  --chesskbd-button-color-border-secondary: #49623c;
 
-  --chesskbd-button-color-bg-secondary-hover: #3378d4;
+  --chesskbd-button-color-bg-secondary-hover: #668855;
   --chesskbd-button-color-fg-secondary-hover: #fff;
-  --chesskbd-button-color-border-secondary-hover: #3378d4;
+  --chesskbd-button-color-border-secondary-hover: #668855;
 
   --chesskbd-settings-panel-bg: #eff1ee;
   --chesskbd-settings-panel-border: #eff1ee;
   --chesskbd-settings-panel-fg: #1f2933;
   --chesskbd-settings-label-fg: #3b4552;
-  --chesskbd-settings-control-accent: #265ea8;
+  --chesskbd-settings-control-accent: #49623c;
   --chesskbd-rank-separator-color: color-mix(in srgb, #333 50%, transparent);
   --chesskbd-rank-separator-thickness: 2px;
 
@@ -301,6 +301,11 @@
   color: var(--chesskbd-button-color-fg-highlight);
   background-color: var(--chesskbd-button-color-bg-highlight);
   border-color: var(--chesskbd-button-color-border-highlight);
+}
+
+.chess-keyboard-button[data-trailed='true'] {
+  background-color: #8c8c00;
+  border: 1px solid #8c8c00;
 }
 
 .chess-keyboard-button[data-highlighted='true']:hover {

@@ -92,6 +92,32 @@ afterEach(() => {
 });
 
 describe('solid/ChessKeyboard', () => {
+  it('should leave a trail on primary grid keys until the move is finished', () => {
+    const view = mount({});
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
+
+    expect(getByRole(view.root, 'button', { name: 'N' }).getAttribute('data-trailed')).toBe('true');
+    expect(getByRole(view.root, 'button', { name: 'f' }).getAttribute('data-trailed')).toBe('true');
+    expect(getByRole(view.root, 'button', { name: '3' }).getAttribute('data-trailed')).toBe('false');
+
+    view.cleanup();
+  });
+
+  it('should clear the primary key trail when cleared', () => {
+    const view = mount({});
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Q' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'a' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Clear' }));
+
+    expect(getByRole(view.root, 'button', { name: 'Q' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: 'a' }).getAttribute('data-trailed')).toBe('false');
+
+    view.cleanup();
+  });
+
   it('should emit onChange for free input that is not legal', () => {
     const onChange = vi.fn();
     const view = mount({ onChange });
@@ -110,6 +136,7 @@ describe('solid/ChessKeyboard', () => {
     const view = mount({ legalMovesSan: ['Nf3', 'Nc3', 'e4'], onSubmit });
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    expect(getByRole(view.root, 'button', { name: 'N' }).getAttribute('data-trailed')).toBe('true');
     fireEvent.click(getByRole(view.root, 'button', { name: 'Nf3' }));
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -119,6 +146,7 @@ describe('solid/ChessKeyboard', () => {
         source: 'candidate',
       })
     );
+    expect(getByRole(view.root, 'button', { name: 'N' }).getAttribute('data-trailed')).toBe('false');
 
     view.cleanup();
   });
@@ -129,6 +157,8 @@ describe('solid/ChessKeyboard', () => {
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
     fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
+    expect(getByRole(view.root, 'button', { name: 'N' }).getAttribute('data-trailed')).toBe('true');
+    expect(getByRole(view.root, 'button', { name: 'f' }).getAttribute('data-trailed')).toBe('true');
     fireEvent.click(getByRole(view.root, 'button', { name: '3' }));
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -139,6 +169,9 @@ describe('solid/ChessKeyboard', () => {
       })
     );
     expect(view.root.querySelector('output')?.textContent).toBe('');
+    expect(getByRole(view.root, 'button', { name: 'N' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: 'f' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: '3' }).getAttribute('data-trailed')).toBe('false');
 
     view.cleanup();
   });
@@ -269,6 +302,7 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'button', { name: 'Q' }));
     fireEvent.click(getByRole(view.root, 'button', { name: 'a' }));
     fireEvent.click(getByRole(view.root, 'button', { name: '1' }));
+    expect(getByRole(view.root, 'button', { name: 'Q' }).getAttribute('data-trailed')).toBe('true');
     fireEvent.click(getByRole(view.root, 'button', { name: 'Submit' }));
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -279,6 +313,9 @@ describe('solid/ChessKeyboard', () => {
       })
     );
     expect(view.root.querySelector('output')?.textContent).toBe('');
+    expect(getByRole(view.root, 'button', { name: 'Q' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: 'a' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: '1' }).getAttribute('data-trailed')).toBe('false');
 
     view.cleanup();
   });
@@ -290,6 +327,7 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'button', { name: 'Q' }));
     fireEvent.click(getByRole(view.root, 'button', { name: 'a' }));
     fireEvent.click(getByRole(view.root, 'button', { name: '1' }));
+    expect(getByRole(view.root, 'button', { name: 'Q' }).getAttribute('data-trailed')).toBe('true');
     fireEvent.click(getByRole(view.root, 'button', { name: 'Submit' }));
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -300,6 +338,20 @@ describe('solid/ChessKeyboard', () => {
       })
     );
     expect(view.root.querySelector('output')?.textContent).toBe('Qa1');
+    expect(getByRole(view.root, 'button', { name: 'Q' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: 'a' }).getAttribute('data-trailed')).toBe('false');
+    expect(getByRole(view.root, 'button', { name: '1' }).getAttribute('data-trailed')).toBe('false');
+
+    view.cleanup();
+  });
+
+  it('should not trail secondary panel keys', () => {
+    const view = mount({});
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Show Secondary Keys' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'O-O' }));
+
+    expect(getByRole(view.root, 'button', { name: 'O-O' }).hasAttribute('data-trailed')).toBe(false);
 
     view.cleanup();
   });
