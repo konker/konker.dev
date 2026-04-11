@@ -277,6 +277,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
           orientation={uiState().boardOrientation}
           showReadout={false}
           visibleSettings={{ showReadout: false, orientation: false }}
+          showNunnAnnotations={false}
         />
       </CollapsibleSection>
 
