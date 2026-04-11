@@ -27,6 +27,39 @@ describe('core/state', () => {
     expect(state.shouldAutoSubmit).toBe(true);
   });
 
+  it('should auto-submit when a unique legal SAN ends with check suffix', () => {
+    const state = deriveKeyboardState(
+      'Bb5',
+      { legalMovesSan: ['Bb5+', 'Nf3'] },
+      'primary',
+      DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS
+    );
+
+    expect(state.exactMatches).toStrictEqual([]);
+    expect(state.autoSubmitMatch).toBe('Bb5+');
+    expect(state.shouldAutoSubmit).toBe(true);
+  });
+
+  it('should auto-submit when a unique legal SAN ends with checkmate suffix', () => {
+    const state = deriveKeyboardState(
+      'Qh7',
+      { legalMovesSan: ['Qh7#', 'Nf3'] },
+      'primary',
+      DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS
+    );
+
+    expect(state.exactMatches).toStrictEqual([]);
+    expect(state.autoSubmitMatch).toBe('Qh7#');
+    expect(state.shouldAutoSubmit).toBe(true);
+  });
+
+  it('should not auto-submit promotion SAN without the promotion suffix', () => {
+    const state = deriveKeyboardState('e8', { legalMovesSan: ['e8=Q'] }, 'primary', DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS);
+
+    expect(state.autoSubmitMatch).toBeUndefined();
+    expect(state.shouldAutoSubmit).toBe(false);
+  });
+
   it('should highlight keys whose append preserves a legal SAN prefix', () => {
     const state = deriveKeyboardState(
       'N',

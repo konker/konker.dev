@@ -143,6 +143,25 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
+  it('should auto-submit on a unique legal move that ends with check suffix', () => {
+    const onSubmit = vi.fn();
+    const view = mount({ legalMovesSan: ['Bb5+', 'Nf3'], onSubmit });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'B' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'b' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: '5' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      'Bb5',
+      expect.objectContaining({
+        exactLegalMatch: 'Bb5+',
+        source: 'auto',
+      })
+    );
+
+    view.cleanup();
+  });
+
   it('should suppress auto-submit when disabled in settings', () => {
     const onSubmit = vi.fn();
     const view = mount({ legalMovesSan: ['Nf3', 'Nc3'], onSubmit, settings: { autoSubmit: false } });
