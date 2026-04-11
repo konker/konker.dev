@@ -54,8 +54,6 @@ export function deriveKeyboardState(
 
 export function reduceKeyboardModel(model: KeyboardModel, action: KeyboardAction): KeyboardModel {
   switch (action.type) {
-    case 'backspace':
-      return withInput(model, model.state.input.slice(0, -1));
     case 'clear':
     case 'reset':
       return withInput(model, '');

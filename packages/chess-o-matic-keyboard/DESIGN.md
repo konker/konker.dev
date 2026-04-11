@@ -123,7 +123,6 @@ Choose fonts that are **distinctive and characterful**, emphasizing precision an
 
 - **Click [Piece/File]:** Key lights up `#00F0FF`, keyboard shifts to Destination State.
 - **Click [Secondary Toggle]:** Shifts action layout to the Secondary Menu State for castling.
-- **Click [Backspace]:** Deletes last character.
 
 **Responsive:**
 
