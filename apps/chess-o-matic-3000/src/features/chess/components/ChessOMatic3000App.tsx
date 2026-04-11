@@ -172,33 +172,12 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     return uiState().currentPly % 2 === 0 ? 'white' : 'black';
   }
 
-  function renderCurrentMoveIndicator(): JSX.Element {
-    return (
-      <span class="flex items-center gap-2">
-        <span class="status-chip status-move-chip">{renderCurrentMoveNumber()}</span>
-        <span
-          aria-label={`${renderCurrentMoveColor()} to move`}
-          class={`status-color-chip status-color-chip-${renderCurrentMoveColor()}`}
-        />
-      </span>
-    );
-  }
-
   async function startNewGame(): Promise<void> {
     try {
       await gameEngine.newGame();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown new game error';
       updateStatusMessage(`Unable to start a new game. ${message}`);
-    }
-  }
-
-  async function _discardCurrentGame(): Promise<void> {
-    try {
-      await gameEngine.discardGame();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown discard game error';
-      updateStatusMessage(`Unable to discard the current game. ${message}`);
     }
   }
 
@@ -282,6 +261,8 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       </div>
 
       <StatusPanel
+        currentMoveColor={renderCurrentMoveColor()}
+        currentMoveNumber={renderCurrentMoveNumber()}
         illegalReason={uiState().lastInputIllegalReason}
         lastMoveSan={uiState().lastMoveSan}
         message={uiState().lastInputResultMessage}
@@ -289,12 +270,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         status={uiState().lastInputEvaluateStatus}
       />
 
-      <CollapsibleSection
-        headerAside={renderCurrentMoveIndicator()}
-        icon={Keyboard}
-        storageKey="keyboard"
-        title="Keyboard"
-      >
+      <CollapsibleSection icon={Keyboard} storageKey="keyboard" title="Keyboard">
         <ChessKeyboard
           legalMovesSan={uiState().legalMovesSan}
           onSubmit={(input) => void gameEngine.handleTextInput(input)}
@@ -304,7 +280,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection headerAside={renderCurrentMoveIndicator()} icon={Grid3x3} storageKey="board" title="Board">
+      <CollapsibleSection icon={Grid3x3} storageKey="board" title="Board">
         <div class="board-section-layout">
           <ChessBoard
             fen={uiState().fen}

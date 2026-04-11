@@ -3,6 +3,8 @@ import type { JSX } from 'solid-js';
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 
 type StatusPanelProps = {
+  readonly currentMoveColor: 'white' | 'black';
+  readonly currentMoveNumber: number;
   readonly status: GameModelEvaluateStatus;
   readonly illegalReason?: 'ambiguous' | 'invalid';
   readonly lastMoveSan: string;
@@ -58,10 +60,19 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
       >
         {props.lastMoveSan || '-'}
       </button>
-      <div class="flex flex-wrap items-baseline gap-3">
-        <span class="status-heard-label">Heard</span>
-        <span aria-label="Last Input Sanitized" class="status-heard-value">
-          {props.sanitizedInput || 'No input yet'}
+      <div class="status-footer-row">
+        <div class="flex flex-wrap items-baseline gap-3">
+          <span class="status-heard-label">Heard</span>
+          <span aria-label="Last Input Sanitized" class="status-heard-value">
+            {props.sanitizedInput || 'No input yet'}
+          </span>
+        </div>
+        <span class="status-panel-move-indicator">
+          <span class="status-chip status-move-chip">{props.currentMoveNumber}</span>
+          <span
+            aria-label={`${props.currentMoveColor} to move`}
+            class={`status-color-chip status-color-chip-${props.currentMoveColor}`}
+          />
         </span>
       </div>
     </section>

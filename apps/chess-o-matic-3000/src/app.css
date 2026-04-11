@@ -469,6 +469,14 @@
     opacity: 0.92;
   }
 
+  .status-footer-row {
+    @apply flex flex-wrap items-end justify-between gap-3;
+  }
+
+  .status-panel-move-indicator {
+    @apply flex items-center gap-2;
+  }
+
   .metadata-grid {
     @apply grid gap-4 sm:grid-cols-2;
   }
