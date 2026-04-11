@@ -1,10 +1,11 @@
 import type { JSX } from 'solid-js';
-import { For } from 'solid-js';
+import { createEffect, For, onCleanup } from 'solid-js';
 
 import type { ScoreSheetData, ScoreSheetDataItem } from './types';
 
 type ScoreSheetProps = {
   readonly currentPly: number;
+  readonly isOpen?: boolean;
   readonly onGoToPly: (ply: number) => void;
   readonly scoresheet: ScoreSheetData;
 };
@@ -12,6 +13,9 @@ type ScoreSheetProps = {
 const SCORESHEET_MIN_ROWS = 10;
 
 export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
+  let scrollEl: HTMLDivElement | undefined;
+  let scrollFrame: number | undefined;
+
   function renderBlackMove(item: ScoreSheetDataItem): string {
     return item[1] === '*' ? '' : item[1];
   }
@@ -35,9 +39,40 @@ export function ScoreSheet(props: ScoreSheetProps): JSX.Element {
     });
   }
 
+  function scrollToBottom(): void {
+    if (!scrollEl) {
+      return;
+    }
+
+    if (scrollFrame !== undefined) {
+      cancelAnimationFrame(scrollFrame);
+    }
+
+    scrollFrame = requestAnimationFrame(() => {
+      if (scrollEl) {
+        scrollEl.scrollTop = scrollEl.scrollHeight;
+      }
+    });
+  }
+
+  createEffect(() => {
+    props.isOpen;
+    props.scoresheet.length;
+
+    if (props.isOpen) {
+      scrollToBottom();
+    }
+  });
+
+  onCleanup(() => {
+    if (scrollFrame !== undefined) {
+      cancelAnimationFrame(scrollFrame);
+    }
+  });
+
   return (
     <section aria-label="Scoresheet" class="scoresheet-shell">
-      <div class="scoresheet-scroll">
+      <div class="scoresheet-scroll" ref={scrollEl}>
         <For each={createDisplayRows()}>
           {(item, index) => (
             <div

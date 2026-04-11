@@ -1,3 +1,4 @@
+import { createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -103,5 +104,44 @@ describe('ScoreSheet', () => {
 
     expect(onGoToPly).toHaveBeenNthCalledWith(1, 3);
     expect(onGoToPly).toHaveBeenNthCalledWith(2, 4);
+  });
+
+  it('scrolls to the bottom when the scoresheet is opened', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    render(() => {
+      const [isOpen, setIsOpen] = createSignal(false);
+
+      queueMicrotask(() => {
+        setIsOpen(true);
+      });
+
+      return (
+        <ScoreSheet
+          currentPly={0}
+          isOpen={isOpen()}
+          onGoToPly={vi.fn()}
+          scoresheet={[
+            ['e4', 'e5'],
+            ['Nf3', 'Nc6'],
+            ['Bb5', 'a6'],
+          ]}
+        />
+      );
+    }, root);
+
+    const scrollEl = root.querySelector('.scoresheet-scroll') as HTMLDivElement | null;
+    expect(scrollEl).not.toBeNull();
+
+    Object.defineProperty(scrollEl!, 'scrollHeight', {
+      configurable: true,
+      value: 480,
+    });
+
+    await Promise.resolve();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    expect(scrollEl!.scrollTop).toBe(480);
   });
 });

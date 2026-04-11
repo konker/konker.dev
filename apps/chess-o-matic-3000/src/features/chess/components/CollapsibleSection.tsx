@@ -7,6 +7,7 @@ type CollapsibleSectionProps = {
   readonly children: JSX.Element;
   readonly headerAside?: JSX.Element;
   readonly icon?: Component<{ class?: string }>;
+  readonly onToggle?: (isOpen: boolean) => void;
   readonly open?: boolean;
   readonly storageKey?: string;
   readonly title: string;
@@ -45,12 +46,15 @@ export function CollapsibleSection(props: CollapsibleSectionProps): JSX.Element 
     const nextValue = Boolean(detailsEl?.open);
     setIsOpen(nextValue);
     persistOpenState(nextValue);
+    props.onToggle?.(nextValue);
   }
 
   onMount(() => {
     if (detailsEl) {
       detailsEl.open = isOpen();
     }
+
+    props.onToggle?.(isOpen());
   });
 
   return (

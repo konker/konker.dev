@@ -42,6 +42,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
   const [isPgnCopied, setIsPgnCopied] = createSignal(false);
   const [isSoundEnabled, setIsSoundEnabled] = createSignal(false);
   const [isSoundAvailable, setIsSoundAvailable] = createSignal(false);
+  const [isScoresheetOpen, setIsScoresheetOpen] = createSignal(false);
   const [uiState, setUiState] = createSignal<GameEngineUiState>({
     ...GAME_ENGINE_UI_STATE_EMPTY,
     lastInputResultMessage: 'Starting app…',
@@ -317,9 +318,10 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection icon={NotebookPen} storageKey="scoresheet" title="Scoresheet">
+      <CollapsibleSection icon={NotebookPen} onToggle={setIsScoresheetOpen} storageKey="scoresheet" title="Scoresheet">
         <ScoreSheet
           currentPly={uiState().currentPly}
+          isOpen={isScoresheetOpen()}
           onGoToPly={gameEngine.goToPly}
           scoresheet={uiState().scoresheetData}
         />
