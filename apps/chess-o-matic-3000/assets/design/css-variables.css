@@ -1,0 +1,38 @@
+:root {
+  /* Primary Branding (Forest Green) */
+  --com3k-primary-100: #DEF9D2;
+  --com3k-primary-400: #668855; /* Main Brand Color */
+  --com3k-primary-700: #151F0F;
+
+  /* Secondary / Wood Tones (Scoresheet & Board) */
+  --com3k-wood-100: #F1DBCD;    /* Light Square */
+  --com3k-wood-300: #B58863;    /* Dark Square */
+  --com3k-wood-700: #180F08;    /* Text on Wood */
+
+  /* UI Feedback Colors */
+  --com3k-accent-blue: #3378D4;  /* Info / Links */
+  --com3k-accent-gold: #DBDB00;  /* Highlights / Voice Active */
+  --com3k-error-berry: #DD2277;  /* Illegal Move / Stop */
+
+  /* Neutrals & Surfaces */
+  --com3k-bg-light: #EFF1EE;    /* App Background */
+  --com3k-surface-paper: #FFFFDD; /* Scoresheet "Paper" look */
+  --com3k-text-main: #1B1C1B;
+  --com3k-text-muted: #7C807B;
+  --com3k-border: #C7CDC5;
+
+  /* Functional Mappings */
+  --board-light: var(--com3k-wood-100);
+  --board-dark: var(--com3k-wood-300);
+  --voice-indicator: var(--com3k-accent-gold);
+}
+
+/* Dark Mode Overrides (Optional Example) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --com3k-bg-light: #1B1C1B;
+    --com3k-text-main: #EFF1EE;
+    --com3k-surface-paper: #242400; /* Darker "old tech" olive */
+    --com3k-border: #393B38;
+  }
+}

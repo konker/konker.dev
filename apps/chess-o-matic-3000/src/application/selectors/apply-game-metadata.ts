@@ -1,0 +1,64 @@
+import type { Chess } from 'chess.js';
+
+import type { GameMetadataData } from '../../domain/game/metadata';
+import type { GameBoardOrientation } from '../../domain/game/types';
+
+const PGN_TAG_MAPPINGS = [
+  ['Event', 'event'],
+  ['Site', 'site'],
+  ['Date', 'date'],
+  ['Round', 'round'],
+  ['Result', 'result'],
+  ['TimeControl', 'timeControl'],
+  ['Termination', 'termination'],
+  ['White', 'white.name'],
+  ['WhiteElo', 'white.elo'],
+  ['Black', 'black.name'],
+  ['BlackElo', 'black.elo'],
+] as const;
+
+export function applyGameMetadata(
+  chess: Chess,
+  metadata: GameMetadataData,
+  orientation: GameBoardOrientation = 'white'
+): void {
+  PGN_TAG_MAPPINGS.forEach(([tagName, fieldPath]) => {
+    const value = resolveMetadataField(metadata, fieldPath);
+
+    if (value === '') {
+      chess.removeHeader(tagName);
+      return;
+    }
+
+    chess.setHeader(tagName, value);
+  });
+
+  chess.setHeader('Orientation', orientation);
+}
+
+function resolveMetadataField(metadata: GameMetadataData, fieldPath: (typeof PGN_TAG_MAPPINGS)[number][1]): string {
+  switch (fieldPath) {
+    case 'event':
+      return metadata.event;
+    case 'site':
+      return metadata.site;
+    case 'date':
+      return metadata.date;
+    case 'round':
+      return metadata.round;
+    case 'result':
+      return metadata.result;
+    case 'timeControl':
+      return metadata.timeControl;
+    case 'termination':
+      return metadata.termination;
+    case 'white.name':
+      return metadata.white.name;
+    case 'white.elo':
+      return metadata.white.elo;
+    case 'black.name':
+      return metadata.black.name;
+    case 'black.elo':
+      return metadata.black.elo;
+  }
+}

@@ -1,0 +1,8 @@
+# Vosk model (large file)
+vosk-model*
+
+# Build output
+dist
+
+# TypeScript
+*.tsbuildinfo

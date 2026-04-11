@@ -1,0 +1,35 @@
+.promo-choice {
+  background-size: 82%;
+}
+
+.white-q {
+  background-image: url('./components/ChessBoard/pieces/staunty/queen.white.svg');
+}
+
+.white-r {
+  background-image: url('./components/ChessBoard/pieces/staunty/rook.white.svg');
+}
+
+.white-b {
+  background-image: url('./components/ChessBoard/pieces/staunty/bishop.white.svg');
+}
+
+.white-n {
+  background-image: url('./components/ChessBoard/pieces/staunty/knight.white.svg');
+}
+
+.black-q {
+  background-image: url('./components/ChessBoard/pieces/staunty/queen.black.svg');
+}
+
+.black-r {
+  background-image: url('./components/ChessBoard/pieces/staunty/rook.black.svg');
+}
+
+.black-b {
+  background-image: url('./components/ChessBoard/pieces/staunty/bishop.black.svg');
+}
+
+.black-n {
+  background-image: url('./components/ChessBoard/pieces/staunty/knight.black.svg');
+}

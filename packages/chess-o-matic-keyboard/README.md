@@ -14,6 +14,16 @@ Import the packaged stylesheet in your app entry or component boundary:
 import '@konker.dev/chess-o-matic-keyboard/solid/chess-keyboard.css';
 ```
 
+The stylesheet no longer loads web fonts for you. If you want the default typography, load these font families in the parent app:
+
+- `Atkinson Hyperlegible Next`
+- `Atkinson Hyperlegible Mono`
+
+The component reads them through these CSS variables, so host apps can also point the keyboard at different fonts:
+
+- `--chesskbd-font-ui`
+- `--chesskbd-font-mono`
+
 ## Usage
 
 ```tsx
