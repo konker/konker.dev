@@ -30,9 +30,9 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
   }
 
   function scrollPanelToTop(): void {
-    const headerEl = document.querySelector('.app-header');
-    if (headerEl instanceof HTMLElement) {
-      const targetTop = window.scrollY + headerEl.getBoundingClientRect().bottom;
+    const panelEl = document.getElementById('status');
+    if (panelEl instanceof HTMLElement) {
+      const targetTop = window.scrollY + panelEl.getBoundingClientRect().top;
       window.scrollTo({
         behavior: 'smooth',
         top: targetTop,
