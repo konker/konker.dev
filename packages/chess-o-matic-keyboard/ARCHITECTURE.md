@@ -64,7 +64,7 @@ Key implications:
   - Put common notation keys in the most reachable zones.
   - Keep destructive actions deliberate but easy to reach.
 - Low-friction correction.
-  - Backspace, clear-token, clear-all, and candidate replacement should be fast.
+  - Clear, clear-token, clear-all, and candidate replacement should be fast.
 - Board-aware assistance.
   - When legal move context is available, disable impossible next actions and surface likely completions early.
 - Separate phone and tablet layouts.
@@ -142,7 +142,6 @@ export type KeyboardState = {
 export type KeyboardController = {
   readonly getState: () => KeyboardState;
   readonly pressKey: (key: string) => KeyboardState;
-  readonly backspace: () => KeyboardState;
   readonly clear: () => KeyboardState;
   readonly clearToken: () => KeyboardState;
   readonly selectCandidate: (candidate: string) => KeyboardState;

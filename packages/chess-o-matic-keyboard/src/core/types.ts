@@ -125,14 +125,6 @@ export const KEYBOARD_KEYS = [
     layers: ['primary', 'secondary', 'settings'],
   },
   {
-    id: 'backspace',
-    label: 'Backspace',
-    value: '',
-    category: 'editing',
-    kind: 'action',
-    layers: ['primary', 'secondary', 'settings'],
-  },
-  {
     id: 'clear',
     label: 'Clear',
     value: '',
@@ -193,7 +185,6 @@ export type KeyboardModel = {
 };
 
 export type KeyboardAction =
-  | { readonly type: 'backspace' }
   | { readonly type: 'clear' }
   | { readonly keyId: KeyboardKeyId; readonly type: 'press-key' }
   | { readonly type: 'reset' }
@@ -216,7 +207,6 @@ export type KeyboardSubmitEvent = {
 };
 
 export type KeyboardController = {
-  readonly backspace: () => KeyboardState;
   readonly clear: () => KeyboardState;
   readonly getModel: () => KeyboardModel;
   readonly getState: () => KeyboardState;

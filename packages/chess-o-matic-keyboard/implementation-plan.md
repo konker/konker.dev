@@ -240,7 +240,6 @@ Refactor the headless core into a simple input reducer plus derived hints.
 
 1. Reduce core actions to:
    - `press-key`
-   - `backspace`
    - `clear`
    - `clear-token`
    - `toggle-layer`

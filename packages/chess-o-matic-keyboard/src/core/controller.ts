@@ -21,7 +21,6 @@ export function createKeyboardController(initialContext?: KeyboardContext): Keyb
   };
 
   return {
-    backspace: () => apply({ type: 'backspace' }),
     clear: () => apply({ type: 'clear' }),
     getModel: () => model,
     getState: () => model.state,

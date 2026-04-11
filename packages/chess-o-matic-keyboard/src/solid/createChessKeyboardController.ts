@@ -14,7 +14,6 @@ import type {
 } from '../core/types.js';
 
 export type SolidChessKeyboardController = {
-  readonly backspace: () => KeyboardState;
   readonly clear: () => KeyboardState;
   readonly dispatch: (action: KeyboardAction) => KeyboardState;
   readonly getModel: () => KeyboardModel;
@@ -51,7 +50,6 @@ export function createChessKeyboardController(
   };
 
   return {
-    backspace: () => dispatch({ type: 'backspace' }),
     clear: () => dispatch({ type: 'clear' }),
     dispatch,
     getModel: model,
