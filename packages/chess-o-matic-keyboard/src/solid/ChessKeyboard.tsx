@@ -329,18 +329,18 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
         orientation={resolvedSettings().orientation}
         trailedKeyIds={pressedPrimaryKeyIds()}
       />
-      <CandidateBar
-        candidates={keyboard.state().matchingMoves}
-        enabled={resolvedSettings().candidateBar}
-        onSelectCandidate={selectCandidate}
-        selectedCandidate={keyboard.state().selectedCandidateId}
-      />
       <SecondaryPanel
         highlightedKeyIds={keyboard.state().highlightedKeyIds}
         keys={secondaryKeys()}
         onPressKey={pressKey}
         showNunnAnnotations={props.showNunnAnnotations !== false}
         visible={effectiveLayer() === 'secondary'}
+      />
+      <CandidateBar
+        candidates={keyboard.state().matchingMoves}
+        enabled={resolvedSettings().candidateBar}
+        onSelectCandidate={selectCandidate}
+        selectedCandidate={keyboard.state().selectedCandidateId}
       />
     </section>
   );

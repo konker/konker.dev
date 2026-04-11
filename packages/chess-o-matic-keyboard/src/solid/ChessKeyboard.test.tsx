@@ -594,7 +594,7 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should render the candidate bar before the secondary panel', () => {
+  it('should render the candidate bar after the secondary panel', () => {
     const view = mount({ legalMovesSan: ['d3', 'd4'] });
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'd' }));
@@ -608,7 +608,7 @@ describe('solid/ChessKeyboard', () => {
     const candidatesNode = candidates as Node;
     const secondaryPanelNode = secondaryPanel as Node;
 
-    expect(candidatesNode.compareDocumentPosition(secondaryPanelNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(secondaryPanelNode.compareDocumentPosition(candidatesNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     view.cleanup();
   });
