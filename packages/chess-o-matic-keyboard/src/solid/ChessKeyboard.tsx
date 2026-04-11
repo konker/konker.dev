@@ -34,6 +34,7 @@ export type ChessKeyboardProps = {
   readonly onSubmit?: (input: string, meta: KeyboardSubmitEvent) => void;
   readonly orientation?: KeyboardBehaviorSettings['orientation'];
   readonly settings?: Partial<KeyboardBehaviorSettings>;
+  readonly showNunnAnnotations?: boolean;
   readonly showReadout?: boolean;
   readonly value?: string;
   readonly visibleSettings?: ChessKeyboardVisibleSettings;
@@ -328,17 +329,18 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
         orientation={resolvedSettings().orientation}
         trailedKeyIds={pressedPrimaryKeyIds()}
       />
+      <SecondaryPanel
+        highlightedKeyIds={keyboard.state().highlightedKeyIds}
+        keys={secondaryKeys()}
+        onPressKey={pressKey}
+        showNunnAnnotations={props.showNunnAnnotations !== false}
+        visible={effectiveLayer() === 'secondary'}
+      />
       <CandidateBar
         candidates={keyboard.state().matchingMoves}
         enabled={resolvedSettings().candidateBar}
         onSelectCandidate={selectCandidate}
         selectedCandidate={keyboard.state().selectedCandidateId}
-      />
-      <SecondaryPanel
-        highlightedKeyIds={keyboard.state().highlightedKeyIds}
-        keys={secondaryKeys()}
-        onPressKey={pressKey}
-        visible={effectiveLayer() === 'secondary'}
       />
     </section>
   );

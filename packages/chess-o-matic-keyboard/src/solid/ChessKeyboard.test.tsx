@@ -594,7 +594,7 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should render the candidate bar before the secondary panel', () => {
+  it('should render the candidate bar after the secondary panel', () => {
     const view = mount({ legalMovesSan: ['d3', 'd4'] });
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'd' }));
@@ -608,7 +608,7 @@ describe('solid/ChessKeyboard', () => {
     const candidatesNode = candidates as Node;
     const secondaryPanelNode = secondaryPanel as Node;
 
-    expect(candidatesNode.compareDocumentPosition(secondaryPanelNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(secondaryPanelNode.compareDocumentPosition(candidatesNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     view.cleanup();
   });
@@ -779,6 +779,24 @@ describe('solid/ChessKeyboard', () => {
     expect(row7).toStrictEqual(['O-O', 'O-O-O']);
     expect(row8).toStrictEqual(['+', '#', '=', '-']);
     expect(row9).toStrictEqual(['!', '!!', '!?', '?', '??', '?!']);
+
+    view.cleanup();
+  });
+
+  it('should hide Nunn annotation buttons when showNunnAnnotations is false', () => {
+    const view = mount({ showNunnAnnotations: false });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Show Secondary Keys' }));
+
+    const row8 = Array.from(view.root.querySelectorAll('[data-row="secondary-row-2"] button')).map(
+      (button) => button.textContent
+    );
+    const row9 = Array.from(view.root.querySelectorAll('[data-row="secondary-row-3"] button')).map(
+      (button) => button.textContent
+    );
+
+    expect(row8).toStrictEqual(['+', '#', '=', '-']);
+    expect(row9).toStrictEqual([]);
 
     view.cleanup();
   });

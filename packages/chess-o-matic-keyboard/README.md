@@ -54,6 +54,7 @@ export function Example() {
 - `value?: string`
 - `defaultValue?: string`
 - `defaultSettings?: Partial<KeyboardBehaviorSettings>`
+- `showNunnAnnotations?: boolean`
 
 Flat behavior props:
 
@@ -77,6 +78,12 @@ You can also pass `visibleSettings?: false | Partial<Record<keyof KeyboardBehavi
     showReadout: true,
   }}
 />
+```
+
+Hide the Nunn annotation buttons `!`, `!!`, `!?`, `?`, `??`, `?!` while keeping `+` and `#` available:
+
+```tsx
+<ChessKeyboard showNunnAnnotations={false} />
 ```
 
 ## Public Exports
