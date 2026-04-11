@@ -9,6 +9,7 @@ type KeyGridProps = {
   readonly keys: ReadonlyArray<KeyboardKeyDefinition>;
   readonly onPressKey: (keyId: KeyboardKeyId) => void;
   readonly orientation: KeyboardOrientation;
+  readonly trailedKeyIds: ReadonlySet<KeyboardKeyId>;
 };
 
 type GridButton = {
@@ -19,6 +20,7 @@ type GridButton = {
   readonly id: string;
   readonly label: string;
   readonly onClick: () => void;
+  readonly trailed: boolean;
 };
 
 type GridRow = {
@@ -64,28 +66,37 @@ export function KeyGrid(props: KeyGridProps): JSX.Element {
       {
         id: 'row-2',
         buttons: PRIMARY_ROW_1.map((keyId) =>
-          notationButton(keyId, 'piece', keyMap, props.highlightedKeyIds, props.onPressKey)
+          notationButton(keyId, 'piece', keyMap, props.highlightedKeyIds, props.onPressKey, props.trailedKeyIds)
         ),
       },
       {
         id: 'row-3',
         buttons: [
-          notationButton('capture', 'takes', keyMap, props.highlightedKeyIds, props.onPressKey, undefined, {
-            ariaLabel: 'Capture',
-            icon: <X aria-hidden="true" class="chess-keyboard-button-icon" />,
-          }),
+          notationButton(
+            'capture',
+            'takes',
+            keyMap,
+            props.highlightedKeyIds,
+            props.onPressKey,
+            props.trailedKeyIds,
+            undefined,
+            {
+              ariaLabel: 'Capture',
+              icon: <X aria-hidden="true" class="chess-keyboard-button-icon" />,
+            }
+          ),
         ],
       },
       {
         id: 'row-4',
         buttons: fileKeys.map((keyId) =>
-          notationButton(keyId, 'file', keyMap, props.highlightedKeyIds, props.onPressKey)
+          notationButton(keyId, 'file', keyMap, props.highlightedKeyIds, props.onPressKey, props.trailedKeyIds)
         ),
       },
       {
         id: 'row-5',
         buttons: rankKeys.map((keyId) =>
-          notationButton(keyId, 'rank', keyMap, props.highlightedKeyIds, props.onPressKey)
+          notationButton(keyId, 'rank', keyMap, props.highlightedKeyIds, props.onPressKey, props.trailedKeyIds)
         ),
       },
     ];
@@ -107,6 +118,7 @@ export function KeyGrid(props: KeyGridProps): JSX.Element {
                   data-icon-only={button.icon === undefined ? 'false' : 'true'}
                   data-highlighted={button.highlighted}
                   data-slot="button"
+                  data-trailed={button.trailed}
                   aria-label={button.ariaLabel}
                   onClick={() => {
                     button.onClick();
@@ -130,6 +142,7 @@ function notationButton(
   keyMap: ReadonlyMap<KeyboardKeyId, KeyboardKeyDefinition>,
   highlightedKeyIds: ReadonlySet<KeyboardKeyId>,
   onPressKey: (keyId: KeyboardKeyId) => void,
+  trailedKeyIds: ReadonlySet<KeyboardKeyId>,
   labelOverride?: string,
   options?: {
     readonly ariaLabel?: string;
@@ -148,5 +161,6 @@ function notationButton(
     onClick: () => {
       onPressKey(keyId);
     },
+    trailed: trailedKeyIds.has(keyId),
   };
 }

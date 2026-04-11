@@ -5,6 +5,7 @@ import type {
   KeyboardBehaviorSettings,
   KeyboardHighlightsMode,
   KeyboardKeyDefinition,
+  KeyboardKeyId,
   KeyboardSubmitEvent,
 } from '../core/types.js';
 import { DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS, KEYBOARD_KEYS } from '../core/types.js';
@@ -48,6 +49,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
     ...props.defaultSettings,
   });
   const [lastAutoSubmitKey, setLastAutoSubmitKey] = createSignal<string | undefined>(undefined);
+  const [pressedPrimaryKeyIds, setPressedPrimaryKeyIds] = createSignal<ReadonlySet<KeyboardKeyId>>(new Set());
   const [settingsOpen, setSettingsOpen] = createSignal(false);
   const controlledSettings = createMemo<Partial<KeyboardBehaviorSettings>>(() => {
     const nextSettings = SETTING_PROP_KEYS.reduce<Partial<KeyboardBehaviorSettings>>(
@@ -187,6 +189,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   };
 
   const clear = () => {
+    resetPressedPrimaryKeyIds();
     const nextState = keyboard.clear();
     applyInputChange(nextState.input);
   };
@@ -194,6 +197,18 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const pressKey = (keyId: KeyboardKeyDefinition['id']) => {
     const nextState = keyboard.pressKey(keyId);
     applyInputChange(nextState.input);
+  };
+
+  const pressPrimaryGridKey = (keyId: KeyboardKeyDefinition['id']) => {
+    setPressedPrimaryKeyIds((currentIds) => {
+      if (currentIds.has(keyId)) {
+        return currentIds;
+      }
+
+      return new Set([...currentIds, keyId]);
+    });
+
+    pressKey(keyId);
   };
 
   const selectCandidate = (candidate: string) => {
@@ -206,6 +221,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
       setLastAutoSubmitKey(autoSubmitKey);
     }
 
+    resetPressedPrimaryKeyIds();
     const nextState = keyboard.selectCandidate(candidate);
     applyInputChange(nextState.input);
     submitAndMaybeClear('candidate');
@@ -250,8 +266,13 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
     props.onSubmit?.(event.input, event);
   }
 
+  function resetPressedPrimaryKeyIds(): void {
+    setPressedPrimaryKeyIds((currentIds) => (currentIds.size === 0 ? currentIds : new Set<KeyboardKeyId>()));
+  }
+
   function submitAndMaybeClear(source: KeyboardSubmitEvent['source']): void {
     emitSubmit(keyboard.submit(source));
+    resetPressedPrimaryKeyIds();
 
     if (props.value !== undefined) {
       return;
@@ -303,8 +324,9 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
       <KeyGrid
         highlightedKeyIds={keyboard.state().highlightedKeyIds}
         keys={visibleKeys()}
-        onPressKey={pressKey}
+        onPressKey={pressPrimaryGridKey}
         orientation={resolvedSettings().orientation}
+        trailedKeyIds={pressedPrimaryKeyIds()}
       />
       <CandidateBar
         candidates={keyboard.state().matchingMoves}
