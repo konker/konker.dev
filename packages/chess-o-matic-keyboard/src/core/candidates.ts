@@ -27,8 +27,10 @@ export function buildCandidateAnalysis(
   const legalMovesSan = getLegalMovesSan(context);
   const matchingMoves = input.length === 0 ? [] : legalMovesSan.filter((move) => move.startsWith(input));
   const exactMatches = input.length === 0 ? [] : legalMovesSan.filter((move) => move === input);
-  const shouldAutoSubmit = settings.autoSubmit && exactMatches.length === 1;
-  const autoSubmitMatch = shouldAutoSubmit ? exactMatches[0] : undefined;
+  const autoSubmitMatches =
+    input.length === 0 ? [] : legalMovesSan.filter((move) => stripAutoSubmitSuffix(move) === input);
+  const shouldAutoSubmit = settings.autoSubmit && autoSubmitMatches.length === 1;
+  const autoSubmitMatch = shouldAutoSubmit ? autoSubmitMatches[0] : undefined;
 
   return {
     ...(autoSubmitMatch === undefined ? {} : { autoSubmitMatch }),
@@ -38,6 +40,10 @@ export function buildCandidateAnalysis(
     matchingMoves,
     shouldAutoSubmit,
   };
+}
+
+function stripAutoSubmitSuffix(move: string): string {
+  return move.replace(/[+#]$/, '');
 }
 
 export function deriveHighlightedKeyIds(

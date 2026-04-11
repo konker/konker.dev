@@ -102,7 +102,11 @@ export function submitKeyboardModel(
   source: KeyboardSubmitSource = 'manual'
 ): KeyboardSubmitEvent {
   return {
-    ...(model.state.exactMatches.length === 1 ? { exactLegalMatch: model.state.exactMatches[0] } : {}),
+    ...(model.state.exactMatches.length === 1
+      ? { exactLegalMatch: model.state.exactMatches[0] }
+      : model.state.autoSubmitMatch === undefined
+        ? {}
+        : { exactLegalMatch: model.state.autoSubmitMatch }),
     input: model.state.input,
     matchingMoves: model.state.matchingMoves,
     source,
