@@ -7,6 +7,7 @@ type SecondaryPanelProps = {
   readonly highlightedKeyIds: ReadonlySet<KeyboardKeyId>;
   readonly keys: ReadonlyArray<KeyboardKeyDefinition>;
   readonly onPressKey: (keyId: KeyboardKeyId) => void;
+  readonly showNunnAnnotations: boolean;
   readonly visible: boolean;
 };
 
@@ -61,7 +62,7 @@ export function SecondaryPanel(props: SecondaryPanelProps): JSX.Element {
           secondaryButton(keyId, keyMap, props.highlightedKeyIds, props.onPressKey)
         ),
       },
-    ];
+    ].filter((row) => row.id !== 'secondary-row-3' || props.showNunnAnnotations);
   });
 
   return (

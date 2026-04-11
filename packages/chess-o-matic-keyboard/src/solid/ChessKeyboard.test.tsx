@@ -782,4 +782,22 @@ describe('solid/ChessKeyboard', () => {
 
     view.cleanup();
   });
+
+  it('should hide Nunn annotation buttons when showNunnAnnotations is false', () => {
+    const view = mount({ showNunnAnnotations: false });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Show Secondary Keys' }));
+
+    const row8 = Array.from(view.root.querySelectorAll('[data-row="secondary-row-2"] button')).map(
+      (button) => button.textContent
+    );
+    const row9 = Array.from(view.root.querySelectorAll('[data-row="secondary-row-3"] button')).map(
+      (button) => button.textContent
+    );
+
+    expect(row8).toStrictEqual(['+', '#', '=', '-']);
+    expect(row9).toStrictEqual([]);
+
+    view.cleanup();
+  });
 });
