@@ -6,6 +6,7 @@ import type { ChessKeyboardVisibleSettingsMap } from './types.js';
 
 type SettingsPanelProps = {
   readonly onToggleAutoSubmit: () => void;
+  readonly onToggleAutoSubmitOnSinglePartialMatch: () => void;
   readonly onToggleCandidateBar: () => void;
   readonly onSetKeyHighlightsMode: (mode: KeyboardHighlightsMode) => void;
   readonly onToggleOrientation: () => void;
@@ -29,6 +30,22 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
               data-slot="settings-control"
               onChange={() => {
                 props.onToggleAutoSubmit();
+              }}
+              type="checkbox"
+            />
+          </label>
+        </Show>
+        <Show when={props.visibleSettings?.autoSubmitOnSinglePartialMatch !== false}>
+          <label class="chess-keyboard-settings-field" data-slot="settings-field">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
+              Auto Submit Single Partial Match
+            </span>
+            <input
+              checked={props.settings.autoSubmitOnSinglePartialMatch}
+              class="chess-keyboard-settings-control"
+              data-slot="settings-control"
+              onChange={() => {
+                props.onToggleAutoSubmitOnSinglePartialMatch();
               }}
               type="checkbox"
             />

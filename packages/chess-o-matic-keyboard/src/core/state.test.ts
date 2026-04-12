@@ -23,7 +23,7 @@ describe('core/state', () => {
 
     expect(state.matchingMoves).toStrictEqual(['Nf3']);
     expect(state.exactMatches).toStrictEqual(['Nf3']);
-    expect(state.autoSubmitMatch).toBe('Nf3');
+    expect(state.autoSubmitTarget).toBe('Nf3');
     expect(state.shouldAutoSubmit).toBe(true);
   });
 
@@ -36,7 +36,7 @@ describe('core/state', () => {
     );
 
     expect(state.exactMatches).toStrictEqual([]);
-    expect(state.autoSubmitMatch).toBe('Bb5+');
+    expect(state.autoSubmitTarget).toBe('Bb5+');
     expect(state.shouldAutoSubmit).toBe(true);
   });
 
@@ -49,14 +49,48 @@ describe('core/state', () => {
     );
 
     expect(state.exactMatches).toStrictEqual([]);
-    expect(state.autoSubmitMatch).toBe('Qh7#');
+    expect(state.autoSubmitTarget).toBe('Qh7#');
     expect(state.shouldAutoSubmit).toBe(true);
   });
 
   it('should not auto-submit promotion SAN without the promotion suffix', () => {
     const state = deriveKeyboardState('e8', { legalMovesSan: ['e8=Q'] }, 'primary', DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS);
 
-    expect(state.autoSubmitMatch).toBeUndefined();
+    expect(state.autoSubmitTarget).toBeUndefined();
+    expect(state.shouldAutoSubmit).toBe(false);
+  });
+
+  it('should auto-submit on a unique partial match when enabled', () => {
+    const state = deriveKeyboardState('Nf', { legalMovesSan: ['Nf3', 'Nc3'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      autoSubmitOnSinglePartialMatch: true,
+    });
+
+    expect(state.matchingMoves).toStrictEqual(['Nf3']);
+    expect(state.exactMatches).toStrictEqual([]);
+    expect(state.autoSubmitTarget).toBe('Nf3');
+    expect(state.shouldAutoSubmit).toBe(true);
+  });
+
+  it('should not auto-submit on a unique partial match when disabled', () => {
+    const state = deriveKeyboardState('Nf', { legalMovesSan: ['Nf3', 'Nc3'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      autoSubmitOnSinglePartialMatch: false,
+    });
+
+    expect(state.matchingMoves).toStrictEqual(['Nf3']);
+    expect(state.autoSubmitTarget).toBeUndefined();
+    expect(state.shouldAutoSubmit).toBe(false);
+  });
+
+  it('should not auto-submit on an ambiguous partial match', () => {
+    const state = deriveKeyboardState('N', { legalMovesSan: ['Nf3', 'Nc3'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      autoSubmitOnSinglePartialMatch: true,
+    });
+
+    expect(state.matchingMoves).toStrictEqual(['Nf3', 'Nc3']);
+    expect(state.autoSubmitTarget).toBeUndefined();
     expect(state.shouldAutoSubmit).toBe(false);
   });
 
@@ -96,13 +130,14 @@ describe('core/state', () => {
         type: 'set-input',
       }),
       {
-        settings: { autoSubmit: false, keyHighlightsMode: 'off' },
+        settings: { autoSubmit: false, autoSubmitOnSinglePartialMatch: true, keyHighlightsMode: 'off' },
         type: 'set-settings',
       }
     );
 
     expect(model.state.input).toBe('e');
     expect(model.state.settings.autoSubmit).toBe(false);
+    expect(model.state.settings.autoSubmitOnSinglePartialMatch).toBe(true);
     expect(model.state.settings.keyHighlightsMode).toBe('off');
     expect(model.state.highlightedKeyIds).toStrictEqual(new Set());
   });
@@ -117,7 +152,7 @@ describe('core/state', () => {
     );
 
     expect(submitEvent.input).toBe('Qa9');
-    expect(submitEvent.exactLegalMatch).toBeUndefined();
+    expect(submitEvent.resolvedLegalMatch).toBeUndefined();
     expect(submitEvent.source).toBe('manual');
   });
 });

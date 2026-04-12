@@ -10,7 +10,7 @@ import type {
 import { KEYBOARD_KEYS } from './types.js';
 
 export type CandidateAnalysis = {
-  readonly autoSubmitMatch?: string;
+  readonly autoSubmitTarget?: string;
   readonly exactMatches: ReadonlyArray<string>;
   readonly highlightedKeyIds: ReadonlySet<KeyboardKeyId>;
   readonly legalMovesSan: ReadonlyArray<string>;
@@ -27,19 +27,40 @@ export function buildCandidateAnalysis(
   const legalMovesSan = getLegalMovesSan(context);
   const matchingMoves = input.length === 0 ? [] : legalMovesSan.filter((move) => move.startsWith(input));
   const exactMatches = input.length === 0 ? [] : legalMovesSan.filter((move) => move === input);
-  const autoSubmitMatches =
+  const exactAutoSubmitMatches =
     input.length === 0 ? [] : legalMovesSan.filter((move) => stripAutoSubmitSuffix(move) === input);
-  const shouldAutoSubmit = settings.autoSubmit && autoSubmitMatches.length === 1;
-  const autoSubmitMatch = shouldAutoSubmit ? autoSubmitMatches[0] : undefined;
+  const partialAutoSubmitMatches = input.length === 0 || exactMatches.length > 0 ? [] : matchingMoves;
+  const autoSubmitTarget = resolveAutoSubmitTarget(settings, exactAutoSubmitMatches, partialAutoSubmitMatches);
+  const shouldAutoSubmit = autoSubmitTarget !== undefined;
 
   return {
-    ...(autoSubmitMatch === undefined ? {} : { autoSubmitMatch }),
+    ...(autoSubmitTarget === undefined ? {} : { autoSubmitTarget }),
     exactMatches,
     highlightedKeyIds: deriveHighlightedKeyIds(input, legalMovesSan, layer, settings),
     legalMovesSan,
     matchingMoves,
     shouldAutoSubmit,
   };
+}
+
+function resolveAutoSubmitTarget(
+  settings: KeyboardBehaviorSettings,
+  exactAutoSubmitMatches: ReadonlyArray<string>,
+  partialAutoSubmitMatches: ReadonlyArray<string>
+): string | undefined {
+  if (!settings.autoSubmit) {
+    return undefined;
+  }
+
+  if (exactAutoSubmitMatches.length === 1) {
+    return exactAutoSubmitMatches[0];
+  }
+
+  if (settings.autoSubmitOnSinglePartialMatch && partialAutoSubmitMatches.length === 1) {
+    return partialAutoSubmitMatches[0];
+  }
+
+  return undefined;
 }
 
 function stripAutoSubmitSuffix(move: string): string {

@@ -152,6 +152,7 @@ export type KeyboardContext = {
 
 export type KeyboardBehaviorSettings = {
   readonly autoSubmit: boolean;
+  readonly autoSubmitOnSinglePartialMatch: boolean;
   readonly candidateBar: boolean;
   readonly keyHighlightsMode: KeyboardHighlightsMode;
   readonly orientation: KeyboardOrientation;
@@ -160,6 +161,7 @@ export type KeyboardBehaviorSettings = {
 
 export const DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS: KeyboardBehaviorSettings = {
   autoSubmit: true,
+  autoSubmitOnSinglePartialMatch: false,
   candidateBar: true,
   keyHighlightsMode: 'after-input',
   orientation: 'white',
@@ -167,7 +169,7 @@ export const DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS: KeyboardBehaviorSettings = {
 };
 
 export type KeyboardState = {
-  readonly autoSubmitMatch?: string;
+  readonly autoSubmitTarget?: string;
   readonly exactMatches: ReadonlyArray<string>;
   readonly highlightedKeyIds: ReadonlySet<KeyboardKeyId>;
   readonly input: string;
@@ -199,9 +201,9 @@ export type KeyboardAction =
 export type KeyboardSubmitSource = 'auto' | 'candidate' | 'manual';
 
 export type KeyboardSubmitEvent = {
-  readonly exactLegalMatch?: string;
   readonly input: string;
   readonly matchingMoves: ReadonlyArray<string>;
+  readonly resolvedLegalMatch?: string;
   readonly source: KeyboardSubmitSource;
   readonly state: KeyboardState;
 };
