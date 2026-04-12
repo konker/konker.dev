@@ -458,6 +458,14 @@
     font-family: var(--font-mono);
   }
 
+  .status-san-button {
+    @apply inline-flex items-center gap-1;
+  }
+
+  .status-move-piece {
+    @apply h-8 w-8 shrink-0 sm:h-10 sm:w-10;
+  }
+
   .status-heard-label {
     @apply inline-flex items-center pt-1 text-[0.72rem] uppercase tracking-[0.18em];
     opacity: 0.78;

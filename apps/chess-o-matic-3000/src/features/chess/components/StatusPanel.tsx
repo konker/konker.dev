@@ -11,6 +11,8 @@ type StatusPanelProps = {
   readonly isGameOver: boolean;
   readonly status: GameModelEvaluateStatus;
   readonly illegalReason?: 'ambiguous' | 'invalid';
+  readonly lastMoveColor?: 'black' | 'white';
+  readonly lastMovePiece?: 'bishop' | 'king' | 'knight' | 'pawn' | 'queen' | 'rook';
   readonly lastMoveSan: string;
   readonly message: string;
   readonly sanitizedInput: string;
@@ -46,6 +48,14 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
     }
   }
 
+  function renderLastMovePieceSrc(): string | undefined {
+    if (!props.lastMovePiece || !props.lastMoveColor) {
+      return undefined;
+    }
+
+    return `/images/pieces/staunty/${props.lastMovePiece}.${props.lastMoveColor}.svg`;
+  }
+
   return (
     <section
       class="status-surface"
@@ -58,10 +68,13 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
       </span>
       <button
         aria-label="Last Input SAN"
-        class="status-san cursor-pointer pr-28 text-left"
+        class="status-san status-san-button cursor-pointer pr-28 text-left"
         onClick={scrollPanelToTop}
         type="button"
       >
+        {renderLastMovePieceSrc() ? (
+          <img alt="" aria-hidden="true" class="status-move-piece" src={renderLastMovePieceSrc()} />
+        ) : null}
         {props.lastMoveSan || '-'}
       </button>
       {props.isGameOver ? (

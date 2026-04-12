@@ -105,6 +105,8 @@ describe('createGameEngine persistence', () => {
       legalMovesSan: expect.arrayContaining(['Nf3', 'Nc3', 'Bb5', 'Bc4', 'd4']),
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'e5',
+      lastMoveColor: 'black',
+      lastMovePiece: 'pawn',
       lastMoveSan: 'e5',
       pgn: expect.stringContaining('[Orientation "black"]'),
     });
@@ -198,6 +200,8 @@ describe('createGameEngine persistence', () => {
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'e4',
       lastInputSanitized: 'e4',
+      lastMoveColor: 'white',
+      lastMovePiece: 'pawn',
       lastMoveSan: 'e4',
       legalMovesSan: expect.arrayContaining(['Nc6', 'Nf6', 'e5', 'c5']),
     });
@@ -262,6 +266,8 @@ describe('createGameEngine persistence', () => {
       currentPly: 0,
       lastInputEvaluateStatus: 'ignore',
       lastInputResultMessage: 'VIEWING PAST MOVE',
+      lastMoveColor: undefined,
+      lastMovePiece: undefined,
       lastMoveSan: '',
     });
 
@@ -278,6 +284,8 @@ describe('createGameEngine persistence', () => {
       currentPly: 2,
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'OK',
+      lastMoveColor: 'black',
+      lastMovePiece: 'pawn',
       lastMoveSan: 'e5',
     });
   });
@@ -418,6 +426,8 @@ describe('createGameEngine persistence', () => {
       gameOverReason: 'Checkmate',
       gameResult: '0-1',
       isGameOver: true,
+      lastMoveColor: 'black',
+      lastMovePiece: 'queen',
       lastMoveSan: 'Qh4#',
     });
   });
@@ -495,7 +505,56 @@ describe('createGameEngine persistence', () => {
       gameOverReason: undefined,
       gameResult: undefined,
       isGameOver: false,
+      lastMoveColor: 'black',
+      lastMovePiece: 'knight',
       lastMoveSan: 'Nc6',
+    });
+  });
+
+  it('uses king for castling and the promoted piece for promotion icons', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    for (const move of ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5', 'O-O']) {
+      await gameEngine.handleBoardMove(move);
+    }
+
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      lastMoveColor: 'white',
+      lastMovePiece: 'king',
+      lastMoveSan: 'O-O',
+    });
+
+    const promotionState: AppState = {
+      ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
+      currentGame: {
+        ...createDefaultAppState('2026-03-30T00:00:00.000Z').currentGame,
+        currentPly: 8,
+        moveHistory: [
+          { from: 'a2', san: 'a4', to: 'a4' },
+          { from: 'h7', san: 'h5', to: 'h5' },
+          { from: 'a4', san: 'a5', to: 'a5' },
+          { from: 'h5', san: 'h4', to: 'h4' },
+          { from: 'a5', san: 'a6', to: 'a6' },
+          { from: 'h4', san: 'h3', to: 'h3' },
+          { from: 'a6', san: 'axb7', to: 'b7' },
+          { from: 'g7', san: 'g5', to: 'g5' },
+        ],
+      },
+    };
+    const promotionStorage = createMemoryGameStorage(promotionState);
+    const promotionUi = vi.fn();
+    const promotionEngine = createGameEngine({ gameStorage: promotionStorage });
+
+    await promotionEngine.init({ onUiStateChange: promotionUi });
+    await promotionEngine.handleBoardMove('bxa8=Q');
+
+    expect(promotionUi.mock.calls.at(-1)?.[0]).toMatchObject({
+      lastMoveColor: 'white',
+      lastMovePiece: 'queen',
+      lastMoveSan: 'bxa8=Q',
     });
   });
 

@@ -268,6 +268,8 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         gameResult={uiState().gameResult}
         illegalReason={uiState().lastInputIllegalReason}
         isGameOver={uiState().isGameOver}
+        lastMoveColor={uiState().lastMoveColor}
+        lastMovePiece={uiState().lastMovePiece}
         lastMoveSan={uiState().lastMoveSan}
         message={uiState().lastInputResultMessage}
         sanitizedInput={uiState().lastInputSanitized}

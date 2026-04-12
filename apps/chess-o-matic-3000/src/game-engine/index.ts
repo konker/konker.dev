@@ -110,6 +110,8 @@ export type GameEngineUiState = {
   readonly currentGameId: GameId;
   readonly gameMetadata: GameMetadataData;
   readonly lastMoveSan: string;
+  readonly lastMovePiece: 'bishop' | 'king' | 'knight' | 'pawn' | 'queen' | 'rook' | undefined;
+  readonly lastMoveColor: 'black' | 'white' | undefined;
   readonly lastInputSanitized: string;
   readonly lastInputEvaluateStatus: GameModelEvaluateStatus;
   readonly lastInputIllegalReason: 'ambiguous' | 'invalid' | undefined;
@@ -132,9 +134,11 @@ export const GAME_ENGINE_UI_STATE_EMPTY: GameEngineUiState = {
   gameResult: undefined,
   isGameOver: false,
   legalMovesSan: [],
+  lastMoveColor: undefined,
   lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
   lastInputIllegalReason: undefined,
   lastInputResultMessage: 'No moves',
+  lastMovePiece: undefined,
   lastInputSanitized: '',
   lastMoveSan: '',
   pgn: '',
@@ -409,6 +413,8 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     lastMoveSan: string
   ): void {
     const gameOverState = resolveGameOverState(model);
+    const lastMovePiece = resolveLastMovePiece(lastMoveSan);
+    const lastMoveColor = resolveLastMoveColor(model.currentPly, lastMoveSan);
 
     emitUiState({
       canGoBackward: gameModelCanGoBackward(model),
@@ -420,8 +426,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       gameResult: gameOverState?.result,
       isGameOver: gameOverState !== undefined,
       legalMovesSan: model.chess.moves(),
+      lastMoveColor,
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
+      lastMovePiece,
       lastInputEvaluateStatus: status,
       lastInputIllegalReason: illegalReason,
       lastInputResultMessage: message,
@@ -544,6 +552,55 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
       message: 'VIEWING PAST MOVE',
       status: GAME_MODEL_EVALUATE_STATUS_IGNORE,
     };
+  }
+
+  function resolveLastMoveColor(currentPly: number, lastMoveSan: string): 'black' | 'white' | undefined {
+    if (lastMoveSan === '' || currentPly <= 0) {
+      return undefined;
+    }
+
+    return currentPly % 2 === 1 ? 'white' : 'black';
+  }
+
+  function resolveLastMovePiece(
+    lastMoveSan: string
+  ): 'bishop' | 'king' | 'knight' | 'pawn' | 'queen' | 'rook' | undefined {
+    if (lastMoveSan === '') {
+      return undefined;
+    }
+
+    const promotionMatch = /=([QRBN])/.exec(lastMoveSan);
+    if (promotionMatch) {
+      switch (promotionMatch[1]) {
+        case 'Q':
+          return 'queen';
+        case 'R':
+          return 'rook';
+        case 'B':
+          return 'bishop';
+        case 'N':
+          return 'knight';
+      }
+    }
+
+    if (lastMoveSan.startsWith('O-O')) {
+      return 'king';
+    }
+
+    switch (lastMoveSan[0]) {
+      case 'K':
+        return 'king';
+      case 'Q':
+        return 'queen';
+      case 'R':
+        return 'rook';
+      case 'B':
+        return 'bishop';
+      case 'N':
+        return 'knight';
+      default:
+        return 'pawn';
+    }
   }
 
   function requireInitialized(): {
