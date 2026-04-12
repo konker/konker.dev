@@ -15,94 +15,6 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(encoding@0.1.13)
 
-  apps/auth.konker.dev:
-    dependencies:
-      '@hono/node-server':
-        specifier: ^1.19.8
-        version: 1.19.8(hono@4.11.3)
-      '@konker.dev/middleware-fp':
-        specifier: workspace:*
-        version: link:../../packages/middleware-fp
-      aws-lambda:
-        specifier: ^1.0.7
-        version: 1.0.7
-      effect:
-        specifier: ^3.19.14
-        version: 3.19.14
-      hono:
-        specifier: ^4.11.3
-        version: 4.11.3
-    devDependencies:
-      '@arethetypeswrong/cli':
-        specifier: ^0.18.2
-        version: 0.18.2
-      '@effect/language-service':
-        specifier: ^0.64.1
-        version: 0.64.1
-      '@eslint/compat':
-        specifier: ^2.0.1
-        version: 2.0.1(eslint@9.39.2(jiti@2.6.1))
-      '@eslint/js':
-        specifier: ^9.39.2
-        version: 9.39.2
-      '@konker.dev/common-config':
-        specifier: ^0.7.0
-        version: 0.7.0(aws-crt@1.28.1)(eslint@9.39.2(jiti@2.6.1))
-      '@konker.dev/config-o-tron':
-        specifier: 0.0.1
-        version: 0.0.1
-      '@types/aws-lambda':
-        specifier: ^8.10.159
-        version: 8.10.159
-      '@types/node':
-        specifier: ^25.0.6
-        version: 25.0.6
-      '@vitest/coverage-istanbul':
-        specifier: ^4.0.16
-        version: 4.0.16(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.6)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
-      eslint:
-        specifier: ^9.39.2
-        version: 9.39.2(jiti@2.6.1)
-      eslint-plugin-fp:
-        specifier: ^2.3.0
-        version: 2.3.0(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint@9.39.2(jiti@2.6.1))(prettier@3.7.4)
-      eslint-plugin-simple-import-sort:
-        specifier: ^12.1.1
-        version: 12.1.1(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-sort-destructure-keys:
-        specifier: ^2.0.0
-        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
-      leasot:
-        specifier: ^14.4.0
-        version: 14.4.0
-      madge:
-        specifier: ^8.0.0
-        version: 8.0.0(typescript@5.9.3)
-      prettier:
-        specifier: ^3.7.4
-        version: 3.7.4
-      sst:
-        specifier: ^3.17.25
-        version: 3.17.25
-      tsx:
-        specifier: ^4.21.0
-        version: 4.21.0
-      type-coverage:
-        specifier: ^2.29.7
-        version: 2.29.7(typescript@5.9.3)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      typescript-eslint:
-        specifier: ^8.52.0
-        version: 8.52.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      vitest:
-        specifier: ^4.0.16
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.6)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
-
   apps/backend-boilerplate.konker.dev:
     dependencies:
       '@dotenvx/dotenvx':
@@ -3552,10 +3464,6 @@ packages:
 
   '@konker.dev/common-config@0.8.0':
     resolution: {integrity: sha512-IQPOyB6gvzs+X+d07zAZ3eCsvlFPsOXb2TI4flY0r9drUgIwJYgqY32LuOjOooAonrzQhhGMuQXWtNhbApZ6jg==}
-    hasBin: true
-
-  '@konker.dev/config-o-tron@0.0.1':
-    resolution: {integrity: sha512-G02x0fbi2e9FPD7szdH/3LJxG3QzzrO4HpHPzbMKkrEKXz1vCjo3eIfascJRC2GWz2oCe7DjZzZ3GB4Spw90qw==}
     hasBin: true
 
   '@konker.dev/config-o-tron@0.0.2':
@@ -13097,20 +13005,6 @@ snapshots:
       - eslint
       - supports-color
       - utf-8-validate
-
-  '@konker.dev/config-o-tron@0.0.1':
-    dependencies:
-      '@aws-sdk/client-ssm': 3.966.0(aws-crt@1.28.1)
-      '@aws-sdk/client-sts': 3.966.0(aws-crt@1.28.1)
-      '@konker.dev/tiny-error-fp': 0.1.12
-      chalk: 5.6.2
-      cli-table3: 0.6.5
-      commander: 14.0.2
-      effect: 3.19.14
-      json5: 2.2.3
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - aws-crt
 
   '@konker.dev/config-o-tron@0.0.2':
     dependencies:
