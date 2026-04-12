@@ -556,7 +556,7 @@
   }
 
   .scoresheet-scroll {
-    @apply flex h-72 flex-col overflow-y-auto pr-1;
+    @apply flex h-[22.5rem] flex-col overflow-y-auto pr-1;
   }
 
   .scoresheet-row {
