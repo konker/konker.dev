@@ -11,7 +11,6 @@ import type { GameBoardOrientation } from '../../../../domain/game/types';
 import type { ChessBoardController } from './controller';
 
 type ChessBoardProps = {
-  readonly disabled?: boolean;
   readonly fen: string;
   readonly isLegalMove: (coords: [Square, Square]) => boolean;
   readonly getPromotionPieceColor: (coords: [Square, Square]) => 'b' | 'w' | undefined;
@@ -148,7 +147,7 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     const dialog = promotionDialogEl;
 
     applyBoardCoordinates(board, showCoordinates());
-    board.interactive = !props.disabled;
+    board.interactive = true;
     board.fen = props.fen;
     board.orientation = props.orientation;
     applyBoardColorScheme(board, colorScheme());
@@ -261,14 +260,6 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
     clearMoveHighlight(boardEl);
   });
 
-  createEffect(() => {
-    if (!boardEl) {
-      return;
-    }
-
-    boardEl.interactive = !props.disabled;
-  });
-
   return (
     <div class="board-panel">
       <div class="board-frame relative">
@@ -277,14 +268,6 @@ export function ChessBoard(props: ChessBoardProps): JSX.Element {
           id="board"
           ref={boardEl}
         />
-        {props.disabled ? (
-          <div
-            aria-label="Board move entry disabled"
-            class="input-lock-overlay absolute inset-0 flex items-center justify-center"
-          >
-            <span class="input-lock-overlay-card">Game over</span>
-          </div>
-        ) : null}
         <div
           class="promotion-dialog absolute inset-0 hidden items-center justify-center bg-black/30 data-[open=true]:flex"
           data-open="false"

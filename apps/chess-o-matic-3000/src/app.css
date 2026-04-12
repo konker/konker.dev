@@ -478,6 +478,12 @@
     border-color: color-mix(in srgb, currentColor 24%, transparent);
   }
 
+  .status-game-over .status-chip {
+    border-color: color-mix(in srgb, var(--color-title) 58%, #2f0821);
+    background-color: color-mix(in srgb, var(--color-title) 5%, white);
+    color: color-mix(in srgb, var(--color-title) 88%, #20030f);
+  }
+
   .status-game-over-reason {
     @apply text-base font-medium;
   }
@@ -758,18 +764,6 @@
   .board-frame {
     padding: 0;
     background-color: transparent;
-  }
-
-  .input-lock-overlay {
-    background-color: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-    backdrop-filter: blur(1px);
-  }
-
-  .input-lock-overlay-card {
-    @apply border px-3 py-2 text-sm font-medium uppercase tracking-[0.14em];
-    border-color: color-mix(in srgb, var(--color-text-primary) 18%, var(--color-border-subtle));
-    background-color: color-mix(in srgb, white 88%, var(--color-bg-panel));
-    color: var(--color-text-primary);
   }
 
   .board-swatch-button {

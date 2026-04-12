@@ -275,38 +275,19 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       />
 
       <CollapsibleSection icon={Keyboard} storageKey="keyboard" title="Keyboard">
-        <div class="relative">
-          <div class={uiState().isGameOver ? 'pointer-events-none opacity-55' : ''}>
-            <ChessKeyboard
-              legalMovesSan={uiState().legalMovesSan}
-              onSubmit={(input) => {
-                if (uiState().isGameOver) {
-                  return;
-                }
-
-                void gameEngine.handleTextInput(input);
-              }}
-              orientation={uiState().boardOrientation}
-              showReadout={false}
-              visibleSettings={{ showReadout: false, orientation: false }}
-              showNunnAnnotations={false}
-            />
-          </div>
-          <Show when={uiState().isGameOver}>
-            <div
-              aria-label="Keyboard move entry disabled"
-              class="input-lock-overlay absolute inset-0 flex items-center justify-center"
-            >
-              <span class="input-lock-overlay-card">Game over</span>
-            </div>
-          </Show>
-        </div>
+        <ChessKeyboard
+          legalMovesSan={uiState().legalMovesSan}
+          onSubmit={(input) => void gameEngine.handleTextInput(input)}
+          orientation={uiState().boardOrientation}
+          showReadout={false}
+          visibleSettings={{ showReadout: false, orientation: false }}
+          showNunnAnnotations={false}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection icon={Grid3x3} storageKey="board" title="Board">
         <div class="board-section-layout">
           <ChessBoard
-            disabled={uiState().isGameOver}
             fen={uiState().fen}
             getPromotionPieceColor={gameEngine.getPromotionPieceColor}
             isLegalMove={gameEngine.isLegalMove}
