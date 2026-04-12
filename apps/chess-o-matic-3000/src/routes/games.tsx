@@ -202,7 +202,7 @@ export default function GamesPage(): JSX.Element {
 
   return (
     <>
-      <Title>History | Chess-o-matic 3000</Title>
+      <Title>History | Chess-o-matic</Title>
       <main class="app-shell">
         <header class="app-header">
           <div class="app-header-top">
@@ -220,7 +220,7 @@ export default function GamesPage(): JSX.Element {
                   class="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
                   src="/images/rook.cobalt.svg"
                 />
-                <span class="pt-1.5">Chess-o-matic 3000</span>
+                <span class="pt-1.5">Chess-o-matic</span>
               </button>
             </div>
             <AppMenu onGoToHistory={() => undefined} onNewGame={() => void navigate('/?newGame=1')} />

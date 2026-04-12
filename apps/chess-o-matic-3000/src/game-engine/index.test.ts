@@ -1,4 +1,4 @@
-/* eslint-disable fp/no-this */
+/* eslint-disable fp/no-this,fp/no-loops */
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ExternalOpen } from '../application/ports/ExternalOpen';
@@ -105,6 +105,8 @@ describe('createGameEngine persistence', () => {
       legalMovesSan: expect.arrayContaining(['Nf3', 'Nc3', 'Bb5', 'Bc4', 'd4']),
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'e5',
+      lastMoveColor: 'black',
+      lastMovePiece: 'pawn',
       lastMoveSan: 'e5',
       pgn: expect.stringContaining('[Orientation "black"]'),
     });
@@ -192,9 +194,14 @@ describe('createGameEngine persistence', () => {
     expect(gameStorage.appState?.currentGame.moveHistory).toEqual([{ from: 'e2', san: 'e4', to: 'e4' }]);
     expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
       currentPly: 1,
+      gameOverReason: undefined,
+      gameResult: undefined,
+      isGameOver: false,
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'e4',
       lastInputSanitized: 'e4',
+      lastMoveColor: 'white',
+      lastMovePiece: 'pawn',
       lastMoveSan: 'e4',
       legalMovesSan: expect.arrayContaining(['Nc6', 'Nf6', 'e5', 'c5']),
     });
@@ -259,6 +266,8 @@ describe('createGameEngine persistence', () => {
       currentPly: 0,
       lastInputEvaluateStatus: 'ignore',
       lastInputResultMessage: 'VIEWING PAST MOVE',
+      lastMoveColor: undefined,
+      lastMovePiece: undefined,
       lastMoveSan: '',
     });
 
@@ -275,6 +284,8 @@ describe('createGameEngine persistence', () => {
       currentPly: 2,
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'OK',
+      lastMoveColor: 'black',
+      lastMovePiece: 'pawn',
       lastMoveSan: 'e5',
     });
   });
@@ -394,6 +405,157 @@ describe('createGameEngine persistence', () => {
 
     await expect(gameEngine.exportGamePgn('missing-game')).rejects.toThrow('Saved game not found: missing-game');
     await expect(gameEngine.openGameInLichess('missing-game')).rejects.toThrow('Saved game not found: missing-game');
+  });
+
+  it('fills the metadata result and emits dedicated game-over state on checkmate', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('f3');
+    await gameEngine.handleBoardMove('e5');
+    await gameEngine.handleBoardMove('g4');
+    await gameEngine.handleBoardMove('Qh4#');
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('0-1');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameMetadata: {
+        result: '0-1',
+      },
+      gameOverReason: 'Checkmate',
+      gameResult: '0-1',
+      isGameOver: true,
+      lastMoveColor: 'black',
+      lastMovePiece: 'queen',
+      lastMoveSan: 'Qh4#',
+    });
+  });
+
+  it('fills the metadata result and emits dedicated game-over state on stalemate', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+
+    for (const move of [
+      'e3',
+      'a5',
+      'Qh5',
+      'Ra6',
+      'Qxa5',
+      'h5',
+      'h4',
+      'Rah6',
+      'Qxc7',
+      'f6',
+      'Qxd7+',
+      'Kf7',
+      'Qxb7',
+      'Qd3',
+      'Qxb8',
+      'Qh7',
+      'Qxc8',
+      'Kg6',
+      'Qe6',
+    ]) {
+      await gameEngine.handleBoardMove(move);
+    }
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('1/2-1/2');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameMetadata: {
+        result: '1/2-1/2',
+      },
+      gameOverReason: 'Stalemate',
+      gameResult: '1/2-1/2',
+      isGameOver: true,
+      lastMoveSan: 'Qe6',
+    });
+  });
+
+  it('clears a prior terminal result only after the user branches to a different line', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('f3');
+    await gameEngine.handleBoardMove('e5');
+    await gameEngine.handleBoardMove('g4');
+    await gameEngine.handleBoardMove('Qh4#');
+
+    gameEngine.stepBackward();
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('0-1');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameOverReason: undefined,
+      gameResult: undefined,
+      isGameOver: false,
+    });
+
+    await gameEngine.handleBoardMove('Nc6');
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameMetadata: {
+        result: '',
+      },
+      gameOverReason: undefined,
+      gameResult: undefined,
+      isGameOver: false,
+      lastMoveColor: 'black',
+      lastMovePiece: 'knight',
+      lastMoveSan: 'Nc6',
+    });
+  });
+
+  it('uses king for castling and the promoted piece for promotion icons', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    for (const move of ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5', 'O-O']) {
+      await gameEngine.handleBoardMove(move);
+    }
+
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      lastMoveColor: 'white',
+      lastMovePiece: 'king',
+      lastMoveSan: 'O-O',
+    });
+
+    const promotionState: AppState = {
+      ...createDefaultAppState('2026-03-30T00:00:00.000Z'),
+      currentGame: {
+        ...createDefaultAppState('2026-03-30T00:00:00.000Z').currentGame,
+        currentPly: 8,
+        moveHistory: [
+          { from: 'a2', san: 'a4', to: 'a4' },
+          { from: 'h7', san: 'h5', to: 'h5' },
+          { from: 'a4', san: 'a5', to: 'a5' },
+          { from: 'h5', san: 'h4', to: 'h4' },
+          { from: 'a5', san: 'a6', to: 'a6' },
+          { from: 'h4', san: 'h3', to: 'h3' },
+          { from: 'a6', san: 'axb7', to: 'b7' },
+          { from: 'g7', san: 'g5', to: 'g5' },
+        ],
+      },
+    };
+    const promotionStorage = createMemoryGameStorage(promotionState);
+    const promotionUi = vi.fn();
+    const promotionEngine = createGameEngine({ gameStorage: promotionStorage });
+
+    await promotionEngine.init({ onUiStateChange: promotionUi });
+    await promotionEngine.handleBoardMove('bxa8=Q');
+
+    expect(promotionUi.mock.calls.at(-1)?.[0]).toMatchObject({
+      lastMoveColor: 'white',
+      lastMovePiece: 'queen',
+      lastMoveSan: 'bxa8=Q',
+    });
   });
 
   it('emits board orientation changes in UI state', async () => {

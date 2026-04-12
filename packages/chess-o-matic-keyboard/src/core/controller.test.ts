@@ -37,7 +37,7 @@ describe('core/controller', () => {
     expect(state.input).toBe('Nf3');
     expect(state.selectedCandidateId).toBe('Nf3');
     expect(submitEvent.source).toBe('candidate');
-    expect(submitEvent.exactLegalMatch).toBe('Nf3');
+    expect(submitEvent.resolvedLegalMatch).toBe('Nf3');
   });
 
   it('should allow settings toggles to be updated independently', () => {
@@ -47,10 +47,12 @@ describe('core/controller', () => {
 
     const state = controller.setSettings({
       autoSubmit: false,
+      autoSubmitOnSinglePartialMatch: true,
       candidateBar: false,
     });
 
     expect(state.settings.autoSubmit).toBe(false);
+    expect(state.settings.autoSubmitOnSinglePartialMatch).toBe(true);
     expect(state.settings.candidateBar).toBe(false);
     expect(state.settings.keyHighlightsMode).toBe('after-input');
   });

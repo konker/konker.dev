@@ -14,7 +14,7 @@ export default function HomePage(): JSX.Element {
 
   return (
     <>
-      <Title>Chess-o-matic 3000</Title>
+      <Title>Chess-o-matic</Title>
       <ChessOMatic3000App
         onConsumeRouteAction={() => void navigate('/', { replace: true })}
         onGoToHistory={() => void navigate('/games')}

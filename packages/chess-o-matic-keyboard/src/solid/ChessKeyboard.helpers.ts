@@ -3,6 +3,7 @@ import type { KeyboardBehaviorSettings } from '../core/types.js';
 export function areSettingsEqual(left: KeyboardBehaviorSettings, right: KeyboardBehaviorSettings): boolean {
   return (
     left.autoSubmit === right.autoSubmit &&
+    left.autoSubmitOnSinglePartialMatch === right.autoSubmitOnSinglePartialMatch &&
     left.candidateBar === right.candidateBar &&
     left.keyHighlightsMode === right.keyHighlightsMode &&
     left.orientation === right.orientation &&

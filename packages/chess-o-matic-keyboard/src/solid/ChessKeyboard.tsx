@@ -23,6 +23,7 @@ export type { ChessKeyboardVisibleSettings } from './types.js';
 
 export type ChessKeyboardProps = {
   readonly autoSubmit?: boolean;
+  readonly autoSubmitOnSinglePartialMatch?: boolean;
   readonly candidateBar?: boolean;
   readonly class?: string;
   readonly defaultValue?: string;
@@ -40,7 +41,14 @@ export type ChessKeyboardProps = {
   readonly visibleSettings?: ChessKeyboardVisibleSettings;
 };
 
-const SETTING_PROP_KEYS = ['autoSubmit', 'candidateBar', 'keyHighlightsMode', 'orientation', 'showReadout'] as const;
+const SETTING_PROP_KEYS = [
+  'autoSubmit',
+  'autoSubmitOnSinglePartialMatch',
+  'candidateBar',
+  'keyHighlightsMode',
+  'orientation',
+  'showReadout',
+] as const;
 
 export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   const keyboard = createChessKeyboardController();
@@ -115,8 +123,8 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   createEffect(() => {
     const currentState = keyboard.state();
     const autoSubmitKey =
-      currentState.shouldAutoSubmit && currentState.autoSubmitMatch !== undefined
-        ? `${currentState.input}::${currentState.autoSubmitMatch}`
+      currentState.shouldAutoSubmit && currentState.autoSubmitTarget !== undefined
+        ? `${currentState.input}::${currentState.autoSubmitTarget}`
         : undefined;
 
     if (autoSubmitKey === undefined) {
@@ -236,7 +244,9 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
     setSettingsOpen((open) => !open);
   };
 
-  const toggleBehaviorSetting = (setting: 'autoSubmit' | 'candidateBar' | 'showReadout') => {
+  const toggleBehaviorSetting = (
+    setting: 'autoSubmit' | 'autoSubmitOnSinglePartialMatch' | 'candidateBar' | 'showReadout'
+  ) => {
     const nextSettings = {
       ...resolvedSettings(),
       [setting]: !resolvedSettings()[setting],
@@ -264,7 +274,15 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   };
 
   function emitSubmit(event: KeyboardSubmitEvent): void {
-    props.onSubmit?.(event.input, event);
+    const submittedInput =
+      event.source === 'auto' &&
+      event.resolvedLegalMatch !== undefined &&
+      event.matchingMoves.length === 1 &&
+      stripAutoSubmitSuffix(event.resolvedLegalMatch) !== event.input
+        ? event.resolvedLegalMatch
+        : event.input;
+
+    props.onSubmit?.(submittedInput, event);
   }
 
   function resetPressedPrimaryKeyIds(): void {
@@ -281,6 +299,10 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
 
     const nextState = keyboard.clear();
     applyInputChange(nextState.input);
+  }
+
+  function stripAutoSubmitSuffix(move: string): string {
+    return move.replace(/[+#]$/, '');
   }
 
   return (
@@ -305,6 +327,9 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
         <SettingsPanel
           onToggleAutoSubmit={() => {
             toggleBehaviorSetting('autoSubmit');
+          }}
+          onToggleAutoSubmitOnSinglePartialMatch={() => {
+            toggleBehaviorSetting('autoSubmitOnSinglePartialMatch');
           }}
           onToggleCandidateBar={() => {
             toggleBehaviorSetting('candidateBar');

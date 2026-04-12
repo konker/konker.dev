@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { CornerDownLeft, PanelTopClose, PanelTopOpen, RotateCcw, Settings2 } from 'lucide-solid';
+import { CornerDownLeft, Ellipsis, Settings2, X } from 'lucide-solid';
 import { type JSX } from 'solid-js';
 
 type TopActionRowProps = {
@@ -30,11 +30,7 @@ export function TopActionRow(props: TopActionRowProps): JSX.Element {
         onClick={props.onToggleSecondary}
         type="button"
       >
-        {props.secondaryActive ? (
-          <PanelTopClose aria-hidden="true" class="chess-keyboard-button-icon" />
-        ) : (
-          <PanelTopOpen aria-hidden="true" class="chess-keyboard-button-icon" />
-        )}
+        <Ellipsis aria-hidden="true" class="chess-keyboard-button-icon" />
       </button>
       {props.settingsVisible ? (
         <button
@@ -62,7 +58,7 @@ export function TopActionRow(props: TopActionRowProps): JSX.Element {
         onClick={props.onClear}
         type="button"
       >
-        <RotateCcw aria-hidden="true" class="chess-keyboard-button-icon" />
+        <X aria-hidden="true" class="chess-keyboard-button-icon" />
       </button>
       <button
         aria-label="Submit"

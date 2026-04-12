@@ -60,7 +60,7 @@ describe('ChessOMatic3000App', () => {
     render(() => ChessOMatic3000App({ autoloadEngine: false }), root);
     await Promise.resolve();
 
-    expect(root.textContent).toContain('Chess-o-matic 3000');
+    expect(root.textContent).toContain('Chess-o-matic');
     expect(root.querySelector('button[aria-label="Open menu"]')).not.toBeNull();
     expect(root.querySelector('button[aria-label="Copy PGN"]')).not.toBeNull();
     expect(root.querySelector('button[aria-label="Copy FEN"]')).not.toBeNull();
@@ -70,7 +70,7 @@ describe('ChessOMatic3000App', () => {
     expect(root.querySelector('button[aria-label="Sounds"]')).not.toBeNull();
     expect(root.textContent).toContain('PGN');
     expect(root.textContent).toContain('Keyboard');
-    expect(root.textContent).toContain('Heard');
+    expect(root.textContent).toContain('Last Input');
     const navigationRow = root.querySelector('.board-navigation-row');
     const statusPanel = root.querySelector('#status');
     const keyboardSection = root.querySelector('.chess-keyboard-root')?.closest('details');

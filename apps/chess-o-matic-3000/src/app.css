@@ -1,5 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@200..800&family=Atkinson+Hyperlegible+Mono:wght@200..800&display=swap');
-/*@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');*/
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/Atkinson_Hyperlegible_Next/AtkinsonHyperlegibleNext-VariableFont_wght.ttf') format('truetype');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Mono';
+  src: url('/fonts/Atkinson_Hyperlegible_Mono/AtkinsonHyperlegibleMono-VariableFont_wght.ttf') format('truetype');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import 'tailwindcss';
 
 @theme {
@@ -435,31 +449,21 @@
     @apply absolute right-4 top-4 sm:right-5 sm:top-5;
   }
 
-  .status-move-chip {
-    @apply inline-flex h-7 min-w-10 items-center justify-center;
-    font-family: var(--font-data);
-  }
-
-  .status-color-chip {
-    @apply inline-block h-7 w-7 border;
-    border-color: currentColor;
-  }
-
-  .status-color-chip-white {
-    background-color: white;
-  }
-
-  .status-color-chip-black {
-    background-color: #1b1c1b;
-  }
-
   .status-san {
     @apply text-4xl font-semibold leading-none sm:text-5xl;
     font-family: var(--font-mono);
   }
 
+  .status-san-button {
+    @apply inline-flex items-center gap-1;
+  }
+
+  .status-move-piece {
+    @apply h-8 w-8 shrink-0 sm:h-10 sm:w-10;
+  }
+
   .status-heard-label {
-    @apply text-[0.72rem] uppercase tracking-[0.18em];
+    @apply inline-flex items-center pt-1 text-[0.72rem] uppercase tracking-[0.18em];
     opacity: 0.78;
   }
 
@@ -473,8 +477,24 @@
     @apply flex flex-wrap items-end justify-between gap-3;
   }
 
-  .status-panel-move-indicator {
-    @apply flex items-center gap-2;
+  .status-game-over {
+    @apply flex flex-wrap items-center gap-3 border-t pt-3;
+    border-color: color-mix(in srgb, currentColor 24%, transparent);
+  }
+
+  .status-game-over .status-chip {
+    border-color: color-mix(in srgb, var(--color-title) 58%, #2f0821);
+    background-color: color-mix(in srgb, var(--color-title) 5%, white);
+    color: color-mix(in srgb, var(--color-title) 88%, #20030f);
+  }
+
+  .status-game-over-reason {
+    @apply text-base font-medium;
+  }
+
+  .status-game-over-result {
+    @apply text-lg font-semibold;
+    font-family: var(--font-data);
   }
 
   .metadata-grid {
@@ -556,7 +576,7 @@
   }
 
   .scoresheet-scroll {
-    @apply flex h-72 flex-col overflow-y-auto pr-1;
+    @apply flex h-[22.5rem] flex-col overflow-y-auto pr-1;
   }
 
   .scoresheet-row {

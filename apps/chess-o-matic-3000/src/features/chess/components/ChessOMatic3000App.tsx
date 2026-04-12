@@ -100,7 +100,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       syncAudioState();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown initialization error';
-      setErrorMessage(`Unable to initialize Chess-o-matic 3000. (${message})`);
+      setErrorMessage(`Unable to initialize Chess-o-matic. (${message})`);
       setUiState((state) => ({
         ...state,
         lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
@@ -164,14 +164,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     }));
   }
 
-  function renderCurrentMoveNumber(): number {
-    return Math.max(1, Math.ceil(uiState().currentPly / 2));
-  }
-
-  function renderCurrentMoveColor(): 'white' | 'black' {
-    return uiState().currentPly % 2 === 0 ? 'white' : 'black';
-  }
-
   async function startNewGame(): Promise<void> {
     try {
       await gameEngine.newGame();
@@ -224,7 +216,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
               type="button"
             >
               <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
-              <span class="pt-1.5">Chess-o-matic 3000</span>
+              <span class="pt-1.5">Chess-o-matic</span>
             </button>
           </div>
           <AppMenu
@@ -251,6 +243,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         />
         <ControlsPanel
           disabled={isInitializing() || !!errorMessage()}
+          isGameOver={uiState().isGameOver}
           isListeningAvailable={isListeningAvailable()}
           isListening={isListening()}
           isSoundAvailable={isSoundAvailable()}
@@ -261,9 +254,12 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       </div>
 
       <StatusPanel
-        currentMoveColor={renderCurrentMoveColor()}
-        currentMoveNumber={renderCurrentMoveNumber()}
+        gameOverReason={uiState().gameOverReason}
+        gameResult={uiState().gameResult}
         illegalReason={uiState().lastInputIllegalReason}
+        isGameOver={uiState().isGameOver}
+        lastMoveColor={uiState().lastMoveColor}
+        lastMovePiece={uiState().lastMovePiece}
         lastMoveSan={uiState().lastMoveSan}
         message={uiState().lastInputResultMessage}
         sanitizedInput={uiState().lastInputSanitized}

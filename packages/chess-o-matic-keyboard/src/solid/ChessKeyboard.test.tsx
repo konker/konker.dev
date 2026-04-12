@@ -29,6 +29,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   readonly root: HTMLElement;
   readonly setSettings: (nextSettings: {
     readonly autoSubmit: boolean;
+    readonly autoSubmitOnSinglePartialMatch: boolean;
     readonly candidateBar: boolean;
     readonly keyHighlightsMode: 'after-input' | 'always' | 'off';
     readonly orientation: 'black' | 'white';
@@ -40,6 +41,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   document.body.append(root);
   let setSettings!: (nextSettings: {
     readonly autoSubmit: boolean;
+    readonly autoSubmitOnSinglePartialMatch: boolean;
     readonly candidateBar: boolean;
     readonly keyHighlightsMode: 'after-input' | 'always' | 'off';
     readonly orientation: 'black' | 'white';
@@ -51,6 +53,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
     const [value, updateValue] = createSignal('');
     const [settings, updateSettings] = createSignal({
       autoSubmit: true,
+      autoSubmitOnSinglePartialMatch: false,
       candidateBar: true,
       keyHighlightsMode: 'always' as const,
       orientation: 'white' as const,
@@ -142,7 +145,7 @@ describe('solid/ChessKeyboard', () => {
     expect(onSubmit).toHaveBeenCalledWith(
       'Nf3',
       expect.objectContaining({
-        exactLegalMatch: 'Nf3',
+        resolvedLegalMatch: 'Nf3',
         source: 'candidate',
       })
     );
@@ -164,7 +167,7 @@ describe('solid/ChessKeyboard', () => {
     expect(onSubmit).toHaveBeenCalledWith(
       'Nf3',
       expect.objectContaining({
-        exactLegalMatch: 'Nf3',
+        resolvedLegalMatch: 'Nf3',
         source: 'auto',
       })
     );
@@ -187,7 +190,7 @@ describe('solid/ChessKeyboard', () => {
     expect(onSubmit).toHaveBeenCalledWith(
       'Bb5',
       expect.objectContaining({
-        exactLegalMatch: 'Bb5+',
+        resolvedLegalMatch: 'Bb5+',
         source: 'auto',
       })
     );
@@ -202,6 +205,44 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
     fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
     fireEvent.click(getByRole(view.root, 'button', { name: '3' }));
+
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    view.cleanup();
+  });
+
+  it('should auto-submit on a unique partial match when enabled', () => {
+    const onSubmit = vi.fn();
+    const view = mount({
+      legalMovesSan: ['Nf3', 'Nc3'],
+      onSubmit,
+      settings: { autoSubmitOnSinglePartialMatch: true },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      'Nf3',
+      expect.objectContaining({
+        resolvedLegalMatch: 'Nf3',
+        source: 'auto',
+      })
+    );
+
+    view.cleanup();
+  });
+
+  it('should not auto-submit on a unique partial match when the setting is off', () => {
+    const onSubmit = vi.fn();
+    const view = mount({
+      legalMovesSan: ['Nf3', 'Nc3'],
+      onSubmit,
+      settings: { autoSubmitOnSinglePartialMatch: false },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
 
     expect(onSubmit).not.toHaveBeenCalled();
 
@@ -275,6 +316,27 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'button', { name: '3' }));
 
     expect(onSubmit).not.toHaveBeenCalled();
+
+    view.cleanup();
+  });
+
+  it('should allow single partial match auto-submit to be toggled from the settings layer', () => {
+    const onSubmit = vi.fn();
+    const view = mount({ legalMovesSan: ['Nf3', 'Nc3'], onSubmit });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Auto Submit Single Partial Match' }));
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'N' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      'Nf3',
+      expect.objectContaining({
+        resolvedLegalMatch: 'Nf3',
+        source: 'auto',
+      })
+    );
 
     view.cleanup();
   });
@@ -367,6 +429,7 @@ describe('solid/ChessKeyboard', () => {
 
     view.setSettings({
       autoSubmit: true,
+      autoSubmitOnSinglePartialMatch: false,
       candidateBar: true,
       keyHighlightsMode: 'off',
       orientation: 'white',
@@ -388,6 +451,7 @@ describe('solid/ChessKeyboard', () => {
     expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'Always' })).toBeTruthy();
     expect(getByRole(view.root, 'checkbox', { name: 'Auto Submit' })).toBeTruthy();
+    expect(getByRole(view.root, 'checkbox', { name: 'Auto Submit Single Partial Match' })).toBeTruthy();
     expect(getByRole(view.root, 'checkbox', { name: 'Show Readout' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'White' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'Black' })).toBeTruthy();

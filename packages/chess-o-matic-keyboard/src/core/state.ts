@@ -40,7 +40,7 @@ export function deriveKeyboardState(
   const analysis = buildCandidateAnalysis(normalizedInput, context, layer, settings);
 
   return {
-    ...(analysis.autoSubmitMatch === undefined ? {} : { autoSubmitMatch: analysis.autoSubmitMatch }),
+    ...(analysis.autoSubmitTarget === undefined ? {} : { autoSubmitTarget: analysis.autoSubmitTarget }),
     exactMatches: analysis.exactMatches,
     highlightedKeyIds: analysis.highlightedKeyIds,
     input: normalizedInput,
@@ -101,10 +101,10 @@ export function submitKeyboardModel(
 ): KeyboardSubmitEvent {
   return {
     ...(model.state.exactMatches.length === 1
-      ? { exactLegalMatch: model.state.exactMatches[0] }
-      : model.state.autoSubmitMatch === undefined
+      ? { resolvedLegalMatch: model.state.exactMatches[0] }
+      : model.state.autoSubmitTarget === undefined
         ? {}
-        : { exactLegalMatch: model.state.autoSubmitMatch }),
+        : { resolvedLegalMatch: model.state.autoSubmitTarget }),
     input: model.state.input,
     matchingMoves: model.state.matchingMoves,
     source,
