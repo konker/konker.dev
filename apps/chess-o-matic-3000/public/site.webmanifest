@@ -1,5 +1,5 @@
 {
-  "name": "Chess-o-matic 3000",
+  "name": "Chess-o-matic",
   "short_name": "Chess-o-matic",
   "description": "Chess game recorder with board entry and speech input.",
   "start_url": "/",

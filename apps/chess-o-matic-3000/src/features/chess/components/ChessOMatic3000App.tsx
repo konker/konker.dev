@@ -100,7 +100,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       syncAudioState();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown initialization error';
-      setErrorMessage(`Unable to initialize Chess-o-matic 3000. (${message})`);
+      setErrorMessage(`Unable to initialize Chess-o-matic. (${message})`);
       setUiState((state) => ({
         ...state,
         lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
@@ -224,7 +224,7 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
               type="button"
             >
               <img alt="" aria-hidden="true" class="h-10 w-10 shrink-0 sm:h-12 sm:w-12" src="/images/rook.cobalt.svg" />
-              <span class="pt-1.5">Chess-o-matic 3000</span>
+              <span class="pt-1.5">Chess-o-matic</span>
             </button>
           </div>
           <AppMenu
