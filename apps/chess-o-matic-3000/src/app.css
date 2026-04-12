@@ -440,7 +440,7 @@
   }
 
   .status-chip {
-    @apply border px-2 py-1 text-[0.7rem] font-medium uppercase tracking-[0.18em];
+    @apply rounded-sm border px-2 py-1 text-[0.7rem] font-medium uppercase tracking-[0.18em];
     border-color: currentColor;
     background-color: color-mix(in srgb, currentColor 9%, white);
   }
@@ -474,7 +474,7 @@
   }
 
   .status-footer-row {
-    @apply flex flex-wrap items-end justify-between gap-3;
+    @apply ml-2 flex flex-wrap items-end justify-between gap-3;
   }
 
   .status-game-over {
