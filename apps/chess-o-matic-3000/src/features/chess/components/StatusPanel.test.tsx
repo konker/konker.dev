@@ -28,5 +28,6 @@ describe('StatusPanel', () => {
     expect(root.querySelector('[aria-label="Game Over Summary"]')?.textContent).toContain('Game over');
     expect(root.querySelector('[aria-label="Game Over Summary"]')?.textContent).toContain('Checkmate');
     expect(root.querySelector('[aria-label="Game Result"]')?.textContent).toBe('0-1');
+    expect(root.textContent).toContain('Last Input');
   });
 });

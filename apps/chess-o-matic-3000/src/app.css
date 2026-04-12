@@ -459,7 +459,7 @@
   }
 
   .status-heard-label {
-    @apply text-[0.72rem] uppercase tracking-[0.18em];
+    @apply inline-flex items-center pt-1 text-[0.72rem] uppercase tracking-[0.18em];
     opacity: 0.78;
   }
 

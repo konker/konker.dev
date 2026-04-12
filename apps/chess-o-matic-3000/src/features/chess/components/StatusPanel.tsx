@@ -1,3 +1,4 @@
+import { Ear } from 'lucide-solid';
 import type { JSX } from 'solid-js';
 
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
@@ -73,8 +74,11 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
         </div>
       ) : null}
       <div class="status-footer-row">
-        <div class="flex flex-wrap items-baseline gap-3">
-          <span class="status-heard-label">Heard</span>
+        <div class="flex flex-wrap items-start gap-2">
+          <span class="status-heard-label">
+            <Ear aria-hidden="true" class="h-4 w-4" />
+            <span class="sr-only">Last Input</span>
+          </span>
           <span aria-label="Last Input Sanitized" class="status-heard-value">
             {props.sanitizedInput || 'No input yet'}
           </span>
