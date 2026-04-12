@@ -361,8 +361,10 @@
 }
 
 .chess-keyboard-secondary-panel {
+  border-bottom: var(--chesskbd-rank-separator-thickness) solid var(--chesskbd-rank-separator-color);
   display: grid;
   gap: var(--chesskbd-gap);
+  padding-bottom: calc(var(--chesskbd-row-gap) * 1.5);
 }
 
 .chess-keyboard-secondary-row {
