@@ -114,6 +114,9 @@ export type GameEngineUiState = {
   readonly lastInputEvaluateStatus: GameModelEvaluateStatus;
   readonly lastInputIllegalReason: 'ambiguous' | 'invalid' | undefined;
   readonly lastInputResultMessage: string;
+  readonly isGameOver: boolean;
+  readonly gameOverReason: string | undefined;
+  readonly gameResult: string | undefined;
   readonly scoresheetData: ScoreSheetData;
 };
 
@@ -125,6 +128,9 @@ export const GAME_ENGINE_UI_STATE_EMPTY: GameEngineUiState = {
   currentGameId: 'current-game',
   fen: START_FEN,
   gameMetadata: GAME_METADATA_EMPTY,
+  gameOverReason: undefined,
+  gameResult: undefined,
+  isGameOver: false,
   legalMovesSan: [],
   lastInputEvaluateStatus: GAME_MODEL_EVALUATE_STATUS_IGNORE,
   lastInputIllegalReason: undefined,
@@ -265,14 +271,87 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     applyGameMetadata(model.chess, state.currentGame.metadata, state.currentGame.orientation);
   }
 
-  function syncAppStateFromGameModel(state: AppState, model: GameModelResources): void {
+  function resolveGameOverState(
+    model: GameModelResources
+  ): { readonly reason: string; readonly result: string } | undefined {
+    const chess = model.chess;
+
+    if (!chess.isGameOver()) {
+      return undefined;
+    }
+
+    if (chess.isCheckmate()) {
+      return {
+        reason: 'Checkmate',
+        result: chess.turn() === 'w' ? '0-1' : '1-0',
+      };
+    }
+
+    if (chess.isStalemate()) {
+      return {
+        reason: 'Stalemate',
+        result: '1/2-1/2',
+      };
+    }
+
+    if (chess.isThreefoldRepetition()) {
+      return {
+        reason: 'Threefold repetition',
+        result: '1/2-1/2',
+      };
+    }
+
+    if (chess.isInsufficientMaterial()) {
+      return {
+        reason: 'Insufficient material',
+        result: '1/2-1/2',
+      };
+    }
+
+    if (chess.isDrawByFiftyMoves()) {
+      return {
+        reason: 'Fifty-move rule',
+        result: '1/2-1/2',
+      };
+    }
+
+    return {
+      reason: 'Draw',
+      result: '1/2-1/2',
+    };
+  }
+
+  function syncAppStateFromGameModel(
+    state: AppState,
+    model: GameModelResources,
+    options: {
+      readonly updateDerivedResult?: boolean;
+    } = {}
+  ): void {
     const snapshot = gameModelSnapshotState(model);
+    const gameOverState = resolveGameOverState(model);
+    const hasBranched = state.currentGame.currentPly < state.currentGame.moveHistory.length;
+    const nextMetadata =
+      options.updateDerivedResult === true
+        ? gameOverState
+          ? {
+              ...state.currentGame.metadata,
+              result: gameOverState.result,
+            }
+          : hasBranched
+            ? {
+                ...state.currentGame.metadata,
+                result: '',
+              }
+            : state.currentGame.metadata
+        : state.currentGame.metadata;
 
     appState = {
       ...state,
       currentGame: {
         ...state.currentGame,
         currentPly: snapshot.currentPly,
+        metadata: nextMetadata,
         moveHistory: snapshot.moveHistory,
         updatedAt: new Date().toISOString(),
       },
@@ -329,12 +408,17 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     sanitizedInput: string,
     lastMoveSan: string
   ): void {
+    const gameOverState = resolveGameOverState(model);
+
     emitUiState({
       canGoBackward: gameModelCanGoBackward(model),
       canGoForward: gameModelCanGoForward(model),
       currentPly: model.currentPly,
       currentGameId: state.currentGame.id,
       boardOrientation: state.currentGame.orientation,
+      gameOverReason: gameOverState?.reason,
+      gameResult: gameOverState?.result,
+      isGameOver: gameOverState !== undefined,
       legalMovesSan: model.chess.moves(),
       lastInputSanitized: sanitizedInput,
       lastMoveSan,
@@ -506,10 +590,19 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
     const state = requireInitialized();
 
     if (result.status === GAME_MODEL_EVALUATE_STATUS_OK) {
-      syncAppStateFromGameModel(state.appState, state.gameModelResources);
+      syncAppStateFromGameModel(state.appState, state.gameModelResources, { updateDerivedResult: true });
       const nextState = requireAppState();
+      const gameOverState = resolveGameOverState(state.gameModelResources);
+      applyGameMetadata(
+        state.gameModelResources.chess,
+        nextState.currentGame.metadata,
+        nextState.currentGame.orientation
+      );
       await syncPersistedCurrentGame(nextState.currentGame);
       await persistAppState();
+      if (gameOverState && isAudioInputOn()) {
+        await audioInputOff();
+      }
       const flags = resolveGameMoveFlags(state.gameModelResources.chess, nextState.currentGame.orientation);
       syncBoardPosition();
       await runNonFatalAudioSideEffect(
@@ -632,6 +725,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
 
     if (!canUseAudioInput()) {
       throw new Error('Speech input is not supported in this browser.');
+    }
+
+    if (state.gameModelResources.chess.isGameOver()) {
+      throw new Error('Move entry is disabled because the game is over.');
     }
 
     if (state.audioInputResources.status === AUDIO_INPUT_LISTENING_ON) {
@@ -817,6 +914,10 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
 
   function isLegalMove(coords: [Square, Square]): boolean {
     const model = requireInitialized().gameModelResources;
+    if (model.chess.isGameOver()) {
+      return false;
+    }
+
     return model.isLegalMove(coords);
   }
 
@@ -834,10 +935,18 @@ export function createGameEngine(deps: CreateGameEngineDeps = {}): GameEngine {
   }
 
   async function handleBoardMove(move: [Square, Square] | string): Promise<void> {
+    if (requireInitialized().gameModelResources.chess.isGameOver()) {
+      return;
+    }
+
     await evaluateBoardMove(move);
   }
 
   async function handleTextInput(input: string): Promise<void> {
+    if (requireInitialized().gameModelResources.chess.isGameOver()) {
+      return;
+    }
+
     const readResult = gameModelRead(input);
 
     if (readResult.status === GAME_INPUT_PARSE_STATUS_IGNORE && input.trim() !== '') {

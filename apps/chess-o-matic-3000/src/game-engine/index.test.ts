@@ -1,4 +1,4 @@
-/* eslint-disable fp/no-this */
+/* eslint-disable fp/no-this,fp/no-loops */
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ExternalOpen } from '../application/ports/ExternalOpen';
@@ -192,6 +192,9 @@ describe('createGameEngine persistence', () => {
     expect(gameStorage.appState?.currentGame.moveHistory).toEqual([{ from: 'e2', san: 'e4', to: 'e4' }]);
     expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
       currentPly: 1,
+      gameOverReason: undefined,
+      gameResult: undefined,
+      isGameOver: false,
       lastInputEvaluateStatus: 'ok',
       lastInputResultMessage: 'e4',
       lastInputSanitized: 'e4',
@@ -394,6 +397,106 @@ describe('createGameEngine persistence', () => {
 
     await expect(gameEngine.exportGamePgn('missing-game')).rejects.toThrow('Saved game not found: missing-game');
     await expect(gameEngine.openGameInLichess('missing-game')).rejects.toThrow('Saved game not found: missing-game');
+  });
+
+  it('fills the metadata result and emits dedicated game-over state on checkmate', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('f3');
+    await gameEngine.handleBoardMove('e5');
+    await gameEngine.handleBoardMove('g4');
+    await gameEngine.handleBoardMove('Qh4#');
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('0-1');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameMetadata: {
+        result: '0-1',
+      },
+      gameOverReason: 'Checkmate',
+      gameResult: '0-1',
+      isGameOver: true,
+      lastMoveSan: 'Qh4#',
+    });
+  });
+
+  it('fills the metadata result and emits dedicated game-over state on stalemate', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+
+    for (const move of [
+      'e3',
+      'a5',
+      'Qh5',
+      'Ra6',
+      'Qxa5',
+      'h5',
+      'h4',
+      'Rah6',
+      'Qxc7',
+      'f6',
+      'Qxd7+',
+      'Kf7',
+      'Qxb7',
+      'Qd3',
+      'Qxb8',
+      'Qh7',
+      'Qxc8',
+      'Kg6',
+      'Qe6',
+    ]) {
+      await gameEngine.handleBoardMove(move);
+    }
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('1/2-1/2');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameMetadata: {
+        result: '1/2-1/2',
+      },
+      gameOverReason: 'Stalemate',
+      gameResult: '1/2-1/2',
+      isGameOver: true,
+      lastMoveSan: 'Qe6',
+    });
+  });
+
+  it('clears a prior terminal result only after the user branches to a different line', async () => {
+    const gameStorage = createMemoryGameStorage(undefined);
+    const onUiStateChange = vi.fn();
+    const gameEngine = createGameEngine({ gameStorage });
+
+    await gameEngine.init({ onUiStateChange });
+    await gameEngine.handleBoardMove('f3');
+    await gameEngine.handleBoardMove('e5');
+    await gameEngine.handleBoardMove('g4');
+    await gameEngine.handleBoardMove('Qh4#');
+
+    gameEngine.stepBackward();
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('0-1');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameOverReason: undefined,
+      gameResult: undefined,
+      isGameOver: false,
+    });
+
+    await gameEngine.handleBoardMove('Nc6');
+
+    expect(gameStorage.appState?.currentGame.metadata.result).toBe('');
+    expect(onUiStateChange.mock.calls.at(-1)?.[0]).toMatchObject({
+      gameMetadata: {
+        result: '',
+      },
+      gameOverReason: undefined,
+      gameResult: undefined,
+      isGameOver: false,
+      lastMoveSan: 'Nc6',
+    });
   });
 
   it('emits board orientation changes in UI state', async () => {

@@ -3,6 +3,7 @@ import type { JSX } from 'solid-js';
 
 type ControlsPanelProps = {
   readonly disabled: boolean;
+  readonly isGameOver: boolean;
   readonly isListeningAvailable: boolean;
   readonly isListening: boolean;
   readonly isSoundAvailable: boolean;
@@ -17,7 +18,7 @@ export function ControlsPanel(props: ControlsPanelProps): JSX.Element {
       <button
         aria-label="Speech"
         class={`toolbar-icon-button toolbar-icon-button-cobalt ${props.isListening ? 'toolbar-button-active' : ''}`}
-        disabled={props.disabled || !props.isListeningAvailable}
+        disabled={props.disabled || props.isGameOver || !props.isListeningAvailable}
         onClick={props.onToggleListening}
         title="Speech"
         type="button"

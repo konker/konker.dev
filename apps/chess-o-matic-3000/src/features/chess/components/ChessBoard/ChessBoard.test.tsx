@@ -228,4 +228,41 @@ describe('ChessBoard', () => {
     // eslint-disable-next-line fp/no-delete
     delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
   });
+
+  it('disables board interaction and shows an overlay when move entry is locked', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    const getAnimationsSpy = vi.fn(() => []);
+    Object.defineProperty(Element.prototype, 'getAnimations', {
+      configurable: true,
+      value: getAnimationsSpy,
+    });
+
+    render(
+      () => (
+        <ChessBoard
+          disabled
+          fen={START_FEN}
+          getPromotionPieceColor={() => undefined}
+          isLegalMove={() => true}
+          onMove={async () => Promise.resolve()}
+          onReady={vi.fn()}
+          onToggleOrientation={vi.fn()}
+          orientation={GAME_BOARD_ORIENTATION_WHITE}
+        />
+      ),
+      root
+    );
+
+    await Promise.resolve();
+
+    const board = root.querySelector('g-chess-board') as { interactive?: boolean } | null;
+
+    expect(board?.interactive).toBe(false);
+    expect(root.querySelector('[aria-label="Board move entry disabled"]')?.textContent).toContain('Game over');
+
+    // eslint-disable-next-line fp/no-delete
+    delete (Element.prototype as Partial<Element> & { getAnimations?: () => Array<Animation> }).getAnimations;
+  });
 });

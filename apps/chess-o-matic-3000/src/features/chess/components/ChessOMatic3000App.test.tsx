@@ -84,6 +84,7 @@ describe('ChessOMatic3000App', () => {
     expect(chessKeyboardMock).toHaveBeenCalled();
     expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-legal-moves')).toBe('');
     expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-orientation')).toBe('white');
+    expect(root.querySelector('[aria-label="Keyboard move entry disabled"]')).toBeNull();
     expect(
       (root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent
     ).toContain('Component test mode');

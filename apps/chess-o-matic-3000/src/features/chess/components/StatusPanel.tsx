@@ -5,6 +5,9 @@ import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 type StatusPanelProps = {
   readonly currentMoveColor: 'white' | 'black';
   readonly currentMoveNumber: number;
+  readonly gameOverReason?: string;
+  readonly gameResult?: string;
+  readonly isGameOver: boolean;
   readonly status: GameModelEvaluateStatus;
   readonly illegalReason?: 'ambiguous' | 'invalid';
   readonly lastMoveSan: string;
@@ -60,6 +63,15 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
       >
         {props.lastMoveSan || '-'}
       </button>
+      {props.isGameOver ? (
+        <div aria-label="Game Over Summary" class="status-game-over">
+          <span class="status-chip">Game over</span>
+          <span class="status-game-over-reason">{props.gameOverReason ?? 'Game over'}</span>
+          <span aria-label="Game Result" class="status-game-over-result">
+            {props.gameResult ?? '-'}
+          </span>
+        </div>
+      ) : null}
       <div class="status-footer-row">
         <div class="flex flex-wrap items-baseline gap-3">
           <span class="status-heard-label">Heard</span>

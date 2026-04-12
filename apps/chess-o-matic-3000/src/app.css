@@ -473,6 +473,20 @@
     @apply flex flex-wrap items-end justify-between gap-3;
   }
 
+  .status-game-over {
+    @apply flex flex-wrap items-center gap-3 border-t pt-3;
+    border-color: color-mix(in srgb, currentColor 24%, transparent);
+  }
+
+  .status-game-over-reason {
+    @apply text-base font-medium;
+  }
+
+  .status-game-over-result {
+    @apply text-lg font-semibold;
+    font-family: var(--font-data);
+  }
+
   .status-panel-move-indicator {
     @apply flex items-center gap-2;
   }
@@ -744,6 +758,18 @@
   .board-frame {
     padding: 0;
     background-color: transparent;
+  }
+
+  .input-lock-overlay {
+    background-color: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+    backdrop-filter: blur(1px);
+  }
+
+  .input-lock-overlay-card {
+    @apply border px-3 py-2 text-sm font-medium uppercase tracking-[0.14em];
+    border-color: color-mix(in srgb, var(--color-text-primary) 18%, var(--color-border-subtle));
+    background-color: color-mix(in srgb, white 88%, var(--color-bg-panel));
+    color: var(--color-text-primary);
   }
 
   .board-swatch-button {
