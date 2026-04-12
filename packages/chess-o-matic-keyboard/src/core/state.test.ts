@@ -27,6 +27,17 @@ describe('core/state', () => {
     expect(state.shouldAutoSubmit).toBe(true);
   });
 
+  it('should sort matching moves lexically regardless of source order', () => {
+    const state = deriveKeyboardState(
+      'N',
+      { legalMovesSan: ['Nc3', 'Nf3', 'Na3'] },
+      'primary',
+      DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS
+    );
+
+    expect(state.matchingMoves).toStrictEqual(['Na3', 'Nc3', 'Nf3']);
+  });
+
   it('should auto-submit when a unique legal SAN ends with check suffix', () => {
     const state = deriveKeyboardState(
       'Bb5',
@@ -89,7 +100,7 @@ describe('core/state', () => {
       autoSubmitOnSinglePartialMatch: true,
     });
 
-    expect(state.matchingMoves).toStrictEqual(['Nf3', 'Nc3']);
+    expect(state.matchingMoves).toStrictEqual(['Nc3', 'Nf3']);
     expect(state.autoSubmitTarget).toBeUndefined();
     expect(state.shouldAutoSubmit).toBe(false);
   });

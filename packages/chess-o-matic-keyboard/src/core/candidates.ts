@@ -25,7 +25,8 @@ export function buildCandidateAnalysis(
   settings: KeyboardBehaviorSettings
 ): CandidateAnalysis {
   const legalMovesSan = getLegalMovesSan(context);
-  const matchingMoves = input.length === 0 ? [] : legalMovesSan.filter((move) => move.startsWith(input));
+  const matchingMoves =
+    input.length === 0 ? [] : sortSanLexically(legalMovesSan.filter((move) => move.startsWith(input)));
   const exactMatches = input.length === 0 ? [] : legalMovesSan.filter((move) => move === input);
   const exactAutoSubmitMatches =
     input.length === 0 ? [] : legalMovesSan.filter((move) => stripAutoSubmitSuffix(move) === input);
@@ -65,6 +66,11 @@ function resolveAutoSubmitTarget(
 
 function stripAutoSubmitSuffix(move: string): string {
   return move.replace(/[+#]$/, '');
+}
+
+function sortSanLexically(moves: ReadonlyArray<string>): ReadonlyArray<string> {
+  // eslint-disable-next-line fp/no-mutating-methods
+  return [...moves].sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
 }
 
 export function deriveHighlightedKeyIds(
