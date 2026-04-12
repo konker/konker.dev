@@ -20,7 +20,7 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
       <div class="chess-keyboard-settings-group" data-slot="settings-group">
         <Show when={props.visibleSettings?.autoSubmit !== false}>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
               Auto Submit
             </span>
             <input
@@ -36,7 +36,7 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
         </Show>
         <Show when={props.visibleSettings?.showReadout !== false}>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
               Show Readout
             </span>
             <input
@@ -52,7 +52,7 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
         </Show>
         <Show when={props.visibleSettings?.candidateBar !== false}>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
               Show Candidate Bar
             </span>
             <input
@@ -67,12 +67,15 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
           </label>
         </Show>
         <Show when={props.visibleSettings?.keyHighlightsMode !== false}>
-          <fieldset class="chess-keyboard-settings-group" data-slot="settings-group">
-            <legend class="chess-keyboard-settings-label" data-slot="settings-label">
+          <fieldset
+            class="chess-keyboard-settings-group chess-keyboard-settings-choice-group"
+            data-slot="settings-group"
+          >
+            <legend class="chess-keyboard-settings-group-title" data-slot="settings-label">
               Key Highlights
             </legend>
             <label class="chess-keyboard-settings-field" data-slot="settings-field">
-              <span class="chess-keyboard-settings-label" data-slot="settings-label">
+              <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
                 Off
               </span>
               <input
@@ -89,7 +92,7 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
               />
             </label>
             <label class="chess-keyboard-settings-field" data-slot="settings-field">
-              <span class="chess-keyboard-settings-label" data-slot="settings-label">
+              <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
                 After Input
               </span>
               <input
@@ -106,7 +109,7 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
               />
             </label>
             <label class="chess-keyboard-settings-field" data-slot="settings-field">
-              <span class="chess-keyboard-settings-label" data-slot="settings-label">
+              <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
                 Always
               </span>
               <input
@@ -126,12 +129,12 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
         </Show>
       </div>
       <Show when={props.visibleSettings?.orientation !== false}>
-        <fieldset class="chess-keyboard-settings-group" data-slot="settings-group">
-          <legend class="chess-keyboard-settings-label" data-slot="settings-label">
+        <fieldset class="chess-keyboard-settings-group chess-keyboard-settings-choice-group" data-slot="settings-group">
+          <legend class="chess-keyboard-settings-group-title" data-slot="settings-label">
             Orientation
           </legend>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
               White
             </span>
             <input
@@ -148,7 +151,7 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
             />
           </label>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-label" data-slot="settings-label">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
               Black
             </span>
             <input
