@@ -449,24 +449,6 @@
     @apply absolute right-4 top-4 sm:right-5 sm:top-5;
   }
 
-  .status-move-chip {
-    @apply inline-flex h-7 min-w-10 items-center justify-center;
-    font-family: var(--font-data);
-  }
-
-  .status-color-chip {
-    @apply inline-block h-7 w-7 border;
-    border-color: currentColor;
-  }
-
-  .status-color-chip-white {
-    background-color: white;
-  }
-
-  .status-color-chip-black {
-    background-color: #1b1c1b;
-  }
-
   .status-san {
     @apply text-4xl font-semibold leading-none sm:text-5xl;
     font-family: var(--font-mono);
@@ -513,10 +495,6 @@
   .status-game-over-result {
     @apply text-lg font-semibold;
     font-family: var(--font-data);
-  }
-
-  .status-panel-move-indicator {
-    @apply flex items-center gap-2;
   }
 
   .metadata-grid {

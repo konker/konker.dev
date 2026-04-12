@@ -164,14 +164,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
     }));
   }
 
-  function renderCurrentMoveNumber(): number {
-    return Math.max(1, Math.ceil(uiState().currentPly / 2));
-  }
-
-  function renderCurrentMoveColor(): 'white' | 'black' {
-    return uiState().currentPly % 2 === 0 ? 'white' : 'black';
-  }
-
   async function startNewGame(): Promise<void> {
     try {
       await gameEngine.newGame();
@@ -262,8 +254,6 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
       </div>
 
       <StatusPanel
-        currentMoveColor={renderCurrentMoveColor()}
-        currentMoveNumber={renderCurrentMoveNumber()}
         gameOverReason={uiState().gameOverReason}
         gameResult={uiState().gameResult}
         illegalReason={uiState().lastInputIllegalReason}

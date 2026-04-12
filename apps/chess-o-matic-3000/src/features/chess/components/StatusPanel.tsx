@@ -4,8 +4,6 @@ import type { JSX } from 'solid-js';
 import type { GameModelEvaluateStatus } from '../../../game-model/evaluate';
 
 type StatusPanelProps = {
-  readonly currentMoveColor: 'white' | 'black';
-  readonly currentMoveNumber: number;
   readonly gameOverReason?: string;
   readonly gameResult?: string;
   readonly isGameOver: boolean;
@@ -96,13 +94,6 @@ export function StatusPanel(props: StatusPanelProps): JSX.Element {
             {props.sanitizedInput || 'No input yet'}
           </span>
         </div>
-        <span class="status-panel-move-indicator">
-          <span class="status-chip status-move-chip">{props.currentMoveNumber}</span>
-          <span
-            aria-label={`${props.currentMoveColor} to move`}
-            class={`status-color-chip status-color-chip-${props.currentMoveColor}`}
-          />
-        </span>
       </div>
     </section>
   );

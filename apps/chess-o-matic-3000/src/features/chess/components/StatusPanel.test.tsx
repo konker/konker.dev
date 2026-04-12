@@ -11,8 +11,6 @@ describe('StatusPanel', () => {
     render(
       () => (
         <StatusPanel
-          currentMoveColor="white"
-          currentMoveNumber={3}
           gameOverReason="Checkmate"
           gameResult="0-1"
           isGameOver
