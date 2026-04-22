@@ -24,7 +24,7 @@ export function buildCandidateAnalysis(
   layer: KeyboardLayer,
   settings: KeyboardBehaviorSettings
 ): CandidateAnalysis {
-  const legalMovesSan = getLegalMovesSan(context);
+  const legalMovesSan = expandLegalMovesSan(getLegalMovesSan(context), settings);
   const matchingMoves =
     input.length === 0 ? [] : sortSanLexically(legalMovesSan.filter((move) => move.startsWith(input)));
   const exactMatches = input.length === 0 ? [] : legalMovesSan.filter((move) => move === input);
@@ -42,6 +42,21 @@ export function buildCandidateAnalysis(
     matchingMoves,
     shouldAutoSubmit,
   };
+}
+
+function expandLegalMovesSan(
+  legalMovesSan: ReadonlyArray<string>,
+  settings: KeyboardBehaviorSettings
+): ReadonlyArray<string> {
+  if (!settings.allowOmittedXInPieceCaptures) {
+    return legalMovesSan;
+  }
+
+  const isDefined = (alias: string | undefined): alias is string => alias !== undefined;
+
+  const looseCaptureAliases = [...new Set(legalMovesSan.map(toLoosePieceCapture).filter(isDefined))];
+
+  return [...legalMovesSan, ...looseCaptureAliases];
 }
 
 function resolveAutoSubmitTarget(
@@ -66,6 +81,20 @@ function resolveAutoSubmitTarget(
 
 function stripAutoSubmitSuffix(move: string): string {
   return move.replace(/[+#]$/, '');
+}
+
+function toLoosePieceCapture(move: string): string | undefined {
+  const match = /^(?<piece>[KQRBN])(?<disambiguator>[a-h1-8]{0,2})x(?<destination>[a-h][1-8])(?<suffix>[+#]?)$/u.exec(
+    move
+  );
+
+  if (match?.groups === undefined) {
+    return undefined;
+  }
+
+  const { destination, disambiguator, piece, suffix } = match.groups;
+
+  return `${piece}${disambiguator}${destination}${suffix}`;
 }
 
 function sortSanLexically(moves: ReadonlyArray<string>): ReadonlyArray<string> {

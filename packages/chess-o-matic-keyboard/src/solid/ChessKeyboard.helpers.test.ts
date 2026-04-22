@@ -13,7 +13,7 @@ describe('solid/ChessKeyboard.helpers', () => {
       expect(
         areSettingsEqual(DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS, {
           ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
-          orientation: DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS.orientation === 'white' ? 'black' : 'white',
+          allowOmittedXInPieceCaptures: !DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS.allowOmittedXInPieceCaptures,
         })
       ).toBe(false);
     });

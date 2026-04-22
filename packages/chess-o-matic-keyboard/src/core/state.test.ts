@@ -64,6 +64,37 @@ describe('core/state', () => {
     expect(state.shouldAutoSubmit).toBe(true);
   });
 
+  it('should append loose aliases for piece captures when enabled', () => {
+    const state = deriveKeyboardState('B', { legalMovesSan: ['Bxf6', 'Bg7'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      allowOmittedXInPieceCaptures: true,
+    });
+
+    expect(state.legalMovesSan).toStrictEqual(['Bxf6', 'Bg7', 'Bf6']);
+    expect(state.matchingMoves).toStrictEqual(['Bf6', 'Bg7', 'Bxf6']);
+  });
+
+  it('should support loose aliases for disambiguated piece captures with suffixes', () => {
+    const state = deriveKeyboardState('Nfd2', { legalMovesSan: ['Nfxd2+', 'Nc3'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      allowOmittedXInPieceCaptures: true,
+    });
+
+    expect(state.exactMatches).toStrictEqual([]);
+    expect(state.autoSubmitTarget).toBe('Nfd2+');
+    expect(state.shouldAutoSubmit).toBe(true);
+  });
+
+  it('should not append loose aliases for pawn captures', () => {
+    const state = deriveKeyboardState('e', { legalMovesSan: ['exd5', 'e4'] }, 'primary', {
+      ...DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS,
+      allowOmittedXInPieceCaptures: true,
+    });
+
+    expect(state.legalMovesSan).toStrictEqual(['exd5', 'e4']);
+    expect(state.matchingMoves).toStrictEqual(['e4', 'exd5']);
+  });
+
   it('should not auto-submit promotion SAN without the promotion suffix', () => {
     const state = deriveKeyboardState('e8', { legalMovesSan: ['e8=Q'] }, 'primary', DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS);
 
@@ -141,12 +172,18 @@ describe('core/state', () => {
         type: 'set-input',
       }),
       {
-        settings: { autoSubmit: false, autoSubmitOnSinglePartialMatch: true, keyHighlightsMode: 'off' },
+        settings: {
+          allowOmittedXInPieceCaptures: true,
+          autoSubmit: false,
+          autoSubmitOnSinglePartialMatch: true,
+          keyHighlightsMode: 'off',
+        },
         type: 'set-settings',
       }
     );
 
     expect(model.state.input).toBe('e');
+    expect(model.state.settings.allowOmittedXInPieceCaptures).toBe(true);
     expect(model.state.settings.autoSubmit).toBe(false);
     expect(model.state.settings.autoSubmitOnSinglePartialMatch).toBe(true);
     expect(model.state.settings.keyHighlightsMode).toBe('off');

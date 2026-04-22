@@ -33,6 +33,7 @@ export function Example() {
   return (
     <ChessKeyboard
       legalMovesSan={['e4', 'd4', 'Nf3', 'Nc3']}
+      allowOmittedXInPieceCaptures
       candidateBar
       keyHighlightsMode="always"
       autoSubmit
@@ -58,6 +59,7 @@ export function Example() {
 
 Flat behavior props:
 
+- `allowOmittedXInPieceCaptures?: boolean`
 - `autoSubmit?: boolean`
 - `candidateBar?: boolean`
 - `keyHighlightsMode?: 'off' | 'after-input' | 'always'`
@@ -71,6 +73,7 @@ You can also pass `visibleSettings?: false | Partial<Record<keyof KeyboardBehavi
 ```tsx
 <ChessKeyboard
   visibleSettings={{
+    allowOmittedXInPieceCaptures: true,
     autoSubmit: false,
     candidateBar: true,
     keyHighlightsMode: true,
@@ -85,6 +88,8 @@ Hide the Nunn annotation buttons `!`, `!!`, `!?`, `?`, `??`, `?!` while keeping 
 ```tsx
 <ChessKeyboard showNunnAnnotations={false} />
 ```
+
+When `allowOmittedXInPieceCaptures` is enabled, non-pawn capture suggestions like `Bxf6` also expose `Bf6`. The keyboard submits the omitted-`x` form unchanged, which lets a downstream `chess.js` instance normalize it back to the canonical SAN.
 
 ## Public Exports
 

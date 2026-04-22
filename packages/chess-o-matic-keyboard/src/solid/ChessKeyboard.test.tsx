@@ -28,6 +28,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   readonly cleanup: () => void;
   readonly root: HTMLElement;
   readonly setSettings: (nextSettings: {
+    readonly allowOmittedXInPieceCaptures: boolean;
     readonly autoSubmit: boolean;
     readonly autoSubmitOnSinglePartialMatch: boolean;
     readonly candidateBar: boolean;
@@ -40,6 +41,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   const root = document.createElement('div');
   document.body.append(root);
   let setSettings!: (nextSettings: {
+    readonly allowOmittedXInPieceCaptures: boolean;
     readonly autoSubmit: boolean;
     readonly autoSubmitOnSinglePartialMatch: boolean;
     readonly candidateBar: boolean;
@@ -52,6 +54,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
   const dispose = render(() => {
     const [value, updateValue] = createSignal('');
     const [settings, updateSettings] = createSignal({
+      allowOmittedXInPieceCaptures: false,
       autoSubmit: true,
       autoSubmitOnSinglePartialMatch: false,
       candidateBar: true,
@@ -261,6 +264,7 @@ describe('solid/ChessKeyboard', () => {
 
   it('should support flat setting props on the main component', () => {
     const view = mount({
+      allowOmittedXInPieceCaptures: true,
       candidateBar: false,
       legalMovesSan: ['Nf3', 'Nc3'],
       orientation: 'black',
@@ -428,6 +432,7 @@ describe('solid/ChessKeyboard', () => {
     expect(queryByRole(view.root, 'button', { name: 'Nf3' })).toBeNull();
 
     view.setSettings({
+      allowOmittedXInPieceCaptures: false,
       autoSubmit: true,
       autoSubmitOnSinglePartialMatch: false,
       candidateBar: true,
@@ -446,6 +451,7 @@ describe('solid/ChessKeyboard', () => {
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
+    expect(getByRole(view.root, 'checkbox', { name: 'Allow omitted x in piece captures' })).toBeTruthy();
     expect(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'Off' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
@@ -576,6 +582,58 @@ describe('solid/ChessKeyboard', () => {
     fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Show Readout' }));
 
     expect(view.root.querySelector('output')).toBeNull();
+
+    view.cleanup();
+  });
+
+  it('should show loose piece capture aliases in the candidate bar when enabled', () => {
+    const view = mount({
+      legalMovesSan: ['Bxf6', 'Bg7'],
+      settings: { allowOmittedXInPieceCaptures: true },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'B' }));
+
+    expect(getByRole(view.root, 'button', { name: 'Bxf6' })).toBeTruthy();
+    expect(getByRole(view.root, 'button', { name: 'Bf6' })).toBeTruthy();
+
+    view.cleanup();
+  });
+
+  it('should submit loose piece capture aliases unchanged when auto-submitted', () => {
+    const onSubmit = vi.fn();
+    const view = mount({
+      legalMovesSan: ['Bxf6'],
+      onSubmit,
+      settings: { allowOmittedXInPieceCaptures: true },
+    });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'B' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: 'f' }));
+    fireEvent.click(getByRole(view.root, 'button', { name: '6' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      'Bf6',
+      expect.objectContaining({
+        input: 'Bf6',
+        resolvedLegalMatch: 'Bf6',
+        source: 'auto',
+      })
+    );
+
+    view.cleanup();
+  });
+
+  it('should allow omitted x in piece captures to be toggled from the settings layer', () => {
+    const view = mount({ legalMovesSan: ['Bxf6'] });
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'B' }));
+    expect(queryByRole(view.root, 'button', { name: 'Bf6' })).toBeNull();
+
+    fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Allow omitted x in piece captures' }));
+
+    expect(getByRole(view.root, 'button', { name: 'Bf6' })).toBeTruthy();
 
     view.cleanup();
   });

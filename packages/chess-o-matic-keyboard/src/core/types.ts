@@ -151,6 +151,7 @@ export type KeyboardContext = {
 };
 
 export type KeyboardBehaviorSettings = {
+  readonly allowOmittedXInPieceCaptures: boolean;
   readonly autoSubmit: boolean;
   readonly autoSubmitOnSinglePartialMatch: boolean;
   readonly candidateBar: boolean;
@@ -160,6 +161,7 @@ export type KeyboardBehaviorSettings = {
 };
 
 export const DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS: KeyboardBehaviorSettings = {
+  allowOmittedXInPieceCaptures: false,
   autoSubmit: true,
   autoSubmitOnSinglePartialMatch: false,
   candidateBar: true,

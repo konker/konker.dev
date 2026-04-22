@@ -22,6 +22,7 @@ import type { ChessKeyboardVisibleSettings, ChessKeyboardVisibleSettingsMap } fr
 export type { ChessKeyboardVisibleSettings } from './types.js';
 
 export type ChessKeyboardProps = {
+  readonly allowOmittedXInPieceCaptures?: boolean;
   readonly autoSubmit?: boolean;
   readonly autoSubmitOnSinglePartialMatch?: boolean;
   readonly candidateBar?: boolean;
@@ -42,6 +43,7 @@ export type ChessKeyboardProps = {
 };
 
 const SETTING_PROP_KEYS = [
+  'allowOmittedXInPieceCaptures',
   'autoSubmit',
   'autoSubmitOnSinglePartialMatch',
   'candidateBar',
@@ -221,14 +223,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   };
 
   const selectCandidate = (candidate: string) => {
-    const autoSubmitKey =
-      keyboard.getModel().context?.legalMovesSan?.includes(candidate) === true
-        ? `${candidate}::${candidate}`
-        : undefined;
-
-    if (autoSubmitKey !== undefined) {
-      setLastAutoSubmitKey(autoSubmitKey);
-    }
+    setLastAutoSubmitKey(`${candidate}::${candidate}`);
 
     resetPressedPrimaryKeyIds();
     const nextState = keyboard.selectCandidate(candidate);
@@ -245,7 +240,12 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
   };
 
   const toggleBehaviorSetting = (
-    setting: 'autoSubmit' | 'autoSubmitOnSinglePartialMatch' | 'candidateBar' | 'showReadout'
+    setting:
+      | 'allowOmittedXInPieceCaptures'
+      | 'autoSubmit'
+      | 'autoSubmitOnSinglePartialMatch'
+      | 'candidateBar'
+      | 'showReadout'
   ) => {
     const nextSettings = {
       ...resolvedSettings(),
@@ -325,6 +325,9 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
       />
       <Show when={settingsVisible() && settingsOpen()}>
         <SettingsPanel
+          onToggleAllowOmittedXInPieceCaptures={() => {
+            toggleBehaviorSetting('allowOmittedXInPieceCaptures');
+          }}
           onToggleAutoSubmit={() => {
             toggleBehaviorSetting('autoSubmit');
           }}

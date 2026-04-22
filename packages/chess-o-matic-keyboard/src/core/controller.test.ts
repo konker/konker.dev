@@ -46,11 +46,13 @@ describe('core/controller', () => {
     });
 
     const state = controller.setSettings({
+      allowOmittedXInPieceCaptures: true,
       autoSubmit: false,
       autoSubmitOnSinglePartialMatch: true,
       candidateBar: false,
     });
 
+    expect(state.settings.allowOmittedXInPieceCaptures).toBe(true);
     expect(state.settings.autoSubmit).toBe(false);
     expect(state.settings.autoSubmitOnSinglePartialMatch).toBe(true);
     expect(state.settings.candidateBar).toBe(false);

@@ -8,6 +8,9 @@ type Scenario = {
   readonly description: string;
   readonly id: string;
   readonly name: string;
+  readonly settings?: {
+    readonly allowOmittedXInPieceCaptures?: boolean;
+  };
   readonly context?: KeyboardContext;
 };
 
@@ -70,6 +73,17 @@ const scenarios: ReadonlyArray<Scenario> = [
       legalMovesSan: ['e4', 'Nf3', 'Bb5+'],
     },
   },
+  {
+    id: 'loose-captures',
+    name: 'Loose Captures',
+    description: 'Piece captures can omit x in suggestions, so Bxf6 is also offered as Bf6.',
+    context: {
+      legalMovesSan: ['Bxf6', 'Nfxd2+', 'exd5'],
+    },
+    settings: {
+      allowOmittedXInPieceCaptures: true,
+    },
+  },
 ] as const;
 
 export function DemoPage(): JSX.Element {
@@ -113,6 +127,7 @@ export function DemoPage(): JSX.Element {
                   return (
                     <ChessKeyboard
                       {...(scenario.context === undefined ? {} : { legalMovesSan: scenario.context.legalMovesSan })}
+                      {...(scenario.settings === undefined ? {} : { settings: scenario.settings })}
                       onSubmit={(input) => {
                         setSubmittedMoves((currentMoves) => [input, ...currentMoves]);
                       }}
