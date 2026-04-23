@@ -1,6 +1,6 @@
 import { Calendar, Clock3, Hash, MapPin, Medal, Trophy, User } from 'lucide-solid';
-import type { Accessor, JSX } from 'solid-js';
-import { createEffect, on } from 'solid-js';
+import type { Accessor, Component, JSX } from 'solid-js';
+import { createEffect, createSignal, on } from 'solid-js';
 
 import type { GameMetadataData } from './types';
 
@@ -8,6 +8,43 @@ type GameMetadataProps = {
   readonly gameId: Accessor<string>;
   readonly metadata: Accessor<GameMetadataData>;
   readonly onMetadataChange: (metadata: GameMetadataData) => void;
+};
+
+type DraftFieldName =
+  | 'event'
+  | 'site'
+  | 'date'
+  | 'round'
+  | 'timeControl'
+  | 'termination'
+  | 'white.name'
+  | 'white.elo'
+  | 'black.name'
+  | 'black.elo'
+  | 'result';
+
+type FieldLabelProps = {
+  readonly icon?: JSX.Element;
+  readonly text: string;
+};
+
+type TextInputProps = {
+  readonly ariaLabel?: string;
+  readonly fieldName: DraftFieldName;
+  readonly onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
+  readonly onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
+  readonly onInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>;
+  readonly placeholder?: string;
+  readonly type?: string;
+  readonly value: string;
+};
+
+type SelectInputProps = {
+  readonly fieldName: DraftFieldName;
+  readonly onChange: JSX.EventHandlerUnion<HTMLSelectElement, Event>;
+  readonly onFocus: JSX.EventHandlerUnion<HTMLSelectElement, FocusEvent>;
+  readonly options: ReadonlyArray<string>;
+  readonly value: string;
 };
 
 const TERMINATION_OPTIONS = [
@@ -44,214 +81,273 @@ function normalizeDateForStorage(value: string): string {
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 
-export function GameMetadata(props: GameMetadataProps): JSX.Element {
-  let eventInputRef: HTMLInputElement | undefined;
-  let siteInputRef: HTMLInputElement | undefined;
-  let dateInputRef: HTMLInputElement | undefined;
-  let roundInputRef: HTMLInputElement | undefined;
-  let timeControlInputRef: HTMLInputElement | undefined;
-  let terminationSelectRef: HTMLSelectElement | undefined;
-  let whiteNameInputRef: HTMLInputElement | undefined;
-  let whiteEloInputRef: HTMLInputElement | undefined;
-  let blackNameInputRef: HTMLInputElement | undefined;
-  let blackEloInputRef: HTMLInputElement | undefined;
-  let resultInputRef: HTMLInputElement | undefined;
+const FieldLabel: Component<FieldLabelProps> = (props) => {
+  return (
+    <span class="paper-field-label">
+      {props.icon}
+      <span>{props.text}</span>
+    </span>
+  );
+};
 
-  function syncFormFromMetadata(metadata: GameMetadataData): void {
-    if (eventInputRef) {
-      eventInputRef.value = metadata.event;
+const TextInput: Component<TextInputProps> = (props) => {
+  return (
+    <span class="paper-field-frame">
+      <input
+        aria-label={props.ariaLabel}
+        class="paper-field-control"
+        data-field={props.fieldName}
+        onBlur={props.onBlur}
+        onFocus={props.onFocus}
+        onInput={props.onInput}
+        placeholder={props.placeholder}
+        type={props.type ?? 'text'}
+        value={props.value}
+      />
+    </span>
+  );
+};
+
+const SelectInput: Component<SelectInputProps> = (props) => {
+  return (
+    <span class="paper-field-frame">
+      <select
+        class="paper-field-control"
+        data-field={props.fieldName}
+        onChange={props.onChange}
+        onFocus={props.onFocus}
+        value={props.value}
+      >
+        <option value=""></option>
+        {props.options.map(function renderOption(option): JSX.Element {
+          return <option value={option}>{option}</option>;
+        })}
+      </select>
+    </span>
+  );
+};
+
+export function GameMetadata(props: GameMetadataProps): JSX.Element {
+  let formRef: HTMLElement | undefined;
+  const [focusedField, setFocusedField] = createSignal<DraftFieldName>();
+
+  function createDraftMetadata(metadata: GameMetadataData): GameMetadataData {
+    return {
+      ...metadata,
+      date: formatDateForDisplay(metadata.date),
+    };
+  }
+
+  const [draft, setDraft] = createSignal<GameMetadataData>(createDraftMetadata(props.metadata()));
+
+  function syncDraftFromMetadata(metadata: GameMetadataData, preserveField?: DraftFieldName): void {
+    setDraft((current) => ({
+      event: preserveField === 'event' ? current.event : metadata.event,
+      site: preserveField === 'site' ? current.site : metadata.site,
+      date: preserveField === 'date' ? current.date : formatDateForDisplay(metadata.date),
+      round: preserveField === 'round' ? current.round : metadata.round,
+      timeControl: preserveField === 'timeControl' ? current.timeControl : metadata.timeControl,
+      termination: preserveField === 'termination' ? current.termination : metadata.termination,
+      white: {
+        elo: preserveField === 'white.elo' ? current.white.elo : metadata.white.elo,
+        name: preserveField === 'white.name' ? current.white.name : metadata.white.name,
+      },
+      black: {
+        elo: preserveField === 'black.elo' ? current.black.elo : metadata.black.elo,
+        name: preserveField === 'black.name' ? current.black.name : metadata.black.name,
+      },
+      result: preserveField === 'result' ? current.result : metadata.result,
+    }));
+  }
+
+  function resolveActiveField(): DraftFieldName | undefined {
+    if (focusedField()) {
+      return focusedField();
     }
-    if (siteInputRef) {
-      siteInputRef.value = metadata.site;
+
+    if (!formRef || typeof document === 'undefined') {
+      return undefined;
     }
-    if (dateInputRef) {
-      dateInputRef.value = formatDateForDisplay(metadata.date);
+
+    const activeElement = document.activeElement;
+    if (!(activeElement instanceof HTMLElement) || !formRef.contains(activeElement)) {
+      return undefined;
     }
-    if (roundInputRef) {
-      roundInputRef.value = metadata.round;
+
+    const fieldName = activeElement.dataset.field;
+    return fieldName as DraftFieldName | undefined;
+  }
+
+  function handleFieldBlur(event: FocusEvent): void {
+    const relatedTarget = event.relatedTarget;
+
+    if (!(relatedTarget instanceof HTMLElement) || !formRef?.contains(relatedTarget)) {
+      setFocusedField(undefined);
+      return;
     }
-    if (timeControlInputRef) {
-      timeControlInputRef.value = metadata.timeControl;
-    }
-    if (terminationSelectRef) {
-      terminationSelectRef.value = metadata.termination;
-    }
-    if (whiteNameInputRef) {
-      whiteNameInputRef.value = metadata.white.name;
-    }
-    if (whiteEloInputRef) {
-      whiteEloInputRef.value = metadata.white.elo;
-    }
-    if (blackNameInputRef) {
-      blackNameInputRef.value = metadata.black.name;
-    }
-    if (blackEloInputRef) {
-      blackEloInputRef.value = metadata.black.elo;
-    }
-    if (resultInputRef) {
-      resultInputRef.value = metadata.result;
-    }
+
+    const nextField = relatedTarget.dataset.field;
+    setFocusedField(nextField as DraftFieldName | undefined);
   }
 
   createEffect(
     on(props.gameId, () => {
-      syncFormFromMetadata(props.metadata());
+      syncDraftFromMetadata(props.metadata());
     })
   );
 
-  function readFormMetadata(): GameMetadataData {
-    const metadata = props.metadata();
+  createEffect(
+    on(props.metadata, (metadata) => {
+      syncDraftFromMetadata(metadata, resolveActiveField());
+    })
+  );
+
+  function readDraftMetadata(): GameMetadataData {
+    const currentDraft = draft();
     return {
-      ...metadata,
-      event: eventInputRef?.value ?? metadata.event,
-      site: siteInputRef?.value ?? metadata.site,
-      date: normalizeDateForStorage(dateInputRef?.value ?? metadata.date),
-      round: roundInputRef?.value ?? metadata.round,
-      timeControl: timeControlInputRef?.value ?? metadata.timeControl,
-      termination: terminationSelectRef?.value ?? metadata.termination,
+      ...currentDraft,
+      date: normalizeDateForStorage(currentDraft.date),
       white: {
-        ...metadata.white,
-        name: whiteNameInputRef?.value ?? metadata.white.name,
-        elo: whiteEloInputRef?.value ?? metadata.white.elo,
+        ...currentDraft.white,
       },
       black: {
-        ...metadata.black,
-        name: blackNameInputRef?.value ?? metadata.black.name,
-        elo: blackEloInputRef?.value ?? metadata.black.elo,
+        ...currentDraft.black,
       },
-      result: resultInputRef?.value ?? metadata.result,
     };
   }
 
   function commitForm(): void {
-    props.onMetadataChange(readFormMetadata());
+    props.onMetadataChange(readDraftMetadata());
   }
 
   function commitDateInput(): void {
-    commitForm();
-
-    if (dateInputRef) {
-      dateInputRef.value = formatDateForDisplay(normalizeDateForStorage(dateInputRef.value));
-    }
-  }
-
-  function renderLabel(icon: JSX.Element, text: string): JSX.Element {
-    return (
-      <span class="paper-field-label">
-        {icon}
-        <span>{text}</span>
-      </span>
-    );
-  }
-
-  function renderTextInput(
-    value: string,
-    ref: ((element: HTMLInputElement) => void) | undefined,
-    onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>,
-    type = 'text',
-    placeholder?: string,
-    ariaLabel?: string
-  ): JSX.Element {
-    return (
-      <span class="paper-field-frame">
-        <input
-          aria-label={ariaLabel}
-          class="paper-field-control"
-          onBlur={onBlur}
-          placeholder={placeholder}
-          ref={ref}
-          type={type}
-          value={value}
-        />
-      </span>
-    );
-  }
-
-  function renderSelect(
-    value: string,
-    ref: ((element: HTMLSelectElement) => void) | undefined,
-    onChange: JSX.EventHandlerUnion<HTMLSelectElement, Event>,
-    options: ReadonlyArray<string>
-  ): JSX.Element {
-    return (
-      <span class="paper-field-frame">
-        <select class="paper-field-control" onChange={onChange} ref={ref} value={value}>
-          <option value=""></option>
-          {options.map(function renderOption(option): JSX.Element {
-            return <option value={option}>{option}</option>;
-          })}
-        </select>
-      </span>
-    );
+    const normalizedDate = normalizeDateForStorage(draft().date);
+    props.onMetadataChange({
+      ...readDraftMetadata(),
+      date: normalizedDate,
+    });
+    setDraft((current) => ({
+      ...current,
+      date: formatDateForDisplay(normalizedDate),
+    }));
   }
 
   return (
-    <section aria-label="Game Metadata" class="panel-muted flex flex-col gap-4">
+    <section aria-label="Game Metadata" class="panel-muted flex flex-col gap-4" ref={formRef}>
       <div class="metadata-grid">
         <label class="paper-field">
-          {renderLabel(<Trophy class="h-4 w-4" />, 'Event')}
-          {renderTextInput(
-            props.metadata().event,
-            (element) => {
-              eventInputRef = element;
-            },
-            () => commitForm()
-          )}
+          <FieldLabel icon={<Trophy class="h-4 w-4" />} text="Event" />
+          <TextInput
+            fieldName="event"
+            onBlur={(event) => {
+              handleFieldBlur(event);
+              commitForm();
+            }}
+            onFocus={() => setFocusedField('event')}
+            onInput={(event) =>
+              setDraft((current) => ({
+                ...current,
+                event: event.currentTarget.value,
+              }))
+            }
+            value={draft().event}
+          />
         </label>
         <label class="paper-field">
-          {renderLabel(<MapPin class="h-4 w-4" />, 'Site')}
-          {renderTextInput(
-            props.metadata().site,
-            (element) => {
-              siteInputRef = element;
-            },
-            () => commitForm()
-          )}
+          <FieldLabel icon={<MapPin class="h-4 w-4" />} text="Site" />
+          <TextInput
+            fieldName="site"
+            onBlur={(event) => {
+              handleFieldBlur(event);
+              commitForm();
+            }}
+            onFocus={() => setFocusedField('site')}
+            onInput={(event) =>
+              setDraft((current) => ({
+                ...current,
+                site: event.currentTarget.value,
+              }))
+            }
+            value={draft().site}
+          />
         </label>
         <label class="paper-field metadata-key-field">
-          {renderLabel(<Calendar class="h-4 w-4" />, 'Date')}
-          {renderTextInput(
-            props.metadata().date,
-            (element) => {
-              dateInputRef = element;
-            },
-            () => commitDateInput(),
-            'text',
-            'dd/mm/yyyy',
-            'Date'
-          )}
+          <FieldLabel icon={<Calendar class="h-4 w-4" />} text="Date" />
+          <TextInput
+            ariaLabel="Date"
+            fieldName="date"
+            onBlur={(event) => {
+              handleFieldBlur(event);
+              commitDateInput();
+            }}
+            onFocus={() => setFocusedField('date')}
+            onInput={(event) =>
+              setDraft((current) => ({
+                ...current,
+                date: event.currentTarget.value,
+              }))
+            }
+            placeholder="dd/mm/yyyy"
+            type="text"
+            value={draft().date}
+          />
         </label>
         <label class="paper-field">
-          {renderLabel(<Hash class="h-4 w-4" />, 'Round')}
-          {renderTextInput(
-            props.metadata().round,
-            (element) => {
-              roundInputRef = element;
-            },
-            () => commitForm()
-          )}
+          <FieldLabel icon={<Hash class="h-4 w-4" />} text="Round" />
+          <TextInput
+            fieldName="round"
+            onBlur={(event) => {
+              handleFieldBlur(event);
+              commitForm();
+            }}
+            onFocus={() => setFocusedField('round')}
+            onInput={(event) =>
+              setDraft((current) => ({
+                ...current,
+                round: event.currentTarget.value,
+              }))
+            }
+            value={draft().round}
+          />
         </label>
         <div class="grid gap-4 sm:col-span-2 sm:grid-cols-2">
           <label class="paper-field">
-            {renderLabel(<Clock3 class="h-4 w-4" />, 'Time Control')}
-            {renderTextInput(
-              props.metadata().timeControl,
-              (element) => {
-                timeControlInputRef = element;
-              },
-              () => commitForm()
-            )}
+            <FieldLabel icon={<Clock3 class="h-4 w-4" />} text="Time Control" />
+            <TextInput
+              fieldName="timeControl"
+              onBlur={(event) => {
+                handleFieldBlur(event);
+                commitForm();
+              }}
+              onFocus={() => setFocusedField('timeControl')}
+              onInput={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  timeControl: event.currentTarget.value,
+                }))
+              }
+              value={draft().timeControl}
+            />
           </label>
           <label class="paper-field">
-            <span class="paper-field-label">Termination</span>
-            {renderSelect(
-              props.metadata().termination,
-              (element) => {
-                terminationSelectRef = element;
-              },
-              () => commitForm(),
-              TERMINATION_OPTIONS
-            )}
+            <FieldLabel text="Termination" />
+            <SelectInput
+              fieldName="termination"
+              onChange={(event) => {
+                const termination = event.currentTarget.value;
+                setDraft((current) => ({
+                  ...current,
+                  termination,
+                }));
+                props.onMetadataChange({
+                  ...readDraftMetadata(),
+                  termination,
+                });
+              }}
+              onFocus={() => setFocusedField('termination')}
+              options={TERMINATION_OPTIONS}
+              value={draft().termination}
+            />
           </label>
         </div>
       </div>
@@ -264,30 +360,52 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
           </h2>
           <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
             <label class="paper-field">
-              <span class="paper-field-label">Name</span>
-              {renderTextInput(
-                props.metadata().white.name,
-                (element) => {
-                  whiteNameInputRef = element;
-                },
-                () => commitForm(),
-                'text',
-                'Name',
-                'White Name'
-              )}
+              <FieldLabel text="Name" />
+              <TextInput
+                ariaLabel="White Name"
+                fieldName="white.name"
+                onBlur={(event) => {
+                  handleFieldBlur(event);
+                  commitForm();
+                }}
+                onFocus={() => setFocusedField('white.name')}
+                onInput={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    white: {
+                      ...current.white,
+                      name: event.currentTarget.value,
+                    },
+                  }))
+                }
+                placeholder="Name"
+                type="text"
+                value={draft().white.name}
+              />
             </label>
             <label class="paper-field">
-              <span class="paper-field-label">Elo</span>
-              {renderTextInput(
-                props.metadata().white.elo,
-                (element) => {
-                  whiteEloInputRef = element;
-                },
-                () => commitForm(),
-                'text',
-                'Elo',
-                'White Elo'
-              )}
+              <FieldLabel text="Elo" />
+              <TextInput
+                ariaLabel="White Elo"
+                fieldName="white.elo"
+                onBlur={(event) => {
+                  handleFieldBlur(event);
+                  commitForm();
+                }}
+                onFocus={() => setFocusedField('white.elo')}
+                onInput={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    white: {
+                      ...current.white,
+                      elo: event.currentTarget.value,
+                    },
+                  }))
+                }
+                placeholder="Elo"
+                type="text"
+                value={draft().white.elo}
+              />
             </label>
           </div>
         </div>
@@ -299,46 +417,75 @@ export function GameMetadata(props: GameMetadataProps): JSX.Element {
           </h2>
           <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
             <label class="paper-field">
-              <span class="paper-field-label">Name</span>
-              {renderTextInput(
-                props.metadata().black.name,
-                (element) => {
-                  blackNameInputRef = element;
-                },
-                () => commitForm(),
-                'text',
-                'Name',
-                'Black Name'
-              )}
+              <FieldLabel text="Name" />
+              <TextInput
+                ariaLabel="Black Name"
+                fieldName="black.name"
+                onBlur={(event) => {
+                  handleFieldBlur(event);
+                  commitForm();
+                }}
+                onFocus={() => setFocusedField('black.name')}
+                onInput={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    black: {
+                      ...current.black,
+                      name: event.currentTarget.value,
+                    },
+                  }))
+                }
+                placeholder="Name"
+                type="text"
+                value={draft().black.name}
+              />
             </label>
             <label class="paper-field">
-              <span class="paper-field-label">Elo</span>
-              {renderTextInput(
-                props.metadata().black.elo,
-                (element) => {
-                  blackEloInputRef = element;
-                },
-                () => commitForm(),
-                'text',
-                'Elo',
-                'Black Elo'
-              )}
+              <FieldLabel text="Elo" />
+              <TextInput
+                ariaLabel="Black Elo"
+                fieldName="black.elo"
+                onBlur={(event) => {
+                  handleFieldBlur(event);
+                  commitForm();
+                }}
+                onFocus={() => setFocusedField('black.elo')}
+                onInput={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    black: {
+                      ...current.black,
+                      elo: event.currentTarget.value,
+                    },
+                  }))
+                }
+                placeholder="Elo"
+                type="text"
+                value={draft().black.elo}
+              />
             </label>
           </div>
         </div>
 
         <label class="paper-field sm:col-span-2">
-          {renderLabel(<Medal class="h-4 w-4" />, 'Result')}
-          {renderTextInput(
-            props.metadata().result,
-            (element) => {
-              resultInputRef = element;
-            },
-            () => commitForm(),
-            'text',
-            undefined,
-            'Result'
-          )}
+          <FieldLabel icon={<Medal class="h-4 w-4" />} text="Result" />
+          <TextInput
+            ariaLabel="Result"
+            fieldName="result"
+            onBlur={(event) => {
+              handleFieldBlur(event);
+              commitForm();
+            }}
+            onFocus={() => setFocusedField('result')}
+            onInput={(event) =>
+              setDraft((current) => ({
+                ...current,
+                result: event.currentTarget.value,
+              }))
+            }
+            type="text"
+            value={draft().result}
+          />
         </label>
       </div>
     </section>
