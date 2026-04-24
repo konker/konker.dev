@@ -20,22 +20,6 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
   return (
     <section class="chess-keyboard-settings" data-slot="settings-panel">
       <div class="chess-keyboard-settings-group" data-slot="settings-group">
-        <Show when={props.visibleSettings?.allowOmittedXInPieceCaptures !== false}>
-          <label class="chess-keyboard-settings-field" data-slot="settings-field">
-            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
-              Allow omitted x in piece captures
-            </span>
-            <input
-              checked={props.settings.allowOmittedXInPieceCaptures}
-              class="chess-keyboard-settings-control"
-              data-slot="settings-control"
-              onChange={() => {
-                props.onToggleAllowOmittedXInPieceCaptures();
-              }}
-              type="checkbox"
-            />
-          </label>
-        </Show>
         <Show when={props.visibleSettings?.autoSubmit !== false}>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
             <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
@@ -63,6 +47,22 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
               data-slot="settings-control"
               onChange={() => {
                 props.onToggleAutoSubmitOnSinglePartialMatch();
+              }}
+              type="checkbox"
+            />
+          </label>
+        </Show>
+        <Show when={props.visibleSettings?.allowOmittedXInPieceCaptures !== false}>
+          <label class="chess-keyboard-settings-field" data-slot="settings-field">
+            <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
+              Allow Omitted X in Piece Captures
+            </span>
+            <input
+              checked={props.settings.allowOmittedXInPieceCaptures}
+              class="chess-keyboard-settings-control"
+              data-slot="settings-control"
+              onChange={() => {
+                props.onToggleAllowOmittedXInPieceCaptures();
               }}
               type="checkbox"
             />

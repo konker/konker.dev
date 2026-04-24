@@ -451,7 +451,7 @@ describe('solid/ChessKeyboard', () => {
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
 
-    expect(getByRole(view.root, 'checkbox', { name: 'Allow omitted x in piece captures' })).toBeTruthy();
+    expect(getByRole(view.root, 'checkbox', { name: 'Allow Omitted X in Piece Captures' })).toBeTruthy();
     expect(getByRole(view.root, 'checkbox', { name: 'Show Candidate Bar' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'Off' })).toBeTruthy();
     expect(getByRole(view.root, 'radio', { name: 'After Input' })).toBeTruthy();
@@ -631,7 +631,7 @@ describe('solid/ChessKeyboard', () => {
     expect(queryByRole(view.root, 'button', { name: 'Bf6' })).toBeNull();
 
     fireEvent.click(getByRole(view.root, 'button', { name: 'Settings' }));
-    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Allow omitted x in piece captures' }));
+    fireEvent.click(getByRole(view.root, 'checkbox', { name: 'Allow Omitted X in Piece Captures' }));
 
     expect(getByRole(view.root, 'button', { name: 'Bf6' })).toBeTruthy();
 
