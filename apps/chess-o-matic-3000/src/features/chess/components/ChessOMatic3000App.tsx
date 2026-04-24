@@ -270,9 +270,8 @@ export function ChessOMatic3000App(props: ChessOMaticAppProps): JSX.Element {
         <ChessKeyboard
           legalMovesSan={uiState().legalMovesSan}
           onSubmit={(input) => void gameEngine.handleTextInput(input)}
-          orientation={uiState().boardOrientation}
           showReadout={false}
-          visibleSettings={{ showReadout: false, orientation: false }}
+          visibleSettings={{ showReadout: false, perspective: false }}
           showNunnAnnotations={false}
         />
       </CollapsibleSection>

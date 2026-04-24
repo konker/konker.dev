@@ -83,7 +83,7 @@ describe('ChessOMatic3000App', () => {
     expect(root.querySelector('.chess-keyboard-root')).not.toBeNull();
     expect(chessKeyboardMock).toHaveBeenCalled();
     expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-legal-moves')).toBe('');
-    expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-orientation')).toBe('white');
+    expect(root.querySelector('.chess-keyboard-root')?.getAttribute('data-orientation')).toBe('');
     expect(
       (root.querySelector('[aria-label="Last Input Evaluate Status"]') as HTMLElement | null)?.textContent
     ).toContain('Component test mode');
