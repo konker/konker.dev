@@ -34,7 +34,7 @@ export type ChessKeyboardProps = {
   readonly onChange?: (input: string) => void;
   readonly onSettingsChange?: (settings: KeyboardBehaviorSettings) => void;
   readonly onSubmit?: (input: string, meta: KeyboardSubmitEvent) => void;
-  readonly orientation?: KeyboardBehaviorSettings['orientation'];
+  readonly perspective?: KeyboardBehaviorSettings['perspective'];
   readonly settings?: Partial<KeyboardBehaviorSettings>;
   readonly showNunnAnnotations?: boolean;
   readonly showReadout?: boolean;
@@ -48,7 +48,7 @@ const SETTING_PROP_KEYS = [
   'autoSubmitOnSinglePartialMatch',
   'candidateBar',
   'keyHighlightsMode',
-  'orientation',
+  'perspective',
   'showReadout',
 ] as const;
 
@@ -262,10 +262,10 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
     });
   };
 
-  const toggleOrientation = () => {
+  const togglePerspective = () => {
     applySettingsChange({
       ...resolvedSettings(),
-      orientation: resolvedSettings().orientation === 'white' ? 'black' : 'white',
+      perspective: resolvedSettings().perspective === 'white' ? 'black' : 'white',
     });
   };
 
@@ -340,8 +340,8 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
           onSetKeyHighlightsMode={(keyHighlightsMode) => {
             setKeyHighlightsMode(keyHighlightsMode);
           }}
-          onToggleOrientation={() => {
-            toggleOrientation();
+          onTogglePerspective={() => {
+            togglePerspective();
           }}
           onToggleShowReadout={() => {
             toggleBehaviorSetting('showReadout');
@@ -354,7 +354,7 @@ export function ChessKeyboard(props: ChessKeyboardProps): JSX.Element {
         highlightedKeyIds={keyboard.state().highlightedKeyIds}
         keys={visibleKeys()}
         onPressKey={pressPrimaryGridKey}
-        orientation={resolvedSettings().orientation}
+        perspective={resolvedSettings().perspective}
         trailedKeyIds={pressedPrimaryKeyIds()}
       />
       <SecondaryPanel

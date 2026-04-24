@@ -37,7 +37,7 @@ export function Example() {
       candidateBar
       keyHighlightsMode="always"
       autoSubmit
-      orientation="white"
+      perspective="white"
       showReadout
       onSubmit={(input, meta) => {
         console.log(input, meta.source, meta.exactLegalMatch);
@@ -63,7 +63,7 @@ Flat behavior props:
 - `autoSubmit?: boolean`
 - `candidateBar?: boolean`
 - `keyHighlightsMode?: 'off' | 'after-input' | 'always'`
-- `orientation?: 'white' | 'black'`
+- `perspective?: 'white' | 'black'`
 - `showReadout?: boolean`
 
 You can also pass `settings?: Partial<KeyboardBehaviorSettings>`, but the flat props take precedence when both are provided.
@@ -77,7 +77,7 @@ You can also pass `visibleSettings?: false | Partial<Record<keyof KeyboardBehavi
     autoSubmit: false,
     candidateBar: true,
     keyHighlightsMode: true,
-    orientation: false,
+    perspective: false,
     showReadout: true,
   }}
 />

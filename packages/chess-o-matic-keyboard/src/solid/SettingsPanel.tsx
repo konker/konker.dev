@@ -10,7 +10,7 @@ type SettingsPanelProps = {
   readonly onToggleAutoSubmitOnSinglePartialMatch: () => void;
   readonly onToggleCandidateBar: () => void;
   readonly onSetKeyHighlightsMode: (mode: KeyboardHighlightsMode) => void;
-  readonly onToggleOrientation: () => void;
+  readonly onTogglePerspective: () => void;
   readonly onToggleShowReadout: () => void;
   readonly settings: KeyboardBehaviorSettings;
   readonly visibleSettings?: ChessKeyboardVisibleSettingsMap | undefined;
@@ -162,23 +162,23 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
           </fieldset>
         </Show>
       </div>
-      <Show when={props.visibleSettings?.orientation !== false}>
+      <Show when={props.visibleSettings?.perspective !== false}>
         <fieldset class="chess-keyboard-settings-group chess-keyboard-settings-choice-group" data-slot="settings-group">
           <legend class="chess-keyboard-settings-group-title" data-slot="settings-label">
-            Orientation
+            Board Perspective
           </legend>
           <label class="chess-keyboard-settings-field" data-slot="settings-field">
             <span class="chess-keyboard-settings-option-label" data-slot="settings-label">
               White
             </span>
             <input
-              checked={props.settings.orientation === 'white'}
+              checked={props.settings.perspective === 'white'}
               class="chess-keyboard-settings-control"
               data-slot="settings-control"
-              name="keyboard-orientation"
+              name="keyboard-perspective"
               onChange={() => {
-                if (props.settings.orientation !== 'white') {
-                  props.onToggleOrientation();
+                if (props.settings.perspective !== 'white') {
+                  props.onTogglePerspective();
                 }
               }}
               type="radio"
@@ -189,13 +189,13 @@ export function SettingsPanel(props: SettingsPanelProps): JSX.Element {
               Black
             </span>
             <input
-              checked={props.settings.orientation === 'black'}
+              checked={props.settings.perspective === 'black'}
               class="chess-keyboard-settings-control"
               data-slot="settings-control"
-              name="keyboard-orientation"
+              name="keyboard-perspective"
               onChange={() => {
-                if (props.settings.orientation !== 'black') {
-                  props.onToggleOrientation();
+                if (props.settings.perspective !== 'black') {
+                  props.onTogglePerspective();
                 }
               }}
               type="radio"

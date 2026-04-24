@@ -7,7 +7,7 @@ export function areSettingsEqual(left: KeyboardBehaviorSettings, right: Keyboard
     left.autoSubmitOnSinglePartialMatch === right.autoSubmitOnSinglePartialMatch &&
     left.candidateBar === right.candidateBar &&
     left.keyHighlightsMode === right.keyHighlightsMode &&
-    left.orientation === right.orientation &&
+    left.perspective === right.perspective &&
     left.showReadout === right.showReadout
   );
 }

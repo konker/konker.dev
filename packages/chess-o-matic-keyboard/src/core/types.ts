@@ -6,7 +6,7 @@ export type KeyboardFile = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 
 export type KeyboardRank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 
-export type KeyboardOrientation = 'black' | 'white';
+export type KeyboardPerspective = 'black' | 'white';
 export type KeyboardHighlightsMode = 'after-input' | 'always' | 'off';
 
 export type KeyboardKeyCategory =
@@ -156,7 +156,7 @@ export type KeyboardBehaviorSettings = {
   readonly autoSubmitOnSinglePartialMatch: boolean;
   readonly candidateBar: boolean;
   readonly keyHighlightsMode: KeyboardHighlightsMode;
-  readonly orientation: KeyboardOrientation;
+  readonly perspective: KeyboardPerspective;
   readonly showReadout: boolean;
 };
 
@@ -166,7 +166,7 @@ export const DEFAULT_KEYBOARD_BEHAVIOR_SETTINGS: KeyboardBehaviorSettings = {
   autoSubmitOnSinglePartialMatch: false,
   candidateBar: true,
   keyHighlightsMode: 'after-input',
-  orientation: 'white',
+  perspective: 'white',
   showReadout: true,
 };
 

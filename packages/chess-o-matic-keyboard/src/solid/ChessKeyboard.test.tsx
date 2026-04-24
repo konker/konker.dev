@@ -33,7 +33,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
     readonly autoSubmitOnSinglePartialMatch: boolean;
     readonly candidateBar: boolean;
     readonly keyHighlightsMode: 'after-input' | 'always' | 'off';
-    readonly orientation: 'black' | 'white';
+    readonly perspective: 'black' | 'white';
     readonly showReadout: boolean;
   }) => void;
   readonly setValue: (nextValue: string) => void;
@@ -46,7 +46,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
     readonly autoSubmitOnSinglePartialMatch: boolean;
     readonly candidateBar: boolean;
     readonly keyHighlightsMode: 'after-input' | 'always' | 'off';
-    readonly orientation: 'black' | 'white';
+    readonly perspective: 'black' | 'white';
     readonly showReadout: boolean;
   }) => void;
   let setValue!: (nextValue: string) => void;
@@ -59,7 +59,7 @@ function mountControlled(onSubmit?: Parameters<typeof ChessKeyboard>[0]['onSubmi
       autoSubmitOnSinglePartialMatch: false,
       candidateBar: true,
       keyHighlightsMode: 'always' as const,
-      orientation: 'white' as const,
+      perspective: 'white' as const,
       showReadout: true,
     });
 
@@ -267,7 +267,7 @@ describe('solid/ChessKeyboard', () => {
       allowOmittedXInPieceCaptures: true,
       candidateBar: false,
       legalMovesSan: ['Nf3', 'Nc3'],
-      orientation: 'black',
+      perspective: 'black',
       showReadout: false,
     });
 
@@ -437,7 +437,7 @@ describe('solid/ChessKeyboard', () => {
       autoSubmitOnSinglePartialMatch: false,
       candidateBar: true,
       keyHighlightsMode: 'off',
-      orientation: 'white',
+      perspective: 'white',
       showReadout: true,
     });
 
@@ -480,10 +480,10 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should hide the orientation setting group when configured in visibleSettings', () => {
+  it('should hide the board perspective setting group when configured in visibleSettings', () => {
     const view = mount({
       visibleSettings: {
-        orientation: false,
+        perspective: false,
       },
     });
 
@@ -538,10 +538,10 @@ describe('solid/ChessKeyboard', () => {
   it('should keep uncontrolled settings interactive when other settings are fixed by flat props', () => {
     const view = mount({
       legalMovesSan: ['Nf3', 'Nc3'],
-      orientation: 'black',
+      perspective: 'black',
       showReadout: false,
       visibleSettings: {
-        orientation: false,
+        perspective: false,
         showReadout: false,
       },
     });
@@ -777,7 +777,7 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should order files and ranks from white orientation by default', () => {
+  it('should order files and ranks from white perspective by default', () => {
     const view = mount({});
     const row2 = Array.from(view.root.querySelectorAll('[data-row="row-2"] button')).map(
       (button) => button.textContent
@@ -804,10 +804,10 @@ describe('solid/ChessKeyboard', () => {
     view.cleanup();
   });
 
-  it('should reverse files and ranks for black orientation', () => {
+  it('should reverse files and ranks for black perspective', () => {
     const view = mount({
       settings: {
-        orientation: 'black',
+        perspective: 'black',
       },
     });
     const row4 = Array.from(view.root.querySelectorAll('[data-row="row-4"] button')).map(

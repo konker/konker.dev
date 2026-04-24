@@ -2,13 +2,13 @@
 import { X } from 'lucide-solid';
 import { createMemo, For, type JSX } from 'solid-js';
 
-import type { KeyboardKeyDefinition, KeyboardKeyId, KeyboardOrientation } from '../core/types.js';
+import type { KeyboardKeyDefinition, KeyboardKeyId, KeyboardPerspective } from '../core/types.js';
 
 type KeyGridProps = {
   readonly highlightedKeyIds: ReadonlySet<KeyboardKeyId>;
   readonly keys: ReadonlyArray<KeyboardKeyDefinition>;
   readonly onPressKey: (keyId: KeyboardKeyId) => void;
-  readonly orientation: KeyboardOrientation;
+  readonly perspective: KeyboardPerspective;
   readonly trailedKeyIds: ReadonlySet<KeyboardKeyId>;
 };
 
@@ -60,8 +60,8 @@ const RANK_KEYS_BLACK: ReadonlyArray<KeyboardKeyId> = [...RANK_KEYS_WHITE].rever
 export function KeyGrid(props: KeyGridProps): JSX.Element {
   const rows = createMemo<ReadonlyArray<GridRow>>(() => {
     const keyMap = new Map(props.keys.map((key) => [key.id, key]));
-    const fileKeys = props.orientation === 'black' ? FILE_KEYS_BLACK : FILE_KEYS_WHITE;
-    const rankKeys = props.orientation === 'black' ? RANK_KEYS_BLACK : RANK_KEYS_WHITE;
+    const fileKeys = props.perspective === 'black' ? FILE_KEYS_BLACK : FILE_KEYS_WHITE;
+    const rankKeys = props.perspective === 'black' ? RANK_KEYS_BLACK : RANK_KEYS_WHITE;
     const nextRows: Array<GridRow> = [
       {
         id: 'row-2',
