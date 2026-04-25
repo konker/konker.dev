@@ -1,6 +1,6 @@
 # Chess-o-Matic 3000 Architecture
 
-This document describes the current technical architecture of `apps/chess-o-matic-3000`.
+This document describes the current technical architecture of `apps/chess-o-matic`.
 It is written for LLM/code agents and assumes the reader needs to get productive quickly without rediscovering the design from scratch.
 
 ## Project Summary

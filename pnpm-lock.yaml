@@ -160,7 +160,7 @@ importers:
         specifier: ^4.0.16
         version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.6)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  apps/chess-o-matic-3000:
+  apps/chess-o-matic:
     dependencies:
       '@kobalte/core':
         specifier: ^0.13.11

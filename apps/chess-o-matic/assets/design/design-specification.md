@@ -50,7 +50,7 @@ This means the scoresheet should feel like a physical object used in over-the-bo
 
 ## Color Strategy
 
-Base palette is defined in [color-palette.md](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/assets/design/color-palette.md).
+Base palette is defined in [color-palette.md](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/assets/design/color-palette.md).
 
 ### Workspace / Digital Tokens
 
@@ -112,7 +112,7 @@ These components should feel modern, direct, and utilitarian:
 
 ## App Shell
 
-File: [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ChessOMatic3000App.tsx)
+File: [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ChessOMatic3000App.tsx)
 
 - move away from a simple vertical stack toward a clearer workspace structure
 - reserve visual space for future furniture such as hamburger menu and user/avatar affordances
@@ -125,7 +125,7 @@ File: [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess
 
 ## Status Panel
 
-File: [StatusPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/StatusPanel.tsx)
+File: [StatusPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/StatusPanel.tsx)
 
 This component should prioritize function over stylistic coherence.
 
@@ -139,7 +139,7 @@ This component should prioritize function over stylistic coherence.
 
 ## Scoresheet
 
-File: [ScoreSheet/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ScoreSheet/index.tsx)
+File: [ScoreSheet/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ScoreSheet/index.tsx)
 
 This is the primary analogue artifact in the app.
 
@@ -152,7 +152,7 @@ This is the primary analogue artifact in the app.
 
 ## Metadata Panel
 
-File: [GameMetadata/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/GameMetadata/index.tsx)
+File: [GameMetadata/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/GameMetadata/index.tsx)
 
 - overall panel should feel modern and structured
 - inputs may borrow from paper-form conventions
@@ -165,7 +165,7 @@ File: [GameMetadata/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess
 
 ## Chess Board
 
-File: [ChessBoard/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ChessBoard/index.tsx)
+File: [ChessBoard/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ChessBoard/index.tsx)
 
 - should feel crisp, modern, and precise
 - square corners
@@ -177,7 +177,7 @@ File: [ChessBoard/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o
 
 ## PGN Panel
 
-File: [PgnPanel/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/PgnPanel/index.tsx)
+File: [PgnPanel/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/PgnPanel/index.tsx)
 
 PGN is a digital counterpart to the traditional scoresheet.
 
@@ -190,7 +190,7 @@ PGN is a digital counterpart to the traditional scoresheet.
 
 ## FEN Panel
 
-File: [FenPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/FenPanel.tsx)
+File: [FenPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/FenPanel.tsx)
 
 FEN is also a digital utility surface.
 
@@ -201,7 +201,7 @@ FEN is also a digital utility surface.
 
 ## Section Chrome
 
-File: [CollapsibleSection.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/CollapsibleSection.tsx)
+File: [CollapsibleSection.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/CollapsibleSection.tsx)
 
 - section headers should act as modern structural chrome
 - use thin rules, tone changes, spacing, and typography to separate sections
@@ -213,10 +213,10 @@ File: [CollapsibleSection.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess
 
 Files:
 
-- [GameNavigationPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/GameNavigationPanel.tsx)
-- [GameDataToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/GameDataToolbar.tsx)
-- [ControlsPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ControlsPanel.tsx)
-- [ExternalOpenToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ExternalOpenToolbar.tsx)
+- [GameNavigationPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/GameNavigationPanel.tsx)
+- [GameDataToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/GameDataToolbar.tsx)
+- [ControlsPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ControlsPanel.tsx)
+- [ExternalOpenToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ExternalOpenToolbar.tsx)
 
 - should feel like modern control surfaces
 - should be visually grouped and consistent
@@ -260,7 +260,7 @@ This section turns the design direction into an implementation strategy for the 
 
 Primary file:
 
-- [app.css](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/app.css)
+- [app.css](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/app.css)
 
 Add semantic tokens in Tailwind v4 using `@theme`.
 
@@ -351,7 +351,7 @@ Use `font-data` for:
 
 Primary file:
 
-- [app.css](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/app.css)
+- [app.css](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/app.css)
 
 Expand the global layer beyond the current minimal reset.
 
@@ -387,7 +387,7 @@ These can live in `@layer components` so class strings in TSX stay readable.
 
 Primary file:
 
-- [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ChessOMatic3000App.tsx)
+- [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ChessOMatic3000App.tsx)
 
 ### Problems in Current Structure
 
@@ -425,7 +425,7 @@ This can still be stacked for now while using stronger section framing.
 
 Primary file:
 
-- [CollapsibleSection.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/CollapsibleSection.tsx)
+- [CollapsibleSection.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/CollapsibleSection.tsx)
 
 ### Problems in Current Structure
 
@@ -449,7 +449,7 @@ Primary file:
 
 Primary file:
 
-- [StatusPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/StatusPanel.tsx)
+- [StatusPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/StatusPanel.tsx)
 
 ### Problems in Current Structure
 
@@ -485,10 +485,10 @@ Primary file:
 
 Primary files:
 
-- [GameNavigationPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/GameNavigationPanel.tsx)
-- [GameDataToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/GameDataToolbar.tsx)
-- [ControlsPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ControlsPanel.tsx)
-- [ExternalOpenToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ExternalOpenToolbar.tsx)
+- [GameNavigationPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/GameNavigationPanel.tsx)
+- [GameDataToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/GameDataToolbar.tsx)
+- [ControlsPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ControlsPanel.tsx)
+- [ExternalOpenToolbar.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ExternalOpenToolbar.tsx)
 
 ### Problems in Current Structure
 
@@ -512,7 +512,7 @@ Primary files:
 
 Primary file:
 
-- [GameMetadata/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/GameMetadata/index.tsx)
+- [GameMetadata/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/GameMetadata/index.tsx)
 
 ### Problems in Current Structure
 
@@ -547,7 +547,7 @@ This may require either:
 
 Primary file:
 
-- [ScoreSheet/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ScoreSheet/index.tsx)
+- [ScoreSheet/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ScoreSheet/index.tsx)
 
 ### Problems in Current Structure
 
@@ -578,7 +578,7 @@ Primary file:
 
 Primary file:
 
-- [ChessBoard/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ChessBoard/index.tsx)
+- [ChessBoard/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ChessBoard/index.tsx)
 
 ### Problems in Current Structure
 
@@ -599,7 +599,7 @@ Primary file:
 
 Primary file:
 
-- [PgnPanel/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/PgnPanel/index.tsx)
+- [PgnPanel/index.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/PgnPanel/index.tsx)
 
 ### Problems in Current Structure
 
@@ -620,7 +620,7 @@ Primary file:
 
 Primary file:
 
-- [FenPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/FenPanel.tsx)
+- [FenPanel.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/FenPanel.tsx)
 
 ### Problems in Current Structure
 
@@ -639,7 +639,7 @@ Primary file:
 
 Primary file:
 
-- [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic-3000/src/features/chess/components/ChessOMatic3000App.tsx)
+- [ChessOMatic3000App.tsx](/home/konker/WORKING/konker/konker.dev/apps/chess-o-matic/src/features/chess/components/ChessOMatic3000App.tsx)
 
 ### Implementation Direction
 
