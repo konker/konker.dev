@@ -39,6 +39,10 @@
       "types": "./dist/do.d.ts",
       "import": "./dist/do.js"
     },
+    "./pipe": {
+      "types": "./dist/pipe.d.ts",
+      "import": "./dist/pipe.js"
+    },
     "./provide": {
       "types": "./dist/provide.d.ts",
       "import": "./dist/provide.js"
@@ -81,6 +85,9 @@
     "typescript-eslint": "^8.52.0",
     "vitest": "^4.1.6"
   },
+  "dependencies": {
+    "neverthrow": "^8.2.0"
+  },
   "scripts": {
     "test": "vitest run --coverage",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
@@ -101,8 +108,5 @@
     "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/neverthrow-r'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
-  },
-  "dependencies": {
-    "neverthrow": "^8.2.0"
   }
 }

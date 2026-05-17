@@ -20,3 +20,5 @@ export { asyncAndThen, asyncAndThrough, asyncMap } from './bridges.js';
 export { provide, provideSome } from './provide.js';
 
 export { bindAsyncR, bindR, doAsyncR, doR } from './do.js';
+
+export { pipe } from './pipe.js';
