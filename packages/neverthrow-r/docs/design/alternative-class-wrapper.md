@@ -7,7 +7,7 @@ Status: **not chosen**. Recorded for possible future revisit.
 The chosen v1 design models `ResultR<R, T, E>` as a bare Reader function:
 
 ```ts
-type ResultR<R, T, E> = (r: R) => Result<T, E>
+type ResultR<R, T, E> = (r: R) => Result<T, E>;
 ```
 
 All operators are free functions used with `pipe(...)`. This is the smallest possible thing — no runtime, no class, no allocation beyond the function itself.
@@ -23,31 +23,31 @@ class ResultR<R, T, E> {
   private constructor(private readonly _run: (r: R) => Result<T, E>) {}
 
   static of<R, T, E>(run: (r: R) => Result<T, E>): ResultR<R, T, E> {
-    return new ResultR(run)
+    return new ResultR(run);
   }
 
   run(r: R): Result<T, E> {
-    return this._run(r)
+    return this._run(r);
   }
 
   // instance methods mirror neverthrow's Result
-  map<U>(f: (t: T) => U): ResultR<R, U, E>
-  mapErr<F>(f: (e: E) => F): ResultR<R, T, F>
-  andThen<R2, U, F>(f: (t: T) => ResultR<R2, U, F>): ResultR<R & R2, U, E | F>
-  orElse<R2, U, F>(f: (e: E) => ResultR<R2, U, F>): ResultR<R & R2, T | U, F>
-  match<A, B = A>(ok: (t: T) => A, err: (e: E) => B): (r: R) => A | B
-  andTee(f: (t: T) => unknown): ResultR<R, T, E>
-  orTee(f: (e: E) => unknown): ResultR<R, T, E>
-  andThrough<R2, F>(f: (t: T) => ResultR<R2, unknown, F>): ResultR<R & R2, T, E | F>
+  map<U>(f: (t: T) => U): ResultR<R, U, E>;
+  mapErr<F>(f: (e: E) => F): ResultR<R, T, F>;
+  andThen<R2, U, F>(f: (t: T) => ResultR<R2, U, F>): ResultR<R & R2, U, E | F>;
+  orElse<R2, U, F>(f: (e: E) => ResultR<R2, U, F>): ResultR<R & R2, T | U, F>;
+  match<A, B = A>(ok: (t: T) => A, err: (e: E) => B): (r: R) => A | B;
+  andTee(f: (t: T) => unknown): ResultR<R, T, E>;
+  orTee(f: (e: E) => unknown): ResultR<R, T, E>;
+  andThrough<R2, F>(f: (t: T) => ResultR<R2, unknown, F>): ResultR<R & R2, T, E | F>;
 
   // sync -> async bridges return ResultAsyncR
-  asyncMap<U>(f: (t: T) => Promise<U>): ResultAsyncR<R, U, E>
-  asyncAndThen<R2, U, F>(f: (t: T) => ResultAsyncR<R2, U, F>): ResultAsyncR<R & R2, U, E | F>
-  asyncAndThrough<R2, F>(f: (t: T) => ResultAsyncR<R2, unknown, F>): ResultAsyncR<R & R2, T, E | F>
+  asyncMap<U>(f: (t: T) => Promise<U>): ResultAsyncR<R, U, E>;
+  asyncAndThen<R2, U, F>(f: (t: T) => ResultAsyncR<R2, U, F>): ResultAsyncR<R & R2, U, E | F>;
+  asyncAndThrough<R2, F>(f: (t: T) => ResultAsyncR<R2, unknown, F>): ResultAsyncR<R & R2, T, E | F>;
 
   // provision
-  provide(deps: R): Result<T, E>
-  provideSome<P extends Partial<R>>(p: P): ResultR<Simplify<Omit<R, keyof P>>, T, E>
+  provide(deps: R): Result<T, E>;
+  provideSome<P extends Partial<R>>(p: P): ResultR<Simplify<Omit<R, keyof P>>, T, E>;
 }
 
 class ResultAsyncR<R, T, E> {
@@ -59,7 +59,7 @@ class ResultAsyncR<R, T, E> {
 
 ## Do-notation
 
-`doR`/`bindR`/`doAsyncR`/`bindAsyncR` would remain as free functions in either design — `bind`-style accumulators don't translate cleanly to method chaining because each step changes the success-channel *type* (adds a named field), which `this`-typed methods handle poorly.
+`doR`/`bindR`/`doAsyncR`/`bindAsyncR` would remain as free functions in either design — `bind`-style accumulators don't translate cleanly to method chaining because each step changes the success-channel _type_ (adds a named field), which `this`-typed methods handle poorly.
 
 ## Equivalences with the chosen design
 

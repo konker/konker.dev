@@ -9,10 +9,10 @@ Add a third "requirements" / "dependencies" channel to neverthrow's `Result` and
 ## Core types
 
 ```ts
-import type { Result, ResultAsync } from 'neverthrow'
+import type { Result, ResultAsync } from 'neverthrow';
 
-export type ResultR<R, T, E>       = (r: R) => Result<T, E>
-export type ResultAsyncR<R, T, E>  = (r: R) => ResultAsync<T, E>
+export type ResultR<R, T, E> = (r: R) => Result<T, E>;
+export type ResultAsyncR<R, T, E> = (r: R) => ResultAsync<T, E>;
 ```
 
 `R` defaults to `unknown` — meaning "requires nothing specific."
@@ -29,7 +29,8 @@ All operators that chain two `ResultR`s combine their requirement types with **i
 const andThen =
   <A, R2, B, E2>(f: (a: A) => ResultR<R2, B, E2>) =>
   <R1, E1>(rr: ResultR<R1, A, E1>): ResultR<R1 & R2, B, E1 | E2> =>
-  (r) => rr(r).andThen((a) => f(a)(r))
+  (r) =>
+    rr(r).andThen((a) => f(a)(r));
 ```
 
 Sync↔async bridges follow the same intersection rule, promoted to `ResultAsyncR<R1 & R2, ...>`.
@@ -95,6 +96,7 @@ bindAsyncR<N extends string, S extends Scope<any>, R2, A, E2>(
 ```
 
 Each `bindR` step:
+
 - Intersects its `R2` into the accumulated requirements (`R1 & R2`).
 - Adds a named field to the accumulated success scope.
 - Unions the error type as usual.
