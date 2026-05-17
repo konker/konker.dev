@@ -781,7 +781,7 @@ importers:
         specifier: ^4.0.16
         version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.6)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.22.1)(yaml@2.8.2)
 
-  packages/neverthrow-deps:
+  packages/neverthrow-r:
     dependencies:
       neverthrow:
         specifier: ^8.2.0
@@ -801,7 +801,7 @@ importers:
         version: 10.0.1(eslint@10.4.0(jiti@2.6.1))
       '@konker.dev/common-config':
         specifier: ^0.8.0
-        version: 0.8.0(eslint@10.4.0(jiti@2.6.1))
+        version: 0.8.0(aws-crt@1.28.1)(eslint@10.4.0(jiti@2.6.1))
       '@types/node':
         specifier: ^25.8.0
         version: 25.8.0
@@ -12046,7 +12046,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@konker.dev/common-config@0.8.0(eslint@10.4.0(jiti@2.6.1))':
+  '@konker.dev/common-config@0.8.0(aws-crt@1.28.1)(eslint@10.4.0(jiti@2.6.1))':
     dependencies:
       '@aws-sdk/client-cloudfront-keyvaluestore': 3.966.0(aws-crt@1.28.1)
       '@aws-sdk/signature-v4-crt': 3.966.0
@@ -13256,6 +13256,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@typescript-eslint/project-service@8.59.3(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/tsconfig-utils': 8.59.3(typescript@5.9.3)
+      '@typescript-eslint/types': 8.59.3
+      debug: 4.4.3
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/project-service@8.59.3(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.59.3(typescript@6.0.3)
@@ -13276,6 +13285,10 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.59.3
 
   '@typescript-eslint/tsconfig-utils@8.52.0(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
+
+  '@typescript-eslint/tsconfig-utils@8.59.3(typescript@5.9.3)':
     dependencies:
       typescript: 5.9.3
 
@@ -13322,6 +13335,21 @@ snapshots:
       semver: 7.7.3
       tinyglobby: 0.2.15
       ts-api-utils: 2.4.0(typescript@5.9.3)
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/typescript-estree@8.59.3(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/project-service': 8.59.3(typescript@5.9.3)
+      '@typescript-eslint/tsconfig-utils': 8.59.3(typescript@5.9.3)
+      '@typescript-eslint/types': 8.59.3
+      '@typescript-eslint/visitor-keys': 8.59.3
+      debug: 4.4.3
+      minimatch: 10.2.5
+      semver: 7.7.3
+      tinyglobby: 0.2.15
+      ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -14467,7 +14495,7 @@ snapshots:
 
   detective-typescript@14.0.0(typescript@5.9.3):
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.52.0(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.59.3(typescript@5.9.3)
       ast-module-types: 6.0.1
       node-source-walk: 7.0.1
       typescript: 5.9.3
@@ -18728,6 +18756,10 @@ snapshots:
   trough@2.2.0: {}
 
   ts-api-utils@2.4.0(typescript@5.9.3):
+    dependencies:
+      typescript: 5.9.3
+
+  ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
 

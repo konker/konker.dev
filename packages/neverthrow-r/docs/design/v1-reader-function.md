@@ -1,6 +1,6 @@
 # v1 design: Reader-function `ResultR` over neverthrow
 
-Status: **chosen**. This document specifies the v1 API for `neverthrow-deps`.
+Status: **chosen**. This document specifies the v1 API for `neverthrow-r`.
 
 ## Goal
 
@@ -68,6 +68,43 @@ All exported as free functions from a flat barrel. Each is a one-line delegation
 
 Same surface as sync — `map`, `mapErr`, `andThen`, `orElse`, `match`, `andTee`, `orTee`, `andThrough` — operating on `ResultAsyncR<R, T, E>`. Module-namespaced or suffixed in implementation to avoid collisions in the barrel; final naming TBD at implementation time.
 
+### Do-notation (scope accumulator)
+
+A `bind`-style do-notation for sequentially composing chains that accumulate intermediate values into a record-shaped "scope" while still threading R correctly. This is the ergonomic replacement for the deferred `safeTry` — it sidesteps the generator R-inference problem.
+
+```ts
+type Scope<Keys extends string> = Record<Keys, any>
+
+type ExtendedScope<S extends Scope<any>, N extends string, A> =
+  S extends any
+    ? { [K in keyof S | N]: K extends N ? A : K extends keyof S ? S[K] : never }
+    : never
+
+doR<R = unknown>(): ResultR<R, {}, never>
+doAsyncR<R = unknown>(): ResultAsyncR<R, {}, never>
+
+bindR<N extends string, S extends Scope<any>, R2, A, E2>(
+  name: N,
+  f: (s: S) => ResultR<R2, A, E2>,
+): <R1, E1>(rr: ResultR<R1, S, E1>) => ResultR<R1 & R2, ExtendedScope<S, N, A>, E1 | E2>
+
+bindAsyncR<N extends string, S extends Scope<any>, R2, A, E2>(
+  name: N,
+  f: (s: S) => ResultAsyncR<R2, A, E2>,
+): <R1, E1>(rr: ResultAsyncR<R1, S, E1>) => ResultAsyncR<R1 & R2, ExtendedScope<S, N, A>, E1 | E2>
+```
+
+Each `bindR` step:
+- Intersects its `R2` into the accumulated requirements (`R1 & R2`).
+- Adds a named field to the accumulated success scope.
+- Unions the error type as usual.
+
+The chain expresses both "what services this computation requires" and "what intermediate values it has produced," yielding a single `ResultR<AllDeps, FinalScope, AllErrors>` to terminate with `andThen`, `map`, or `provide`.
+
+Sync→async bridge `bindR` → `bindAsyncR` follows the same intersection rule and promotes the chain to `ResultAsyncR`.
+
+Lives in `src/do.ts`, re-exported from the barrel.
+
 ### Provision
 
 ```ts
@@ -108,7 +145,7 @@ These are intentionally out of v1 scope:
 - Operators: same verbs as neverthrow methods, exported as free functions.
 - Provision: `provide`, `provideSome`.
 
-The package name `neverthrow-deps` is retained for v1 and may be renamed before a wider release if a clearer name emerges.
+Package name: **`neverthrow-r`**. The `-r` suffix mirrors the type-parameter convention used throughout the API (`ResultR`, `ResultAsyncR`, `okR`, `errR`, `doR`, `bindR`).
 
 ## Module layout
 
@@ -116,7 +153,7 @@ Flat barrel from `src/index.ts`. No namespacing. Tree-shakable. No collisions wi
 
 ## `pipe`
 
-`neverthrow-deps` does not ship or depend on a `pipe` implementation. Operators are curried free functions designed to be used with any `pipe` the consumer prefers (or none — direct application works too).
+`neverthrow-r` does not ship or depend on a `pipe` implementation. Operators are curried free functions designed to be used with any `pipe` the consumer prefers (or none — direct application works too).
 
 This is deliberate: the library's purpose is to be a lightweight alternative to effect-ts, so taking on `effect` (or any other fp library) as a dependency just for `pipe` would defeat the point. Consumers bring their own.
 

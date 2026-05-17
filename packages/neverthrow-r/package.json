@@ -1,5 +1,5 @@
 {
-  "name": "@konker.dev/neverthrow-deps",
+  "name": "@konker.dev/neverthrow-r",
   "version": "0.0.1",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/konker/konker.dev/packages/neverthrow-deps"
+    "url": "https://github.com/konker/konker.dev/packages/neverthrow-r"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -71,7 +71,7 @@
     "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
-    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/neverthrow-deps'",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/neverthrow-r'",
     "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
   },

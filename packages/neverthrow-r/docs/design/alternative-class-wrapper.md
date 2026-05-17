@@ -57,17 +57,21 @@ class ResultAsyncR<R, T, E> {
 
 `R` defaults to `unknown`. Static constructors `ok`, `err`, `asks`, `ask`, `fromResult`, `fromResultAsync` produce instances.
 
+## Do-notation
+
+`doR`/`bindR`/`doAsyncR`/`bindAsyncR` would remain as free functions in either design — `bind`-style accumulators don't translate cleanly to method chaining because each step changes the success-channel *type* (adds a named field), which `this`-typed methods handle poorly.
+
 ## Equivalences with the chosen design
 
-| Chosen (Reader function)           | Alternative (class wrapper)        |
-| ---------------------------------- | ---------------------------------- |
-| `rr(deps)`                         | `rr.run(deps)` or `rr.provide(deps)` |
-| `pipe(rr, map(f))`                 | `rr.map(f)`                        |
-| `pipe(rr, andThen(f))`             | `rr.andThen(f)`                    |
-| `provide(rr, deps)`                | `rr.provide(deps)`                 |
-| `provideSome(rr, p)`               | `rr.provideSome(p)`                |
-| `asks(f)`                          | `ResultR.asks(f)`                  |
-| `fromResult(r)`                    | `ResultR.fromResult(r)`            |
+| Chosen (Reader function) | Alternative (class wrapper)          |
+| ------------------------ | ------------------------------------ |
+| `rr(deps)`               | `rr.run(deps)` or `rr.provide(deps)` |
+| `pipe(rr, map(f))`       | `rr.map(f)`                          |
+| `pipe(rr, andThen(f))`   | `rr.andThen(f)`                      |
+| `provide(rr, deps)`      | `rr.provide(deps)`                   |
+| `provideSome(rr, p)`     | `rr.provideSome(p)`                  |
+| `asks(f)`                | `ResultR.asks(f)`                    |
+| `fromResult(r)`          | `ResultR.fromResult(r)`              |
 
 Semantics are identical. `R1 & R2` intersection rules, whole-key replacement in `provideSome`, async bridges all behave the same.
 
