@@ -19,7 +19,7 @@
   "excludeInternal": true,
   "excludePrivate": true,
   "intentionallyNotExported": ["UnaryFn"],
-  "readme": "none",
+  "readme": "./docs/reference-readme.md",
   "hideGenerator": true,
   "githubPages": false,
   "gitRevision": "main"

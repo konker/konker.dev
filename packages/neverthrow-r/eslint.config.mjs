@@ -3,6 +3,9 @@ import baseConfig from '@konker.dev/common-config/configs/eslint.config-base.mjs
 export default [
   ...baseConfig,
   {
+    ignores: ['.examples-check/**'],
+  },
+  {
     ignores: ['vitest.config.ts'],
     languageOptions: {
       parserOptions: {

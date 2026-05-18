@@ -1,7 +1,3 @@
-**@konker.dev/neverthrow-r**
-
-***
-
 # `@konker.dev/neverthrow-r`
 
 A thin Reader-function layer over [neverthrow](https://github.com/supermacro/neverthrow). Every value is a function `(r: R) => Result<T, E>` (or its async sibling), so dependencies travel through a third **requirements** channel `R` alongside the usual `T` / `E` of `Result`.

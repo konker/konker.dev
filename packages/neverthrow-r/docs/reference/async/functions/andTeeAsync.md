@@ -2,13 +2,15 @@
 
 ***
 
-[@konker.dev/neverthrow-r](../../README.md) / [async](../README.md) / andTeeAsync
+[@konker.dev/neverthrow-r](../../modules.md) / [async](../README.md) / andTeeAsync
 
 # Function: andTeeAsync()
 
 > **andTeeAsync**\<`T`\>(`f`): \<`R`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `E`\>
 
-Defined in: [async.ts:44](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L44)
+Defined in: [async.ts:171](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L171)
+
+Async variant of andTee.
 
 ## Type Parameters
 
@@ -45,3 +47,17 @@ Defined in: [async.ts:44](https://github.com/konker/konker.dev/blob/main/package
 ### Returns
 
 [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `E`\>
+
+## Example
+
+```ts
+import { okAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import { andTeeAsync } from '@konker.dev/neverthrow-r/async';
+import { pipe } from '@konker.dev/neverthrow-r/pipe';
+
+const traced = pipe(okAsyncR<number>(2), andTeeAsync((n) => console.log(n)));
+```
+
+## See
+
+andTee

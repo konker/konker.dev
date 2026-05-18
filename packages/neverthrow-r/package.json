@@ -102,6 +102,7 @@
     "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
     "docs-generate": "typedoc",
     "generated-docs-check": "pnpm run docs-generate && git diff --exit-code docs/reference",
+    "examples-check": "node scripts/check-examples.mjs",
     "exports-check": "NPM_CONFIG_CACHE=.npm-cache attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=esm-only",
     "fixme-check": "leasot --exit-nicely --skip-unsupported src",
     "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
@@ -110,7 +111,7 @@
     "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
     "pre-push": "pnpm run lint-check && pnpm run typecheck",
     "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/neverthrow-r'",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run generated-docs-check && pnpm run exports-check && pnpm run fixme-check",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run generated-docs-check && pnpm run examples-check && pnpm run exports-check && pnpm run fixme-check",
     "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
   }
 }
