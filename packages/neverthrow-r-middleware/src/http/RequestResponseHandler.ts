@@ -1,0 +1,8 @@
+import type { Handler } from '../handler.js';
+import type { Rec } from './Rec.js';
+import type { RequestW } from './RequestW.js';
+import type { ResponseW } from './ResponseW.js';
+
+export type { BodyRec, Rec, StrBodyRec } from './Rec.js';
+
+export type RequestResponseHandler<I extends Rec, O extends Rec, E, R> = Handler<RequestW<I>, ResponseW<O>, E, R>;
