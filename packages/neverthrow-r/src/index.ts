@@ -1,8 +1,32 @@
 /**
- * Public barrel for `@konker.dev/neverthrow-r`: a thin Reader-function layer
- * over neverthrow that adds a third "requirements" channel (`R`) to `Result`
- * and `ResultAsync`. Re-exports every public type, constructor, operator,
- * bridge, do-notation helper, provision function, and `pipe`.
+ * Public barrel for `@konker.dev/neverthrow-r` — a thin Reader-function layer
+ * over `neverthrow` that adds a third *requirements* channel `R` alongside
+ * the usual `T` / `E` of `Result`.
+ *
+ * @remarks
+ * Re-exports every public type, constructor, operator, bridge, do-notation
+ * helper, provision function, and `pipe`. For a guided tour and "pick your
+ * module" table, see the package landing page; for the conceptual model of
+ * the `R` channel, see {@link types}.
+ *
+ * @example
+ * ```ts
+ * import {
+ *   andThen,
+ *   map,
+ *   okR,
+ *   pipe,
+ *   provide,
+ * } from '@konker.dev/neverthrow-r';
+ *
+ * const program = pipe(
+ *   okR<number>(2),
+ *   map((n) => n + 1),
+ *   andThen((n) => okR<string>(`got ${n}`)),
+ * );
+ *
+ * provide(program, undefined); // Ok('got 3')
+ * ```
  *
  * @module
  */

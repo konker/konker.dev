@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["es2023", "dom"],
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "baseUrl": ".",
+    "paths": {
+      "@konker.dev/neverthrow-r": ["./src/index.ts"],
+      "@konker.dev/neverthrow-r/*": ["./src/*.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", ".examples-check/**/*.ts"],
+  "exclude": ["src/**/*.test.ts", "dist", "docs", "node_modules"]
+}

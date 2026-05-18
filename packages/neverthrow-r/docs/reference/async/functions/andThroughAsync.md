@@ -2,13 +2,15 @@
 
 ***
 
-[@konker.dev/neverthrow-r](../../README.md) / [async](../README.md) / andThroughAsync
+[@konker.dev/neverthrow-r](../../modules.md) / [async](../README.md) / andThroughAsync
 
 # Function: andThroughAsync()
 
 > **andThroughAsync**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
 
-Defined in: [async.ts:56](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L56)
+Defined in: [async.ts:216](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L216)
+
+Async variant of andThrough.
 
 ## Type Parameters
 
@@ -53,3 +55,22 @@ Defined in: [async.ts:56](https://github.com/konker/konker.dev/blob/main/package
 ### Returns
 
 [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+
+## Example
+
+```ts
+import { errAsyncR, okAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import { andThroughAsync } from '@konker.dev/neverthrow-r/async';
+import { pipe } from '@konker.dev/neverthrow-r/pipe';
+
+const validated = pipe(
+  okAsyncR<number>(2),
+  andThroughAsync((n) =>
+    n > 0 ? okAsyncR<unknown>(undefined) : errAsyncR<string>('non-positive'),
+  ),
+);
+```
+
+## See
+
+andThrough
