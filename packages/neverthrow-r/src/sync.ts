@@ -1,3 +1,12 @@
+/**
+ * Sync operators over `ResultR`: `map`, `mapErr`, `andThen`, `orElse`,
+ * `match`, `andTee`, `orTee`, `andThrough`. Each is a one-line delegation to
+ * the underlying neverthrow `Result` method, threading the environment `r`
+ * and intersecting requirement types (`R1 & R2`) across composed steps.
+ *
+ * @module
+ */
+
 import type { ResultR } from './types.js';
 
 export const map =

@@ -1,3 +1,13 @@
+/**
+ * Core type aliases for the Reader-function layer: `ResultR<R, T, E>` is
+ * `(r: R) => Result<T, E>` and `ResultAsyncR<R, T, E>` is its async sibling.
+ * `R` defaults to `unknown` (no specific requirements). Also exposes the
+ * `Scope` / `ExtendedScope` helpers used by do-notation and the `Simplify`
+ * intersection-flattener.
+ *
+ * @module
+ */
+
 import type { Result, ResultAsync } from 'neverthrow';
 
 export type ResultR<R, T, E> = (r: R) => Result<T, E>;
