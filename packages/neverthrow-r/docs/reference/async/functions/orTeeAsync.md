@@ -2,13 +2,15 @@
 
 ***
 
-[@konker.dev/neverthrow-r](../../README.md) / [async](../README.md) / orTeeAsync
+[@konker.dev/neverthrow-r](../../modules.md) / [async](../README.md) / orTeeAsync
 
 # Function: orTeeAsync()
 
 > **orTeeAsync**\<`E`\>(`f`): \<`R`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `E`\>
 
-Defined in: [async.ts:50](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L50)
+Defined in: [async.ts:191](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L191)
+
+Async variant of orTee.
 
 ## Type Parameters
 
@@ -45,3 +47,17 @@ Defined in: [async.ts:50](https://github.com/konker/konker.dev/blob/main/package
 ### Returns
 
 [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `E`\>
+
+## Example
+
+```ts
+import { errAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import { orTeeAsync } from '@konker.dev/neverthrow-r/async';
+import { pipe } from '@konker.dev/neverthrow-r/pipe';
+
+const logged = pipe(errAsyncR<string>('boom'), orTeeAsync((e) => console.error(e)));
+```
+
+## See
+
+orTee

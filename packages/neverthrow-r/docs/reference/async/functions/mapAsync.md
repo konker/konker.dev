@@ -2,13 +2,16 @@
 
 ***
 
-[@konker.dev/neverthrow-r](../../README.md) / [async](../README.md) / mapAsync
+[@konker.dev/neverthrow-r](../../modules.md) / [async](../README.md) / mapAsync
 
 # Function: mapAsync()
 
 > **mapAsync**\<`A`, `B`\>(`f`): \<`R`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `B`, `E`\>
 
-Defined in: [async.ts:14](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L14)
+Defined in: [async.ts:52](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L52)
+
+Async variant of map. Accepts a sync- or `Promise`-returning
+transform.
 
 ## Type Parameters
 
@@ -49,3 +52,17 @@ Defined in: [async.ts:14](https://github.com/konker/konker.dev/blob/main/package
 ### Returns
 
 [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `B`, `E`\>
+
+## Example
+
+```ts
+import { okAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import { mapAsync } from '@konker.dev/neverthrow-r/async';
+import { pipe } from '@konker.dev/neverthrow-r/pipe';
+
+const doubled = pipe(okAsyncR<number>(2), mapAsync(async (n) => n * 2));
+```
+
+## See
+
+map

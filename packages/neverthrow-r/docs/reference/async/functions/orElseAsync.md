@@ -2,13 +2,15 @@
 
 ***
 
-[@konker.dev/neverthrow-r](../../README.md) / [async](../README.md) / orElseAsync
+[@konker.dev/neverthrow-r](../../modules.md) / [async](../README.md) / orElseAsync
 
 # Function: orElseAsync()
 
 > **orElseAsync**\<`E`, `R2`, `U`, `F`\>(`f`): \<`R1`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
 
-Defined in: [async.ts:32](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L32)
+Defined in: [async.ts:123](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L123)
+
+Async variant of orElse. The recovery returns a `ResultAsyncR`.
 
 ## Type Parameters
 
@@ -57,3 +59,20 @@ Defined in: [async.ts:32](https://github.com/konker/konker.dev/blob/main/package
 ### Returns
 
 [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+
+## Example
+
+```ts
+import { errAsyncR, okAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import { orElseAsync } from '@konker.dev/neverthrow-r/async';
+import { pipe } from '@konker.dev/neverthrow-r/pipe';
+
+const withFallback = pipe(
+  errAsyncR<string, number>('boom'),
+  orElseAsync(() => okAsyncR<number>(0)),
+);
+```
+
+## See
+
+orElse

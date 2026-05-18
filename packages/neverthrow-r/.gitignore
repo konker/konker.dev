@@ -33,3 +33,6 @@ pnpm-debug.log*
 .vscode
 
 .turbo
+
+# extracted JSDoc @example fences (see scripts/check-examples.mjs)
+.examples-check/
