@@ -1,3 +1,13 @@
+/**
+ * Async operators over `ResultAsyncR`: `mapAsync`, `mapErrAsync`,
+ * `andThenAsync`, `orElseAsync`, `matchAsync`, `andTeeAsync`, `orTeeAsync`,
+ * `andThroughAsync`. Mirror the sync surface from `./sync`, suffixed with
+ * `Async` to avoid barrel collisions, and delegate to the corresponding
+ * neverthrow `ResultAsync` methods.
+ *
+ * @module
+ */
+
 import type { ResultAsyncR } from './types.js';
 
 export const mapAsync =

@@ -133,6 +133,10 @@ const result = provide(stillNeedsDb, { db });
 - `provide(rr, deps)` — supply all requirements, return the underlying `Result` / `ResultAsync`.
 - `provideSome(rr, partial)` — supply some requirements, return a `ResultR` over the remaining ones.
 
+## API Reference
+
+Full auto-generated reference docs (signatures, types, module summaries) live in [`./docs/reference/`](./docs/reference/). They're regenerated from source on every `ci` run and a staleness check fails the build if they drift.
+
 ## License
 
 ISC

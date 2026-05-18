@@ -1,3 +1,12 @@
+/**
+ * Constructors and lifters that produce `ResultR` / `ResultAsyncR` values:
+ * `okR`, `errR`, `okAsyncR`, `errAsyncR` for plain values; `fromResult` and
+ * `fromResultAsync` for lifting existing neverthrow values; `asks` and `ask`
+ * for building a `ResultR` directly from the environment.
+ *
+ * @module
+ */
+
 import type { Result, ResultAsync } from 'neverthrow';
 import { err, errAsync, ok, okAsync } from 'neverthrow';
 

@@ -1,3 +1,13 @@
+/**
+ * Provision: supply the environment to a `ResultR` / `ResultAsyncR` and
+ * obtain the underlying neverthrow value. `provide(rr, deps)` is the named
+ * alias for `rr(deps)` with explicit type narrowing. `provideSome(rr, p)`
+ * whole-replaces a subset of requirement keys and returns a `ResultR` over
+ * the remaining ones (no deep merge).
+ *
+ * @module
+ */
+
 import type { Result, ResultAsync } from 'neverthrow';
 
 import type { ResultAsyncR, ResultR, Simplify } from './types.js';

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/async.ts",
+    "src/bridges.ts",
+    "src/constructors.ts",
+    "src/do.ts",
+    "src/pipe.ts",
+    "src/provide.ts",
+    "src/sync.ts",
+    "src/types.ts"
+  ],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "./tsconfig.json",
+  "out": "docs/reference",
+  "plugin": ["typedoc-plugin-markdown"],
+  "exclude": ["**/*.test.ts"],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "intentionallyNotExported": ["UnaryFn"],
+  "readme": "none",
+  "hideGenerator": true,
+  "githubPages": false,
+  "gitRevision": "main"
+}

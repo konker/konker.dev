@@ -1,3 +1,12 @@
+/**
+ * Sync→async bridge operators that take a `ResultR` and return a
+ * `ResultAsyncR`: `asyncMap`, `asyncAndThen`, `asyncAndThrough`. They follow
+ * the same `R1 & R2` intersection rule as the pure sync/async operators,
+ * promoting the chain to the async track.
+ *
+ * @module
+ */
+
 import type { ResultAsyncR, ResultR } from './types.js';
 
 export const asyncMap =

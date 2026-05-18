@@ -1,3 +1,12 @@
+/**
+ * Public barrel for `@konker.dev/neverthrow-r`: a thin Reader-function layer
+ * over neverthrow that adds a third "requirements" channel (`R`) to `Result`
+ * and `ResultAsync`. Re-exports every public type, constructor, operator,
+ * bridge, do-notation helper, provision function, and `pipe`.
+ *
+ * @module
+ */
+
 export type { ExtendedScope, ResultAsyncR, ResultR, Scope, Simplify } from './types.js';
 
 export { ask, asks, errAsyncR, errR, fromResult, fromResultAsync, okAsyncR, okR } from './constructors.js';
