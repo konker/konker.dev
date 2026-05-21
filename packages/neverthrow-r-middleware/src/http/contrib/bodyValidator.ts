@@ -26,8 +26,8 @@ const toMiddlewareError = (error: SchemaValidationError): MiddlewareError =>
 export const middleware =
   <V>(schema: StandardSchemaV1<unknown, V>) =>
   <I extends Rec, O extends Rec, E, R>(
-    wrapped: RequestResponseHandler<Override<I, WithValidatedBody<V>>, O, E, R>
-  ): RequestResponseHandler<I, O, E | MiddlewareError, R & WithLogger> =>
+    wrapped: RequestResponseHandler<Override<I, WithValidatedBody<V>>, R, O, E>
+  ): RequestResponseHandler<I, R & WithLogger, O, E | MiddlewareError> =>
   (i: RequestW<I>) =>
     pipe(
       okAsyncR(i.body),

@@ -55,11 +55,11 @@ export function adaptToHonoResponse<O extends StrBodyRec>(
 export const middleware =
   (_params?: never) =>
   <O extends StrBodyRec, E, R>(
-    wrapped: Handler<RequestW<WithHonoRequestRaw & StrBodyRec>, ResponseW<O>, E, R>
-  ): Handler<HonoRequest, Response, E | MiddlewareError, R & WithLogger> =>
+    wrapped: Handler<RequestW<WithHonoRequestRaw & StrBodyRec>, R, ResponseW<O>, E>
+  ): Handler<HonoRequest, R & WithLogger, Response, E | MiddlewareError> =>
   (i: HonoRequest) =>
     pipe(
-      okAsyncR<HonoRequest>(i),
+      okAsyncR(i),
       tapLogger('debug', `[${TAG}] IN`),
       andThenAsync(() => (_r: unknown) => adaptFromHonoRequest(i)),
       andThenAsync(wrapped),

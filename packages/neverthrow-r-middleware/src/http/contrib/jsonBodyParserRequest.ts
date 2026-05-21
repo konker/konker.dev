@@ -20,11 +20,11 @@ export type WithParsedBody = {
 export const middleware =
   () =>
   <I extends StrBodyRec, O extends BodyRec, E, R>(
-    wrapped: RequestResponseHandler<Override<I, WithParsedBody>, O, E, R>
-  ): RequestResponseHandler<I, O, E | MiddlewareError, R & WithLogger> =>
+    wrapped: RequestResponseHandler<Override<I, WithParsedBody>, R, O, E>
+  ): RequestResponseHandler<I, R & WithLogger, O, E | MiddlewareError> =>
   (i: RequestW<I>) =>
     pipe(
-      okAsyncR<RequestW<I>>(i),
+      okAsyncR(i),
       tapLogger('debug', `[${TAG}] IN`),
       andThenAsync((req: RequestW<I>) => {
         const raw = req.body;

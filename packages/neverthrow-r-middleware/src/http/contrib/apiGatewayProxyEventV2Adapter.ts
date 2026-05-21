@@ -42,11 +42,11 @@ export function adaptToApiGatewayProxyResult<O extends StrBodyRec>(responseW: Re
 export const middleware =
   (_params?: never) =>
   <O extends StrBodyRec, E, R>(
-    wrapped: Handler<RequestW<WithApiGatewayProxyEventRaw & StrBodyRec>, ResponseW<O>, E, R>
-  ): Handler<APIGatewayProxyEventV2, APIGatewayProxyResult, E, R & WithLogger> =>
+    wrapped: Handler<RequestW<WithApiGatewayProxyEventRaw & StrBodyRec>, R, ResponseW<O>, E>
+  ): Handler<APIGatewayProxyEventV2, R & WithLogger, APIGatewayProxyResult, E> =>
   (i: APIGatewayProxyEventV2) =>
     pipe(
-      okAsyncR<APIGatewayProxyEventV2>(i),
+      okAsyncR(i),
       tapLogger('debug', `[${TAG}] IN`),
       mapAsync(adaptFromApiGatewayProxyEventV2),
       andThenAsync(wrapped),

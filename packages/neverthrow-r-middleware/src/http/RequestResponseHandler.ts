@@ -5,4 +5,4 @@ import type { ResponseW } from './ResponseW.js';
 
 export type { BodyRec, Override, Rec, StrBodyRec } from './Rec.js';
 
-export type RequestResponseHandler<I extends Rec, O extends Rec, E, R> = Handler<RequestW<I>, ResponseW<O>, E, R>;
+export type RequestResponseHandler<I extends Rec, R, O extends Rec, E> = Handler<RequestW<I>, R, ResponseW<O>, E>;

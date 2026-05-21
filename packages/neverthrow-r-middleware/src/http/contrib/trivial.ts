@@ -13,11 +13,11 @@ export const TAG = 'trivial';
 export const middleware =
   (_params?: never) =>
   <I extends Rec, O extends Rec, E, R>(
-    wrapped: RequestResponseHandler<I, O, E, R>
-  ): RequestResponseHandler<I, O, E, R & WithLogger> =>
+    wrapped: RequestResponseHandler<I, R, O, E>
+  ): RequestResponseHandler<I, R & WithLogger, O, E> =>
   (i: RequestW<I>) =>
     pipe(
-      okAsyncR<RequestW<I>>(i),
+      okAsyncR(i),
       tapLogger('debug', `[${TAG}] IN`),
       mapAsync((req) => makeRequestW(req)),
       andThenAsync(wrapped),
