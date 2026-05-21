@@ -1,8 +1,9 @@
-import { andThenAsync, mapAsync } from '@konker.dev/neverthrow-r/async';
+import { andThenAsync, mapAsync, mapErrAsync } from '@konker.dev/neverthrow-r/async';
 import { okAsyncR } from '@konker.dev/neverthrow-r/constructors';
 import { pipe } from '@konker.dev/neverthrow-r/pipe';
+import { andThenParseAsyncR } from '@konker.dev/neverthrow-r-schema/async';
+import type { SchemaValidationError } from '@konker.dev/neverthrow-r-schema/common';
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 
 import type { WithLogger } from '../../lib/Logger.js';
 import { tapLogger } from '../../lib/Logger.js';
@@ -19,6 +20,9 @@ export type WithValidatedBody<V> = {
   readonly bodyValidatorRaw: unknown;
 };
 
+const toMiddlewareError = (error: SchemaValidationError): MiddlewareError =>
+  middlewareError(error.message, error.cause === undefined ? error.issues : [error.cause, ...error.issues]);
+
 export const middleware =
   <V>(schema: StandardSchemaV1<unknown, V>) =>
   <I extends Rec, O extends Rec, E, R>(
@@ -26,26 +30,16 @@ export const middleware =
   ): RequestResponseHandler<I, O, E | MiddlewareError, R & WithLogger> =>
   (i: RequestW<I>) =>
     pipe(
-      okAsyncR<RequestW<I>>(i),
+      okAsyncR(i.body),
       tapLogger('debug', `[${TAG}] IN`),
-      andThenAsync((req: RequestW<I>) => {
-        const validation = (): ResultAsync<RequestW<Override<I, WithValidatedBody<V>>>, MiddlewareError> =>
-          ResultAsync.fromSafePromise(Promise.resolve(schema['~standard'].validate(req.body))).andThen(
-            (outcome: StandardSchemaV1.Result<V>) => {
-              if ('issues' in outcome && outcome.issues !== undefined) {
-                return errAsync(middlewareError('Body validation failed', outcome.issues));
-              }
-              const validated = outcome.value;
-              return okAsync(
-                makeRequestW(req, {
-                  body: validated,
-                  bodyValidatorRaw: req.body,
-                })
-              );
-            }
-          );
-        return (_r: unknown) => validation();
-      }),
+      andThenParseAsyncR(schema, { message: 'Body validation failed' }),
+      mapErrAsync(toMiddlewareError),
+      mapAsync((validatedBody) =>
+        makeRequestW(i, {
+          body: validatedBody,
+          bodyValidatorRaw: i.body,
+        })
+      ),
       andThenAsync(wrapped),
       mapAsync((res) => makeResponseW(res)),
       tapLogger('debug', `[${TAG}] OUT`)

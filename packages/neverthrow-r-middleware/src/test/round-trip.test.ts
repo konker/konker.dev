@@ -1,8 +1,8 @@
 import { okAsyncR } from '@konker.dev/neverthrow-r/constructors';
 import { pipe } from '@konker.dev/neverthrow-r/pipe';
-import type { StandardSchemaV1 } from '@standard-schema/spec';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import { middleware as apiGatewayProxyEventV2Adapter } from '../http/contrib/apiGatewayProxyEventV2Adapter.js';
 import { middleware as bodyValidator } from '../http/contrib/bodyValidator.js';
@@ -16,18 +16,7 @@ import { recordingLogger } from './test-common.js';
 
 type Payload = { name: string };
 
-const payloadSchema: StandardSchemaV1<unknown, Payload> = {
-  '~standard': {
-    version: 1,
-    vendor: 'fixture',
-    validate(input) {
-      if (typeof input === 'object' && input !== null && typeof (input as { name?: unknown }).name === 'string') {
-        return { value: { name: (input as { name: string }).name } };
-      }
-      return { issues: [{ message: 'expected { name: string }' }] };
-    },
-  },
-};
+const payloadSchema = z.object({ name: z.string() });
 
 // --- fixture API Gateway events -----------------------------------------
 
