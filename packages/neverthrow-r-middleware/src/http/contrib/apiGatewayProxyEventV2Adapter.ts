@@ -19,7 +19,7 @@ export type WithApiGatewayProxyEventRaw = {
 
 export function adaptFromApiGatewayProxyEventV2(
   request: APIGatewayProxyEventV2
-): RequestW<WithApiGatewayProxyEventRaw> {
+): RequestW<WithApiGatewayProxyEventRaw & StrBodyRec> {
   return {
     url: request.requestContext.http.path,
     method: request.requestContext.http.method,
@@ -42,7 +42,7 @@ export function adaptToApiGatewayProxyResult<O extends StrBodyRec>(responseW: Re
 export const middleware =
   (_params?: never) =>
   <O extends StrBodyRec, E, R>(
-    wrapped: Handler<RequestW<WithApiGatewayProxyEventRaw>, ResponseW<O>, E, R>
+    wrapped: Handler<RequestW<WithApiGatewayProxyEventRaw & StrBodyRec>, ResponseW<O>, E, R>
   ): Handler<APIGatewayProxyEventV2, APIGatewayProxyResult, E, R & WithLogger> =>
   (i: APIGatewayProxyEventV2) =>
     pipe(

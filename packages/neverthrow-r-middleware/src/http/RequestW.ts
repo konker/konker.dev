@@ -1,12 +1,15 @@
+import type { Override, StrBodyRec } from './Rec.js';
+
 // --------------------------------------------------------------------------
-export type RequestW<T extends Record<string, unknown> = {}> = {
+type RequestWBase = {
   readonly url: string;
   readonly method: string;
-  readonly body?: string;
   readonly headers: Record<string, string>;
   readonly queryStringParameters: Record<string, string>;
   readonly pathParameters: Record<string, string>;
-} & T;
+};
+
+export type RequestW<T extends Record<string, unknown> = StrBodyRec> = RequestWBase & T;
 
 // --------------------------------------------------------------------------
 export function makeRequestW<T extends Record<string, unknown>>(requestW: RequestW<T>): RequestW<T>;
@@ -14,12 +17,15 @@ export function makeRequestW<T extends Record<string, unknown>>(requestW: Reques
 export function makeRequestW<
   T extends Record<string, unknown> = {},
   U extends Record<string, unknown> | undefined = undefined,
->(requestW: RequestW<T>, u: U): NoInfer<U extends undefined ? RequestW<T> : RequestW<T & U>>;
+>(
+  requestW: RequestW<T>,
+  u: U
+): NoInfer<U extends undefined ? RequestW<T> : U extends Record<string, unknown> ? RequestW<Override<T, U>> : never>;
 
 export function makeRequestW<T extends Record<string, unknown>, U extends Record<string, unknown>>(
   requestW: RequestW<T>,
   u?: U
-): RequestW<T> | RequestW<T & U> {
+): RequestW<T> | RequestW<Override<T, U>> {
   return u
     ? {
         ...requestW,

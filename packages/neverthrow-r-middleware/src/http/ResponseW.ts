@@ -1,10 +1,12 @@
-import type { BodyRec } from './Rec.js';
+import type { BodyRec, Override } from './Rec.js';
 
 // --------------------------------------------------------------------------
-export type ResponseW<T extends Record<string, unknown> = BodyRec> = {
+type ResponseWBase = {
   readonly statusCode: number;
   readonly headers: Record<string, string>;
-} & T;
+};
+
+export type ResponseW<T extends Record<string, unknown> = BodyRec> = ResponseWBase & T;
 
 // --------------------------------------------------------------------------
 export function makeResponseW<T extends Record<string, unknown>>(responseW: ResponseW<T>): ResponseW<T>;
@@ -12,12 +14,15 @@ export function makeResponseW<T extends Record<string, unknown>>(responseW: Resp
 export function makeResponseW<
   T extends Record<string, unknown> = {},
   U extends Record<string, unknown> | undefined = undefined,
->(responseW: ResponseW<T>, u: U): ResponseW<T & U>;
+>(
+  responseW: ResponseW<T>,
+  u: U
+): U extends undefined ? ResponseW<T> : U extends Record<string, unknown> ? ResponseW<Override<T, U>> : never;
 
 export function makeResponseW<T extends Record<string, unknown>, U extends Record<string, unknown>>(
   responseW: ResponseW<T>,
   u?: U
-): NoInfer<ResponseW<T> | ResponseW<T & U>> {
+): NoInfer<ResponseW<T> | ResponseW<Override<T, U>>> {
   return u
     ? {
         ...responseW,

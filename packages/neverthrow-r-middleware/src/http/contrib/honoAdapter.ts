@@ -22,7 +22,9 @@ export type WithHonoRequestRaw = {
   readonly honoRequestRaw: HonoRequest;
 };
 
-export function adaptFromHonoRequest(request: HonoRequest): ResultAsync<RequestW<WithHonoRequestRaw>, MiddlewareError> {
+export function adaptFromHonoRequest(
+  request: HonoRequest
+): ResultAsync<RequestW<WithHonoRequestRaw & StrBodyRec>, MiddlewareError> {
   return ResultAsync.fromPromise(
     (async () => ({
       url: request.url,
@@ -53,7 +55,7 @@ export function adaptToHonoResponse<O extends StrBodyRec>(
 export const middleware =
   (_params?: never) =>
   <O extends StrBodyRec, E, R>(
-    wrapped: Handler<RequestW<WithHonoRequestRaw>, ResponseW<O>, E, R>
+    wrapped: Handler<RequestW<WithHonoRequestRaw & StrBodyRec>, ResponseW<O>, E, R>
   ): Handler<HonoRequest, Response, E | MiddlewareError, R & WithLogger> =>
   (i: HonoRequest) =>
     pipe(

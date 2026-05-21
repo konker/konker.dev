@@ -3,7 +3,7 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { describe, expect, it } from 'vitest';
 
 import { recordingLogger, sampleRequestW } from '../../test/test-common.js';
-import { makeRequestW } from '../RequestW.js';
+import { makeRequestW, type RequestW } from '../RequestW.js';
 import { EMPTY_RESPONSE_W, type ResponseW } from '../ResponseW.js';
 import { middleware as bodyValidator, type WithValidatedBody } from './bodyValidator.js';
 
@@ -21,7 +21,7 @@ const positiveNumberSchema: StandardSchemaV1<unknown, number> = {
 describe('bodyValidator', () => {
   it('forwards a validated body to the wrapped handler', async () => {
     const { logger } = recordingLogger();
-    const wrapped = bodyValidator(positiveNumberSchema)((req: typeof sampleRequestW & WithValidatedBody<number>) =>
+    const wrapped = bodyValidator(positiveNumberSchema)((req: RequestW<WithValidatedBody<number>>) =>
       okAsyncR<ResponseW>({
         ...EMPTY_RESPONSE_W,
         body: { received: req.body },
@@ -50,7 +50,7 @@ describe('bodyValidator', () => {
       },
     };
     const { logger } = recordingLogger();
-    const wrapped = bodyValidator(asyncSchema)((req: typeof sampleRequestW & WithValidatedBody<string>) =>
+    const wrapped = bodyValidator(asyncSchema)((req: RequestW<WithValidatedBody<string>>) =>
       okAsyncR<ResponseW>({
         ...EMPTY_RESPONSE_W,
         body: { received: req.body },

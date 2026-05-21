@@ -2,14 +2,14 @@ import { okAsyncR } from '@konker.dev/neverthrow-r/constructors';
 import { describe, expect, it } from 'vitest';
 
 import { recordingLogger, sampleRequestW } from '../../test/test-common.js';
-import { makeRequestW } from '../RequestW.js';
+import { makeRequestW, type RequestW } from '../RequestW.js';
 import { EMPTY_RESPONSE_W, type ResponseW } from '../ResponseW.js';
 import { middleware as jsonBodyParserRequest, type WithParsedBody } from './jsonBodyParserRequest.js';
 
 describe('jsonBodyParserRequest', () => {
   it('parses a JSON body and forwards it to the wrapped handler', async () => {
     const { logger } = recordingLogger();
-    const wrapped = jsonBodyParserRequest()((req: { body: unknown } & typeof sampleRequestW & WithParsedBody) =>
+    const wrapped = jsonBodyParserRequest()((req: RequestW<WithParsedBody>) =>
       okAsyncR<ResponseW>({
         ...EMPTY_RESPONSE_W,
         body: req.body,
@@ -24,7 +24,7 @@ describe('jsonBodyParserRequest', () => {
 
   it('passes undefined through when there is no body', async () => {
     const { logger } = recordingLogger();
-    const wrapped = jsonBodyParserRequest()((req: typeof sampleRequestW & WithParsedBody) =>
+    const wrapped = jsonBodyParserRequest()((req: RequestW<WithParsedBody>) =>
       okAsyncR<ResponseW>({
         ...EMPTY_RESPONSE_W,
         body: req.body,
