@@ -860,6 +860,179 @@ importers:
         specifier: ^4.1.6
         version: 4.1.6(@opentelemetry/api@1.9.0)(@types/node@25.8.0)(@vitest/coverage-istanbul@4.1.6)(jsdom@26.1.0)(vite@7.3.1(@types/node@25.8.0)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.22.1)(yaml@2.8.2))
 
+  packages/neverthrow-r-middleware:
+    dependencies:
+      '@konker.dev/neverthrow-r':
+        specifier: workspace:*
+        version: link:../neverthrow-r
+      aws-lambda:
+        specifier: ^1.0.7
+        version: 1.0.7
+      neverthrow:
+        specifier: ^8.2.0
+        version: 8.2.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.2
+        version: 0.18.2
+      '@eslint/compat':
+        specifier: ^2.0.1
+        version: 2.1.0(eslint@9.39.2(jiti@2.6.1))
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
+      '@konker.dev/common-config':
+        specifier: ^0.8.0
+        version: 0.8.0(eslint@9.39.2(jiti@2.6.1))
+      '@konker.dev/neverthrow-r-schema':
+        specifier: workspace:*
+        version: link:../neverthrow-r-schema
+      '@standard-schema/spec':
+        specifier: ^1.0.0
+        version: 1.1.0
+      '@types/aws-lambda':
+        specifier: ^8.10.159
+        version: 8.10.159
+      '@types/node':
+        specifier: ^25.8.0
+        version: 25.8.0
+      '@vitest/coverage-istanbul':
+        specifier: ^4.1.6
+        version: 4.1.6(vitest@4.1.6)
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      eslint-plugin-fp:
+        specifier: ^2.3.0
+        version: 2.3.0(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-prettier:
+        specifier: ^5.5.5
+        version: 5.5.5(eslint@9.39.2(jiti@2.6.1))(prettier@3.8.3)
+      eslint-plugin-simple-import-sort:
+        specifier: ^12.1.1
+        version: 12.1.1(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-sort-destructure-keys:
+        specifier: ^2.0.0
+        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
+      hono:
+        specifier: ^4.12.21
+        version: 4.12.21
+      leasot:
+        specifier: ^14.4.0
+        version: 14.4.0
+      madge:
+        specifier: ^8.0.0
+        version: 8.0.0(typescript@5.9.3)
+      prettier:
+        specifier: ^3.8.3
+        version: 3.8.3
+      tsx:
+        specifier: ^4.22.1
+        version: 4.22.1
+      type-coverage:
+        specifier: ^2.29.7
+        version: 2.29.7(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.52.0
+        version: 8.59.3(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      vitest:
+        specifier: ^4.1.6
+        version: 4.1.6(@opentelemetry/api@1.9.0)(@types/node@25.8.0)(@vitest/coverage-istanbul@4.1.6)(jsdom@26.1.0)(vite@7.3.1(@types/node@25.8.0)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.22.1)(yaml@2.8.2))
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+
+  packages/neverthrow-r-schema:
+    dependencies:
+      '@konker.dev/neverthrow-r':
+        specifier: workspace:*
+        version: link:../neverthrow-r
+      '@standard-schema/spec':
+        specifier: ^1.0.0
+        version: 1.1.0
+      neverthrow:
+        specifier: ^8.2.0
+        version: 8.2.0
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.2
+        version: 0.18.2
+      '@effect/language-service':
+        specifier: ^0.86.1
+        version: 0.86.1
+      '@eslint/compat':
+        specifier: ^2.0.1
+        version: 2.1.0(eslint@9.39.2(jiti@2.6.1))
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
+      '@konker.dev/common-config':
+        specifier: ^0.8.0
+        version: 0.8.0(eslint@9.39.2(jiti@2.6.1))
+      '@types/node':
+        specifier: ^25.8.0
+        version: 25.8.0
+      '@vitest/coverage-istanbul':
+        specifier: ^4.1.6
+        version: 4.1.6(vitest@4.1.6)
+      aws-sdk-client-mock:
+        specifier: ^4.1.0
+        version: 4.1.0
+      aws-sdk-client-mock-vitest:
+        specifier: ^7.0.1
+        version: 7.0.1(@smithy/types@4.11.0)(aws-sdk-client-mock@4.1.0)(vitest@4.1.6(@opentelemetry/api@1.9.0)(@types/node@25.8.0)(@vitest/coverage-istanbul@4.1.6)(jsdom@26.1.0)(vite@7.3.1(@types/node@25.8.0)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.22.1)(yaml@2.8.2)))
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      eslint-plugin-fp:
+        specifier: ^2.3.0
+        version: 2.3.0(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-prettier:
+        specifier: ^5.5.5
+        version: 5.5.5(eslint@9.39.2(jiti@2.6.1))(prettier@3.8.3)
+      eslint-plugin-simple-import-sort:
+        specifier: ^12.1.1
+        version: 12.1.1(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-sort-destructure-keys:
+        specifier: ^2.0.0
+        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
+      leasot:
+        specifier: ^14.4.0
+        version: 14.4.0
+      madge:
+        specifier: ^8.0.0
+        version: 8.0.0(typescript@5.9.3)
+      prettier:
+        specifier: ^3.8.3
+        version: 3.8.3
+      tsx:
+        specifier: ^4.22.1
+        version: 4.22.1
+      type-coverage:
+        specifier: ^2.29.7
+        version: 2.29.7(typescript@5.9.3)
+      typedoc:
+        specifier: ^0.28.15
+        version: 0.28.15(typescript@5.9.3)
+      typedoc-plugin-markdown:
+        specifier: ^4.4.0
+        version: 4.9.0(typedoc@0.28.15(typescript@5.9.3))
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.52.0
+        version: 8.59.3(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      vitest:
+        specifier: ^4.1.6
+        version: 4.1.6(@opentelemetry/api@1.9.0)(@types/node@25.8.0)(@vitest/coverage-istanbul@4.1.6)(jsdom@26.1.0)(vite@7.3.1(@types/node@25.8.0)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.1)(tsx@4.22.1)(yaml@2.8.2))
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+
   packages/tiny-auth-utils-fp:
     dependencies:
       '@konker.dev/tiny-error-fp':
@@ -6447,6 +6620,10 @@ packages:
 
   hono@4.11.3:
     resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
+    engines: {node: '>=16.9.0'}
+
+  hono@4.12.21:
+    resolution: {integrity: sha512-uV63apnb0kyPtAUwoWgaGh9HyIFcv8lgmzPZSiTBQAFOFGIzka5EZ1dZocmGnn0XdX0+XTqJ6Tqv7selMuGLRQ==}
     engines: {node: '>=16.9.0'}
 
   hono@4.7.4:
@@ -15656,6 +15833,8 @@ snapshots:
       parse-passwd: 1.0.0
 
   hono@4.11.3: {}
+
+  hono@4.12.21: {}
 
   hono@4.7.4: {}
 

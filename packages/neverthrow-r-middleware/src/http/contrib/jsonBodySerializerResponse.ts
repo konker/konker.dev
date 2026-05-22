@@ -1,0 +1,40 @@
+import { andThenAsync, mapAsync } from '@konker.dev/neverthrow-r/async';
+import { errAsyncR, okAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import { pipe } from '@konker.dev/neverthrow-r/pipe';
+
+import type { WithLogger } from '../../lib/Logger.js';
+import { tapLogger } from '../../lib/Logger.js';
+import type { MiddlewareError } from '../../lib/MiddlewareError.js';
+import { tryJsonStringify } from '../../lib/utils.js';
+import type { BodyRec, Override, RequestResponseHandler, StrBodyRec } from '../RequestResponseHandler.js';
+import { type RequestW } from '../RequestW.js';
+import { makeResponseW, type ResponseW } from '../ResponseW.js';
+
+export const TAG = 'jsonBodySerializerResponse';
+
+export type WithSerializedBody = {
+  readonly body: string;
+};
+
+export const middleware =
+  () =>
+  <I extends StrBodyRec, O extends BodyRec, E, R>(
+    wrapped: RequestResponseHandler<I, R, O, E>
+  ): RequestResponseHandler<I, R & WithLogger, Override<O, WithSerializedBody>, E | MiddlewareError> =>
+  (i: RequestW<I>) =>
+    pipe(
+      okAsyncR(i),
+      tapLogger('debug', `[${TAG}] IN`),
+      andThenAsync(wrapped),
+      andThenAsync((res: ResponseW<O>) => {
+        if (res.body === undefined) {
+          return okAsyncR(makeResponseW(res, { body: '' }));
+        }
+        return tryJsonStringify(res.body).match(
+          (value) => okAsyncR(makeResponseW(res, { body: value })),
+          (error) => errAsyncR(error)
+        );
+      }),
+      mapAsync((res) => makeResponseW(res)),
+      tapLogger('debug', `[${TAG}] OUT`)
+    );
