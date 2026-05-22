@@ -31,21 +31,21 @@ jobs:
     environment: development
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: '9.6.0'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: |
             .sst
@@ -56,7 +56,7 @@ jobs:
 
       # Assume config management role and export config
       - name: Configure AWS credentials (Configuration management role)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
           aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
@@ -68,7 +68,7 @@ jobs:
 
       # Assume application deployment role
       - name: Configure AWS credentials (Application deployment role)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
           aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
