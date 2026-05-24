@@ -1,0 +1,24 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/array.ts",
+    "src/hash.ts",
+    "src/stream/index.ts",
+    "src/stream/BufferWriteableStream.ts",
+    "src/stream/ChildProcessStreamPipe.ts",
+    "src/stream/PromiseDependentWritableStream.ts"
+  ],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "./tsconfig.json",
+  "out": "docs/reference",
+  "plugin": ["typedoc-plugin-markdown"],
+  "exclude": ["**/*.test.ts"],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "intentionallyNotExported": [],
+  "readme": "./docs/reference-readme.md",
+  "hideGenerator": true,
+  "githubPages": false,
+  "gitRevision": "main"
+}
