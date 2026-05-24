@@ -1,0 +1,56 @@
+import { okAsyncR } from '@konker.dev/neverthrow-r/constructors';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
+import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
+
+import { recordingLogger, sampleRequestW } from '../../test/test-common.js';
+import { makeRequestW } from '../RequestW.js';
+import { EMPTY_RESPONSE_W, type ResponseW } from '../ResponseW.js';
+import { middleware as headersValidator } from './headersValidator.js';
+
+describe('headersValidator', () => {
+  const schema = z.object({
+    foo: z.literal('foo_value'),
+    num: z.coerce.number(),
+  });
+
+  it('validates and replaces headers', async () => {
+    const { logger } = recordingLogger();
+    const wrapped = headersValidator(schema)((req) =>
+      okAsyncR<ResponseW>({
+        ...EMPTY_RESPONSE_W,
+        body: req.headers,
+      } as ResponseW)
+    );
+    const input = makeRequestW(sampleRequestW, { headers: { foo: 'foo_value', num: '123' } });
+    const result = await wrapped(input)({ logger });
+
+    expect(result.isOk() && result.value.body).toEqual({ foo: 'foo_value', num: 123 });
+  });
+
+  it('returns a MiddlewareError when headers fail validation', async () => {
+    const { logger } = recordingLogger();
+    const wrapped = headersValidator(schema)(() => okAsyncR<ResponseW>(EMPTY_RESPONSE_W));
+    const input = makeRequestW(sampleRequestW, { headers: { foo: 'bad', num: '123' } });
+    const result = await wrapped(input)({ logger });
+
+    expect(result.isErr() && result.error.message).toBe('Headers validation failed');
+  });
+
+  it('keeps a thrown validator cause in internal details', async () => {
+    const schema: StandardSchemaV1<unknown, string> = {
+      '~standard': {
+        version: 1,
+        vendor: 'fixture',
+        validate: () => {
+          throw new Error('validator exploded');
+        },
+      },
+    };
+    const { logger } = recordingLogger();
+    const wrapped = headersValidator(schema)(() => okAsyncR<ResponseW>(EMPTY_RESPONSE_W));
+    const result = await wrapped(makeRequestW(sampleRequestW, { headers: { foo: 'bar' } }))({ logger });
+
+    expect(result.isErr() && result.error.internal?.length).toBeGreaterThan(0);
+  });
+});

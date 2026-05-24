@@ -962,6 +962,12 @@ importers:
       '@konker.dev/neverthrow-r':
         specifier: workspace:*
         version: link:../neverthrow-r
+      '@konker.dev/neverthrow-r-auth-utils':
+        specifier: workspace:*
+        version: link:../neverthrow-r-auth-utils
+      '@konker.dev/neverthrow-r-utils':
+        specifier: workspace:*
+        version: link:../neverthrow-r-utils
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7

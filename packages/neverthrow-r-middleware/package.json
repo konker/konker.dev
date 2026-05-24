@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/neverthrow-r-middleware",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -27,9 +27,53 @@
       "types": "./dist/http/contrib/apiGatewayProxyEventV2Adapter.d.ts",
       "import": "./dist/http/contrib/apiGatewayProxyEventV2Adapter.js"
     },
+    "./http/contrib/base64BodyDecoder": {
+      "types": "./dist/http/contrib/base64BodyDecoder.d.ts",
+      "import": "./dist/http/contrib/base64BodyDecoder.js"
+    },
+    "./http/contrib/basicAuthAuthenticator": {
+      "types": "./dist/http/contrib/basicAuthAuthenticator.d.ts",
+      "import": "./dist/http/contrib/basicAuthAuthenticator.js"
+    },
+    "./http/contrib/basicAuthDecoder": {
+      "types": "./dist/http/contrib/basicAuthDecoder.d.ts",
+      "import": "./dist/http/contrib/basicAuthDecoder.js"
+    },
     "./http/contrib/bodyValidator": {
       "types": "./dist/http/contrib/bodyValidator.d.ts",
       "import": "./dist/http/contrib/bodyValidator.js"
+    },
+    "./http/contrib/envValidator": {
+      "types": "./dist/http/contrib/envValidator.d.ts",
+      "import": "./dist/http/contrib/envValidator.js"
+    },
+    "./http/contrib/headerSignatureAuthorizer": {
+      "types": "./dist/http/contrib/headerSignatureAuthorizer/index.d.ts",
+      "import": "./dist/http/contrib/headerSignatureAuthorizer/index.js"
+    },
+    "./http/contrib/headerSignatureAuthorizer/lib": {
+      "types": "./dist/http/contrib/headerSignatureAuthorizer/lib.d.ts",
+      "import": "./dist/http/contrib/headerSignatureAuthorizer/lib.js"
+    },
+    "./http/contrib/headersNormalizer": {
+      "types": "./dist/http/contrib/headersNormalizer/index.d.ts",
+      "import": "./dist/http/contrib/headersNormalizer/index.js"
+    },
+    "./http/contrib/headersNormalizer/lib": {
+      "types": "./dist/http/contrib/headersNormalizer/lib.d.ts",
+      "import": "./dist/http/contrib/headersNormalizer/lib.js"
+    },
+    "./http/contrib/headersNormalizer/types": {
+      "types": "./dist/http/contrib/headersNormalizer/types.d.ts",
+      "import": "./dist/http/contrib/headersNormalizer/types.js"
+    },
+    "./http/contrib/headersValidator": {
+      "types": "./dist/http/contrib/headersValidator.d.ts",
+      "import": "./dist/http/contrib/headersValidator.js"
+    },
+    "./http/contrib/helmetJsHeaders": {
+      "types": "./dist/http/contrib/helmetJsHeaders.d.ts",
+      "import": "./dist/http/contrib/helmetJsHeaders.js"
     },
     "./http/contrib/honoAdapter": {
       "types": "./dist/http/contrib/honoAdapter.d.ts",
@@ -39,6 +83,10 @@
       "types": "./dist/http/contrib/identity.d.ts",
       "import": "./dist/http/contrib/identity.js"
     },
+    "./http/contrib": {
+      "types": "./dist/http/contrib/index.d.ts",
+      "import": "./dist/http/contrib/index.js"
+    },
     "./http/contrib/jsonBodyParserRequest": {
       "types": "./dist/http/contrib/jsonBodyParserRequest.d.ts",
       "import": "./dist/http/contrib/jsonBodyParserRequest.js"
@@ -47,13 +95,49 @@
       "types": "./dist/http/contrib/jsonBodySerializerResponse.d.ts",
       "import": "./dist/http/contrib/jsonBodySerializerResponse.js"
     },
+    "./http/contrib/jwtAuthenticator": {
+      "types": "./dist/http/contrib/jwtAuthenticator.d.ts",
+      "import": "./dist/http/contrib/jwtAuthenticator.js"
+    },
+    "./http/contrib/jwtAuthenticatorRsa": {
+      "types": "./dist/http/contrib/jwtAuthenticatorRsa.d.ts",
+      "import": "./dist/http/contrib/jwtAuthenticatorRsa.js"
+    },
+    "./http/contrib/jwtDecoder": {
+      "types": "./dist/http/contrib/jwtDecoder.d.ts",
+      "import": "./dist/http/contrib/jwtDecoder.js"
+    },
+    "./http/contrib/pathParametersValidator": {
+      "types": "./dist/http/contrib/pathParametersValidator.d.ts",
+      "import": "./dist/http/contrib/pathParametersValidator.js"
+    },
+    "./http/contrib/pathTokenAuthorizer": {
+      "types": "./dist/http/contrib/pathTokenAuthorizer.d.ts",
+      "import": "./dist/http/contrib/pathTokenAuthorizer.js"
+    },
+    "./http/contrib/queryStringValidator": {
+      "types": "./dist/http/contrib/queryStringValidator.d.ts",
+      "import": "./dist/http/contrib/queryStringValidator.js"
+    },
     "./http/contrib/requestResponseLogger": {
       "types": "./dist/http/contrib/requestResponseLogger.d.ts",
       "import": "./dist/http/contrib/requestResponseLogger.js"
     },
+    "./http/contrib/responseProcessor": {
+      "types": "./dist/http/contrib/responseProcessor.d.ts",
+      "import": "./dist/http/contrib/responseProcessor.js"
+    },
+    "./http/contrib/standardRequestResponseAdapter": {
+      "types": "./dist/http/contrib/standardRequestResponseAdapter.d.ts",
+      "import": "./dist/http/contrib/standardRequestResponseAdapter.js"
+    },
     "./http/contrib/trivial": {
       "types": "./dist/http/contrib/trivial.d.ts",
       "import": "./dist/http/contrib/trivial.js"
+    },
+    "./http/HttpApiError": {
+      "types": "./dist/http/HttpApiError.d.ts",
+      "import": "./dist/http/HttpApiError.js"
     },
     "./http": {
       "types": "./dist/http/index.d.ts",
@@ -127,6 +211,8 @@
   },
   "dependencies": {
     "@konker.dev/neverthrow-r": "workspace:*",
+    "@konker.dev/neverthrow-r-auth-utils": "workspace:*",
+    "@konker.dev/neverthrow-r-utils": "workspace:*",
     "neverthrow": "^8.2.0"
   },
   "devDependencies": {
