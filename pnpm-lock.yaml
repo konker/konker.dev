@@ -884,12 +884,21 @@ importers:
       '@konker.dev/common-config':
         specifier: ^0.8.0
         version: 0.8.0(eslint@9.39.2(jiti@2.6.1))
+      '@types/aws-lambda':
+        specifier: ^8.10.159
+        version: 8.10.159
+      '@types/jsonwebtoken':
+        specifier: ^9.0.10
+        version: 9.0.10
       '@types/node':
         specifier: ^25.8.0
         version: 25.8.0
       '@vitest/coverage-istanbul':
         specifier: ^4.1.6
         version: 4.1.6(vitest@4.1.6)
+      aws-lambda:
+        specifier: ^1.0.7
+        version: 1.0.7
       aws-sdk-client-mock:
         specifier: ^4.1.0
         version: 4.1.0
@@ -911,6 +920,9 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^2.0.0
         version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
+      jsonwebtoken:
+        specifier: ^9.0.3
+        version: 9.0.3
       leasot:
         specifier: ^14.4.0
         version: 14.4.0

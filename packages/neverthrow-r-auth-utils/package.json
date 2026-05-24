@@ -1,0 +1,138 @@
+{
+  "name": "@konker.dev/neverthrow-r-auth-utils",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "Konrad Markus <mail@konker.dev>",
+  "license": "ISC",
+  "description": "Auth utils for neverthrow and @konker.dev/neverthrow-r.",
+  "homepage": "https://konker.dev/",
+  "keywords": [
+    "node",
+    "neverthrow",
+    "neverthrow-r",
+    "typescript",
+    "functional-programming"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konker/konker.dev/packages/neverthrow-r-auth-utils"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./jwt/common": {
+      "types": "./dist/jwt/common.d.ts",
+      "import": "./dist/jwt/common.js"
+    },
+    "./jwt": {
+      "types": "./dist/jwt/index.d.ts",
+      "import": "./dist/jwt/index.js"
+    },
+    "./jwt/rsa": {
+      "types": "./dist/jwt/rsa.d.ts",
+      "import": "./dist/jwt/rsa.js"
+    },
+    "./lib/toError": {
+      "types": "./dist/lib/toError.d.ts",
+      "import": "./dist/lib/toError.js"
+    },
+    "./test/fixtures/jwt": {
+      "types": "./dist/test/fixtures/jwt.d.ts",
+      "import": "./dist/test/fixtures/jwt.js"
+    },
+    "./test/fixtures/test-jwt-rsa-keys": {
+      "types": "./dist/test/fixtures/test-jwt-rsa-keys.d.ts",
+      "import": "./dist/test/fixtures/test-jwt-rsa-keys.js"
+    },
+    "./test/fixtures/test-jwt-tokens-rsa": {
+      "types": "./dist/test/fixtures/test-jwt-tokens-rsa.d.ts",
+      "import": "./dist/test/fixtures/test-jwt-tokens-rsa.js"
+    },
+    "./test/fixtures/test-jwt-tokens": {
+      "types": "./dist/test/fixtures/test-jwt-tokens.d.ts",
+      "import": "./dist/test/fixtures/test-jwt-tokens.js"
+    },
+    "./aws-authorizer": {
+      "types": "./dist/aws-authorizer.d.ts",
+      "import": "./dist/aws-authorizer.js"
+    },
+    "./basic-auth": {
+      "types": "./dist/basic-auth.d.ts",
+      "import": "./dist/basic-auth.js"
+    },
+    "./helpers": {
+      "types": "./dist/helpers.d.ts",
+      "import": "./dist/helpers.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "!dist/**/*.test.*"
+  ],
+  "main": "dist/index.js",
+  "peerDependencies": {
+    "aws-lambda": "^1.0.7",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@effect/language-service": "^0.86.1",
+    "@eslint/compat": "^2.0.1",
+    "@eslint/js": "^9.39.2",
+    "@konker.dev/common-config": "^0.8.0",
+    "@types/aws-lambda": "^8.10.159",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.8.0",
+    "@vitest/coverage-istanbul": "^4.1.6",
+    "aws-lambda": "^1.0.7",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-vitest": "^7.0.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "leasot": "^14.4.0",
+    "madge": "^8.0.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.22.1",
+    "type-coverage": "^2.29.7",
+    "typedoc": "^0.28.15",
+    "typedoc-plugin-markdown": "^4.4.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0",
+    "vitest": "^4.1.6",
+    "zod": "^3.23.0"
+  },
+  "dependencies": {
+    "@konker.dev/neverthrow-r": "workspace:*",
+    "neverthrow": "^8.2.0"
+  },
+  "scripts": {
+    "test": "vitest run --coverage",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm run clean && tsc",
+    "type-coverage-check": "type-coverage --detail --at-least 97",
+    "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
+    "eslint-check": "eslint --max-warnings=0 '**/*.{ts,js,json}'",
+    "eslint-fix": "npx eslint --fix||true",
+    "generated-exports-check": "npx --package=@konker.dev/common-config generate-exports-verify `pwd`",
+    "docs-generate": "typedoc",
+    "generated-docs-check": "pnpm run docs-generate && git diff --exit-code docs/reference",
+    "exports-check": "NPM_CONFIG_CACHE=.npm-cache attw --pack . --ignore-rules=cjs-resolves-to-esm --profile=esm-only",
+    "fixme-check": "leasot --exit-nicely --skip-unsupported src",
+    "prettier-check": "npx prettier --check --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}'",
+    "prettier-fix": "pnpm run prettier-check --write",
+    "lint-check": "pnpm run eslint-check && pnpm run prettier-check && pnpm run circular-check && pnpm run fixme-check",
+    "lint-fix": "pnpm run eslint-fix && pnpm run prettier-fix",
+    "pre-push": "pnpm run lint-check && pnpm run typecheck",
+    "codecov": "npx --package=@konker.dev/common-config codecov-upload `pwd` '@konker.dev/neverthrow-r-auth-utils'",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run generated-exports-check && pnpm run generated-docs-check && pnpm run exports-check && pnpm run fixme-check",
+    "cd": "pnpm run build && npx --package=@konker.dev/common-config npm-publish-if-version-not-exists `pwd`"
+  }
+}
