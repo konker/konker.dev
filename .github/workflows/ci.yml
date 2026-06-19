@@ -26,6 +26,9 @@ env:
 
 jobs:
   ci:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 30
     name: CI
@@ -55,15 +58,18 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Configure AWS credentials for Turborepo cache
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::047719649582:role/infra/ci-turborepo-cache-konker-dev
+          aws-region: eu-west-1
+
       - name: TurboRepo Remote Cache Server
         uses: trappar/turborepo-remote-cache-gh-action@main
         with:
           storage-provider: s3
-          storage-path: ${{ secrets.TURBOCACHE_S3_BUCKET }}
-        env:
-          AWS_REGION: 'eu-west-1'
-          AWS_ACCESS_KEY_ID: ${{ secrets.TURBOCACHE_S3_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.TURBOCACHE_S3_AWS_SECRET_ACCESS_KEY }}
+          storage-path: konkerdotdev-turborepo-cache
+          team-id: turbo/konker.dev
 
       - name: Run Checks
         run: pnpm run ci ${{ env.TURBO_FILTER_ARG }} ${{ env.TURBO_EXTRA_ARGS }}
