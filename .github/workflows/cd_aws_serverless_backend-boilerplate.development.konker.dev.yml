@@ -29,6 +29,9 @@ jobs:
     timeout-minutes: 30
     name: CD Development
     environment: development
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -54,26 +57,38 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # Assume config management role and export config
+      # Authenticate via GitHub OIDC -> CI role (replaces the static cd user; KDV-233)
+      - name: Configure AWS credentials (CI OIDC role)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-backend-boilerplate-konker-dev"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      # Assume config management role and export config (chains from the CI role)
       - name: Configure AWS credentials (Configuration management role)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
-          aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role" # ${{ env.CONFIG_MANAGEMENT_ROLE_ARN }}
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-backend-boilerplate"
           role-external-id: "configuration-management-access"
+          role-chaining: true
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-skip-session-tagging: true # apparently we cannot avoid this
       # TODO
 
-      # Assume application deployment role
+      # Re-establish the CI role base (config-management role cannot assume other roles)
+      - name: Configure AWS credentials (CI OIDC role, for deployment)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-backend-boilerplate-konker-dev"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      # Assume application deployment role (chains from the CI role)
       - name: Configure AWS credentials (Application deployment role)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: '${{ secrets.AWS_CD_AWS_ACCESS_KEY_ID_BOILERPLATE_BACKEND }}'
-          aws-secret-access-key: '${{ secrets.AWS_CD_AWS_SECRET_ACCESS_KEY_BOILERPLATE_BACKEND }}'
           role-to-assume: "arn:aws:iam::898403669204:role/infra/application-deployment-role" # ${{ env.APPLICATION_DEVELOPMENT_ROLE_ARN }}
           role-external-id: "application-deployment-access"
+          role-chaining: true
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-skip-session-tagging: true # apparently we cannot avoid this
 
