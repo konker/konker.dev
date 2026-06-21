@@ -19,4 +19,12 @@ export const ConfigSchema = Schema.Struct({
   log: Schema.Struct({
     level: Schema.String,
   }),
+  zero: Schema.Struct({
+    upstream_db: Schema.String,
+    backend_service_token: Schema.String,
+  }),
+  jwt: Schema.Struct({
+    signing_secret: Schema.String,
+    issuer: Schema.String,
+  }),
 });

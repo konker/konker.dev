@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Backend app base. Not deployable standalone — consumed by overlays/<env> which
+# set the namespace and combine it with the vendored zero-sync base.
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - externalsecret.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingressroute.yaml

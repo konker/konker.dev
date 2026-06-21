@@ -11,6 +11,12 @@ export const EnvSchema = Schema.Struct({
   DATABASE_SSL: SslConfigSchema,
   OTEL_TRACE_EXPORTER_URL: Schema.String,
   LOG_LEVEL: Schema.String,
+  // Zero Sync + JWT auth — required by the /zero/* routes, optional here so the
+  // shared env validation does not couple the other routes/targets to them.
+  ZERO_UPSTREAM_DB: Schema.optional(Schema.String),
+  ZERO_BACKEND_SERVICE_TOKEN: Schema.optional(Schema.String),
+  JWT_SIGNING_SECRET: Schema.optional(Schema.String),
+  JWT_ISSUER: Schema.optional(Schema.String),
 });
 
 export type Env = typeof EnvSchema.Type;

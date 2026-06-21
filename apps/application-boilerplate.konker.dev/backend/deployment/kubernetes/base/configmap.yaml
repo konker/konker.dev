@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application-boilerplate-config
+data:
+  NODE_ENV: production
+  PORT: '3000'
+  LOG_LEVEL: Debug
+  OTEL_TRACE_EXPORTER_URL: http://grafana-k8s-monitoring-alloy-receiver.grafana-cloud-integration.svc.cluster.local:4318/v1/traces
+  # Non-secret DB connection bits (credentials come from the ExternalSecret).
+  DATABASE_HOST: ssh-tunnel-proxy.infrastructure-development.svc.cluster.local
+  DATABASE_PORT: '54321'
+  DATABASE_NAME: backend_boilerplate_dev
+  DATABASE_SSL: '{ "caBundlePath": "/app/dist/config/eu-west-1-bundle.pem" }'
+  # JWT issuer is not secret; the signing secret comes from the ExternalSecret.
+  JWT_ISSUER: application-boilerplate-development

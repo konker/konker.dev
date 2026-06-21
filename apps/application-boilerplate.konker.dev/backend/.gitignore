@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.deploy/
+
+# coverage
+coverage
+*.lcov
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# environment variables
+.env
+
+# macOS
+.DS_Store
+
+# editors
+.idea/
+.vscode
+
+# turbo
+.turbo
+
+# sst
+.sst/

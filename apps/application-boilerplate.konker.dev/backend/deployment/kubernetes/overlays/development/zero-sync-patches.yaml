@@ -1,0 +1,72 @@
+# Fill the vendored zero-sync base REPLACE_* placeholders for this app/environment.
+# environment=development, app-key=application-boilerplate, app-id=application_boilerplate.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zero-sync-config
+data:
+  ZERO_APP_ID: application_boilerplate
+  ZERO_APP_PUBLICATIONS: application_boilerplate_zero_data
+  ZERO_QUERY_URL: https://application-boilerplate.development.cloudfleet.konker.dev/zero/query
+  ZERO_MUTATE_URL: https://application-boilerplate.development.cloudfleet.konker.dev/zero/mutate
+  ZERO_LITESTREAM_BACKUP_URL: s3://mws-zero-sync-backups/development/application-boilerplate/
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: zero-sync-secrets
+spec:
+  target:
+    template:
+      data:
+        ZERO_UPSTREAM_DB: '{{ printf "postgres://%s:%s@ssh-tunnel-proxy.infrastructure-development.svc.cluster.local:54321/%s?sslmode=require" .username .password .dbname }}'
+        ZERO_CVR_DB: '{{ printf "postgres://%s:%s@ssh-tunnel-proxy.infrastructure-development.svc.cluster.local:54321/%s?sslmode=require" .username .password .dbname }}'
+        ZERO_CHANGE_DB: '{{ printf "postgres://%s:%s@ssh-tunnel-proxy.infrastructure-development.svc.cluster.local:54321/%s?sslmode=require" .username .password .dbname }}'
+  dataFrom:
+    - extract:
+        key: /secrets/development/application-boilerplate/database/superuser/connection-info
+  data:
+    - secretKey: admin_password
+      remoteRef:
+        key: /secrets/development/application-boilerplate/zero-sync/admin-password
+    - secretKey: backend_service_token
+      remoteRef:
+        key: /secrets/development/application-boilerplate/zero-sync/backend-service-token
+    - secretKey: backup_access_key_id
+      remoteRef:
+        key: /secrets/development/shared/zero-sync-backups/access-key-id
+    - secretKey: backup_secret_access_key
+      remoteRef:
+        key: /secrets/development/shared/zero-sync-backups/secret-access-key
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zero-sync-data
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zero-sync
+spec:
+  template:
+    spec:
+      containers:
+        - name: zero-sync
+          image: rocicorp/zero:1.6.2
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: zero-sync
+spec:
+  routes:
+    - match: Host(`zero-sync.application-boilerplate.development.cloudfleet.konker.dev`)
+      kind: Rule
+      services:
+        - name: zero-sync
+          port: 4848

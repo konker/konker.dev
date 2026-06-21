@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zero-sync-config
+  labels:
+    app.kubernetes.io/name: zero-sync
+    app.kubernetes.io/component: sync
+    app.kubernetes.io/managed-by: kustomize
+data:
+  NODE_ENV: production
+  ZERO_APP_ID: REPLACE_ZERO_APP_ID
+  ZERO_APP_PUBLICATIONS: REPLACE_ZERO_APP_PUBLICATIONS
+  ZERO_QUERY_URL: REPLACE_ZERO_QUERY_URL
+  ZERO_MUTATE_URL: REPLACE_ZERO_MUTATE_URL
+  ZERO_REPLICA_FILE: /data/replica.db
+  ZERO_LITESTREAM_BACKUP_URL: s3://REPLACE_BACKUP_BUCKET/REPLACE_ENVIRONMENT/REPLACE_APP_KEY/
+  ZERO_ENABLE_CRUD_MUTATIONS: 'false'
+  ZERO_QUERY_FORWARD_COOKIES: 'true'
+  ZERO_MUTATE_FORWARD_COOKIES: 'true'
+  ZERO_LOG_FORMAT: json
+  ZERO_PORT: '4848'

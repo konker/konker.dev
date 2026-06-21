@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: application-boilerplatedotkonkerdotdev
-  namespace: application-boilerplate
 spec:
   replicas: 1
   selector:
@@ -20,12 +19,14 @@ spec:
           image: 047719649582.dkr.ecr.eu-west-1.amazonaws.com/application-boilerplate.konker.dev:latest
           ports:
             - containerPort: 3000
-          env:
-            - name: NODE_ENV
-              value: 'production'
+          envFrom:
+            - configMapRef:
+                name: application-boilerplate-config
+            - secretRef:
+                name: application-boilerplate-secrets
           livenessProbe:
             httpGet:
-              path: /health
+              path: /ping
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 10
@@ -33,7 +34,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /health
+              path: /ping
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 5
