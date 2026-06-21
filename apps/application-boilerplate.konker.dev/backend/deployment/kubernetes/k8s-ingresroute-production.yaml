@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: application-boilerplatedotkonkerdotdev
+  namespace: application-boilerplate
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`application-boilerplate.cloudfleet.konker.dev`)
+      kind: Rule
+      services:
+        - name: application-boilerplatedotkonkerdotdev
+          port: 3000
+  tls:
+    certResolver: letsencrypt

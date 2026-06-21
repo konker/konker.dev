@@ -1,4 +1,4 @@
-name: '@konker.dev/backend-boilerplate.konker.dev / CD / Development [AWS Serverless]'
+name: '@konker.dev/application-boilerplate.konker.dev / CD / Development [AWS Serverless]'
 
 on:
   workflow_dispatch:
@@ -12,8 +12,8 @@ on:
 #    branches:
 #      - 'development'
 #    paths:
-#      - 'apps/backend-boilerplate.konker.dev/src/**'
-#      - 'apps/backend-boilerplate.konker.dev/deployment/aws-serverless/**'
+#      - 'apps/application-boilerplate.konker.dev/src/**'
+#      - 'apps/application-boilerplate.konker.dev/deployment/aws-serverless/**'
 
 env:
   CWD: './apps/backend-boilerplate.konker.dev'
