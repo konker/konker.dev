@@ -7,10 +7,12 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 hono
 
-# Copy prebuilt app from host .deploy directory
-COPY --chown=hono:nodejs ../.deploy/dist ./dist
-COPY --chown=hono:nodejs ../.deploy/node_modules ./node_modules
-COPY --chown=hono:nodejs ../.deploy/package.json ./
+# Copy prebuilt app from the .deploy directory (build context is the backend
+# package root; .deploy is produced there by `build:prod` and allowlisted in
+# .dockerignore).
+COPY --chown=hono:nodejs .deploy/dist ./dist
+COPY --chown=hono:nodejs .deploy/node_modules ./node_modules
+COPY --chown=hono:nodejs .deploy/package.json ./
 
 USER hono
 EXPOSE 3000

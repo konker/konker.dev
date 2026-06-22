@@ -16,11 +16,11 @@ on:
 #      - 'apps/application-boilerplate.konker.dev/deployment/aws-serverless/**'
 
 env:
-  CWD: './apps/backend-boilerplate.konker.dev'
+  CWD: './apps/application-boilerplate.konker.dev'
   AWS_DEFAULT_REGION: 'eu-west-1'
   IMAGE_TAG: '${{ github.sha }}'
   TURBO_TELEMETRY_DISABLED: 1
-  TURBO_FILTER_ARG: '--filter=@konker.dev/backend-boilerplate.konker.dev'
+  TURBO_FILTER_ARG: '--filter=@konker.dev/application-boilerplate.konker.dev'
   TURBO_EXTRA_ARGS: '${{ inputs.extra_args }}'
 
 jobs:
@@ -61,14 +61,14 @@ jobs:
       - name: Configure AWS credentials (CI OIDC role)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-backend-boilerplate-konker-dev"
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       # Assume config management role and export config (chains from the CI role)
       - name: Configure AWS credentials (Configuration management role)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-backend-boilerplate"
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-application-boilerplate"
           role-external-id: "configuration-management-access"
           role-chaining: true
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
@@ -79,7 +79,7 @@ jobs:
       - name: Configure AWS credentials (CI OIDC role, for deployment)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-backend-boilerplate-konker-dev"
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       # Assume application deployment role (chains from the CI role)
@@ -94,7 +94,7 @@ jobs:
 
       - name: Deploy (Development)
         run: |
-          cd ./apps/backend-boilerplate.konker.dev
+          cd ./apps/application-boilerplate.konker.dev
           pnpm sst install --config=./deployment/aws-serverless/sst.config.ts --stage=development --print-logs
           pnpm sst deploy --config=./deployment/aws-serverless/sst.config.ts --stage=development --print-logs
           cd ../../
