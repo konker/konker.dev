@@ -2,11 +2,6 @@ name: '@konker.dev/application-boilerplate.konker.dev / CD / Development [Kubern
 
 on:
   workflow_dispatch:
-    inputs:
-      extra_args:
-        description: "TurboRepo Extra Args"
-        required: false
-        type: string
 
 #  push:
 #    branches:
