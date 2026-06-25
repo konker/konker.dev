@@ -65,10 +65,10 @@ jobs:
           # before build:prod packages the backend via `pnpm deploy --prod`.
           pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build
           pnpm run build-container
-          # Also tag :latest so the kustomize base (image: ...:latest) resolves.
-          docker tag "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG" "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:latest"
+          # Push only the immutable, unique :$IMAGE_TAG (= git sha). The ECR repo
+          # is IMMUTABLE, so :latest cannot be overwritten — deploys reference the
+          # sha tag directly (set via kustomize at apply time below).
           pnpm run push-container
-          docker push "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:latest"
           cd -
 
       # CloudFleet (cfke) kubectl access via GitHub OIDC workload-identity
@@ -77,19 +77,28 @@ jobs:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v5
 
+      - name: Setup kustomize
+        run: |
+          KUSTOMIZE_VERSION=5.5.0
+          curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" | tar -xz
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
       - name: Configure kubectl (CloudFleet OIDC)
         uses: cloudfleet-actions/configure-kubectl@v1
         with:
-          cluster-id: ${{ vars.CFKE_CLUSTER_ID }}
-          region: ${{ vars.CFKE_REGION }}
+          cluster-id: ${{ env.CFKE_CLUSTER_ID }}
+          region: ${{ env.CFKE_REGION }}
 
       - name: Deploy to kubernetes (Development)
         run: |
-          # Applies the development overlay: backend app base + vendored
-          # zero-sync base, all in the application-boilerplate namespace.
-          kubectl apply -k ${{ env.CWD }}/deployment/kubernetes/overlays/development
+          # Pin the backend image to the immutable sha tag we just pushed, then
+          # apply the development overlay (backend app base + vendored zero-sync
+          # base, in the application-boilerplate namespace). The image change in
+          # the pod template triggers a rollout on its own — no restart needed.
+          cd ${{ env.CWD }}/deployment/kubernetes/overlays/development
+          kustomize edit set image "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY=$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG"
+          kubectl apply -k .
 
-          # Force a fresh pull of the :latest backend image and wait for rollout.
-          kubectl rollout restart deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }} --timeout=5m
           kubectl rollout status deployment/zero-sync -n ${{ env.K8S_NAMESPACE }} --timeout=5m

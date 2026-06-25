@@ -11,3 +11,11 @@ resources:
 
 patches:
   - path: zero-sync-patches.yaml
+
+# Backend image tag. The ECR repo is IMMUTABLE, so deploys reference a unique
+# commit-sha tag rather than :latest. CI overrides newTag per run via
+# `kustomize edit set image` before applying; `latest` is only the local/manual
+# default.
+images:
+  - name: 047719649582.dkr.ecr.eu-west-1.amazonaws.com/application-boilerplate.konker.dev
+    newTag: latest
