@@ -1,0 +1,14 @@
+# VENDORED COPY — do not edit by hand.
+# upstream: morningwoodsoftware.private/packages/infra/zero-sync-template/base@2d7eed6
+# Vendored (not git-referenced) because this is a PUBLIC repo and the template
+# lives in a private repo. Resync by re-copying from the pinned upstream ref.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - configmap.yaml
+  - externalsecret.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingressroute.yaml

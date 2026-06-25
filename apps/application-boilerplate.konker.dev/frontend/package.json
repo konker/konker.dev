@@ -1,0 +1,32 @@
+{
+  "name": "@konker.dev/application-boilerplate.konker.dev-frontend",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "author": "Konrad Markus <mail@konker.dev>",
+  "license": "ISC",
+  "scripts": {
+    "predev": "pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build",
+    "dev": "vite",
+    "prebuild": "pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "ci": "pnpm run typecheck && pnpm run build",
+    "cd": "echo NOOP"
+  },
+  "dependencies": {
+    "@konker.dev/application-boilerplate.konker.dev-zerosync": "workspace:*",
+    "@rocicorp/zero": "^1.6.2",
+    "jose": "^5.10.0",
+    "solid-js": "^1.9.5",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.6",
+    "typescript": "^5.9.3",
+    "vite": "^6.3.6",
+    "vite-plugin-solid": "^2.11.9"
+  }
+}

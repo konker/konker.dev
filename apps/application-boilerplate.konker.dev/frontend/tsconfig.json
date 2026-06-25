@@ -1,0 +1,16 @@
+{
+  "extends": "../../../packages/common-config/configs/tsconfig-base.json",
+  "include": ["./src", "./vite.config.ts"],
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "types": ["vite/client", "node"]
+  }
+}

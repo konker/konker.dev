@@ -1,0 +1,101 @@
+name: '@konker.dev/application-boilerplate.konker.dev / CD / Development [AWS Serverless]'
+
+on:
+  workflow_dispatch:
+    inputs:
+      extra_args:
+        description: "TurboRepo Extra Args"
+        required: false
+        type: string
+
+#  push:
+#    branches:
+#      - 'development'
+#    paths:
+#      - 'apps/application-boilerplate.konker.dev/src/**'
+#      - 'apps/application-boilerplate.konker.dev/deployment/aws-serverless/**'
+
+env:
+  CWD: './apps/application-boilerplate.konker.dev'
+  AWS_DEFAULT_REGION: 'eu-west-1'
+  IMAGE_TAG: '${{ github.sha }}'
+  TURBO_TELEMETRY_DISABLED: 1
+  TURBO_FILTER_ARG: '--filter=@konker.dev/application-boilerplate.konker.dev'
+  TURBO_EXTRA_ARGS: '${{ inputs.extra_args }}'
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: CD Development
+    environment: development
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: '9.6.0'
+
+      - uses: actions/cache@v5
+        with:
+          path: |
+            .sst
+          key: ${{ runner.os }}-sst
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Authenticate via GitHub OIDC -> CI role (replaces the static cd user; KDV-233)
+      - name: Configure AWS credentials (CI OIDC role)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      # Assume config management role and export config (chains from the CI role)
+      - name: Configure AWS credentials (Configuration management role)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-application-boilerplate"
+          role-external-id: "configuration-management-access"
+          role-chaining: true
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-skip-session-tagging: true # apparently we cannot avoid this
+      # TODO
+
+      # Re-establish the CI role base (config-management role cannot assume other roles)
+      - name: Configure AWS credentials (CI OIDC role, for deployment)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      # Assume application deployment role (chains from the CI role)
+      - name: Configure AWS credentials (Application deployment role)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::898403669204:role/infra/application-deployment-role" # ${{ env.APPLICATION_DEVELOPMENT_ROLE_ARN }}
+          role-external-id: "application-deployment-access"
+          role-chaining: true
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-skip-session-tagging: true # apparently we cannot avoid this
+
+      - name: Deploy (Development)
+        run: |
+          cd ./apps/application-boilerplate.konker.dev
+          pnpm sst install --config=./deployment/aws-serverless/sst.config.ts --stage=development --print-logs
+          pnpm sst deploy --config=./deployment/aws-serverless/sst.config.ts --stage=development --print-logs
+          cd ../../
+

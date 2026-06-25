@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zero-sync
+  labels:
+    app.kubernetes.io/name: zero-sync
+    app.kubernetes.io/component: sync
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-sync
+      app.kubernetes.io/component: sync
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: zero-sync
+        app.kubernetes.io/component: sync
+    spec:
+      terminationGracePeriodSeconds: 60
+      nodeSelector:
+        cfke.io/provider: hetzner
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: db-check
+          image: postgres:17-alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              wal_level="$(psql "$ZERO_UPSTREAM_DB" -Atc "show wal_level")"
+              if [ "$wal_level" != "logical" ]; then
+                echo "expected wal_level=logical, got ${wal_level}" >&2
+                exit 1
+              fi
+
+              echo "$ZERO_APP_PUBLICATIONS" | tr ',' '\n' | while read -r publication; do
+                publication="$(echo "$publication" | xargs)"
+                if [ -z "$publication" ]; then
+                  continue
+                fi
+                publication_exists="$(psql "$ZERO_UPSTREAM_DB" -Atc "select 1 from pg_publication where pubname = '$publication'")"
+                if [ "$publication_exists" != "1" ]; then
+                  echo "missing Zero publication: ${publication}" >&2
+                  exit 1
+                fi
+              done
+          envFrom:
+            - configMapRef:
+                name: zero-sync-config
+            - secretRef:
+                name: zero-sync-secrets
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - name: zero-sync
+          image: REPLACE_ZERO_IMAGE
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 4848
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: zero-sync-config
+            - secretRef:
+                name: zero-sync-secrets
+          volumeMounts:
+            - name: zero-sync-data
+              mountPath: /data
+          startupProbe:
+            httpGet:
+              path: /keepalive
+              port: http
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /keepalive
+              port: http
+            failureThreshold: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /keepalive
+              port: http
+            failureThreshold: 6
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: zero-sync-data
+          persistentVolumeClaim:
+            claimName: zero-sync-data

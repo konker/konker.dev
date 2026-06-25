@@ -35,7 +35,9 @@
     "turborepo-remote-cache": "^2.7.0"
   },
   "pnpm": {
-    "overrides": {}
+    "overrides": {
+      "hono": "4.11.3"
+    }
   },
   "scripts": {
     "dev": "turbo run dev",

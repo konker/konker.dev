@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: zero-sync
+  labels:
+    app.kubernetes.io/name: zero-sync
+    app.kubernetes.io/component: sync
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`REPLACE_ZERO_HOST`)
+      kind: Rule
+      services:
+        - name: zero-sync
+          port: 4848
+  tls:
+    certResolver: letsencrypt

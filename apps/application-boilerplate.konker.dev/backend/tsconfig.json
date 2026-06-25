@@ -1,0 +1,15 @@
+{
+  "extends": "../../../packages/common-config/configs/tsconfig-base.json",
+  "include": ["./src"],
+  "exclude": ["./.deploy", "./.sst"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "plugins": [{ "name": "@effect/language-service" }]
+  }
+}

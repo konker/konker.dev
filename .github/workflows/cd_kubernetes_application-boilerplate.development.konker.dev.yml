@@ -1,0 +1,93 @@
+name: '@konker.dev/application-boilerplate.konker.dev / CD / Development [Kubernetes]'
+
+on:
+  workflow_dispatch:
+
+#  push:
+#    branches:
+#      - 'development'
+#    paths:
+#      - 'apps/application-boilerplate.konker.dev/backend/src/**'
+#      - 'apps/application-boilerplate.konker.dev/backend/deployment/kubernetes/**'
+#      - 'apps/application-boilerplate.konker.dev/zerosync/src/**'
+
+env:
+  CWD: './apps/application-boilerplate.konker.dev/backend'
+  AWS_DEFAULT_REGION: 'eu-west-1'
+  AWS_ECR_REGISTRY: '047719649582.dkr.ecr.eu-west-1.amazonaws.com'
+  AWS_ECR_REPOSITORY: 'application-boilerplate.konker.dev'
+  IMAGE_TAG: '${{ github.sha }}'
+  K8S_NAMESPACE: 'application-boilerplate'
+  TURBO_TELEMETRY_DISABLED: 1
+  TURBO_EXTRA_ARGS: '${{ inputs.extra_args }}'
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: CD Development
+    environment: development
+    permissions:
+      id-token: write # AWS OIDC (ECR) + GitHub OIDC (CloudFleet)
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: '9.6.0'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Authenticate via GitHub OIDC -> CI role (same account as ECR; KDV-233)
+      - name: Configure AWS credentials (CI OIDC role)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Build and push backend container to ECR (Development)
+        run: |
+          cd ${{ env.CWD }}
+          # zerosync is a workspace-only build-time dep; ensure its dist exists
+          # before build:prod packages the backend via `pnpm deploy --prod`.
+          pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build
+          pnpm run build-container
+          # Also tag :latest so the kustomize base (image: ...:latest) resolves.
+          docker tag "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG" "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:latest"
+          pnpm run push-container
+          docker push "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:latest"
+          cd -
+
+      # CloudFleet (cfke) kubectl access via GitHub OIDC workload-identity
+      # federation. Requires repo vars CFKE_CLUSTER_ID / CFKE_REGION and a
+      # federation trust configured on the CloudFleet side for this repo.
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v5
+
+      - name: Configure kubectl (CloudFleet OIDC)
+        uses: cloudfleet-actions/configure-kubectl@v1
+        with:
+          cluster-id: ${{ vars.CFKE_CLUSTER_ID }}
+          region: ${{ vars.CFKE_REGION }}
+
+      - name: Deploy to kubernetes (Development)
+        run: |
+          # Applies the development overlay: backend app base + vendored
+          # zero-sync base, all in the application-boilerplate namespace.
+          kubectl apply -k ${{ env.CWD }}/deployment/kubernetes/overlays/development
+
+          # Force a fresh pull of the :latest backend image and wait for rollout.
+          kubectl rollout restart deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }} --timeout=5m
+          kubectl rollout status deployment/zero-sync -n ${{ env.K8S_NAMESPACE }} --timeout=5m
