@@ -18,6 +18,8 @@ env:
   AWS_ECR_REPOSITORY: 'application-boilerplate.konker.dev'
   IMAGE_TAG: '${{ github.sha }}'
   K8S_NAMESPACE: 'application-boilerplate'
+  CFKE_CLUSTER_ID: '2c29f203-bbf2-4a4b-89ed-d0c62a1285f2'
+  CFKE_REGION: 'europe-central-1a'
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_EXTRA_ARGS: '${{ inputs.extra_args }}'
 
