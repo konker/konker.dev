@@ -101,7 +101,24 @@ jobs:
           # the pod template triggers a rollout on its own — no restart needed.
           cd ${{ env.CWD }}/deployment/kubernetes/overlays/development
           kustomize edit set image "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY=$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG"
+
+          # A Job's pod template is immutable, so delete any prior run before
+          # applying — each deploy then creates a fresh migration Job with the
+          # current sha image.
+          kubectl delete job application-boilerplate-migrate -n ${{ env.K8S_NAMESPACE }} --ignore-not-found
+
           kubectl apply -k .
+
+          # Run DB migrations to completion first: they create the `widgets` table
+          # and the Zero publication that zero-sync's db-check initContainer gates
+          # on. Idempotent (drizzle tracks applied migrations). Dump logs on
+          # failure so the CD log shows why.
+          if ! kubectl wait --for=condition=complete job/application-boilerplate-migrate -n ${{ env.K8S_NAMESPACE }} --timeout=5m; then
+            echo "::error::Database migration Job failed or timed out"
+            kubectl logs job/application-boilerplate-migrate -n ${{ env.K8S_NAMESPACE }} --all-containers --tail=200 || true
+            kubectl describe job/application-boilerplate-migrate -n ${{ env.K8S_NAMESPACE }} || true
+            exit 1
+          fi
 
           kubectl rollout status deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }} --timeout=5m
           kubectl rollout status deployment/zero-sync -n ${{ env.K8S_NAMESPACE }} --timeout=5m
