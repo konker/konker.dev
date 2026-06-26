@@ -7,7 +7,6 @@ namespace: application-boilerplate
 
 resources:
   - ../../base
-  - ../../migrate-base
   - ../../zero-sync-base
 
 patches:

@@ -13,7 +13,5 @@ export default defineConfig({
   esbuildOptions(options) {
     options.supported = { ...options.supported, 'import-attributes': true };
   },
-  // Copy non-TS assets tsup doesn't emit: runtime config, and the drizzle SQL
-  // migrations + journal (consumed by dist/database/migrate.js in the k8s Job).
-  onSuccess: 'cp -r src/config/* dist/config/ && cp -r src/database/drizzle dist/database/drizzle',
+  onSuccess: 'cp -r src/config/* dist/config/',
 });
