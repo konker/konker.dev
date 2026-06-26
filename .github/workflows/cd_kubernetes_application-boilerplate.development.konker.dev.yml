@@ -105,6 +105,7 @@ jobs:
           role-external-id: "application-deployment-access"
           role-chaining: true
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-skip-session-tagging: true # the role's trust does not permit sts:TagSession
 
       # Apply DB migrations before the rollout: they create the `widgets` table
       # and the `application_boilerplate_zero_data` publication that zero-sync's
