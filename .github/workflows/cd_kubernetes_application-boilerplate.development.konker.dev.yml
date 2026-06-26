@@ -61,9 +61,12 @@ jobs:
       - name: Build and push backend container to ECR (Development)
         run: |
           cd ${{ env.CWD }}
-          # zerosync is a workspace-only build-time dep; ensure its dist exists
-          # before build:prod packages the backend via `pnpm deploy --prod`.
-          pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build
+          # Build the backend's entire workspace dependency graph (zerosync,
+          # middleware-fp and its transitive workspace deps) so each package's
+          # dist/ exists before build:prod packages the backend via
+          # `pnpm deploy --prod`. `^...` selects dependencies only, not the
+          # backend itself (build-container builds that via tsup).
+          pnpm --filter "@konker.dev/application-boilerplate.konker.dev^..." run build
           pnpm run build-container
           # Push only the immutable, unique :$IMAGE_TAG (= git sha). The ECR repo
           # is IMMUTABLE, so :latest cannot be overwritten — deploys reference the
