@@ -1,0 +1,94 @@
+name: '@konker.dev/application-boilerplate.konker.dev / CD / Development [Frontend]'
+
+on:
+  workflow_dispatch:
+
+#  push:
+#    branches:
+#      - 'development'
+#    paths:
+#      - 'apps/application-boilerplate.konker.dev/frontend/**'
+#      - 'apps/application-boilerplate.konker.dev/zerosync/src/**'
+
+env:
+  CWD: './apps/application-boilerplate.konker.dev/frontend'
+  AWS_DEFAULT_REGION: 'eu-west-1'
+  # Static-site CI OIDC role in the mws-development account (created by the
+  # website-hosting-aws-development Terraform; scoped to S3 sync + CloudFront
+  # invalidation for this site only).
+  AWS_DEPLOY_ROLE: 'arn:aws:iam::898403669204:role/infra/ci-application-boilerplate-frontend-konker-dev'
+  # S3 bucket and CloudFront distribution for the site. These are Terraform
+  # outputs (application_boilerplate_frontend_bucket_name /
+  # _cloudfront_distribution_id); set them as `development` environment variables
+  # after `terraform apply`. The distribution id is non-deterministic and the CI
+  # role is not allowed to list distributions, hence the explicit variable.
+  S3_BUCKET: '${{ vars.APPLICATION_BOILERPLATE_FRONTEND_BUCKET }}'
+  CLOUDFRONT_DISTRIBUTION_ID: '${{ vars.APPLICATION_BOILERPLATE_FRONTEND_DISTRIBUTION_ID }}'
+  # Origin path of the CloudFront S3 origin (see the static-site module).
+  S3_ORIGIN_PATH: 'www'
+  # Backend endpoints baked into the build (Vite inlines VITE_* at build time).
+  VITE_BACKEND_URL: 'https://api.application-boilerplate.development.konker.dev'
+  VITE_ZERO_CACHE_URL: 'https://zero-sync.application-boilerplate.development.konker.dev'
+  TURBO_TELEMETRY_DISABLED: 1
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    name: CD Development
+    environment: development
+    permissions:
+      id-token: write # AWS OIDC
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: '9.6.0'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend (Development)
+        run: |
+          # Build the frontend's workspace dependency graph (zerosync and its
+          # transitive workspace deps) so each dist/ exists, then build the
+          # frontend itself. `^...` selects dependencies only, not the frontend.
+          pnpm --filter "@konker.dev/application-boilerplate.konker.dev-frontend^..." run build
+          pnpm --filter "@konker.dev/application-boilerplate.konker.dev-frontend" run build
+
+      - name: Configure AWS credentials (CI OIDC role)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Deploy to S3 + invalidate CloudFront (Development)
+        run: |
+          set -euo pipefail
+          if [ -z "$S3_BUCKET" ] || [ -z "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+            echo "Missing APPLICATION_BOILERPLATE_FRONTEND_BUCKET / _DISTRIBUTION_ID environment variables." >&2
+            echo "Set them on the 'development' GitHub environment from the Terraform outputs." >&2
+            exit 1
+          fi
+
+          # Hashed asset filenames are immutable -> cache long; index.html must be
+          # revalidated so new deploys are picked up.
+          aws s3 sync "${{ env.CWD }}/dist" "s3://$S3_BUCKET/$S3_ORIGIN_PATH" \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 cp "${{ env.CWD }}/dist/index.html" "s3://$S3_BUCKET/$S3_ORIGIN_PATH/index.html" \
+            --cache-control "no-cache"
+
+          aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*"
