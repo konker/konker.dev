@@ -93,20 +93,6 @@ jobs:
           cluster-id: ${{ env.CFKE_CLUSTER_ID }}
           region: ${{ env.CFKE_REGION }}
 
-      # Chain into the development account's application-deployment-role to read
-      # the DB superuser secret from SSM (the /secrets/development/* params live
-      # in account 898403669204, not the deployment account). Mirrors the
-      # serverless CD. kubectl context is unaffected (cloudfleet kubeconfig is
-      # independent of AWS creds).
-      - name: Configure AWS credentials (application-deployment-role)
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: "arn:aws:iam::898403669204:role/infra/application-deployment-role"
-          role-external-id: "application-deployment-access"
-          role-chaining: true
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
-          role-skip-session-tagging: true # the role's trust does not permit sts:TagSession
-
       # Apply DB migrations before the rollout: they create the `widgets` table
       # and the `application_boilerplate_zero_data` publication that zero-sync's
       # db-check initContainer gates on. The private RDS is reached by
