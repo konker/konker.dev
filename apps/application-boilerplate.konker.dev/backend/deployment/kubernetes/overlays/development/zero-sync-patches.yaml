@@ -7,8 +7,8 @@ metadata:
 data:
   ZERO_APP_ID: application_boilerplate
   ZERO_APP_PUBLICATIONS: application_boilerplate_zero_data
-  ZERO_QUERY_URL: https://application-boilerplate.development.cloudfleet.konker.dev/zero/query
-  ZERO_MUTATE_URL: https://application-boilerplate.development.cloudfleet.konker.dev/zero/mutate
+  ZERO_QUERY_URL: https://api.application-boilerplate.development.konker.dev/zero/query
+  ZERO_MUTATE_URL: https://api.application-boilerplate.development.konker.dev/zero/mutate
   ZERO_LITESTREAM_BACKUP_URL: s3://mws-zero-sync-backups/development/application-boilerplate/
 ---
 apiVersion: external-secrets.io/v1beta1
@@ -65,7 +65,7 @@ metadata:
   name: zero-sync
 spec:
   routes:
-    - match: Host(`zero-sync.application-boilerplate.development.cloudfleet.konker.dev`)
+    - match: Host(`zero-sync.application-boilerplate.development.konker.dev`)
       kind: Rule
       services:
         - name: zero-sync

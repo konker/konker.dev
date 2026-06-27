@@ -10,7 +10,7 @@ data:
   # Non-secret DB connection bits (credentials come from the ExternalSecret).
   DATABASE_HOST: ssh-tunnel-proxy.infrastructure-development.svc.cluster.local
   DATABASE_PORT: '54321'
-  DATABASE_NAME: backend_boilerplate_dev
+  DATABASE_NAME: application_boilerplate_development
   DATABASE_SSL: '{ "caBundlePath": "/app/dist/config/eu-west-1-bundle.pem" }'
   # JWT issuer is not secret; the signing secret comes from the ExternalSecret.
   JWT_ISSUER: application-boilerplate-development

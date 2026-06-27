@@ -12,6 +12,10 @@ spec:
       labels:
         app: application-boilerplatedotkonkerdotdev
     spec:
+      # CFKE's node auto-provisioner needs a placement constraint to choose a
+      # node/provider; pin to the Hetzner fleet like the zero-sync deployment.
+      nodeSelector:
+        cfke.io/provider: hetzner
       imagePullSecrets:
         - name: ecr-secret
       containers:
@@ -40,3 +44,11 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 2
+          # Required by CFKE: scaling and node auto-provisioning rely on requests.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

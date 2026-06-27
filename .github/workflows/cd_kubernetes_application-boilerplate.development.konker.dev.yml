@@ -18,6 +18,8 @@ env:
   AWS_ECR_REPOSITORY: 'application-boilerplate.konker.dev'
   IMAGE_TAG: '${{ github.sha }}'
   K8S_NAMESPACE: 'application-boilerplate'
+  CFKE_CLUSTER_ID: '2c29f203-bbf2-4a4b-89ed-d0c62a1285f2'
+  CFKE_REGION: 'europe-central-1a'
   TURBO_TELEMETRY_DISABLED: 1
   TURBO_EXTRA_ARGS: '${{ inputs.extra_args }}'
 
@@ -59,14 +61,17 @@ jobs:
       - name: Build and push backend container to ECR (Development)
         run: |
           cd ${{ env.CWD }}
-          # zerosync is a workspace-only build-time dep; ensure its dist exists
-          # before build:prod packages the backend via `pnpm deploy --prod`.
-          pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build
+          # Build the backend's entire workspace dependency graph (zerosync,
+          # middleware-fp and its transitive workspace deps) so each package's
+          # dist/ exists before build:prod packages the backend via
+          # `pnpm deploy --prod`. `^...` selects dependencies only, not the
+          # backend itself (build-container builds that via tsup).
+          pnpm --filter "@konker.dev/application-boilerplate.konker.dev^..." run build
           pnpm run build-container
-          # Also tag :latest so the kustomize base (image: ...:latest) resolves.
-          docker tag "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG" "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:latest"
+          # Push only the immutable, unique :$IMAGE_TAG (= git sha). The ECR repo
+          # is IMMUTABLE, so :latest cannot be overwritten — deploys reference the
+          # sha tag directly (set via kustomize at apply time below).
           pnpm run push-container
-          docker push "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:latest"
           cd -
 
       # CloudFleet (cfke) kubectl access via GitHub OIDC workload-identity
@@ -75,19 +80,60 @@ jobs:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v5
 
+      - name: Setup kustomize
+        run: |
+          KUSTOMIZE_VERSION=5.5.0
+          curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" | tar -xz
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
       - name: Configure kubectl (CloudFleet OIDC)
         uses: cloudfleet-actions/configure-kubectl@v1
         with:
-          cluster-id: ${{ vars.CFKE_CLUSTER_ID }}
-          region: ${{ vars.CFKE_REGION }}
+          cluster-id: ${{ env.CFKE_CLUSTER_ID }}
+          region: ${{ env.CFKE_REGION }}
+
+      # Apply DB migrations before the rollout: they create the `widgets` table
+      # and the `application_boilerplate_zero_data` publication that zero-sync's
+      # db-check initContainer gates on. The private RDS is reached by
+      # port-forwarding the in-cluster ssh-tunnel-proxy (bastion -> RDS), then
+      # drizzle-kit connects on localhost. Must run as the DB superuser (CREATE
+      # DDL + publication; the app user cannot). Idempotent (drizzle tracks
+      # applied migrations).
+      - name: Run database migrations (Development)
+        run: |
+          set -euo pipefail
+
+          CONN="$(aws ssm get-parameter \
+            --name /secrets/development/application-boilerplate/database/superuser/connection-info \
+            --with-decryption --query Parameter.Value --output text)"
+          DB_USER="$(echo "$CONN" | jq -r '.username')"
+          DB_PASSWORD="$(echo "$CONN" | jq -r '.password')"
+          DB_NAME="$(echo "$CONN" | jq -r '.dbname')"
+          echo "::add-mask::$DB_PASSWORD"
+
+          kubectl port-forward -n infrastructure-development svc/ssh-tunnel-proxy 54321:54321 &
+          PF_PID=$!
+          trap 'kill "$PF_PID" 2>/dev/null || true' EXIT
+          timeout 60 bash -c 'until (echo > /dev/tcp/127.0.0.1/54321) 2>/dev/null; do sleep 1; done'
+
+          cd ${{ env.CWD }}
+          DATABASE_HOST=127.0.0.1 \
+          DATABASE_PORT=54321 \
+          DATABASE_USER="$DB_USER" \
+          DATABASE_PASSWORD="$DB_PASSWORD" \
+          DATABASE_NAME="$DB_NAME" \
+            pnpm exec drizzle-kit migrate --config=src/config/drizzle.config.ts
 
       - name: Deploy to kubernetes (Development)
         run: |
-          # Applies the development overlay: backend app base + vendored
-          # zero-sync base, all in the application-boilerplate namespace.
-          kubectl apply -k ${{ env.CWD }}/deployment/kubernetes/overlays/development
+          # Pin the backend image to the immutable sha tag we just pushed, then
+          # apply the development overlay (backend app base + vendored zero-sync
+          # base, in the application-boilerplate namespace). The image change in
+          # the pod template triggers a rollout on its own — no restart needed.
+          cd ${{ env.CWD }}/deployment/kubernetes/overlays/development
+          kustomize edit set image "$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY=$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG"
+          kubectl apply -k .
 
-          # Force a fresh pull of the :latest backend image and wait for rollout.
-          kubectl rollout restart deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/application-boilerplatedotkonkerdotdev -n ${{ env.K8S_NAMESPACE }} --timeout=5m
           kubectl rollout status deployment/zero-sync -n ${{ env.K8S_NAMESPACE }} --timeout=5m

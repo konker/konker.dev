@@ -16,7 +16,7 @@ export default $config({
   },
 
   async run() {
-    const api = new sst.cloudflare.Worker('API_backend.boilerplate.development.konker.dev', {
+    const api = new sst.cloudflare.Worker('API_application-boilerplate', {
       url: true,
       link: [],
       handler: './src/hono-cloudflare-serverless.handler',

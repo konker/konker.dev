@@ -7,7 +7,7 @@ spec:
     - web
     - websecure
   routes:
-    - match: Host(`application-boilerplate.development.cloudfleet.konker.dev`)
+    - match: Host(`api.application-boilerplate.development.konker.dev`)
       kind: Rule
       services:
         - name: application-boilerplatedotkonkerdotdev
