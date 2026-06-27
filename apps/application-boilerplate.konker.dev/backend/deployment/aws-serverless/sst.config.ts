@@ -18,6 +18,7 @@ export default $config({
     const apiFn = new sst.aws.Function('API_application-boilerplate', {
       dev: false,
       permissions: [],
+      runtime: 'nodejs24.x',
       link: [],
       handler: '../../src/hono/hono-aws-serverless.handler',
       copyFiles: [
