@@ -32,6 +32,9 @@ spec:
     - secretKey: backend_service_token
       remoteRef:
         key: /secrets/development/application-boilerplate/zero-sync/backend-service-token
+    - secretKey: jwt_signing_secret
+      remoteRef:
+        key: /secrets/development/application-boilerplate/auth/jwt-signing-secret
     - secretKey: backup_access_key_id
       remoteRef:
         key: /secrets/development/shared/zero-sync-backups/access-key-id
