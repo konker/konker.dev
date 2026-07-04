@@ -4,7 +4,7 @@
 
 [@konker.dev/neverthrow-r-auth-utils](../globals.md) / generateLambdaAuthResultDeny
 
-# Variable: generateLambdaAuthResultDeny()
+# Variable: generateLambdaAuthResultDeny
 
 > `const` **generateLambdaAuthResultDeny**: (`principalId`, `lambdaArn`) => `APIGatewayAuthorizerResult`
 

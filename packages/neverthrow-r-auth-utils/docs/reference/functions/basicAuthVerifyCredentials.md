@@ -18,14 +18,4 @@ Defined in: [basic-auth.ts:78](https://github.com/konker/konker.dev/blob/main/pa
 
 ## Returns
 
-> (`basicAuth`): `ResultR`\<`unknown`, [`BasicAuthUserContext`](../type-aliases/BasicAuthUserContext.md), `never`\>
-
-### Parameters
-
-#### basicAuth
-
-[`BasicAuthCredentials`](../type-aliases/BasicAuthCredentials.md)
-
-### Returns
-
-`ResultR`\<`unknown`, [`BasicAuthUserContext`](../type-aliases/BasicAuthUserContext.md), `never`\>
+(`basicAuth`) => `ResultR`\<`unknown`, [`BasicAuthUserContext`](../type-aliases/BasicAuthUserContext.md), `never`\>

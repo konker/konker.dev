@@ -18,14 +18,4 @@ Defined in: [basic-auth.ts:37](https://github.com/konker/konker.dev/blob/main/pa
 
 ## Returns
 
-> (`valid`): `boolean`
-
-### Parameters
-
-#### valid
-
-[`ValidBasicAuthCredentials`](../type-aliases/ValidBasicAuthCredentials.md)
-
-### Returns
-
-`boolean`
+(`valid`) => `boolean`

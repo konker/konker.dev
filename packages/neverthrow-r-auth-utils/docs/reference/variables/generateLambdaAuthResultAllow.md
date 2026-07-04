@@ -4,7 +4,7 @@
 
 [@konker.dev/neverthrow-r-auth-utils](../globals.md) / generateLambdaAuthResultAllow
 
-# Variable: generateLambdaAuthResultAllow()
+# Variable: generateLambdaAuthResultAllow
 
 > `const` **generateLambdaAuthResultAllow**: (`principalId`, `lambdaArn`) => `APIGatewayAuthorizerResult`
 
