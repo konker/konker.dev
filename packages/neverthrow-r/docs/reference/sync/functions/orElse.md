@@ -48,27 +48,7 @@ Function from the previous error to a recovery `ResultR`.
 
 ## Returns
 
-> \<`R1`, `T`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### T
-
-`T`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1`, `T`, `E`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+\<`R1`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
 
 ## Remarks
 

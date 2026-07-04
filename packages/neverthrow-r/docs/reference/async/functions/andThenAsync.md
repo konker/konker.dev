@@ -39,27 +39,7 @@ Async variant of andThen. The continuation returns a
 
 ## Returns
 
-> \<`R1`, `E1`\>(`rr`): [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### E1
-
-`E1`
-
-### Parameters
-
-#### rr
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1`, `A`, `E1`\>
-
-### Returns
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
 
 ## Example
 

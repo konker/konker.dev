@@ -60,27 +60,7 @@ Function from current scope to the next step's `ResultR`.
 
 ## Returns
 
-> \<`R1`, `E1`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### E1
-
-`E1`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1`, `S`, `E1`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
 
 ## Remarks
 

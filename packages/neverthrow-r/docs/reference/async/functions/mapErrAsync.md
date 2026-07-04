@@ -31,27 +31,7 @@ transform.
 
 ## Returns
 
-> \<`R`, `T`\>(`rr`): [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `F`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### T
-
-`T`
-
-### Parameters
-
-#### rr
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `E`\>
-
-### Returns
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `F`\>
+\<`R`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `F`\>
 
 ## Example
 

@@ -43,33 +43,7 @@ Async variant of match. Returns a function from environment to a
 
 ## Returns
 
-> \<`R`\>(`rr`): (`r`) => `Promise`\<`A` \| `B`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-### Parameters
-
-#### rr
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `T`, `E`\>
-
-### Returns
-
-> (`r`): `Promise`\<`A` \| `B`\>
-
-#### Parameters
-
-##### r
-
-`R`
-
-#### Returns
-
-`Promise`\<`A` \| `B`\>
+\<`R`\>(`rr`) => (`r`) => `Promise`\<`A` \| `B`\>
 
 ## Example
 

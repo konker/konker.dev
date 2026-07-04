@@ -36,27 +36,7 @@ Pure transformation from `E` to `F`.
 
 ## Returns
 
-> \<`R`, `T`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `F`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### T
-
-`T`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `E`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `F`\>
+\<`R`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `F`\>
 
 ## Remarks
 

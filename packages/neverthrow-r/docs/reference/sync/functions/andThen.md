@@ -51,27 +51,7 @@ Function from the previous success value to a `ResultR`.
 A function taking a `ResultR<R1, A, E1>` and returning a
   `ResultR<R1 & R2, B, E1 | E2>`.
 
-> \<`R1`, `E1`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### E1
-
-`E1`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1`, `A`, `E1`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
 
 ## Remarks
 

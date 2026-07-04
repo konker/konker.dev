@@ -34,27 +34,7 @@ Async variant of andThrough.
 
 ## Returns
 
-> \<`R1`, `E`\>(`rr`): [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### E
-
-`E`
-
-### Parameters
-
-#### rr
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1`, `T`, `E`\>
-
-### Returns
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+\<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
 
 ## Example
 

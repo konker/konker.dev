@@ -44,27 +44,7 @@ Function from the success value to a `ResultR` whose value is
 
 ## Returns
 
-> \<`R1`, `E`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### E
-
-`E`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1`, `T`, `E`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+\<`R1`, `E`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
 
 ## Remarks
 

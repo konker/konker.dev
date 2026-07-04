@@ -39,27 +39,7 @@ Pure transformation from `A` to `B`.
 A function taking a `ResultR<R, A, E>` and returning a
   `ResultR<R, B, E>`.
 
-> \<`R`, `E`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `B`, `E`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### E
-
-`E`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `A`, `E`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `B`, `E`\>
+\<`R`, `E`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `B`, `E`\>
 
 ## Remarks
 
