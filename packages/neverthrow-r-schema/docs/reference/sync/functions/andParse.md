@@ -34,20 +34,4 @@ Parses the success value of a plain neverthrow `Result`.
 
 ## Returns
 
-> \<`E`\>(`r`): `Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
-
-### Type Parameters
-
-#### E
-
-`E`
-
-### Parameters
-
-#### r
-
-`Result`\<`I`, `E`\>
-
-### Returns
-
-`Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+\<`E`\>(`r`) => `Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>

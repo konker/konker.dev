@@ -26,7 +26,7 @@ helpers that call the validator. It is accepted but unused by
 
 ### message?
 
-> `readonly` `optional` **message**: `string`
+> `readonly` `optional` **message?**: `string`
 
 Defined in: [common.ts:43](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-schema/src/common.ts#L43)
 
@@ -34,6 +34,6 @@ Defined in: [common.ts:43](https://github.com/konker/konker.dev/blob/main/packag
 
 ### validationOptions?
 
-> `readonly` `optional` **validationOptions**: `StandardSchemaV1.Options`
+> `readonly` `optional` **validationOptions?**: `StandardSchemaV1.Options`
 
 Defined in: [common.ts:44](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-schema/src/common.ts#L44)

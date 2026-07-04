@@ -16,7 +16,7 @@ Tagged error returned by all Standard Schema helpers in this package.
 
 ### cause?
 
-> `readonly` `optional` **cause**: `unknown`
+> `readonly` `optional` **cause?**: `unknown`
 
 Defined in: [common.ts:27](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-schema/src/common.ts#L27)
 

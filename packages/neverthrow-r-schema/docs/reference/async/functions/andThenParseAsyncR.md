@@ -35,24 +35,4 @@ chain.
 
 ## Returns
 
-> \<`R`, `E`\>(`rr`): `ResultAsyncR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### E
-
-`E`
-
-### Parameters
-
-#### rr
-
-`ResultAsyncR`\<`R`, `I`, `E`\>
-
-### Returns
-
-`ResultAsyncR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+\<`R`, `E`\>(`rr`) => `ResultAsyncR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
