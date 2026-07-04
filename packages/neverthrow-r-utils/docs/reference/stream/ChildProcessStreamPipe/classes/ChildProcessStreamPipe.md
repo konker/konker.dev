@@ -16,7 +16,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:12
 
 ### Constructor
 
-> **new ChildProcessStreamPipe**(`cmd`, `args`): `ChildProcessStreamPipe`
+> **new ChildProcessStreamPipe**(`cmd`, `args?`): `ChildProcessStreamPipe`
 
 Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:20](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts#L20)
 
@@ -26,7 +26,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:20
 
 `string`
 
-##### args
+##### args?
 
 `string`[] = `[]`
 
@@ -84,7 +84,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:16
 
 > **allowHalfOpen**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1146
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1178
 
 If `false` then the stream will automatically end the writable side when the
 readable side ends. Set initially by the `allowHalfOpen` constructor option,
@@ -107,7 +107,7 @@ v0.9.4
 
 > `readonly` **closed**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:167
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:168
 
 Is `true` after `'close'` has been emitted.
 
@@ -133,7 +133,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:13
 
 > **destroyed**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:162
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:163
 
 Is `true` after `readable.destroy()` has been called.
 
@@ -151,7 +151,7 @@ v8.0.0
 
 > `readonly` **errored**: `Error` \| `null`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:172
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:173
 
 Returns error if the stream has been destroyed with an error.
 
@@ -169,7 +169,7 @@ v18.0.0
 
 > **readable**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:119
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:120
 
 Is `true` if it is safe to call [read](#read), which means
 the stream has not been destroyed or emitted `'error'` or `'end'`.
@@ -188,7 +188,7 @@ v11.4.0
 
 > `readonly` **readableAborted**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:113
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:114
 
 Returns whether the stream was destroyed or errored before emitting `'end'`.
 
@@ -206,7 +206,7 @@ v16.8.0
 
 > `readonly` **readableDidRead**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:124
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:125
 
 Returns whether `'data'` has been emitted.
 
@@ -224,7 +224,7 @@ v16.7.0, v14.18.0
 
 > `readonly` **readableEncoding**: `BufferEncoding` \| `null`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:129
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:130
 
 Getter for the property `encoding` of a given `Readable` stream. The `encoding` property can be set using the [setEncoding](#setencoding) method.
 
@@ -242,9 +242,9 @@ v12.7.0
 
 > `readonly` **readableEnded**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:134
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:135
 
-Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v25.x/api/stream.html#event-end) event is emitted.
+Becomes `true` when [`'end'`](https://nodejs.org/docs/latest-v26.x/api/stream.html#event-end) event is emitted.
 
 #### Since
 
@@ -260,10 +260,10 @@ v12.9.0
 
 > **readableFlowing**: `boolean` \| `null`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:140
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:141
 
 This property reflects the current state of a `Readable` stream as described
-in the [Three states](https://nodejs.org/docs/latest-v25.x/api/stream.html#three-states) section.
+in the [Three states](https://nodejs.org/docs/latest-v26.x/api/stream.html#three-states) section.
 
 #### Since
 
@@ -279,7 +279,7 @@ v9.4.0
 
 > `readonly` **readableHighWaterMark**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:145
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:146
 
 Returns the value of `highWaterMark` passed when creating this `Readable`.
 
@@ -297,7 +297,7 @@ v9.3.0
 
 > `readonly` **readableLength**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:152
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:153
 
 This property contains the number of bytes (or objects) in the queue
 ready to be read. The value provides introspection data regarding
@@ -317,7 +317,7 @@ v9.4.0
 
 > `readonly` **readableObjectMode**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:157
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:158
 
 Getter for the property `objectMode` of a given `Readable` stream.
 
@@ -335,7 +335,7 @@ v12.3.0
 
 > **writable**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:760
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:792
 
 Is `true` if it is safe to call `writable.write()`, which means
 the stream has not been destroyed, errored, or ended.
@@ -354,7 +354,7 @@ v11.4.0
 
 > `readonly` **writableAborted**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:765
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:797
 
 Returns whether the stream was destroyed or errored before emitting `'finish'`.
 
@@ -372,7 +372,7 @@ v18.0.0, v16.17.0
 
 > `readonly` **writableCorked**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:799
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:831
 
 Number of times `writable.uncork()` needs to be
 called in order to fully uncork the stream.
@@ -391,7 +391,7 @@ v13.2.0, v12.16.0
 
 > `readonly` **writableEnded**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:771
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:803
 
 Is `true` after `writable.end()` has been called. This property
 does not indicate whether the data has been flushed, for this use `writable.writableFinished` instead.
@@ -410,7 +410,7 @@ v12.9.0
 
 > `readonly` **writableFinished**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:776
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:808
 
 Is set to `true` immediately before the `'finish'` event is emitted.
 
@@ -428,7 +428,7 @@ v12.6.0
 
 > `readonly` **writableHighWaterMark**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:781
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:813
 
 Return the value of `highWaterMark` passed when creating this `Writable`.
 
@@ -446,7 +446,7 @@ v9.3.0
 
 > `readonly` **writableLength**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:788
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:820
 
 This property contains the number of bytes (or objects) in the queue
 ready to be written. The value provides introspection data regarding
@@ -466,7 +466,7 @@ v9.4.0
 
 > `readonly` **writableNeedDrain**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:819
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:851
 
 Is `true` if the stream's buffer has been full and stream will emit `'drain'`.
 
@@ -484,7 +484,7 @@ v15.2.0, v14.17.0
 
 > `readonly` **writableObjectMode**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:793
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:825
 
 Getter for the property `objectMode` of a given `Writable` stream.
 
@@ -516,7 +516,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:72
 
 > `optional` **\_construct**(`callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:173
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:174
 
 #### Parameters
 
@@ -538,13 +538,13 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **\_destroy**(`error`, `callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:636
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:637
 
 #### Parameters
 
 ##### error
 
-`Error` | `null`
+`Error` \| `null`
 
 ##### callback
 
@@ -564,7 +564,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **\_final**(`callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:830
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:862
 
 #### Parameters
 
@@ -608,7 +608,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:40
 
 > **\_read**(`size`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:174
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:175
 
 #### Parameters
 
@@ -660,7 +660,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:30
 
 > **\_write**(`chunk`, `encoding`, `callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:820
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:852
 
 #### Parameters
 
@@ -690,7 +690,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > `optional` **\_writev**(`chunks`, `callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:821
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:853
 
 #### Parameters
 
@@ -716,7 +716,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **\[asyncDispose\]**(): `Promise`\<`void`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:659
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:691
 
 Calls `readable.destroy()` with an `AbortError` and returns
 a promise that fulfills when the stream is finished.
@@ -739,7 +739,7 @@ v20.4.0
 
 > **\[asyncIterator\]**(): `AsyncIterator`\<`any`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:653
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:654
 
 #### Returns
 
@@ -761,7 +761,7 @@ v10.0.0
 
 > `optional` **\[captureRejectionSymbol\]**(`error`, `event`, ...`args`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:87
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:87
 
 The `Symbol.for('nodejs.rejection')` method is called in case a
 promise rejection happens when emitting an event and
@@ -796,7 +796,7 @@ class MyClass extends EventEmitter {
 
 ##### event
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### args
 
@@ -816,13 +816,58 @@ v13.4.0, v12.16.0
 
 ***
 
+### \[toAsyncStreamable\]()
+
+> **\[toAsyncStreamable\]**(): `ByteReadableStream`
+
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:685
+
+When the `--experimental-stream-iter` flag is enabled, `Readable` streams
+implement the `Stream.toAsyncStreamable` protocol, enabling efficient
+consumption by the `stream/iter` API.
+
+This provides a batched async iterator that drains the stream's internal
+buffer into `Uint8Array[]` batches, amortizing the per-chunk Promise overhead
+of the standard `Symbol.asyncIterator` path. For byte-mode streams, chunks
+are yielded directly as `Buffer` instances (which are `Uint8Array` subclasses).
+For object-mode or encoded streams, each chunk is normalized to `Uint8Array`
+before batching.
+
+The returned iterator is tagged as a validated source, so `from()`
+passes it through without additional normalization.
+
+```js
+import { Readable } from 'node:stream';
+import { text, from } from 'node:stream/iter';
+
+const readable = new Readable({
+  read() { this.push('hello'); this.push(null); },
+});
+
+// Readable is automatically consumed via toAsyncStreamable
+console.log(await text(from(readable))); // 'hello'
+```
+
+Without the `--experimental-stream-iter` flag, calling this method throws
+`ERR_STREAM_ITER_MISSING_FLAG`.
+
+#### Returns
+
+`ByteReadableStream`
+
+#### Inherited from
+
+`Stream.Transform.[toAsyncStreamable]`
+
+***
+
 ### addListener()
 
 #### Call Signature
 
 > **addListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1148
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1180
 
 Alias for `emitter.on(eventName, listener)`.
 
@@ -858,13 +903,13 @@ v0.1.26
 
 > **addListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1152
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1184
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -902,7 +947,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:67
 
 > **compose**(`stream`, `options?`): `Duplex`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:485
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:486
 
 ```js
 import { Readable } from 'node:stream';
@@ -928,13 +973,13 @@ console.log(words); // prints ['text', 'passed', 'through', 'composed', 'stream'
 This method also allows for an `AbortSignal` to be provided, which will destroy
 the composed stream when aborted.
 
-See [`stream.compose(...streams)`](https://nodejs.org/docs/latest-v25.x/api/stream.html#streamcomposestreams) for more information.
+See [`stream.compose(...streams)`](https://nodejs.org/docs/latest-v26.x/api/stream.html#streamcomposestreams) for more information.
 
 #### Parameters
 
 ##### stream
 
-`WritableStream` | `WritableStream`\<`any`\> | `TransformStream`\<`any`, `any`\> | (`source`) => `void`
+`WritableStream` \| `WritableStream`\<`any`\> \| `TransformStream`\<`any`, `any`\> \| ((`source`) => `void`)
 
 ##### options?
 
@@ -960,7 +1005,7 @@ v19.1.0, v18.13.0
 
 > **cork**(): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:957
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:989
 
 The `writable.cork()` method forces all written data to be buffered in memory.
 The buffered data will be flushed when either the [uncork](../../BufferWriteableStream/classes/BufferWriteableStream.md#uncork) or [end](#end) methods are called.
@@ -992,7 +1037,7 @@ v0.11.2
 
 > **destroy**(`error?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:648
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:649
 
 Destroy the stream. Optionally emit an `'error'` event, and emit a `'close'` event (unless `emitClose` is set to `false`). After this call, the readable
 stream will release any internal resources and subsequent calls to `push()` will be ignored.
@@ -1028,7 +1073,7 @@ v8.0.0
 
 > **drop**(`limit`, `options?`): `Readable`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:608
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:609
 
 This method returns a new stream with the first *limit* chunks dropped from the start.
 
@@ -1066,7 +1111,7 @@ v17.5.0
 
 > **emit**\<`E`\>(`eventName`, ...`args`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1153
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1185
 
 Synchronously calls each of the listeners registered for the event named
 `eventName`, in the order they were registered, passing the supplied arguments
@@ -1139,13 +1184,13 @@ v0.1.26
 
 > **emit**(`eventName`, ...`args`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1154
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1186
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### args
 
@@ -1167,7 +1212,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **end**(`cb?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:923
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:955
 
 Calling the `writable.end()` method signals that no more data will be written
 to the `Writable`. The optional `chunk` and `encoding` arguments allow one
@@ -1209,7 +1254,7 @@ v0.9.4
 
 > **end**(`chunk`, `cb?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:932
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:964
 
 Signals that no more data will be written, with one final chunk of data.
 
@@ -1248,7 +1293,7 @@ v0.9.4
 
 > **end**(`chunk`, `encoding`, `cb?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:942
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:974
 
 Signals that no more data will be written, with one final chunk of data.
 
@@ -1295,7 +1340,7 @@ v0.9.4
 
 > **eventNames**(): (`string` \| `symbol`)[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:154
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:154
 
 Returns an array listing the events for which the emitter has registered
 listeners.
@@ -1332,7 +1377,7 @@ v6.0.0
 
 > **every**(`fn`, `options?`): `Promise`\<`boolean`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:584
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:585
 
 This method is similar to `Array.prototype.every` and calls *fn* on each chunk in the stream
 to check if all awaited return values are truthy value for *fn*. Once an *fn* call on a chunk
@@ -1383,7 +1428,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:76
 
 > **filter**(`fn`, `options?`): `Readable`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:512
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:513
 
 This method allows filtering the stream. For each chunk in the stream the *fn* function will be called
 and if it returns a truthy value, the chunk will be passed to the result stream.
@@ -1423,7 +1468,7 @@ v17.4.0, v16.14.0
 
 > **find**\<`T`\>(`fn`, `options?`): `Promise`\<`T` \| `undefined`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:567
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:568
 
 This method is similar to `Array.prototype.find` and calls *fn* on each chunk in the stream
 to find a chunk with a truthy value for *fn*. Once an *fn* call's awaited return value is truthy,
@@ -1467,7 +1512,7 @@ v17.5.0
 
 > **find**(`fn`, `options?`): `Promise`\<`any`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:571
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:572
 
 This method is similar to `Array.prototype.find` and calls *fn* on each chunk in the stream
 to find a chunk with a truthy value for *fn*. Once an *fn* call's awaited return value is truthy,
@@ -1507,7 +1552,7 @@ v17.5.0
 
 > **flatMap**(`fn`, `options?`): `Readable`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:598
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:599
 
 This method returns a new stream by applying the given callback to each chunk of the stream
 and then flattening the result.
@@ -1547,7 +1592,7 @@ v17.5.0
 
 > **forEach**(`fn`, `options?`): `Promise`\<`void`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:531
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:532
 
 This method allows iterating a stream. For each chunk in the stream the *fn* function will be called.
 If the *fn* function returns a promise - that promise will be `await`ed.
@@ -1592,7 +1637,7 @@ v17.5.0
 
 > **getMaxListeners**(): `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:161
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:161
 
 Returns the current max listener value for the `EventEmitter` which is either
 set by `emitter.setMaxListeners(n)` or defaults to
@@ -1634,7 +1679,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:57
 
 > **isPaused**(): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:335
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:336
 
 The `readable.isPaused()` method returns the current operating state of the `Readable`.
 This is used primarily by the mechanism that underlies the `readable.pipe()` method.
@@ -1668,7 +1713,7 @@ v0.11.14
 
 > **iterator**(`options?`): `AsyncIterator`\<`any`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:495
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:496
 
 The iterator created by this method gives users the option to cancel the destruction
 of the stream if the `for await...of` loop is exited by `return`, `break`, or `throw`,
@@ -1700,7 +1745,7 @@ v16.3.0
 
 > **listenerCount**\<`E`\>(`eventName`, `listener?`): `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1155
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1187
 
 Returns the number of listeners listening for the event named `eventName`.
 If `listener` is provided, it will return how many times the listener is found
@@ -1742,13 +1787,13 @@ v3.2.0
 
 > **listenerCount**(`eventName`, `listener?`): `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1159
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1191
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener?
 
@@ -1770,7 +1815,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **listeners**\<`E`\>(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1160
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1192
 
 Returns a copy of the array of listeners for the event named `eventName`.
 
@@ -1810,13 +1855,13 @@ v0.1.26
 
 > **listeners**(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1161
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1193
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### Returns
 
@@ -1832,7 +1877,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **map**(`fn`, `options?`): `Readable`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:503
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:504
 
 This method allows mapping over the stream. The *fn* function will be called for every chunk in the stream.
 If the *fn* function returns a promise - that promise will be `await`ed before being passed to the result stream.
@@ -1871,7 +1916,7 @@ v17.4.0, v16.14.0
 
 > **off**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1162
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1194
 
 Alias for `emitter.removeListener()`.
 
@@ -1907,13 +1952,13 @@ v10.0.0
 
 > **off**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1163
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1195
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1935,7 +1980,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **on**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1164
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1196
 
 Adds the `listener` function to the end of the listeners array for the
 event named `eventName`. No checks are made to see if the `listener` has
@@ -2002,13 +2047,13 @@ v0.1.101
 
 > **on**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1165
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1197
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -2030,7 +2075,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **once**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1166
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1198
 
 Adds a **one-time** `listener` function for the event named `eventName`. The
 next time `eventName` is triggered, this listener is removed and then invoked.
@@ -2094,13 +2139,13 @@ v0.3.0
 
 > **once**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1167
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1199
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -2156,7 +2201,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/ChildProcessStreamPipe.ts:62
 
 > **pause**(): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:299
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:300
 
 The `readable.pause()` method will cause a stream in flowing mode to stop
 emitting `'data'` events, switching out of flowing mode. Any data that
@@ -2195,7 +2240,7 @@ v0.9.4
 
 > **pipe**\<`T`\>(`destination`, `options?`): `T`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:10
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:11
 
 #### Type Parameters
 
@@ -2233,7 +2278,7 @@ v0.9.4
 
 > **prependListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1168
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1200
 
 Adds the `listener` function to the _beginning_ of the listeners array for the
 event named `eventName`. No checks are made to see if the `listener` has
@@ -2285,13 +2330,13 @@ v6.0.0
 
 > **prependListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1172
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1204
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -2313,7 +2358,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **prependOnceListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1173
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1205
 
 Adds a **one-time** `listener` function for the event named `eventName` to the
 _beginning_ of the listeners array. The next time `eventName` is triggered, this
@@ -2363,13 +2408,13 @@ v6.0.0
 
 > **prependOnceListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1177
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1209
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -2389,7 +2434,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **push**(`chunk`, `encoding?`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:455
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:456
 
 #### Parameters
 
@@ -2417,7 +2462,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **rawListeners**\<`E`\>(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1178
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1210
 
 Returns a copy of the array of listeners for the event named `eventName`,
 including any wrappers (such as those created by `.once()`).
@@ -2475,13 +2520,13 @@ v9.4.0
 
 > **rawListeners**(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1179
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1211
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### Returns
 
@@ -2497,7 +2542,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **read**(`size?`): `any`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:252
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:253
 
 The `readable.read()` method reads data out of the internal buffer and
 returns it. If no data is available to be read, `null` is returned. By default,
@@ -2601,7 +2646,7 @@ v0.9.4
 
 > **reduce**\<`T`\>(`fn`): `Promise`\<`T`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:630
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:631
 
 This method calls *fn* on each chunk of the stream in order, passing it the result from the calculation
 on the previous element. It returns a promise for the final value of the reduction.
@@ -2644,7 +2689,7 @@ v17.5.0
 
 > **reduce**\<`T`\>(`fn`, `initial`, `options?`): `Promise`\<`T`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:631
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:632
 
 This method calls *fn* on each chunk of the stream in order, passing it the result from the calculation
 on the previous element. It returns a promise for the final value of the reduction.
@@ -2701,7 +2746,7 @@ v17.5.0
 
 > **removeAllListeners**\<`E`\>(`eventName?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1181
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1213
 
 Removes all listeners, or those of the specified `eventName`.
 
@@ -2739,13 +2784,13 @@ v0.1.26
 
 > **removeAllListeners**(`eventName?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1182
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1214
 
 ##### Parameters
 
 ###### eventName?
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### Returns
 
@@ -2763,7 +2808,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **removeListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1183
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1215
 
 Removes the specified `listener` from the listener array for the event named
 `eventName`.
@@ -2881,13 +2926,13 @@ v0.1.26
 
 > **removeListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1187
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1219
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -2943,7 +2988,7 @@ v0.9.4
 
 > **setDefaultEncoding**(`encoding`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:903
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:935
 
 The `writable.setDefaultEncoding()` method sets the default `encoding` for a `Writable` stream.
 
@@ -2973,7 +3018,7 @@ v0.11.15
 
 > **setEncoding**(`encoding`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:277
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:278
 
 The `readable.setEncoding()` method sets the character encoding for
 data read from the `Readable` stream.
@@ -3022,7 +3067,7 @@ v0.9.4
 
 > **setMaxListeners**(`n`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:436
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:436
 
 By default `EventEmitter`s will print a warning if more than `10` listeners are
 added for a particular event. This is a useful default that helps finding
@@ -3056,7 +3101,7 @@ v0.3.5
 
 > **some**(`fn`, `options?`): `Promise`\<`boolean`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:553
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:554
 
 This method is similar to `Array.prototype.some` and calls *fn* on each chunk in the stream
 until the awaited return value is `true` (or any truthy value). Once an *fn* call on a chunk
@@ -3095,7 +3140,7 @@ v17.5.0
 
 > **take**(`limit`, `options?`): `Readable`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:615
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:616
 
 This method returns a new stream with the first *limit* chunks.
 
@@ -3131,7 +3176,7 @@ v17.5.0
 
 > **toArray**(`options?`): `Promise`\<`any`[]\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:543
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:544
 
 This method allows easily obtaining the contents of a stream.
 
@@ -3164,7 +3209,7 @@ v17.5.0
 
 > **uncork**(): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:991
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1023
 
 The `writable.uncork()` method flushes all data buffered since [cork](../../BufferWriteableStream/classes/BufferWriteableStream.md#cork) was called.
 
@@ -3215,7 +3260,7 @@ v0.11.2
 
 > **unpipe**(`destination?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:362
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:363
 
 The `readable.unpipe()` method detaches a `Writable` stream previously attached
 using the [pipe](../../BufferWriteableStream/classes/BufferWriteableStream.md#pipe) method.
@@ -3266,7 +3311,7 @@ v0.9.4
 
 > **unshift**(`chunk`, `encoding?`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:428
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:429
 
 Passing `chunk` as `null` signals the end of the stream (EOF) and behaves the
 same as `readable.push(null)`, after which no more data can be written. The EOF
@@ -3361,7 +3406,7 @@ v0.9.11
 
 > **wrap**(`stream`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:454
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:455
 
 Prior to Node.js 0.10, streams did not implement the entire `node:stream` module API as it is currently defined. (See `Compatibility` for more
 information.)
@@ -3413,7 +3458,7 @@ v0.9.4
 
 > **write**(`chunk`, `callback?`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:886
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:918
 
 The `writable.write()` method writes some data to the stream, and calls the
 supplied `callback` once the data has been fully handled. If an error
@@ -3497,7 +3542,7 @@ v0.9.4
 
 > **write**(`chunk`, `encoding`, `callback?`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:897
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:929
 
 Writes data to the stream, with an explicit encoding for string data.
 
@@ -3546,7 +3591,7 @@ v0.9.4
 
 > `static` **from**(`src`): `Duplex`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1106
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1138
 
 A utility method for creating duplex streams.
 
@@ -3570,7 +3615,7 @@ A utility method for creating duplex streams.
 
 ##### src
 
-`string` | `Promise`\<`any`\> | `ReadableStream`\<`any`\> | `WritableStream` | `Iterable`\<`any`, `any`, `any`\> | `AsyncIterable`\<`any`, `any`, `any`\> | `WritableStream`\<`any`\> | `ReadableStream` | `Blob` | (`source`) => `AsyncIterable`\<`any`\> | (`source`) => `Promise`\<`void`\> | `ReadableWritablePair`\<`any`, `any`\>
+`string` \| `Promise`\<`any`\> \| `ReadableStream`\<`any`\> \| `WritableStream` \| `Iterable`\<`any`, `any`, `any`\> \| `AsyncIterable`\<`any`, `any`, `any`\> \| `WritableStream`\<`any`\> \| `ReadableStream` \| `Blob` \| ((`source`) => `AsyncIterable`\<`any`\>) \| ((`source`) => `Promise`\<`void`\>) \| `ReadableWritablePair`\<`any`, `any`\>
 
 #### Returns
 
@@ -3590,7 +3635,7 @@ v16.8.0
 
 > `static` **fromWeb**(`duplexStream`, `options?`): `Duplex`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1130
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1162
 
 A utility method for creating a `Duplex` from a web `ReadableStream` and `WritableStream`.
 
@@ -3622,7 +3667,7 @@ v17.0.0
 
 > `static` **toWeb**(`streamDuplex`, `options?`): `ReadableWritablePair`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1125
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1157
 
 A utility method for creating a web `ReadableStream` and `WritableStream` from a `Duplex`.
 

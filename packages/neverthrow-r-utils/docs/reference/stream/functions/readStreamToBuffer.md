@@ -16,7 +16,7 @@ Consume a readStream
 
 ### readStream
 
-`Readable` | `ReadableStream`\<`any`\>
+`Readable` \| `ReadableStream`\<`any`\>
 
 ## Returns
 
