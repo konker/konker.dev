@@ -6,7 +6,7 @@
 
 # Function: andParseAsyncR()
 
-> **andParseAsyncR**\<`I`, `O`\>(`schema`, `options?`): \<`R`, `E`\>(`rr`) => `ResultAsyncR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+> **andParseAsyncR**\<`I`, `O`\>(`schema`, `options?`): \<`R`, `E`\>(`rr`) => `ResultAsyncR`\<`R`, `O`, `E` \| [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
 
 Defined in: [async.ts:65](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-schema/src/async.ts#L65)
 
@@ -34,4 +34,4 @@ Parses the success value of a `ResultR`, returning a `ResultAsyncR`.
 
 ## Returns
 
-\<`R`, `E`\>(`rr`) => `ResultAsyncR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+\<`R`, `E`\>(`rr`) => `ResultAsyncR`\<`R`, `O`, `E` \| [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
