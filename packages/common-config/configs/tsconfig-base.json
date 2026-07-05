@@ -10,8 +10,9 @@
 
     /* Base Options: */
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "target": "es2022",
+    "target": "es2023",
     "allowJs": false,
     "resolveJsonModule": true,
     "moduleDetection": "force",
@@ -31,6 +32,9 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "libReplacement": false,
+    "noUncheckedSideEffectImports": true,
+    "stableTypeOrdering": true,
 
     /* If transpiling with TypeScript: */
     "module": "NodeNext",
