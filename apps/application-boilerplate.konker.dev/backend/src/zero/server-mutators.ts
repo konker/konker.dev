@@ -1,4 +1,4 @@
-import { mutators } from '@konker.dev/application-boilerplate.konker.dev-zerosync/mutators';
+import { mutators } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/mutators';
 
 // --------------------------------------------------------------------------
 // Server-authoritative mutators. For this slice they are identical to the

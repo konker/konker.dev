@@ -2,9 +2,9 @@
 // Imperative glue to Zero's server handlers (async/await over postgres.js).
 import { timingSafeEqual } from 'node:crypto';
 
-import type { AuthData } from '@konker.dev/application-boilerplate.konker.dev-zerosync/auth';
-import { queries } from '@konker.dev/application-boilerplate.konker.dev-zerosync/queries';
-import { schema } from '@konker.dev/application-boilerplate.konker.dev-zerosync/schema';
+import type { AuthData } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/auth';
+import { queries } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/queries';
+import { schema } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/schema';
 import { mustGetMutator, mustGetQuery, type ReadonlyJSONValue } from '@rocicorp/zero';
 import { handleMutateRequest, handleQueryRequest } from '@rocicorp/zero/server';
 import type { Context } from 'hono';
