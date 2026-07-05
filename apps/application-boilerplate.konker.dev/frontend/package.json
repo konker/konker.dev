@@ -17,7 +17,7 @@
     "cd": "echo NOOP"
   },
   "dependencies": {
-    "@konker.dev/application-boilerplate.konker.dev-zerosync": "workspace:*",
+    "@konker.dev/zero-sync-common.application-boilerplate.konker.dev": "workspace:*",
     "@rocicorp/zero": "^1.7.0",
     "jose": "^6.2.3",
     "solid-js": "^1.9.14",

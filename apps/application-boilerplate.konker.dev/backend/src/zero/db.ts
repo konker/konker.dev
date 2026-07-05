@@ -1,5 +1,5 @@
 /* eslint-disable fp/no-throw, fp/no-let, fp/no-mutation, fp/no-nil, @typescript-eslint/consistent-type-definitions */
-import { schema } from '@konker.dev/application-boilerplate.konker.dev-zerosync/schema';
+import { schema } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/schema';
 import { zeroPostgresJS } from '@rocicorp/zero/server/adapters/postgresjs';
 
 // --------------------------------------------------------------------------
