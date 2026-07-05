@@ -64,24 +64,6 @@ jobs:
           role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
-      # Assume config management role and export config (chains from the CI role)
-      - name: Configure AWS credentials (Configuration management role)
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/config-management-role-development-application-boilerplate"
-          role-external-id: "configuration-management-access"
-          role-chaining: true
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
-          role-skip-session-tagging: true # apparently we cannot avoid this
-      # TODO
-
-      # Re-establish the CI role base (config-management role cannot assume other roles)
-      - name: Configure AWS credentials (CI OIDC role, for deployment)
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: "arn:aws:iam::047719649582:role/infra/ci-application-boilerplate-konker-dev"
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
       # Assume application deployment role (chains from the CI role)
       - name: Configure AWS credentials (Application deployment role)
         uses: aws-actions/configure-aws-credentials@v6
