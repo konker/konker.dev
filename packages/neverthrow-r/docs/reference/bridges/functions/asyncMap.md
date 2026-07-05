@@ -37,27 +37,7 @@ The output success type.
 
 ## Returns
 
-> \<`R`, `E`\>(`rr`): [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `B`, `E`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### E
-
-`E`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `A`, `E`\>
-
-### Returns
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `B`, `E`\>
+\<`R`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R`, `B`, `E`\>
 
 ## Remarks
 

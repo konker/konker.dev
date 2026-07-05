@@ -66,8 +66,8 @@ export async function zeroMutateHandler(c: Context): Promise<Response> {
 
   const response = await handleMutateRequest(
     getDbProvider(),
-    (transact) =>
-      transact((tx, name, args) => {
+    async (transact) =>
+      transact(async (tx, name, args) => {
         const mutator = mustGetMutator(serverMutators, name);
         return mutator.fn({ tx, args, ctx: authData });
       }),

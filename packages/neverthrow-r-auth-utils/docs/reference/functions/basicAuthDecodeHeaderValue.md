@@ -14,7 +14,7 @@ Defined in: [basic-auth.ts:50](https://github.com/konker/konker.dev/blob/main/pa
 
 ### basicAuthHeaderValue
 
-`string` | `undefined`
+`string` \| `undefined`
 
 ## Returns
 

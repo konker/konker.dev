@@ -47,27 +47,7 @@ scope.
 
 ## Returns
 
-> \<`R1`, `E1`\>(`rr`): [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### E1
-
-`E1`
-
-### Parameters
-
-#### rr
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1`, `S`, `E1`\>
-
-### Returns
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
 
 ## Example
 

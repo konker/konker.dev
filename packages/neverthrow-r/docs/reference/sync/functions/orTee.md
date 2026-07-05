@@ -30,27 +30,7 @@ Side-effecting callback receiving the error value.
 
 ## Returns
 
-> \<`R`, `T`\>(`rr`): [`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `E`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### T
-
-`T`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `E`\>
-
-### Returns
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `E`\>
+\<`R`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `E`\>
 
 ## Remarks
 

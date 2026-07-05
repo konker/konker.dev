@@ -49,7 +49,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/BufferWriteableStream.ts:13]
 
 > `readonly` **closed**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:809
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:841
 
 Is `true` after `'close'` has been emitted.
 
@@ -67,7 +67,7 @@ v18.0.0
 
 > **destroyed**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:804
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:836
 
 Is `true` after `writable.destroy()` has been called.
 
@@ -85,7 +85,7 @@ v8.0.0
 
 > `readonly` **errored**: `Error` \| `null`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:814
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:846
 
 Returns error if the stream has been destroyed with an error.
 
@@ -103,7 +103,7 @@ v18.0.0
 
 > **writable**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:760
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:792
 
 Is `true` if it is safe to call `writable.write()`, which means
 the stream has not been destroyed, errored, or ended.
@@ -122,7 +122,7 @@ v11.4.0
 
 > `readonly` **writableAborted**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:765
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:797
 
 Returns whether the stream was destroyed or errored before emitting `'finish'`.
 
@@ -140,7 +140,7 @@ v18.0.0, v16.17.0
 
 > `readonly` **writableCorked**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:799
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:831
 
 Number of times `writable.uncork()` needs to be
 called in order to fully uncork the stream.
@@ -159,7 +159,7 @@ v13.2.0, v12.16.0
 
 > `readonly` **writableEnded**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:771
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:803
 
 Is `true` after `writable.end()` has been called. This property
 does not indicate whether the data has been flushed, for this use `writable.writableFinished` instead.
@@ -178,7 +178,7 @@ v12.9.0
 
 > `readonly` **writableFinished**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:776
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:808
 
 Is set to `true` immediately before the `'finish'` event is emitted.
 
@@ -196,7 +196,7 @@ v12.6.0
 
 > `readonly` **writableHighWaterMark**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:781
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:813
 
 Return the value of `highWaterMark` passed when creating this `Writable`.
 
@@ -214,7 +214,7 @@ v9.3.0
 
 > `readonly` **writableLength**: `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:788
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:820
 
 This property contains the number of bytes (or objects) in the queue
 ready to be written. The value provides introspection data regarding
@@ -234,7 +234,7 @@ v9.4.0
 
 > `readonly` **writableNeedDrain**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:819
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:851
 
 Is `true` if the stream's buffer has been full and stream will emit `'drain'`.
 
@@ -252,7 +252,7 @@ v15.2.0, v14.17.0
 
 > `readonly` **writableObjectMode**: `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:793
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:825
 
 Getter for the property `objectMode` of a given `Writable` stream.
 
@@ -318,7 +318,7 @@ Get the contents of the buffer as a UTF-8 string
 
 > `optional` **\_construct**(`callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:828
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:860
 
 #### Parameters
 
@@ -340,13 +340,13 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **\_destroy**(`error`, `callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:829
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:861
 
 #### Parameters
 
 ##### error
 
-`Error` | `null`
+`Error` \| `null`
 
 ##### callback
 
@@ -366,7 +366,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **\_final**(`callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:830
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:862
 
 #### Parameters
 
@@ -418,7 +418,7 @@ Defined in: [packages/neverthrow-r-utils/src/stream/BufferWriteableStream.ts:20]
 
 > `optional` **\_writev**(`chunks`, `callback`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:821
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:853
 
 #### Parameters
 
@@ -444,7 +444,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **\[asyncDispose\]**(): `Promise`\<`void`\>
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1014
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1046
 
 Calls `writable.destroy()` with an `AbortError` and returns
 a promise that fulfills when the stream is finished.
@@ -467,7 +467,7 @@ v22.4.0, v20.16.0
 
 > `optional` **\[captureRejectionSymbol\]**(`error`, `event`, ...`args`): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:87
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:87
 
 The `Symbol.for('nodejs.rejection')` method is called in case a
 promise rejection happens when emitting an event and
@@ -502,7 +502,7 @@ class MyClass extends EventEmitter {
 
 ##### event
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### args
 
@@ -528,7 +528,7 @@ v13.4.0, v12.16.0
 
 > **addListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1016
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1048
 
 Alias for `emitter.on(eventName, listener)`.
 
@@ -564,13 +564,13 @@ v0.1.26
 
 > **addListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1020
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1052
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -590,7 +590,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **cork**(): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:957
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:989
 
 The `writable.cork()` method forces all written data to be buffered in memory.
 The buffered data will be flushed when either the [uncork](#uncork) or [end](#end) methods are called.
@@ -622,7 +622,7 @@ v0.11.2
 
 > **destroy**(`error?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1008
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1040
 
 Destroy the stream. Optionally emit an `'error'` event, and emit a `'close'` event (unless `emitClose` is set to `false`). After this call, the writable
 stream has ended and subsequent calls to `write()` or `end()` will result in
@@ -665,7 +665,7 @@ v8.0.0
 
 > **emit**\<`E`\>(`eventName`, ...`args`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1021
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1053
 
 Synchronously calls each of the listeners registered for the event named
 `eventName`, in the order they were registered, passing the supplied arguments
@@ -738,13 +738,13 @@ v0.1.26
 
 > **emit**(`eventName`, ...`args`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1022
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1054
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### args
 
@@ -766,7 +766,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **end**(`cb?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:923
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:955
 
 Calling the `writable.end()` method signals that no more data will be written
 to the `Writable`. The optional `chunk` and `encoding` arguments allow one
@@ -808,7 +808,7 @@ v0.9.4
 
 > **end**(`chunk`, `cb?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:932
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:964
 
 Signals that no more data will be written, with one final chunk of data.
 
@@ -847,7 +847,7 @@ v0.9.4
 
 > **end**(`chunk`, `encoding`, `cb?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:942
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:974
 
 Signals that no more data will be written, with one final chunk of data.
 
@@ -894,7 +894,7 @@ v0.9.4
 
 > **eventNames**(): (`string` \| `symbol`)[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:154
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:154
 
 Returns an array listing the events for which the emitter has registered
 listeners.
@@ -931,7 +931,7 @@ v6.0.0
 
 > **getMaxListeners**(): `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:161
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:161
 
 Returns the current max listener value for the `EventEmitter` which is either
 set by `emitter.setMaxListeners(n)` or defaults to
@@ -957,7 +957,7 @@ v1.0.0
 
 > **listenerCount**\<`E`\>(`eventName`, `listener?`): `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1023
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1055
 
 Returns the number of listeners listening for the event named `eventName`.
 If `listener` is provided, it will return how many times the listener is found
@@ -999,13 +999,13 @@ v3.2.0
 
 > **listenerCount**(`eventName`, `listener?`): `number`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1027
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1059
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener?
 
@@ -1027,7 +1027,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **listeners**\<`E`\>(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1028
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1060
 
 Returns a copy of the array of listeners for the event named `eventName`.
 
@@ -1067,13 +1067,13 @@ v0.1.26
 
 > **listeners**(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1029
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1061
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### Returns
 
@@ -1091,7 +1091,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **off**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1030
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1062
 
 Alias for `emitter.removeListener()`.
 
@@ -1127,13 +1127,13 @@ v10.0.0
 
 > **off**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1031
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1063
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1155,7 +1155,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **on**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1032
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1064
 
 Adds the `listener` function to the end of the listeners array for the
 event named `eventName`. No checks are made to see if the `listener` has
@@ -1222,13 +1222,13 @@ v0.1.101
 
 > **on**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1033
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1065
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1250,7 +1250,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **once**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1034
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1066
 
 Adds a **one-time** `listener` function for the event named `eventName`. The
 next time `eventName` is triggered, this listener is removed and then invoked.
@@ -1314,13 +1314,13 @@ v0.3.0
 
 > **once**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1038
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1070
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1340,7 +1340,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **pipe**\<`T`\>(`destination`, `options?`): `T`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:10
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:11
 
 #### Type Parameters
 
@@ -1378,7 +1378,7 @@ v0.9.4
 
 > **prependListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1039
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1071
 
 Adds the `listener` function to the _beginning_ of the listeners array for the
 event named `eventName`. No checks are made to see if the `listener` has
@@ -1430,13 +1430,13 @@ v6.0.0
 
 > **prependListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1043
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1075
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1458,7 +1458,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **prependOnceListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1044
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1076
 
 Adds a **one-time** `listener` function for the event named `eventName` to the
 _beginning_ of the listeners array. The next time `eventName` is triggered, this
@@ -1508,13 +1508,13 @@ v6.0.0
 
 > **prependOnceListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1048
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1080
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1536,7 +1536,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **rawListeners**\<`E`\>(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1049
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1081
 
 Returns a copy of the array of listeners for the event named `eventName`,
 including any wrappers (such as those created by `.once()`).
@@ -1594,13 +1594,13 @@ v9.4.0
 
 > **rawListeners**(`eventName`): (...`args`) => `void`[]
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1050
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1082
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### Returns
 
@@ -1618,7 +1618,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **removeAllListeners**\<`E`\>(`eventName?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1052
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1084
 
 Removes all listeners, or those of the specified `eventName`.
 
@@ -1656,13 +1656,13 @@ v0.1.26
 
 > **removeAllListeners**(`eventName?`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1053
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1085
 
 ##### Parameters
 
 ###### eventName?
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ##### Returns
 
@@ -1680,7 +1680,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **removeListener**\<`E`\>(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1054
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1086
 
 Removes the specified `listener` from the listener array for the event named
 `eventName`.
@@ -1798,13 +1798,13 @@ v0.1.26
 
 > **removeListener**(`eventName`, `listener`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:1058
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1090
 
 ##### Parameters
 
 ###### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ###### listener
 
@@ -1824,7 +1824,7 @@ Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/str
 
 > **setDefaultEncoding**(`encoding`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:903
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:935
 
 The `writable.setDefaultEncoding()` method sets the default `encoding` for a `Writable` stream.
 
@@ -1854,7 +1854,7 @@ v0.11.15
 
 > **setMaxListeners**(`n`): `this`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/events.d.ts:436
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/events.d.ts:436
 
 By default `EventEmitter`s will print a warning if more than `10` listeners are
 added for a particular event. This is a useful default that helps finding
@@ -1888,7 +1888,7 @@ v0.3.5
 
 > **uncork**(): `void`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:991
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:1023
 
 The `writable.uncork()` method flushes all data buffered since [cork](#cork) was called.
 
@@ -1941,7 +1941,7 @@ v0.11.2
 
 > **write**(`chunk`, `callback?`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:886
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:918
 
 The `writable.write()` method writes some data to the stream, and calls the
 supplied `callback` once the data has been fully handled. If an error
@@ -2025,7 +2025,7 @@ v0.9.4
 
 > **write**(`chunk`, `encoding`, `callback?`): `boolean`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:897
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:929
 
 Writes data to the stream, with an explicit encoding for string data.
 
@@ -2074,7 +2074,7 @@ v0.9.4
 
 > `static` **fromWeb**(`writableStream`, `options?`): `Writable`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:746
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:778
 
 A utility method for creating a `Writable` from a web `WritableStream`.
 
@@ -2106,7 +2106,7 @@ v17.0.0
 
 > `static` **toWeb**(`streamWritable`): `WritableStream`
 
-Defined in: node\_modules/.pnpm/@types+node@25.8.0/node\_modules/@types/node/stream.d.ts:754
+Defined in: node\_modules/.pnpm/@types+node@26.1.0/node\_modules/@types/node/stream.d.ts:786
 
 A utility method for creating a web `WritableStream` from a `Writable`.
 

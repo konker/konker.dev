@@ -36,6 +36,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "sourceMap": true,
+    "types": ["node"],
 
     /* AND if you're building for a library: */
     "declaration": true,

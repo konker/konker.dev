@@ -54,33 +54,7 @@ Handler for the error branch.
 
 ## Returns
 
-> \<`R`\>(`rr`): (`r`) => `A` \| `B`
-
-### Type Parameters
-
-#### R
-
-`R`
-
-### Parameters
-
-#### rr
-
-[`ResultR`](../../types/type-aliases/ResultR.md)\<`R`, `T`, `E`\>
-
-### Returns
-
-> (`r`): `A` \| `B`
-
-#### Parameters
-
-##### r
-
-`R`
-
-#### Returns
-
-`A` \| `B`
+\<`R`\>(`rr`) => (`r`) => `A` \| `B`
 
 ## Remarks
 

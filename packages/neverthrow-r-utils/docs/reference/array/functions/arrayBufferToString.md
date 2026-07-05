@@ -14,7 +14,7 @@ Defined in: [packages/neverthrow-r-utils/src/array.ts:5](https://github.com/konk
 
 ### a
 
-`ArrayBuffer` | `ArrayBufferView`\<`ArrayBufferLike`\>
+`ArrayBuffer` \| `ArrayBufferView`\<`ArrayBufferLike`\>
 
 ## Returns
 

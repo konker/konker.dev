@@ -178,16 +178,16 @@ describe('S3 URI Utils', () => {
     });
 
     it('should fail correctly', async () => {
-      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url('http://foobucket/bar/baz/qux.csv'))).rejects.toThrow(
-        '[s3-uri-utils] Incorrect protocol'
-      );
-      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url('s3://FooBucket/bar/baz/qux.csv'))).rejects.toThrow(
-        's3-uri-utils] S3 URLs must have a lower case bucket component'
-      );
-      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url('s3://'))).rejects.toThrow(
+      await expect(async () =>
+        Effect.runPromise(s3UriUtils.parseS3Url('http://foobucket/bar/baz/qux.csv'))
+      ).rejects.toThrow('[s3-uri-utils] Incorrect protocol');
+      await expect(async () =>
+        Effect.runPromise(s3UriUtils.parseS3Url('s3://FooBucket/bar/baz/qux.csv'))
+      ).rejects.toThrow('s3-uri-utils] S3 URLs must have a lower case bucket component');
+      await expect(async () => Effect.runPromise(s3UriUtils.parseS3Url('s3://'))).rejects.toThrow(
         '[s3-uri-utils] Could not determine bucket name'
       );
-      await expect(() => Effect.runPromise(s3UriUtils.parseS3Url(''))).rejects.toThrow('ERR_INVALID_URL');
+      await expect(async () => Effect.runPromise(s3UriUtils.parseS3Url(''))).rejects.toThrow('ERR_INVALID_URL');
     });
   });
 });

@@ -51,8 +51,7 @@ export type AwsCognitoJwtVerifierFactoryVerifierMultiFactory = <T extends Cognit
 // --------------------------------------------------------------------------
 export type AwsCognitoJwtVerifierFactoryDeps = {
   readonly awsCognitoJwtVerifierFactory:
-    | AwsCognitoJwtVerifierFactory
-    | AwsCognitoJwtVerifierFactoryVerifierMultiFactory;
+    AwsCognitoJwtVerifierFactory | AwsCognitoJwtVerifierFactoryVerifierMultiFactory;
 };
 export const AwsCognitoJwtVerifierFactoryDeps = Context.GenericTag<AwsCognitoJwtVerifierFactoryDeps>(
   '@aws-cognito-jwt-verify-effect/AwsJwtVerifierFactoryDeps'
@@ -127,7 +126,7 @@ export const awsCognitoJwtVerifierVerify = <
   return pipe(
     AwsCognitoJwtVerifierDeps<SpecificVerifyProperties, IssuerConfig, MultiIssuer>(),
     Effect.flatMap((deps) =>
-      Effect.tryPromise({ try: () => deps.awsJwtVerifier.verify(...params), catch: toJwtVerifyError })
+      Effect.tryPromise({ try: async () => deps.awsJwtVerifier.verify(...params), catch: toJwtVerifyError })
     )
   );
 };

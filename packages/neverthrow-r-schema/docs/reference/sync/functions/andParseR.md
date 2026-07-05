@@ -34,24 +34,4 @@ Parses the success value of a `ResultR`.
 
 ## Returns
 
-> \<`R`, `E`\>(`rr`): `ResultR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
-
-### Type Parameters
-
-#### R
-
-`R`
-
-#### E
-
-`E`
-
-### Parameters
-
-#### rr
-
-`ResultR`\<`R`, `I`, `E`\>
-
-### Returns
-
-`ResultR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+\<`R`, `E`\>(`rr`) => `ResultR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>

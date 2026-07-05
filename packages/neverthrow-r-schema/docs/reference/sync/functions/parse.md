@@ -34,17 +34,7 @@ Builds a sync parser for a Standard Schema.
 
 ## Returns
 
-> (`input`): `Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
-
-### Parameters
-
-#### input
-
-`I`
-
-### Returns
-
-`Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
+(`input`) => `Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
 
 ## Remarks
 

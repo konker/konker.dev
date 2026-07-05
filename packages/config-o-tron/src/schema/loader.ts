@@ -68,7 +68,7 @@ export function loadSchema(
 
           return pipe(
             Effect.tryPromise({
-              try: () => import(fileUrl),
+              try: async () => import(fileUrl),
               catch: () => fileNotFoundError(absolutePath),
             }),
             Effect.flatMap((module: Record<string, unknown>) => {

@@ -4,7 +4,7 @@
 
 [@konker.dev/neverthrow-r](../../modules.md) / [types](../README.md) / ResultR
 
-# Type Alias: ResultR()\<R, T, E\>
+# Type Alias: ResultR\<R, T, E\>
 
 > **ResultR**\<`R`, `T`, `E`\> = (`r`) => `Result`\<`T`, `E`\>
 

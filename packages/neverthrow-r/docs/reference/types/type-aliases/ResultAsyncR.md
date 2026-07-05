@@ -4,7 +4,7 @@
 
 [@konker.dev/neverthrow-r](../../modules.md) / [types](../README.md) / ResultAsyncR
 
-# Type Alias: ResultAsyncR()\<R, T, E\>
+# Type Alias: ResultAsyncR\<R, T, E\>
 
 > **ResultAsyncR**\<`R`, `T`, `E`\> = (`r`) => `ResultAsync`\<`T`, `E`\>
 

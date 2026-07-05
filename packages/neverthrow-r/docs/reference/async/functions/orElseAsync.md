@@ -38,27 +38,7 @@ Async variant of orElse. The recovery returns a `ResultAsyncR`.
 
 ## Returns
 
-> \<`R1`, `T`\>(`rr`): [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
-
-### Type Parameters
-
-#### R1
-
-`R1`
-
-#### T
-
-`T`
-
-### Parameters
-
-#### rr
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1`, `T`, `E`\>
-
-### Returns
-
-[`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+\<`R1`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
 
 ## Example
 

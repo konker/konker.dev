@@ -113,7 +113,7 @@ export const awsJwtVerifierVerify = <
   return pipe(
     AwsJwtVerifierDeps<SpecificVerifyProperties, IssuerConfig, MultiIssuer>(),
     Effect.flatMap((deps) =>
-      Effect.tryPromise({ try: () => deps.awsJwtVerifier.verify(...params), catch: toJwtVerifyError })
+      Effect.tryPromise({ try: async () => deps.awsJwtVerifier.verify(...params), catch: toJwtVerifyError })
     )
   );
 };

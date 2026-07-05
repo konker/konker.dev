@@ -14,7 +14,7 @@ Defined in: [jwt/common.ts:25](https://github.com/konker/konker.dev/blob/main/pa
 
 ### payload
 
-`string` | `JwtPayload` | `null`
+`string` \| `JwtPayload` \| `null`
 
 ## Returns
 

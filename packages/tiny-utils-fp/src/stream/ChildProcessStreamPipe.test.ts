@@ -66,7 +66,7 @@ describe('ChildProcessStreamPipe', () => {
     const actual = new unit.ChildProcessStreamPipe('cat', ['/tmp/LICENSE']);
     inStream.pipe(actual).pipe(outStream);
 
-    expect(() => {
+    expect(async () => {
       return waitForWriteStreamPromise(outStream);
     }).toBeDefined();
   });
@@ -80,7 +80,7 @@ describe('ChildProcessStreamPipe', () => {
     const actual = new unit.ChildProcessStreamPipe('cat', ['/tmp/doesnotexist']);
     inStream.pipe(actual).pipe(outStream);
 
-    expect(() => {
+    expect(async () => {
       return waitForWriteStreamPromise(outStream);
     }).toBeDefined();
   });

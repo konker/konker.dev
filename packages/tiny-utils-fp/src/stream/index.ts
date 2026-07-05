@@ -30,7 +30,7 @@ export function readStreamToBuffer(readStream: Readable | ReadableStream): Effec
 /**
  * Wait for a writable stream to finish
  */
-export function waitForWriteStreamPromise(writeStream: Writable): Promise<void> {
+export async function waitForWriteStreamPromise(writeStream: Writable): Promise<void> {
   return new Promise((resolve, reject) => {
     writeStream.on('finish', resolve);
     writeStream.on('error', reject);
@@ -42,7 +42,7 @@ export function waitForWriteStreamPromise(writeStream: Writable): Promise<void> 
  */
 export function waitForWriteStream(writeStream: Writable): Effect.Effect<void, Error> {
   return Effect.tryPromise({
-    try: () =>
+    try: async () =>
       new Promise((resolve, reject) => {
         writeStream.on('finish', resolve);
         writeStream.on('error', reject);
@@ -56,7 +56,7 @@ export function waitForWriteStream(writeStream: Writable): Effect.Effect<void, E
  */
 export function waitForStreamPipe(readStream: Readable, writeStream: Writable): Effect.Effect<number, Error> {
   return Effect.tryPromise({
-    try: () =>
+    try: async () =>
       new Promise((resolve, reject) => {
         // eslint-disable-next-line fp/no-let
         let size = 0;

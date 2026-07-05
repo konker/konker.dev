@@ -43,7 +43,7 @@ describe('tiny-fetch-fp', () => {
         text: async () => TEST_BODY_NON_JSON,
       } as never);
 
-      const actual = () => Effect.runPromise(underTest('https://example.com/'));
+      const actual = async () => Effect.runPromise(underTest('https://example.com/'));
       await expect(actual).rejects.toThrow('"not_json" is not valid JSON');
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });

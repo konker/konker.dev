@@ -14,22 +14,8 @@ Defined in: [aws-authorizer.ts:15](https://github.com/konker/konker.dev/blob/mai
 
 ### effect
 
-`"Allow"` | `"Deny"`
+`"Allow"` \| `"Deny"`
 
 ## Returns
 
-> (`principalId`, `lambdaArn`): `APIGatewayAuthorizerResult`
-
-### Parameters
-
-#### principalId
-
-`string`
-
-#### lambdaArn
-
-`string`
-
-### Returns
-
-`APIGatewayAuthorizerResult`
+(`principalId`, `lambdaArn`) => `APIGatewayAuthorizerResult`

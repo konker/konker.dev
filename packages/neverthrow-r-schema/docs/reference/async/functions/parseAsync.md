@@ -34,17 +34,7 @@ Builds an async parser for a Standard Schema.
 
 ## Returns
 
-> (`input`): `ResultAsync`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
-
-### Parameters
-
-#### input
-
-`I`
-
-### Returns
-
-`ResultAsync`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
+(`input`) => `ResultAsync`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
 
 ## Remarks
 

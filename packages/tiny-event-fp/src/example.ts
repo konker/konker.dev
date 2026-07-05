@@ -19,7 +19,7 @@ const prog = pipe(
   // Add a listener for the End event
   Effect.flatMap(E.addListener('End' as ExampleType, () => Console.log('END DETECTED'))),
 
-  // Add a listener for the Number event, and implement FizzBuzz
+  // Add a listener for the Number event and implement FizzBuzz
   Effect.flatMap(
     E.addListener('Num' as ExampleType, (_, n) => {
       if (n === undefined) return Effect.fail(new Error('No number given!'));
@@ -47,6 +47,6 @@ const prog = pipe(
 
 // Execute the program
 // eslint-disable-next-line fp/no-unused-expression
-(async function main() {
+await (async function main() {
   return Effect.runPromise(prog);
 })().catch(console.error);
