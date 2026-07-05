@@ -1,4 +1,4 @@
-import { mutators } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/mutators';
+import { mutators } from '../../zero-sync/mutators.js';
 
 // --------------------------------------------------------------------------
 // Server-authoritative mutators. For this slice they are identical to the

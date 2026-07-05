@@ -2,16 +2,16 @@
 // Imperative glue to Zero's server handlers (async/await over postgres.js).
 import { timingSafeEqual } from 'node:crypto';
 
-import type { AuthData } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/auth';
-import { queries } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/queries';
-import { schema } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/schema';
 import { mustGetMutator, mustGetQuery, type ReadonlyJSONValue } from '@rocicorp/zero';
 import { handleMutateRequest, handleQueryRequest } from '@rocicorp/zero/server';
 import type { Context } from 'hono';
 import { jwtVerify } from 'jose';
 
-import { getDbProvider } from '../../zero/db.js';
-import { serverMutators } from '../../zero/server-mutators.js';
+import type { AuthData } from '../../zero-sync/auth.js';
+import { queries } from '../../zero-sync/queries.js';
+import { schema } from '../../zero-sync/schema.js';
+import { getDbProvider } from './db.js';
+import { serverMutators } from './server-mutators.js';
 
 // --------------------------------------------------------------------------
 // Service auth: Zero sends the configured query/mutate API key in `X-Api-Key`.

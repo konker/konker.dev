@@ -9,7 +9,6 @@ on:
 #    paths:
 #      - 'apps/application-boilerplate.konker.dev/backend/src/**'
 #      - 'apps/application-boilerplate.konker.dev/backend/deployment/kubernetes/**'
-#      - 'apps/application-boilerplate.konker.dev/zerosync/src/**'
 
 env:
   CWD: './apps/application-boilerplate.konker.dev/backend'
@@ -61,8 +60,8 @@ jobs:
       - name: Build and push backend container to ECR (Development)
         run: |
           cd ${{ env.CWD }}
-          # Build the backend's entire workspace dependency graph (zerosync,
-          # middleware-fp and its transitive workspace deps) so each package's
+          # Build the backend's entire workspace dependency graph (middleware-fp
+          # and its transitive workspace deps) so each package's
           # dist/ exists before build:prod packages the backend via
           # `pnpm deploy --prod`. `^...` selects dependencies only, not the
           # backend itself (build-container builds that via tsup).

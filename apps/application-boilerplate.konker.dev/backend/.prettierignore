@@ -1,3 +1,4 @@
 sst-env.d.ts
 **/bruno.json
 src/database/drizzle
+src/zero-sync/schema.gen.ts

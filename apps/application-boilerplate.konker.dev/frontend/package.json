@@ -6,9 +6,9 @@
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
   "scripts": {
-    "predev": "pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build",
+    "predev": "pnpm --filter @konker.dev/application-boilerplate.konker.dev run build",
     "dev": "vite",
-    "prebuild": "pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build",
+    "prebuild": "pnpm --filter @konker.dev/application-boilerplate.konker.dev run build",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -17,7 +17,7 @@
     "cd": "echo NOOP"
   },
   "dependencies": {
-    "@konker.dev/zero-sync-common.application-boilerplate.konker.dev": "workspace:*",
+    "@konker.dev/application-boilerplate.konker.dev": "workspace:*",
     "@rocicorp/zero": "^1.7.0",
     "jose": "^6.2.3",
     "solid-js": "^1.9.14",
