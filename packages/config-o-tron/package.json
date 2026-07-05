@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/config-o-tron",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -197,7 +197,7 @@
     "@effect/language-service": "^0.86.4",
     "@eslint/compat": "^2.1.0",
     "@eslint/js": "^10.0.1",
-    "@konker.dev/common-config": "^0.8.0",
+    "@konker.dev/common-config": "^0.9.0",
     "@types/node": "^26.1.0",
     "@vitest/coverage-istanbul": "^4.1.9",
     "aws-sdk-client-mock": "^4.1.0",
