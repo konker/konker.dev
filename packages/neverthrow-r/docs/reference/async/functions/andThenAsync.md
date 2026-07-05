@@ -6,7 +6,7 @@
 
 # Function: andThenAsync()
 
-> **andThenAsync**\<`A`, `R2`, `B`, `E2`\>(`f`): \<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+> **andThenAsync**\<`A`, `R2`, `B`, `E2`\>(`f`): \<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E1` \| `E2`\>
 
 Defined in: [async.ts:100](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L100)
 
@@ -39,7 +39,7 @@ Async variant of andThen. The continuation returns a
 
 ## Returns
 
-\<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E1` \| `E2`\>
 
 ## Example
 

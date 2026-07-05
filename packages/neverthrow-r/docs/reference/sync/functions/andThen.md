@@ -6,7 +6,7 @@
 
 # Function: andThen()
 
-> **andThen**\<`A`, `R2`, `B`, `E2`\>(`f`): \<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+> **andThen**\<`A`, `R2`, `B`, `E2`\>(`f`): \<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E1` \| `E2`\>
 
 Defined in: [sync.ts:158](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/sync.ts#L158)
 
@@ -51,7 +51,7 @@ Function from the previous success value to a `ResultR`.
 A function taking a `ResultR<R1, A, E1>` and returning a
   `ResultR<R1 & R2, B, E1 | E2>`.
 
-\<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `B`, `E1` \| `E2`\>
 
 ## Remarks
 

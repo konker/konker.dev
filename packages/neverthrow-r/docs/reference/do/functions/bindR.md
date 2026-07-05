@@ -6,7 +6,7 @@
 
 # Function: bindR()
 
-> **bindR**\<`N`, `S`, `R2`, `A`, `E2`\>(`name`, `f`): \<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
+> **bindR**\<`N`, `S`, `R2`, `A`, `E2`\>(`name`, `f`): \<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E1` \| `E2`\>
 
 Defined in: [do.ts:127](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/do.ts#L127)
 
@@ -60,7 +60,7 @@ Function from current scope to the next step's `ResultR`.
 
 ## Returns
 
-\<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, [`ExtendedScope`](../../types/type-aliases/ExtendedScope.md)\<`S`, `N`, `A`\>, `E1` \| `E2`\>
 
 ## Remarks
 

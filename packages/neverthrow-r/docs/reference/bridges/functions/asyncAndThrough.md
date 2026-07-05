@@ -6,7 +6,7 @@
 
 # Function: asyncAndThrough()
 
-> **asyncAndThrough**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+> **asyncAndThrough**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `E` \| `F`\>
 
 Defined in: [bridges.ts:144](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/bridges.ts#L144)
 
@@ -44,7 +44,7 @@ Function from the success value to a `ResultAsyncR` whose value
 
 ## Returns
 
-\<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+\<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `E` \| `F`\>
 
 ## Remarks
 

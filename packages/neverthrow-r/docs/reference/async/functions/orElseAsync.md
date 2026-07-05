@@ -6,7 +6,7 @@
 
 # Function: orElseAsync()
 
-> **orElseAsync**\<`E`, `R2`, `U`, `F`\>(`f`): \<`R1`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+> **orElseAsync**\<`E`, `R2`, `U`, `F`\>(`f`): \<`R1`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T` \| `U`, `F`\>
 
 Defined in: [async.ts:123](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L123)
 
@@ -38,7 +38,7 @@ Async variant of orElse. The recovery returns a `ResultAsyncR`.
 
 ## Returns
 
-\<`R1`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+\<`R1`, `T`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T` \| `U`, `F`\>
 
 ## Example
 
