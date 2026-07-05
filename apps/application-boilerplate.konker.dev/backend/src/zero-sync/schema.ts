@@ -1,25 +1,16 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-import { createBuilder, createSchema, number, string, table } from '@rocicorp/zero';
+import { createBuilder } from '@rocicorp/zero';
 
 import type { AuthData } from './auth.js';
+import { schema } from './schema.gen.js';
 
 // --------------------------------------------------------------------------
-// One entity for the vertical slice. `id` is a client-generated string PK so
-// that Zero custom mutators can create rows optimistically on the client.
-export const widgets = table('widgets')
-  .columns({
-    id: string(),
-    name: string(),
-    size: number(),
-  })
-  .primaryKey('id');
-
-// --------------------------------------------------------------------------
-export const schema = createSchema({
-  tables: [widgets],
-});
-
-export type Schema = typeof schema;
+// The Zero schema itself is generated from the Drizzle schema by drizzle-zero
+// (`schema.gen.ts`, never edited by hand — run `pnpm run zero:generate`). This
+// wrapper adds the hand-written concerns that codegen does not own: the shared
+// query builder and the Zero default-type augmentation.
+export { schema } from './schema.gen.js';
+export type { Schema } from './schema.gen.js';
 
 // Query builder shared by queries.ts (server) and the frontend.
 export const builder = createBuilder(schema);

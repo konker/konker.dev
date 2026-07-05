@@ -8,7 +8,7 @@ on:
 #      - 'development'
 #    paths:
 #      - 'apps/application-boilerplate.konker.dev/frontend/**'
-#      - 'apps/application-boilerplate.konker.dev/zerosync/src/**'
+#      - 'apps/application-boilerplate.konker.dev/backend/src/zero-sync/**'
 
 env:
   CWD: './apps/application-boilerplate.konker.dev/frontend'
@@ -59,9 +59,10 @@ jobs:
 
       - name: Build frontend (Development)
         run: |
-          # Build the frontend's workspace dependency graph (zerosync and its
-          # transitive workspace deps) so each dist/ exists, then build the
-          # frontend itself. `^...` selects dependencies only, not the frontend.
+          # Build the frontend's workspace dependency graph (the backend package,
+          # whose src/zero-sync it imports, and its transitive workspace deps) so
+          # each dist/ exists, then build the frontend itself. `^...` selects
+          # dependencies only, not the frontend.
           pnpm --filter "@konker.dev/application-boilerplate.konker.dev-frontend^..." run build
           pnpm --filter "@konker.dev/application-boilerplate.konker.dev-frontend" run build
 

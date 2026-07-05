@@ -22,6 +22,38 @@
     "!dist/**/*.test.*"
   ],
   "main": "dist/index.js",
+  "comment:exports": "The zero-sync/* subpaths are the isomorphic Zero schema/queries/mutators/auth shared with the frontend. Types are exposed from TS source (consumers use moduleResolution=bundler); runtime JS is built to dist. This is the only public surface the frontend depends on — server code stays behind relative imports.",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./zero-sync": {
+      "source": "./src/zero-sync/index.ts",
+      "types": "./src/zero-sync/index.ts",
+      "import": "./dist/zero-sync/index.js"
+    },
+    "./zero-sync/schema": {
+      "source": "./src/zero-sync/schema.ts",
+      "types": "./src/zero-sync/schema.ts",
+      "import": "./dist/zero-sync/schema.js"
+    },
+    "./zero-sync/queries": {
+      "source": "./src/zero-sync/queries.ts",
+      "types": "./src/zero-sync/queries.ts",
+      "import": "./dist/zero-sync/queries.js"
+    },
+    "./zero-sync/mutators": {
+      "source": "./src/zero-sync/mutators.ts",
+      "types": "./src/zero-sync/mutators.ts",
+      "import": "./dist/zero-sync/mutators.js"
+    },
+    "./zero-sync/auth": {
+      "source": "./src/zero-sync/auth.ts",
+      "types": "./src/zero-sync/auth.ts",
+      "import": "./dist/zero-sync/auth.js"
+    }
+  },
   "dependencies": {
     "@dotenvx/dotenvx": "^2.1.4",
     "@effect/opentelemetry": "^0.63.0",
@@ -31,7 +63,6 @@
     "@effect/sql-drizzle": "^0.50.0",
     "@effect/sql-pg": "^0.52.1",
     "@hono/node-server": "^2.0.8",
-    "@konker.dev/zero-sync-common.application-boilerplate.konker.dev": "workspace:*",
     "@konker.dev/middleware-fp": "workspace:*",
     "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
     "@opentelemetry/sdk-metrics": "^2.9.0",
@@ -60,8 +91,11 @@
     "@types/pg": "^8.20.0",
     "@vitest/coverage-istanbul": "^4.1.9",
     "drizzle-kit": "^0.31.10",
+    "drizzle-zero": "^0.19.0",
     "eslint": "^10.6.0",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-sort-destructure-keys": "^3.0.0",
@@ -81,12 +115,13 @@
     "build:prod": "pnpm run build && pnpm deploy --filter @konker.dev/application-boilerplate.konker.dev --prod ./.deploy",
     "build-container": "pnpm run build:prod && docker buildx build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG -f ./deployment/Dockerfile .",
     "push-container": "aws ecr get-login-password --region ${AWS_DEFAULT_REGION:-eu-west-1} | docker login --username AWS --password-stdin $AWS_ECR_REGISTRY && docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$IMAGE_TAG",
-    "predev": "pnpm --filter @konker.dev/application-boilerplate.konker.dev-zerosync run build",
     "dev": "dotenvx run --env-file .env.local.development -- tsx watch src/hono/hono-node-server.ts",
-    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run fixme-check",
+    "ci": "pnpm run lint-check && pnpm run typecheck && pnpm run zero:check && pnpm run type-coverage-check && pnpm run test && pnpm run build && pnpm run fixme-check",
     "cd": "echo NOOP",
     "db:generate": "dotenvx run --env-file .env.local.development -- drizzle-kit generate --config=src/config/drizzle.config.ts",
     "db:migrate": "dotenvx run --env-file .env.local.development -- drizzle-kit migrate --config=src/config/drizzle.config.ts",
+    "zero:generate": "drizzle-zero generate -c src/config/drizzle-zero.config.ts -o src/zero-sync/schema.gen.ts --skip-builder --skip-declare --skip-types -f",
+    "zero:check": "pnpm run zero:generate && git diff --exit-code src/zero-sync/schema.gen.ts",
     "mint-jwt": "dotenvx run --env-file .env.local.development -- tsx scripts/MintDevJwt.ts",
     "circular-check": "madge --extensions ts --circular --no-color --no-spinner --warning src",
     "clean": "rm -rf dist && rm -rf .deploy && rm -f tsconfig.tsbuildinfo",

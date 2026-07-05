@@ -1,6 +1,6 @@
-import { mutators } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/mutators';
-import { queries } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/queries';
-import { schema } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/schema';
+import { mutators } from '@konker.dev/application-boilerplate.konker.dev/zero-sync/mutators';
+import { queries } from '@konker.dev/application-boilerplate.konker.dev/zero-sync/queries';
+import { schema } from '@konker.dev/application-boilerplate.konker.dev/zero-sync/schema';
 import { useQuery, useZero, ZeroProvider } from '@rocicorp/zero/solid';
 import { decodeJwt } from 'jose';
 import { createSignal, For, Show, type JSX } from 'solid-js';

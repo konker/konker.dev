@@ -1,6 +1,7 @@
 /* eslint-disable fp/no-throw, fp/no-let, fp/no-mutation, fp/no-nil, @typescript-eslint/consistent-type-definitions */
-import { schema } from '@konker.dev/zero-sync-common.application-boilerplate.konker.dev/schema';
 import { zeroPostgresJS } from '@rocicorp/zero/server/adapters/postgresjs';
+
+import { schema } from '../../zero-sync/schema.js';
 
 // --------------------------------------------------------------------------
 // Zero's server-side query/mutate endpoints talk to the upstream Postgres
