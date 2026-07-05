@@ -6,7 +6,7 @@
 
 # Function: andParseR()
 
-> **andParseR**\<`I`, `O`\>(`schema`, `options?`): \<`R`, `E`\>(`rr`) => `ResultR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+> **andParseR**\<`I`, `O`\>(`schema`, `options?`): \<`R`, `E`\>(`rr`) => `ResultR`\<`R`, `O`, `E` \| [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
 
 Defined in: [sync.ts:53](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-schema/src/sync.ts#L53)
 
@@ -34,4 +34,4 @@ Parses the success value of a `ResultR`.
 
 ## Returns
 
-\<`R`, `E`\>(`rr`) => `ResultR`\<`R`, `O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+\<`R`, `E`\>(`rr`) => `ResultR`\<`R`, `O`, `E` \| [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>

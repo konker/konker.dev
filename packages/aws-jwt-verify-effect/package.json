@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/aws-jwt-verify-effect",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -52,7 +52,7 @@
     "@aws-sdk/types": "^3.973.15",
     "@effect/language-service": "^0.86.4",
     "@eslint/js": "^10.0.1",
-    "@konker.dev/common-config": "^0.8.0",
+    "@konker.dev/common-config": "^0.10.0",
     "@smithy/smithy-client": "^4.14.6",
     "@smithy/util-stream": "^4.7.6",
     "@types/node": "^26.1.0",

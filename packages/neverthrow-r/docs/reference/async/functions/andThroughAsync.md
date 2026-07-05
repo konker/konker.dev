@@ -6,7 +6,7 @@
 
 # Function: andThroughAsync()
 
-> **andThroughAsync**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+> **andThroughAsync**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `E` \| `F`\>
 
 Defined in: [async.ts:216](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/async.ts#L216)
 
@@ -34,7 +34,7 @@ Async variant of andThrough.
 
 ## Returns
 
-\<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+\<`R1`, `E`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `T`, `E` \| `F`\>
 
 ## Example
 

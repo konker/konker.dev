@@ -6,7 +6,7 @@
 
 # Function: asyncAndThen()
 
-> **asyncAndThen**\<`A`, `R2`, `B`, `E2`\>(`f`): \<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+> **asyncAndThen**\<`A`, `R2`, `B`, `E2`\>(`f`): \<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E1` \| `E2`\>
 
 Defined in: [bridges.ts:105](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/bridges.ts#L105)
 
@@ -49,7 +49,7 @@ Function from the previous success value to a `ResultAsyncR`.
 
 ## Returns
 
-\<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E2` \| `E1`\>
+\<`R1`, `E1`\>(`rr`) => [`ResultAsyncR`](../../types/type-aliases/ResultAsyncR.md)\<`R1` & `R2`, `B`, `E1` \| `E2`\>
 
 ## Remarks
 

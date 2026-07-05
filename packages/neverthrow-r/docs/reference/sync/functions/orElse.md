@@ -6,7 +6,7 @@
 
 # Function: orElse()
 
-> **orElse**\<`E`, `R2`, `U`, `F`\>(`f`): \<`R1`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+> **orElse**\<`E`, `R2`, `U`, `F`\>(`f`): \<`R1`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T` \| `U`, `F`\>
 
 Defined in: [sync.ts:197](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/sync.ts#L197)
 
@@ -48,7 +48,7 @@ Function from the previous error to a recovery `ResultR`.
 
 ## Returns
 
-\<`R1`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `U` \| `T`, `F`\>
+\<`R1`, `T`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T` \| `U`, `F`\>
 
 ## Remarks
 

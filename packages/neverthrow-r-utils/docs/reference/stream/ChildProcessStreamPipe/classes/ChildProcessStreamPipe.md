@@ -979,7 +979,7 @@ See [`stream.compose(...streams)`](https://nodejs.org/docs/latest-v26.x/api/stre
 
 ##### stream
 
-`WritableStream` \| `WritableStream`\<`any`\> \| `TransformStream`\<`any`, `any`\> \| ((`source`) => `void`)
+`TransformStream`\<`any`, `any`\> \| `WritableStream` \| `WritableStream`\<`any`\> \| ((`source`) => `void`)
 
 ##### options?
 
@@ -1394,7 +1394,7 @@ a function to call on each chunk of the stream. Async or not.
 
 ##### options?
 
-`Pick`\<`ReadableOperatorOptions`, `"signal"` \| `"concurrency"`\>
+`Pick`\<`ReadableOperatorOptions`, `"concurrency"` \| `"signal"`\>
 
 #### Returns
 
@@ -1491,7 +1491,7 @@ a function to call on each chunk of the stream. Async or not.
 
 ###### options?
 
-`Pick`\<`ReadableOperatorOptions`, `"signal"` \| `"concurrency"`\>
+`Pick`\<`ReadableOperatorOptions`, `"concurrency"` \| `"signal"`\>
 
 ##### Returns
 
@@ -1529,7 +1529,7 @@ a function to call on each chunk of the stream. Async or not.
 
 ###### options?
 
-`Pick`\<`ReadableOperatorOptions`, `"signal"` \| `"concurrency"`\>
+`Pick`\<`ReadableOperatorOptions`, `"concurrency"` \| `"signal"`\>
 
 ##### Returns
 
@@ -1570,7 +1570,7 @@ a function to map over every chunk in the stream. May be async. May be a stream 
 
 ##### options?
 
-`Pick`\<`ReadableOperatorOptions`, `"signal"` \| `"concurrency"`\>
+`Pick`\<`ReadableOperatorOptions`, `"concurrency"` \| `"signal"`\>
 
 #### Returns
 
@@ -1615,7 +1615,7 @@ a function to call on each chunk of the stream. Async or not.
 
 ##### options?
 
-`Pick`\<`ReadableOperatorOptions`, `"signal"` \| `"concurrency"`\>
+`Pick`\<`ReadableOperatorOptions`, `"concurrency"` \| `"signal"`\>
 
 #### Returns
 
@@ -3118,7 +3118,7 @@ a function to call on each chunk of the stream. Async or not.
 
 ##### options?
 
-`Pick`\<`ReadableOperatorOptions`, `"signal"` \| `"concurrency"`\>
+`Pick`\<`ReadableOperatorOptions`, `"concurrency"` \| `"signal"`\>
 
 #### Returns
 
@@ -3615,7 +3615,7 @@ A utility method for creating duplex streams.
 
 ##### src
 
-`string` \| `Promise`\<`any`\> \| `ReadableStream`\<`any`\> \| `WritableStream` \| `Iterable`\<`any`, `any`, `any`\> \| `AsyncIterable`\<`any`, `any`, `any`\> \| `WritableStream`\<`any`\> \| `ReadableStream` \| `Blob` \| ((`source`) => `AsyncIterable`\<`any`\>) \| ((`source`) => `Promise`\<`void`\>) \| `ReadableWritablePair`\<`any`, `any`\>
+`string` \| `AsyncIterable`\<`any`, `any`, `any`\> \| `Blob` \| `Iterable`\<`any`, `any`, `any`\> \| `Promise`\<`any`\> \| `ReadableStream` \| `ReadableStream`\<`any`\> \| `ReadableWritablePair`\<`any`, `any`\> \| `WritableStream` \| `WritableStream`\<`any`\> \| ((`source`) => `AsyncIterable`\<`any`\>) \| ((`source`) => `Promise`\<`void`\>)
 
 #### Returns
 
@@ -3647,7 +3647,7 @@ A utility method for creating a `Duplex` from a web `ReadableStream` and `Writab
 
 ##### options?
 
-`Pick`\<`DuplexOptions`\<`Duplex`\>, `"decodeStrings"` \| `"highWaterMark"` \| `"objectMode"` \| `"signal"` \| `"allowHalfOpen"` \| `"encoding"`\>
+`Pick`\<`DuplexOptions`\<`Duplex`\>, `"allowHalfOpen"` \| `"decodeStrings"` \| `"encoding"` \| `"highWaterMark"` \| `"objectMode"` \| `"signal"`\>
 
 #### Returns
 

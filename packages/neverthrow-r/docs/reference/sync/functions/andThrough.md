@@ -6,7 +6,7 @@
 
 # Function: andThrough()
 
-> **andThrough**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+> **andThrough**\<`T`, `R2`, `F`\>(`f`): \<`R1`, `E`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `E` \| `F`\>
 
 Defined in: [sync.ts:354](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r/src/sync.ts#L354)
 
@@ -44,7 +44,7 @@ Function from the success value to a `ResultR` whose value is
 
 ## Returns
 
-\<`R1`, `E`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `F` \| `E`\>
+\<`R1`, `E`\>(`rr`) => [`ResultR`](../../types/type-aliases/ResultR.md)\<`R1` & `R2`, `T`, `E` \| `F`\>
 
 ## Remarks
 

@@ -6,7 +6,7 @@
 
 # Function: andParse()
 
-> **andParse**\<`I`, `O`\>(`schema`, `options?`): \<`E`\>(`r`) => `Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+> **andParse**\<`I`, `O`\>(`schema`, `options?`): \<`E`\>(`r`) => `Result`\<`O`, `E` \| [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>
 
 Defined in: [sync.ts:47](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-schema/src/sync.ts#L47)
 
@@ -34,4 +34,4 @@ Parses the success value of a plain neverthrow `Result`.
 
 ## Returns
 
-\<`E`\>(`r`) => `Result`\<`O`, [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md) \| `E`\>
+\<`E`\>(`r`) => `Result`\<`O`, `E` \| [`SchemaValidationError`](../../common/type-aliases/SchemaValidationError.md)\>

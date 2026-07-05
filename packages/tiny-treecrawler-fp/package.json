@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/tiny-treecrawler-fp",
-  "version": "0.1.13",
+  "version": "0.2.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -141,7 +141,7 @@
     "@aws-sdk/types": "^3.973.15",
     "@effect/language-service": "^0.86.4",
     "@eslint/js": "^10.0.1",
-    "@konker.dev/common-config": "^0.8.0",
+    "@konker.dev/common-config": "^0.10.0",
     "@smithy/smithy-client": "^4.14.6",
     "@swc/core": "^1.15.43",
     "@types/micromatch": "^4.0.10",
