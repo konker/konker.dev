@@ -36,7 +36,7 @@ export function readStreamToBuffer(readStream: Readable | ReadableStream): Effec
  */
 export function waitForStreamPipe(readStream: Readable, writeStream: Writable): Effect.Effect<number, Error> {
   return Effect.tryPromise({
-    try: () =>
+    try: async () =>
       // eslint-disable-next-line fp/no-nil
       new Promise((resolve, reject) => {
         // eslint-disable-next-line fp/no-let

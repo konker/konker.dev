@@ -51,7 +51,7 @@ describe('tiny-fetch-fp', () => {
     it('should call fetch and decode the body string in the error case', async () => {
       fetchMock.mockRejectedValueOnce(new Error('Boom!'));
 
-      const actual = () =>
+      const actual = async () =>
         Effect.runPromise(
           underTest('https://example.com/', {
             bodyObject: TEST_REQUEST_BODY,

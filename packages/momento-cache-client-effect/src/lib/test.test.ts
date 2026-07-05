@@ -45,13 +45,13 @@ describe('lib/test', () => {
       const rep: any = {};
       const testClient = unit.MockMomentoClient(rep);
 
-      const actual1 = () => testClient.get(TEST_CACHE_NAME, unit.EXCEPTION_KEY);
+      const actual1 = async () => testClient.get(TEST_CACHE_NAME, unit.EXCEPTION_KEY);
       await expect(actual1).rejects.toThrow();
 
-      const actual2 = () => testClient.set(TEST_CACHE_NAME, unit.EXCEPTION_KEY, TEST_VALUE);
+      const actual2 = async () => testClient.set(TEST_CACHE_NAME, unit.EXCEPTION_KEY, TEST_VALUE);
       await expect(actual2).rejects.toThrow();
 
-      const actual3 = () => testClient.delete(TEST_CACHE_NAME, unit.EXCEPTION_KEY);
+      const actual3 = async () => testClient.delete(TEST_CACHE_NAME, unit.EXCEPTION_KEY);
       await expect(actual3).rejects.toThrow();
     });
   });

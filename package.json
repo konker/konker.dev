@@ -31,8 +31,8 @@
     }
   },
   "devDependencies": {
-    "turbo": "^2.7.3",
-    "turborepo-remote-cache": "^2.7.0"
+    "turbo": "^2.10.3",
+    "turborepo-remote-cache": "^2.11.2"
   },
   "pnpm": {
     "overrides": {

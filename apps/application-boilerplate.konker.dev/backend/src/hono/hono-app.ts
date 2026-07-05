@@ -11,16 +11,16 @@ export const app = (runtime: RuntimeLive) => {
   const fooHandler = fooHandlerCtor(runtime);
 
   return new Hono()
-    .get('/', (c) => {
+    .get('/', async (c) => {
       return rootHandler(c.req);
     })
-    .get('/foo', (c) => {
+    .get('/foo', async (c) => {
       return fooHandler(c.req);
     })
-    .post('/zero/query', (c) => {
+    .post('/zero/query', async (c) => {
       return zeroQueryHandler(c);
     })
-    .post('/zero/mutate', (c) => {
+    .post('/zero/mutate', async (c) => {
       return zeroMutateHandler(c);
     })
     .get('/ping', (c) => {

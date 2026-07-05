@@ -33,7 +33,7 @@ export async function tagsGetAllCollectionTags(
   collections: ReadonlyArray<TagCollection>,
   sorter: TagSorterT = tagsSorterCountDesc
 ): Promise<{ readonly total: number; readonly tags: ReadonlyArray<TagT> }> {
-  const allEntries = await Promise.all(collections.map((collection) => getCollection(collection)));
+  const allEntries = await Promise.all(collections.map(async (collection) => getCollection(collection)));
   const filteredEntries = allEntries.flat().filter(notEntryDraftFilterPredicate);
   const allTags = filteredEntries.flatMap((x) => x.data.tags ?? []);
 
@@ -58,16 +58,14 @@ export async function tagsGetAllCollectionTags(
 export async function tagsGetAllCollectionTagEntries<T extends TagCollection>(
   collections: ReadonlyArray<T>
 ): Promise<ReadonlyArray<TagEntry<T>>> {
-  const allEntries = await Promise.all(collections.map((collection) => getCollection(collection)));
+  const allEntries = await Promise.all(collections.map(async (collection) => getCollection(collection)));
   const allTagEntries = allEntries.reduce(
     (acc, entries, i) => {
       const collection: T = collections[i]!;
-      const tagEntries = entries.map(
-        (entry: CollectionEntry<T>): TagEntry<T> => ({
-          entry,
-          collection,
-        })
-      );
+      const tagEntries = entries.map((entry: CollectionEntry<T>): TagEntry<T> => ({
+        entry,
+        collection,
+      }));
       return [...acc, ...tagEntries];
     },
     [] as ReadonlyArray<TagEntry<T>>

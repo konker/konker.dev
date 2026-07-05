@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 
 export function fetchEffect(url: URL | string, init: Partial<RequestInit> = {}): Effect.Effect<Response, Error> {
   return Effect.tryPromise({
-    try: () => fetch(url, init),
+    try: async () => fetch(url, init),
     catch: toError,
   });
 }

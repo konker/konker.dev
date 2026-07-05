@@ -50,18 +50,18 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.2",
-    "@konker.dev/common-config": "^0.7.0",
-    "@rocicorp/zero": "^1.6.2",
-    "@types/node": "^25.0.6",
-    "@vitest/coverage-istanbul": "^4.0.16",
-    "eslint": "^9.39.2",
+    "@arethetypeswrong/cli": "^0.18.4",
+    "@konker.dev/common-config": "^0.8.0",
+    "@rocicorp/zero": "^1.7.0",
+    "@types/node": "^26.1.0",
+    "@vitest/coverage-istanbul": "^4.1.9",
+    "eslint": "^10.6.0",
     "madge": "^8.0.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.9.4",
     "type-coverage": "^2.29.7",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.16",
-    "zod": "^3.25.67"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
+    "zod": "^4.4.3"
   },
   "scripts": {
     "build": "pnpm run clean && tsc",

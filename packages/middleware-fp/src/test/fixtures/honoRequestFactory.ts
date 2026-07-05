@@ -28,19 +28,19 @@ export function honoRequestFactory(
       return '';
     },
     addValidatedData(): void {},
-    arrayBuffer(): Promise<ArrayBuffer> {
+    async arrayBuffer(): Promise<ArrayBuffer> {
       return Promise.resolve(Buffer.from(options.body ?? '').buffer);
     },
-    blob(): Promise<Blob> {
+    async blob(): Promise<Blob> {
       return Promise.resolve(new Blob([Buffer.from(options.body ?? '').buffer]));
     },
-    formData(): Promise<FormData> {
+    async formData(): Promise<FormData> {
       return Promise.resolve(new FormData());
     },
     header(): any {
       return options.headers ?? {};
     },
-    json<T = any>(): Promise<T> {
+    async json<T = any>(): Promise<T> {
       return Promise.resolve(JSON.parse(options.body ?? ''));
     },
     param(): any {
@@ -48,7 +48,7 @@ export function honoRequestFactory(
         id: '123',
       };
     },
-    parseBody(): Promise<string> {
+    async parseBody(): Promise<string> {
       return Promise.resolve(options.body ?? '');
     },
     queries(): any {
@@ -57,7 +57,7 @@ export function honoRequestFactory(
     query(): any {
       return Object.fromEntries(new URL(url).searchParams.entries());
     },
-    text(): Promise<string> {
+    async text(): Promise<string> {
       return Promise.resolve(options.body ?? '');
     },
     get url(): string {

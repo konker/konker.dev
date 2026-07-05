@@ -12,7 +12,6 @@
     "lib": ["es2023", "dom"],
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "baseUrl": ".",
     "paths": {
       "@konker.dev/neverthrow-r": ["./src/index.ts"],
       "@konker.dev/neverthrow-r/*": ["./src/*.ts"]
