@@ -111,9 +111,6 @@ importers:
       '@konker.dev/common-config':
         specifier: ^0.8.0
         version: 0.8.0(eslint@10.6.0(jiti@2.7.0))
-      '@konker.dev/config-o-tron':
-        specifier: 0.0.2
-        version: 0.0.2
       '@types/aws-lambda':
         specifier: ^8.10.162
         version: 8.10.162
@@ -4041,13 +4038,6 @@ packages:
     resolution: {integrity: sha512-IQPOyB6gvzs+X+d07zAZ3eCsvlFPsOXb2TI4flY0r9drUgIwJYgqY32LuOjOooAonrzQhhGMuQXWtNhbApZ6jg==}
     hasBin: true
 
-  '@konker.dev/config-o-tron@0.0.2':
-    resolution: {integrity: sha512-eIrlgBxW+QbT8XohklP1igiIjDW3zTMS3k2Vh+cRwoiCTP6GuzRXkAv8mfjoMpyqz9rOyhH/BrtH0f6skMj0mA==}
-    hasBin: true
-
-  '@konker.dev/tiny-error-fp@0.1.12':
-    resolution: {integrity: sha512-/rjkzaCYQ+z4+KG+qTGOLKlxWPbN2EPURusHF8wR8gWonTS9Oig5vd5NRBrJXArFwjRCvABhSCmdHFnNN5iz7Q==}
-
   '@loaderkit/resolve@1.0.6':
     resolution: {integrity: sha512-G8FdIoF5CypfwmD9rl8BXod5HDn8JqB0CCNBXDTaRZ+yRYhARrrSToX1zg1zy9jX3zLqigsELwhT4gNtkdQAUg==}
 
@@ -6654,10 +6644,6 @@ packages:
   commander@12.1.0:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
-
-  commander@14.0.3:
-    resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
-    engines: {node: '>=20'}
 
   commander@15.0.0:
     resolution: {integrity: sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg==}
@@ -13659,22 +13645,6 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@konker.dev/config-o-tron@0.0.2':
-    dependencies:
-      '@aws-sdk/client-ssm': 3.1079.0
-      '@aws-sdk/client-sts': 3.1079.0
-      '@konker.dev/tiny-error-fp': 0.1.12
-      chalk: 5.6.2
-      cli-table3: 0.6.5
-      commander: 14.0.3
-      effect: 3.21.4
-      json5: 2.2.3
-      zod: 3.25.76
-
-  '@konker.dev/tiny-error-fp@0.1.12':
-    dependencies:
-      effect: 3.21.4
-
   '@loaderkit/resolve@1.0.6':
     dependencies:
       '@braidai/lang': 1.1.2
@@ -16673,8 +16643,6 @@ snapshots:
   commander@11.1.0: {}
 
   commander@12.1.0: {}
-
-  commander@14.0.3: {}
 
   commander@15.0.0: {}
 
