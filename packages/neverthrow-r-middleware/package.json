@@ -219,7 +219,7 @@
     "@arethetypeswrong/cli": "^0.18.4",
     "@eslint/compat": "^2.1.0",
     "@eslint/js": "^10.0.1",
-    "@konker.dev/common-config": "^0.9.0",
+    "@konker.dev/common-config": "^0.10.0",
     "@konker.dev/neverthrow-r-schema": "workspace:*",
     "@standard-schema/spec": "^1.1.0",
     "@types/aws-lambda": "^8.10.162",
