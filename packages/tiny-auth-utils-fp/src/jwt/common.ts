@@ -8,17 +8,20 @@ export type JwtPayloadSubIss = jwt.JwtPayload & {
 };
 
 export type JwtUserContext =
-  | { readonly verified: false }
+  | { readonly verified: false; readonly reason?: string }
   | ({
       readonly verified: true;
       readonly userId: string;
     } & JwtPayloadSubIss);
 
-export function JwtUserContext(verified: false): JwtUserContext;
+export function JwtUserContext(verified: false, reason?: string): JwtUserContext;
 export function JwtUserContext(verified: true, jwtPayload: JwtPayloadSubIss): JwtUserContext;
-export function JwtUserContext(verified: boolean, jwtPayload?: JwtPayloadSubIss): JwtUserContext {
-  return verified && jwtPayload
-    ? { verified: true as const, userId: jwtPayload.sub, ...jwtPayload }
+export function JwtUserContext(verified: boolean, jwtPayloadOrReason?: JwtPayloadSubIss | string): JwtUserContext {
+  if (verified && jwtPayloadOrReason && typeof jwtPayloadOrReason !== 'string') {
+    return { verified: true as const, userId: jwtPayloadOrReason.sub, ...jwtPayloadOrReason };
+  }
+  return typeof jwtPayloadOrReason === 'string'
+    ? { verified: false as const, reason: jwtPayloadOrReason }
     : { verified: false as const };
 }
 

@@ -1,7 +1,8 @@
 import { toError } from '@konker.dev/tiny-error-fp/lib';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
-import * as jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import type { JwtPayloadSubIss } from './common.js';
 import { checkJwtPayloadIssSub, JwtUserContext } from './common.js';
@@ -19,7 +20,7 @@ export type JwtVerificationConfigRsa = {
 };
 
 // --------------------------------------------------------------------------
-export function jwtSignTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): Effect.Effect<string, Error> {
+export function jwtSignTokenRsa(payload: JwtPayload, config: JwtSigningConfigRsa): Effect.Effect<string, Error> {
   return Effect.try({
     try: () =>
       jwt.sign(payload, config.rsaPrivateKey, {
@@ -46,6 +47,6 @@ export function jwtVerifyTokenRsa(token: string, config: JwtVerificationConfigRs
     }),
     Effect.flatMap(checkJwtPayloadIssSub),
     Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
-    Effect.orElse(() => Effect.succeed(JwtUserContext(false)))
+    Effect.catchAll((err) => Effect.succeed(JwtUserContext(false, err.message)))
   );
 }

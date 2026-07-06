@@ -59,32 +59,32 @@ describe('jwt/rsa', () => {
         TEST_TOKEN_RSA,
         Object.assign({}, TEST_VERIFICATION_CONFIG, { rsaPublicKey: TEST_RSA_KEY_PUBLIC_OTHER })
       );
-      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false, reason: expect.any(String) });
     });
 
     it('should return an error if the token is invalid, expired', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_EXPIRED, TEST_VERIFICATION_CONFIG);
-      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false, reason: expect.any(String) });
     });
 
     it('should return an error if the token is invalid, wrong issuer', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_OTHER_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false, reason: expect.any(String) });
     });
 
     it('should return an error if the token is invalid, missing issuer', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_MISSING_ISSUER, TEST_VERIFICATION_CONFIG);
-      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false, reason: expect.any(String) });
     });
 
     it('should return an error if the token is invalid, missing subject', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_MISSING_SUBJECT, TEST_VERIFICATION_CONFIG);
-      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false, reason: expect.any(String) });
     });
 
     it('should return an error if the token is invalid, string payload', () => {
       const actual = unit.jwtVerifyTokenRsa(TEST_TOKEN_RSA_STRING_PAYLOAD, TEST_VERIFICATION_CONFIG);
-      expect(Effect.runSync(actual)).toStrictEqual({ verified: false });
+      expect(Effect.runSync(actual)).toStrictEqual({ verified: false, reason: expect.any(String) });
     });
   });
 });

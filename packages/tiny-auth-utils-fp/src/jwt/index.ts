@@ -1,7 +1,8 @@
 import { toError } from '@konker.dev/tiny-error-fp/lib';
 import { pipe } from 'effect';
 import * as Effect from 'effect/Effect';
-import * as jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import type { JwtPayloadSubIss } from './common.js';
 import { checkJwtPayloadIssSub, JwtUserContext } from './common.js';
@@ -18,7 +19,7 @@ export type JwtVerificationConfig = {
 };
 
 // --------------------------------------------------------------------------
-export function jwtDecodeToken(token: string): Effect.Effect<jwt.JwtPayload, Error> {
+export function jwtDecodeToken(token: string): Effect.Effect<JwtPayload, Error> {
   return pipe(
     Effect.try({
       try: () => jwt.decode(token),
@@ -33,7 +34,7 @@ export function jwtDecodeToken(token: string): Effect.Effect<jwt.JwtPayload, Err
 }
 
 // --------------------------------------------------------------------------
-export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): Effect.Effect<string, Error> {
+export function jwtSignToken(payload: JwtPayload, config: JwtSigningConfig): Effect.Effect<string, Error> {
   return Effect.try({
     try: () =>
       jwt.sign(payload, config.signingSecret, {
@@ -58,6 +59,6 @@ export function jwtVerifyToken(token: string, config: JwtVerificationConfig): Ef
     }),
     Effect.flatMap(checkJwtPayloadIssSub),
     Effect.map((jwtPayload: JwtPayloadSubIss) => JwtUserContext(true, jwtPayload)),
-    Effect.orElse(() => Effect.succeed(JwtUserContext(false)))
+    Effect.catchAll((err) => Effect.succeed(JwtUserContext(false, err.message)))
   );
 }
