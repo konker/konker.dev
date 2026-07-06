@@ -1,0 +1,34 @@
+import type { RequestW, ResponseW } from '@konker.dev/middleware-fp/http';
+import * as M from '@konker.dev/middleware-fp/http/contrib';
+import { pipe } from 'effect';
+import type { HonoRequest } from 'hono';
+
+import { type Env, EnvSchema } from '../../config/env.schema.js';
+import type { RuntimeLive } from '../../deps/runtimeLive.js';
+import { core } from './core.js';
+
+export type CoreEvent = RequestW<
+  M.envValidator.WithValidatedEnv<Env> & M.jwtAuthenticator.WithUserId & M.jsonBodyParserRequest.WithParsedBody
+>;
+export type CoreResponse = ResponseW;
+
+export const handler =
+  (runtime: RuntimeLive) =>
+  async (event: HonoRequest): Promise<Response> => {
+    const stack = pipe(
+      core,
+      M.requestSpan.middleware('request-inner'),
+      M.helmetJsHeaders.middleware(),
+      M.jsonBodyParserRequest.middleware(),
+      M.jsonBodySerializerResponse.middleware(),
+      M.headerValueAuthorizer.middleware({ headerName: 'x-api-key', envVarName: 'ZERO_BACKEND_SERVICE_TOKEN' }),
+      M.jwtAuthenticator.middleware(),
+      M.headersNormalizer.middleware(),
+      M.envValidator.middleware(EnvSchema),
+      M.responseProcessor.middleware(),
+      M.requestResponseLogger.middleware(),
+      M.honoAdapter.middleware()
+    );
+
+    return pipe(event, stack, runtime.runPromise);
+  };
