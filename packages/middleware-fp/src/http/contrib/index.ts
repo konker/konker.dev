@@ -9,6 +9,7 @@ export * as envValidator from './envValidator.js';
 export * as headerSignatureAuthorizer from './headerSignatureAuthorizer/index.js';
 export * as headersNormalizer from './headersNormalizer/index.js';
 export * as headersValidator from './headersValidator.js';
+export * as headerValueAuthorizer from './headerValueAuthorizer/index.js';
 export * as helmetJsHeaders from './helmetJsHeaders.js';
 export * as honoAdapter from './honoAdapter.js';
 export * as identity from './identity.js';

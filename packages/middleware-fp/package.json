@@ -1,6 +1,6 @@
 {
   "name": "@konker.dev/middleware-fp",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "type": "module",
   "author": "Konrad Markus <mail@konker.dev>",
   "license": "ISC",
@@ -79,6 +79,14 @@
     "./http/contrib/headersValidator": {
       "types": "./dist/http/contrib/headersValidator.d.ts",
       "import": "./dist/http/contrib/headersValidator.js"
+    },
+    "./http/contrib/headerValueAuthorizer": {
+      "types": "./dist/http/contrib/headerValueAuthorizer/index.d.ts",
+      "import": "./dist/http/contrib/headerValueAuthorizer/index.js"
+    },
+    "./http/contrib/headerValueAuthorizer/lib": {
+      "types": "./dist/http/contrib/headerValueAuthorizer/lib.d.ts",
+      "import": "./dist/http/contrib/headerValueAuthorizer/lib.js"
     },
     "./http/contrib/helmetJsHeaders": {
       "types": "./dist/http/contrib/helmetJsHeaders.d.ts",

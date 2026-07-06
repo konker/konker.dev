@@ -1,5 +1,6 @@
 import { fromResult, type ResultR } from '@konker.dev/neverthrow-r';
-import * as jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { ok, Result } from 'neverthrow';
 
 import { toError } from '../lib/toError.js';
@@ -17,7 +18,7 @@ export type JwtVerificationConfigRsa = {
   issuer: string;
 };
 
-export function jwtSignTokenRsa(payload: jwt.JwtPayload, config: JwtSigningConfigRsa): ResultR<unknown, string, Error> {
+export function jwtSignTokenRsa(payload: JwtPayload, config: JwtSigningConfigRsa): ResultR<unknown, string, Error> {
   return fromResult(
     Result.fromThrowable(
       () =>

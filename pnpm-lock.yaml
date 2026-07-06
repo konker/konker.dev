@@ -47,6 +47,9 @@ importers:
       '@konker.dev/middleware-fp':
         specifier: workspace:*
         version: link:../../../packages/middleware-fp
+      '@konker.dev/tiny-auth-utils-fp':
+        specifier: workspace:*
+        version: link:../../../packages/tiny-auth-utils-fp
       '@konker.dev/zero-sync-common.application-boilerplate.konker.dev':
         specifier: workspace:*
         version: link:../zerosync

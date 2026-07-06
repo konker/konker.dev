@@ -8,7 +8,7 @@
 
 > **jwtVerifyTokenRsa**(`token`, `config`): `ResultR`\<`unknown`, [`JwtUserContext`](../type-aliases/JwtUserContext.md), `never`\>
 
-Defined in: [jwt/rsa.ts:34](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L34)
+Defined in: [jwt/rsa.ts:35](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L35)
 
 ## Parameters
 

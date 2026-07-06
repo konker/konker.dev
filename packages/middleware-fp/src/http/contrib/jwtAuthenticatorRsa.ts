@@ -38,7 +38,7 @@ export const middleware =
                 userId: verification.sub,
               })
             )
-          : Effect.fail(void 0)
+          : Effect.fail(new Error(verification.reason ?? 'JWT verification failed'))
       ),
       Effect.mapError((e) => toHttpApiError(e, 401, `Invalid JWT RSA credentials: ${e?.message}`)),
       Effect.tapError((_) => Effect.logError(`UnauthorizedError: Invalid JWT RSA credentials: ${i.headers}`)),

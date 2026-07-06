@@ -8,7 +8,7 @@
 
 > **JwtVerificationConfig** = `object`
 
-Defined in: [jwt/index.ts:15](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L15)
+Defined in: [jwt/index.ts:16](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L16)
 
 ## Properties
 
@@ -16,7 +16,7 @@ Defined in: [jwt/index.ts:15](https://github.com/konker/konker.dev/blob/main/pac
 
 > **issuer**: `string`
 
-Defined in: [jwt/index.ts:17](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L17)
+Defined in: [jwt/index.ts:18](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L18)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [jwt/index.ts:17](https://github.com/konker/konker.dev/blob/main/pac
 
 > **signingSecret**: `string`
 
-Defined in: [jwt/index.ts:16](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L16)
+Defined in: [jwt/index.ts:17](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L17)

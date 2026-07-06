@@ -8,7 +8,7 @@
 
 > **jwtDecodeToken**(`token`): `ResultR`\<`unknown`, `JwtPayload`, `Error`\>
 
-Defined in: [jwt/index.ts:20](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L20)
+Defined in: [jwt/index.ts:21](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L21)
 
 ## Parameters
 

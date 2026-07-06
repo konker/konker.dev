@@ -33,6 +33,7 @@
     "@hono/node-server": "^2.0.8",
     "@konker.dev/zero-sync-common.application-boilerplate.konker.dev": "workspace:*",
     "@konker.dev/middleware-fp": "workspace:*",
+    "@konker.dev/tiny-auth-utils-fp": "workspace:*",
     "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
     "@opentelemetry/sdk-metrics": "^2.9.0",
     "@opentelemetry/sdk-trace-base": "^2.9.0",
