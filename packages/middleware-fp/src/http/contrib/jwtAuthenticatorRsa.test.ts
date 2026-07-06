@@ -1,4 +1,5 @@
 import type { JwtVerificationConfigRsa } from '@konker.dev/tiny-auth-utils-fp/jwt/rsa';
+import * as tinyAuthJwtRsa from '@konker.dev/tiny-auth-utils-fp/jwt/rsa';
 import { TEST_JWT_NOW_MS } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/jwt';
 import { TEST_RSA_KEY_PUBLIC } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-rsa-keys';
 import { TEST_TOKEN_RSA } from '@konker.dev/tiny-auth-utils-fp/test/fixtures/test-jwt-tokens-rsa';
@@ -13,6 +14,7 @@ import * as unit from './jwtAuthenticatorRsa.js';
 // https://stackoverflow.com/a/72885576/203284
 // https://github.com/vitest-dev/vitest/issues/6099
 vi.mock('effect/Effect', { spy: true });
+vi.mock('@konker.dev/tiny-auth-utils-fp/jwt/rsa', { spy: true });
 
 export const JWT_AUTHENTICATOR_RSA_TEST_DEPS: JwtVerificationConfigRsa = unit.JwtAuthenticatorRsaDeps.of({
   rsaPublicKey: TEST_RSA_KEY_PUBLIC,
@@ -88,7 +90,17 @@ describe('middleware/jwt-authenticator-rsa', () => {
     const egHandler = pipe(echoCoreIn200W, unit.middleware());
     const result = pipe(egHandler(TEST_IN_2), mockJwtAuthenticatorRsaDeps, Effect.runPromise);
 
-    await expect(result).rejects.toThrow('Invalid JWT RSA credentials');
+    await expect(result).rejects.toThrow('Invalid JWT RSA credentials: jwt malformed');
     expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should fall back to a generic message when verification fails without a reason', async () => {
+    vi.spyOn(tinyAuthJwtRsa, 'jwtVerifyTokenRsa').mockReturnValue(Effect.succeed({ verified: false }));
+
+    const egHandler = pipe(echoCoreIn200W, unit.middleware());
+    const result = pipe(egHandler(TEST_IN_2), mockJwtAuthenticatorRsaDeps, Effect.runPromise);
+
+    await expect(result).rejects.toThrow('Invalid JWT RSA credentials: JWT verification failed');
+    expect(errorSpy).toHaveBeenCalled();
   });
 });

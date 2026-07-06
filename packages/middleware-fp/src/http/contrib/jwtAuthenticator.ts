@@ -39,7 +39,7 @@ export const middleware =
                 userId: verification.sub,
               })
             )
-          : Effect.fail(void 0)
+          : Effect.fail(new Error(verification.reason ?? 'JWT verification failed'))
       ),
       Effect.mapError((e) => toHttpApiError(e, 401, `Invalid JWT credentials: ${e?.message}`)),
       Effect.tapError(Effect.logError),
