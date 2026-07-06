@@ -8,7 +8,7 @@
 
 > **jwtSignToken**(`payload`, `config`): `ResultR`\<`unknown`, `string`, `Error`\>
 
-Defined in: [jwt/index.ts:28](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L28)
+Defined in: [jwt/index.ts:29](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L29)
 
 ## Parameters
 

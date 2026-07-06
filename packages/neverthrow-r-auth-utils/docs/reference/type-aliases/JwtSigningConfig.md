@@ -8,7 +8,7 @@
 
 > **JwtSigningConfig** = `object`
 
-Defined in: [jwt/index.ts:9](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L9)
+Defined in: [jwt/index.ts:10](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L10)
 
 ## Properties
 
@@ -16,7 +16,7 @@ Defined in: [jwt/index.ts:9](https://github.com/konker/konker.dev/blob/main/pack
 
 > **issuer**: `string`
 
-Defined in: [jwt/index.ts:11](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L11)
+Defined in: [jwt/index.ts:12](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L12)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [jwt/index.ts:11](https://github.com/konker/konker.dev/blob/main/pac
 
 > **maxTtlSec**: `number`
 
-Defined in: [jwt/index.ts:12](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L12)
+Defined in: [jwt/index.ts:13](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L13)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [jwt/index.ts:12](https://github.com/konker/konker.dev/blob/main/pac
 
 > **signingSecret**: `string`
 
-Defined in: [jwt/index.ts:10](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L10)
+Defined in: [jwt/index.ts:11](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/index.ts#L11)

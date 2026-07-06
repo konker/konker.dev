@@ -1,5 +1,6 @@
 import { fromResult, type ResultR } from '@konker.dev/neverthrow-r';
-import * as jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { err, ok, Result } from 'neverthrow';
 
 import { toError } from '../lib/toError.js';
@@ -17,7 +18,7 @@ export type JwtVerificationConfig = {
   issuer: string;
 };
 
-export function jwtDecodeToken(token: string): ResultR<unknown, jwt.JwtPayload, Error> {
+export function jwtDecodeToken(token: string): ResultR<unknown, JwtPayload, Error> {
   return fromResult(
     Result.fromThrowable(() => jwt.decode(token), toError)().andThen((decoded) =>
       !decoded || typeof decoded === 'string' ? err(new Error('Invalid token payload')) : ok(decoded)
@@ -25,7 +26,7 @@ export function jwtDecodeToken(token: string): ResultR<unknown, jwt.JwtPayload, 
   );
 }
 
-export function jwtSignToken(payload: jwt.JwtPayload, config: JwtSigningConfig): ResultR<unknown, string, Error> {
+export function jwtSignToken(payload: JwtPayload, config: JwtSigningConfig): ResultR<unknown, string, Error> {
   return fromResult(
     Result.fromThrowable(
       () =>

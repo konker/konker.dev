@@ -8,7 +8,7 @@
 
 > **JwtVerificationConfigRsa** = `object`
 
-Defined in: [jwt/rsa.ts:15](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L15)
+Defined in: [jwt/rsa.ts:16](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L16)
 
 ## Properties
 
@@ -16,7 +16,7 @@ Defined in: [jwt/rsa.ts:15](https://github.com/konker/konker.dev/blob/main/packa
 
 > **issuer**: `string`
 
-Defined in: [jwt/rsa.ts:17](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L17)
+Defined in: [jwt/rsa.ts:18](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L18)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [jwt/rsa.ts:17](https://github.com/konker/konker.dev/blob/main/packa
 
 > **rsaPublicKey**: `string`
 
-Defined in: [jwt/rsa.ts:16](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L16)
+Defined in: [jwt/rsa.ts:17](https://github.com/konker/konker.dev/blob/main/packages/neverthrow-r-auth-utils/src/jwt/rsa.ts#L17)
