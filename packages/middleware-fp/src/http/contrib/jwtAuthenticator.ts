@@ -16,7 +16,7 @@ export const JwtAuthenticatorDeps = Context.GenericTag<JwtVerificationConfig>('J
 
 // FIXME: extract these WithUserId types into common def
 export type WithUserId = {
-  readonly userId: string | undefined;
+  readonly userId: string;
 };
 
 // --------------------------------------------------------------------------
